@@ -1,5 +1,4 @@
 ﻿# Template project for using the C# version of SableCC
-by Aavild
 
 ## Index
 
