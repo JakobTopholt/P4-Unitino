@@ -1,0 +1,22 @@
+$ param package = @package
+$ param dest_dir='.', target_build
+$ param basedir=$dest_dir
+
+$ include 'nodes.xss'
+$ include 'tokens.xss'
+$ include 'prods.xss'
+$ include 'analysis.xss'
+$ include 'lexer.xss'
+$ include 'parser.xss'
+$ include 'utils.xss'
+
+$ call make_nodes()
+$ call make_tokens()
+$ call make_prods()
+$ call make_analysis()
+$ call make_lexer()
+$ call make_parser()
+$ if $target_build
+$   call make_utils()
+$ end
+

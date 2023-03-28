@@ -1,0 +1,157 @@
+$ template make_analysis()
+
+$ // Generate the analysis.py file 
+############################# analysis.py #############################################
+
+class Analysis(object):
+    def __init__(self):
+        self._in_ = None
+        self._out_ = None
+
+    def getIn(self, node):
+        if (self._in_ == None):
+            return None
+            
+        if self._in_.has_key(node):
+            return self._in_[node]
+        else:
+            return None
+
+    def setIn(self, node, _in_):
+        if(self._in_ == None):
+            self._in_ = dict()
+
+        if not(_in_ == None):
+            self._in_[node] = _in_
+        else:
+            if self._in_.has_key(node):
+                del self._in_[node]
+
+    def getOut(self, node):
+        if(self._out_ == None):
+            return None
+            
+        if self._out_.has_key(node):
+            return self._out_[node]
+        else:
+            return None
+
+    def setOut(self, node, _out_):
+        if(self._out_ == None):
+            self._out_ = dict()
+
+        if not(_out_ == None):
+            self._out_[node] = _out_
+        else:
+            if self._out_.has_key(node):
+                del self._out_[node]
+
+    def caseStart(self, node):
+        self.defaultCase(node)
+
+$ foreach {//alt}
+    def case@ename(self, node):
+        self.defaultCase(node)
+        
+$ end
+
+$ foreach {//token}
+    def case@ename(self, node):
+        self.defaultCase(node)
+        
+$ end
+    def caseEOF(self, node):
+        self.defaultCase(node)
+
+    def defaultCase(self, node):
+		pass
+
+class DepthFirstAdapter(Analysis):
+    def inStart(self, node):
+        self.defaultIn(node)
+
+    def outStart(self, node):
+        self.defaultOut(node)
+
+    def defaultIn(self, node):
+        pass
+
+    def defaultOut(self, node):
+	    pass
+
+    def caseStart(self, node):
+        self.inStart(node)
+        node.get${/parser/prods/prod/@ename}().apply(self)
+        node.getEOF().apply(self);
+        self.outStart(node)
+
+$ foreach {//alt}
+    def in@ename(self, node):
+        self.defaultIn(node)
+
+    def out@ename(self, node):
+        self.defaultOut(node)
+
+    def case@ename(self, node):
+        self.in@ename(node)
+$   foreach {elem}
+$     if @is_list
+        temp = node.get@ename()
+        for item in temp:
+            item.apply(self)
+$     else
+        if not(node.get@ename() == None):
+            node.get@ename().apply(self)
+$     end
+$   end foreach
+        self.out@ename(node)
+        
+$ end foreach
+
+$ // Generate the ReversedDepthFirstAdapter class 
+
+class ReversedDepthFirstAdapter(Analysis):
+    def inStart(self, node):
+        self.defaultIn(node)
+
+    def outStart(self, node):
+        self.defaultOut(node)
+
+    def defaultIn(self, node):
+        pass
+
+    def defaultOut(self, node):
+        pass
+
+    def caseStart(self, node):
+        self.inStart(node)
+        node.getEOF().apply(self)
+        node.get${/parser/prods/prod/@ename}().apply(self)
+        self.outStart(node)
+
+$ foreach {//alt}
+    def in@ename(self, node):
+        self.defaultIn(node)
+
+    def out@ename(self, node):
+        self.defaultOut(node)
+
+    def case@ename(self, node):
+        self.in@ename(node)
+$   foreach {reverse(elem)}
+$     if @is_list
+        temp = node.get@ename()
+        temp.reverse()
+        for item in temp:
+            item.apply(self)
+$     else
+        if (node.get@ename() != None):
+            node.get@ename().apply(self)
+$     end if
+$   end foreach
+        self.out@ename(node)
+        
+$ end foreach
+
+$ end template
+

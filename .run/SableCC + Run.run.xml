@@ -1,0 +1,7 @@
+﻿<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="SableCC + Run" type="CompoundRunConfigurationType">
+    <toRun name="Run" type="DotNetProject" />
+    <toRun name="SableCC" type="ShConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>

@@ -1,0 +1,9 @@
+The goal of the most Resolve*.java classes is essentially the semantic checks 
+of the grammar.
+
+-- ResolveIds.java : It performs the semantic checks of Productions section.
+		     It was the only classes in SableCC2.x.x which performs
+		     this job.
+		     Now, for SableCC3.x.x, this class is still performing
+		     his previous job, but it also construct symbol tables
+		     for other Resolve classes.

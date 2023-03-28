@@ -1,0 +1,58 @@
+
+New sablecc syntax:
+  sablecc [-c cache.file] [--no-inline] [-d destination] [-t target|file.xss[,..]] \
+     [-p key value] [-o path] filename [filename]...
+
+This file describes the alternative generation system usage.
+Currently available language targets and parameters:
+
+Java (copies the original SableCC backend, should be the same except .dat files)
+  java
+  java-build
+    - package = <default from grammar file>
+    - src = '.'
+C++ (by Indrek Mandre)
+  cxx
+  cxx-build
+    - package = <default from grammar file> - namespace in C++
+C# (basically copies Java)
+  csharp
+  csharp-build
+    - package = <default from grammar file>
+O'Caml (by Patrick Lam)
+  ocaml
+  ocaml-build
+    - package = <default from grammar file>
+C (by Indrek Mandre)
+  c
+  c-build
+    - lots of arguments, see src/org/sablecc/sablecc/xss2/data/c/README
+Python (by Fidel Viegas)
+  python
+  python-build
+XML (by Indrek Mandre)
+  xml
+Graphviz's DOT graph visualization (by Indrek Mandre)
+  dotgraph-simple
+      Will generate a simple non-repeated DAG
+  dotgraph-tree
+      Will generate a DAG but repeat productions unless they are
+      already specified up the tree (no recursion, DAG)
+  dotgraph-graph
+      Will generate a true graph.
+
+For example to generate java parser with source files under src/
+directory and also generate the build.xml and README.parser files
+run following:
+
+  % sablecc -t java,java-build -p src src grammar-file.sablecc3
+
+In practical development process one might choose to generate
+the build systems only once and later modify those by hand.
+See individual README.parser files for more information in the
+generated parser source tree.
+
+- Caching (-c)
+The new sablecc's -c option is currenly mostly useful for xss
+writers/developers as grammar analysis is skipped.
+

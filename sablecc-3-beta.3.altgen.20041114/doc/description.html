@@ -1,0 +1,334 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<!--Converted with LaTeX2HTML 97.1 (release) (July 13th, 1997)
+ by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippman, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Description of CST-&gt;AST transformations in SableCC3 </TITLE>
+<META NAME="description" CONTENT="Description of CST-&gt;AST transformations in SableCC3 ">
+<META NAME="keywords" CONTENT="description">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso_8859_1">
+<LINK REL="STYLESHEET" HREF="description.css">
+</HEAD>
+<BODY >
+<H1 ALIGN="CENTER">
+<DIV ALIGN="CENTER">
+<P>
+Description of CST-&gt;AST transformations in SableCC3
+<P></DIV>
+<P></H1>
+<P ALIGN="LEFT"></P>
+<P>
+<BR>
+<H2><A NAME="SECTION00100000000000000000">
+Contents</A>
+</H2>
+<!--Table of Contents-->
+<UL>
+<LI><A NAME="tex2html16"
+ HREF="description.html#SECTION00100000000000000000">
+Contents</A>
+<LI><A NAME="tex2html17"
+ HREF="description.html#SECTION00600000000000000000">
+Index</A>
+</UL>
+<!--End of Table of Contents-->
+<H1><A NAME="SECTION00200000000000000000">
+INTRODUCTION</A>
+</H1>
+<P>
+What has been changed?
+<P><UL>
+<LI> Addition of a new section called Abstract Syntax Tree.
+<LI> New syntax for transformations specification.
+<LI> SableCC3 provides support for SableCC2 grammars.
+</UL>
+<P>
+To be able to benefit of AST transformations in SableCC, it is necessary to add a new <B>Abstract Syntax Tree</B> section's to the grammar.
+This section must be placed after the Productions section's. It contains the grammar of the Abstract Syntax Tree, so all the Nodes in this tree are instances of classes generated using this part of the grammar. In this new section, the syntax of productions(ast_prod) is the same as in the section <B>Productions</B> of SableCC2 grammars. All the classes used to represent this tree are generated using the productions specified in this new section.
+<BR>
+A typical grammar of SableCC3 should contains these following sections :
+<UL>
+<LI> helpers
+<LI> Tokens
+<LI> Ignored Tokens
+<LI> Productions and
+<LI> Abstract Syntax Tree.
+</UL>
+All these sections as it is specified in the SableCC3's grammar are optional.
+<P><H1><A NAME="SECTION00300000000000000000">
+<IMG WIDTH="14" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img1.gif"
+ ALT="$\cal{I}$"> - TRANSFORMATIONS</A>
+</H1>
+<P>
+Transformations
+<P>
+They are specified in the section Productions. Two intrinsically bound transformation's actions are needed to perform :
+<UL>
+<LI> - the first is a for the production itself
+<LI> - and the second is for alternatives of this production
+</UL><H1><A NAME="SECTION00310000000000000000">
+1.1 - Transformation of the production</A>
+</H1>
+<P>
+A production is transformed in one or several AST productions or tokens.
+<P>
+Such a transformation looks like :
+<BR>
+<UL>
+<LI> production -&gt; prod_transform1 prod_transform2* prod_transform3 ... prod_transformN = element1 element2 element3 ... elementN <BR>
+		 -&gt; alt_transform1 alt_transform2 alt_transform3 ... alt_transformN
+</UL>
+where prod_transformation1, prod_transformation2, ..., prod_transformationN are AST productions or Tokens. The existence of the operator * indicates that it is a list of this element and not just the element itself.
+<BR>
+(Note : <B>{-&gt;</B> is a token constitued by two other tokens : left brace and an arrow. space(more precisely blank) caracters are not allowed between these two tokens. )
+During the parsing time of this mini grammar's compliant program, at the reduction phase of the alternative below, instead of constrcuting a traditional production node, the parser will constrcut the following items :
+<UL>
+<LI> a node of type prod_transform1,
+<LI> a homogeneous list containing elements of type prod_transform2,
+<LI> a node of type prod_transform3
+<LI> ...(a type prod_transformi node or list of type prod_transformi node depending on the presence of * operator or not.)
+<LI> and finally a node of type prod_transformN.
+</UL><H1><A NAME="SECTION00320000000000000000">
+1.2 - Transformation of alternatives</A>
+</H1>
+<P>(Note: In order to use SableCC grammar terminology, we will refer to : <B>element</B> for transformations of one production and <B>term</B> for tranformations of an alternative.)
+<BR>
+<P>
+The transformation of an alternative is guided by the transformation of the production :
+<UL>
+<LI> the number of terms and the number of elements should be the same.
+<LI> the type of these terms shoud also correspond to the type of elements of the production.
+</UL>
+<P>
+If we look at our example of production in the paragraph 2.1, it means that : 
+<UL>
+<LI> prod_transform1 should be the same type that alt_transform1,
+<LI> prod_transform2 should be the same type that alt_transform2 
+   and so forth for all another ones until prod_transformN.
+</UL>
+<P>(Note: When we say that prod_transform1 is the same type as alt_transform1, that means :alt_transform1 are one of the alternatives of the production prod_transform1 or alt_transform1 and prod_transform1 can match the same token).
+<BR>
+<P>
+There are four types of terms for the transformation of an alternative: 
+<UL>
+<LI> 1 - Getting an already existing element :: ident
+<LI> 2 - New  alternative (New production[.nameofalternative]) :: creation of a new node
+<LI> 3 - List creation (elem1 elem2 ... ) :: creation of a homogeneous list of terms
+<LI> 4 - Elimination (Null) :: used in general to replace an element or to eliminate the effect of another one.
+<LI> 5 - Empty transformation :: used in general to get ride of all the the subtree
+</UL>
+<P>
+In order to describe with more precise manner these terms, let use one example of SableCC3 grammar with transformations.
+<BR>
+This example can be found in appendix of this document.
+<BR>
+<P><H2><A NAME="SECTION00321000000000000000">
+1.2.1 - Getting an already existing element (exp_list_tail -&gt; exp = comma exp   -&gt; exp;)</A>
+</H2>
+<P>
+In the production <B>exp_list_tail</B>, we have an alternative with two elements: <B>comma</B> and <B>exp</B>. In the transformation of this alternative, we only keeps the element exp. Here, we are just taking an already existing element of the tree. <BR>
+Notice that the production exp_list_tail is supposed to change to exp, and the term of the transformation of alternative is also an exp. Therefore the concordance of type is respected.
+<BR>
+In the production <B>factor</B>, if we look at the grammar, we realize that <B>term</B> is itself a production that is transformed to <B>exp</B>. It means that in our tree, all the <B>term</B> are transformed to <B>exp</B>. Hence, &quot;term.exp&quot; refers to the element &quot;exp&quot; which already replace production <B>term</B>; so term.exp is not an element of type <B>term</B> but an element of type <B>exp</B>. That makes us once again respect the required concordance of type.
+<P><H2><A NAME="SECTION00322000000000000000">
+1.2.2 - New  alternative (exp = (plus) exp plus factors -&gt; New exp.plus(exp, factor.exp);) </A>
+</H2>
+<P>
+The syntax is: <BR>
+<B>New</B> following by the appropriate name the alternative of the production. If the alternative carries an explicitly specified name between  like nameofalternative, the syntax must be:
+<B>New nameofproduction.nameofalternative (parameters)</B>, otherwise 
+<B>New nameofproduction (parameters)</B>. In this case, nameofproduction and nameofalternatives are similar.
+<BR>
+nameofproduction must be the name of a definite production in the AST section. And parameters must be describe as :
+<BR>
+<PRE>
+	    parameter1, parameter2, parameter3,... .
+</PRE>
+In the case of the transformation 2(see Appendix), exp.plus refers to the alternative <B>{plus} [l]:exp [r]:exp</B> of production <B>exp</B> that state in the Abstract Syntax Tree section. This alternative is composed of two elements which types are <B>exp</B>. It is why for parameters of <B>New exp.plus()</B>, we have <B>exp</B> and <B>factor.exp</B> which are two elements of type exp.
+<BR>
+<P><H2><A NAME="SECTION00323000000000000000">
+1.2.3 - List creation (exp_list -&gt; exp* = exp exp_list_tail -&gt; (exp_list_tail.exp exp);)</A>
+</H2>
+<P>
+To construct a list elements, the syntax used is <B>(elem1 elem2 elem3... elemN)</B>, where elem1 ... elemN are all elements of the same type.
+<BR>
+In production <B>exp_list</B>, <B>(exp_list_tail.exp exp)</B> is a list of exp. exp_list_tail.exp represents an exp type's element; because exp_list_tail is transformed to exp.
+<BR>
+<P><H2><A NAME="SECTION00324000000000000000">
+1.2.4 - Elimination (Null).</A>
+</H2>
+<P>
+In the grammar in appendix, there is no such transformation. To make an illustration, we can modify one of alternatives. For example we can transform the production <B>exp</B> of section Productions to :
+<PRE>
+   exp = {plus} exp  plus factor  {-&gt; New exp.plus(exp, factor.exp)} |
+         {minus} exp minus factor {-&gt; New exp.minus(exp, Null)}      |
+	 {factor} factor	  {-&gt; factor.exp };
+</PRE>
+<P>
+It means that we don't keep the term factor anymore in the alternative minus. Null is an element that is compatible with all types except lists. So it can be used everywhere an element is needed. If a empty list is needed, just used this : ().
+<BR>
+<P><H2><A NAME="SECTION00325000000000000000">
+1.2.5 - Empty transformation.</A>
+</H2>
+<P><PRE>
+   exp_list_tail {-&gt; } = comma exp {-&gt; };
+</PRE>
+<P>
+There is a difference between empty and Null transformation :
+<BR>
+in the case of null transformation (exp_list_tail -&gt; exp = comma exp -&gt; Null), the corresponding node can still be accessed by writing <B>exp_list_tail.exp</B> even if the associated node contains null reference. That is <B>exp_list_tail.exp</B> is an expression type element but it contains null reference.
+<BR>
+But in the case of empty transformation, one just get rid of the production. exp_list_tail cannot be accessed anymore.
+<BR>
+<P><H1><A NAME="SECTION00330000000000000000">
+1.3 - Implicit transformations</A>
+</H1>
+<P>
+When transformation is not specified in the grammar, an implicit transformation is introduced by the parser either for productions and alternatives.
+     Example: A production like
+<UL>
+<LI> production = elem1 elem2 * elem3+ elem4?; is transformed to
+<LI> production -&gt; production = elem1 elem2 * elem3+ elem4? -&gt; New production(elem1, (elem2), (elem3), elem4); 
+</UL>
+This implicit kind of transformation is always done for all productions and alternatives with no explicit transformations.
+<BR>
+<P><H1><A NAME="SECTION00400000000000000000">
+<IMG WIDTH="26" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img2.gif"
+ ALT="$\cal{II}$"> - Limits</A>
+</H1>
+<P><DL COMPACT>
+<DT>1.
+<DD>*** For the specification of transformations, the first production of Productions' sections shoulb be transformed to the first production of the AST section. In our example(see appendix), we should have :
+<BR>
+grammar -&gt; grammar, what is seen to be the case because <BR>
+grammar = elems ... is transformed in <BR>
+grammar -&gt; grammar = elems ... by the parser. <BR>
+<P><DT>2.
+<DD>*** The only authorized operator in the transformation of a production(element) is *.
+<BR>
+exp_list -&gt; exp* is a correct form but not <BR>
+exp_list -&gt; exp? nor <BR>
+exp_list -&gt; exp+ which can also be expressed by <BR>
+exp_list -&gt; exp*.
+<BR>
+<P><DT>3.
+<DD>*** It is prohibited to create list of heteregeneous elements. For example, if we have this productions :
+<BR>
+exp_list -&gt; exp* = exp exp_list_tail* -&gt; (exp exp_list_tail.exp);
+<BR>
+exp_list_tail -&gt; exp sharp = comma exp sharp -&gt; exp sharp;
+<BR>
+The problem here is about the transformation of <B>exp_list_tail</B>. This production is transformed to more than one elements. And in the unique alternative of production <B>exp_list</B>, it appears to be a list. Since SableCC lists are homogeneous, we made the arbitrary decision to not support this kind of thing.
+<P><DT>4.
+<DD>*** In transformations of alternative, an element with an operator * or + can only be referred to in a list transformation.
+ For example :
+<BR>
+prod -&gt; elem = elem1 elem* -&gt; elem; is not correct even if the concordance type is still respected.
+<BR>
+It should rather be :
+<BR>
+prod -&gt; elem* = elem1 elem* -&gt; (elem);
+</DL><H1><A NAME="SECTION00500000000000000000">
+Appendix</A>
+</H1>
+<P><PRE>
+Package expression;
+
+Helpers
+
+    digit = ['0' .. '9'];
+    tab = 9;
+    cr = 13;
+    lf = 10;
+    eol = cr lf | cr | lf; // This takes care of different platforms
+
+    blank = (' ' | tab | eol)+;
+
+Tokens
+    l_par = '(';
+    r_par = ')';
+    plus = '+';
+    minus = '-';
+    mult = '*';
+    div = '/';
+    comma = ',';
+
+    blank = blank;
+    number = digit+;
+
+
+Ignored Tokens
+
+    blank;
+
+Productions
+
+    grammar   =  exp_list {-&gt; New grammar((exp_list.exp))};
+
+    exp_list {-&gt; exp*} = exp exp_list_tail*  {-&gt; (exp exp_list_tail.exp)};
+
+    exp_list_tail {-&gt; exp} = comma exp {-&gt; exp};
+
+    exp = {plus}   exp plus factor  {-&gt; New exp.plus(exp, factor.exp)  } |
+          {minus}  exp minus factor {-&gt; New exp.minus(exp, factor.exp) } |
+          {factor} factor {-&gt; factor.exp};
+
+
+    factor {-&gt; exp} = {mult}      factor mult term {-&gt; New exp.mult(factor.exp, term.exp )} |
+                      {div}       factor div term  {-&gt; New exp.div(factor.exp, term.exp ) } |
+                      {term}      term 		   {-&gt; term.exp};
+
+    term {-&gt; exp} = {number}   number {-&gt; New exp.number(number)} |
+           	    {exp}      l_par exp r_par {-&gt;  exp};
+
+
+Abstract Syntax Tree
+
+    exp = {plus}   [l]:exp [r]:exp |
+	  {minus}  [l]:exp [r]:exp |
+	  {div}    [l]:exp [r]:exp |
+	  {mult}   [l]:exp [r]:exp |
+	  {number} number;
+</PRE>
+<P>
+Appendix
+<P>
+<BR>
+<H2><A NAME="SECTION00600000000000000000">
+Index</A>
+</H2><DL COMPACT>
+<P></DL>
+<H1><A NAME="SECTION00700000000000000000">
+About this document ... </A>
+</H1> 
+ <STRONG>
+<DIV ALIGN="CENTER">
+<P>
+Description of CST-&gt;AST transformations in SableCC3
+<P></DIV>
+<P></STRONG><P>
+This document was generated using the
+<A HREF="http://www-dsed.llnl.gov/files/programs/unix/latex2html/manual/"><STRONG>LaTeX</STRONG>2<tt>HTML</tt></A> translator Version 97.1 (release) (July 13th, 1997)
+<P>
+Copyright &#169; 1993, 1994, 1995, 1996, 1997,
+<A HREF="http://cbl.leeds.ac.uk/nikos/personal.html">Nikos Drakos</A>, 
+Computer Based Learning Unit, University of Leeds.
+<P>
+The command line arguments were: <BR>
+ <STRONG>latex2html</STRONG> <tt>-no_navigation -split 0 description.tex</tt>.
+<P>
+The translation was initiated by Agbakpem Komivi on 5/23/2003
+<BR><HR>
+<ADDRESS>
+<I>Agbakpem Komivi</I>
+<BR><I>5/23/2003</I>
+</ADDRESS>
+</BODY>
+</HTML>

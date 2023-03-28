@@ -1,0 +1,283 @@
+$ template make_parser()
+$
+$ // generate the parser.py
+############################# parser.py #############################################
+
+class ParserException(Exception):
+    def __init__(self, token, value):
+        self.value = value
+        self.token = token
+
+    def getToken(self):
+        return self.token
+
+    def __str__(self):
+        return self.value
+        
+class State(object):
+    def __init__(self, state, nodes):
+        self.state = state
+        self.nodes = nodes
+
+# parser actions
+ACTION_SHIFT = 0
+ACTION_REDUCE = 1
+ACTION_ACCEPT = 2
+ACTION_ERROR = 3
+        
+$ foreach {rules/rule}
+def new@index(self):
+    nodeList = list()
+$   foreach {action}
+$   choose
+$     when {@cmd='POP'}
+    @result = self.pop()
+$     end
+$     when {@cmd='FETCHLIST'}
+    @result = @from[@index]
+$     end
+$     when {@cmd='FETCHNODE'}
+    @result = @from[@index]
+$     end
+$     when {@cmd='ADDNODE'}
+    if (@node != None):
+        @tolist.append(@node)
+$     end
+$     when {@cmd='ADDLIST'}
+    if (@fromlist != None):
+        @tolist.extend(@fromlist)
+$     end
+$     when {@cmd='MAKELIST'}
+    @result = list()
+$     end
+$     when {@cmd='MAKENODE'}
+    @result = @etype([-foreach {arg}-][-if @null-]None[-sep ','-][-else-]${.}[-sep ','-][-end if-][-end foreach-])
+$     end
+$     when {@cmd='RETURNNODE'}
+$       if @null
+    nodeList.append(None)
+$       else
+    nodeList.append(@node)
+$       end
+$     end
+$     when {@cmd='RETURNLIST'}
+    nodeList.append(@list)
+$     end
+$   end choose
+$   end foreach
+    return nodeList, @leftside[-if {not(/parser/@inlined)}-][-if {not(contains(@ename, "$"))}-], True[-else-], False[-end if-][-end if-]
+
+$ end foreach
+newnode = [
+$  foreach {rules/rule}
+  new@index[-sep ','-]
+$  end foreach
+]
+
+actionTable = [
+$ foreach {parser_data/action_table/row}
+                [
+$   foreach {action}
+                  [@from, @action, @to],
+$   end foreach
+                ],
+$ end foreach
+              ]
+
+parser_gotoTable = [
+$ foreach {parser_data/goto_table/row}
+                     [
+$   foreach {goto}
+                       [@from, @to],
+$   end foreach
+                     ],
+$ end foreach
+                   ]
+    
+errorMessages = [
+$ foreach {parser_data/error_messages/msg}
+                  "${sablecc:string2escaped_unicode(.)}",
+$ end
+                ]
+    
+errors = [
+           [-foreach {parser_data/errors/i}-]${.}, [-end-]
+         ]
+                                   
+class Parser(object):
+    def __init__(self, lexer):
+        self.lexer = lexer
+$ if {not(@inlined)}
+        self.nodeList = None
+$ end if
+        self.stack = Stack()
+     
+$ if {not(@inlined)}
+    def filter(self):
+        pass
+
+$ end if
+    def goTo(self, index):
+        state = self.state()
+        low = 1
+        high = len(parser_gotoTable[index]) - 1
+        value = parser_gotoTable[index][0][1]
+
+        while (low <= high):
+            middle = (low + high) / 2
+
+            if (state < parser_gotoTable[index][middle][0]):
+                high = middle - 1
+            elif (state > parser_gotoTable[index][middle][0]):
+                low = middle + 1
+            else:
+                value = parser_gotoTable[index][middle][1]
+                break
+
+        return value
+
+    def push(self, numstate, listNode):
+        self.stack.push(State(numstate, listNode))
+
+    def state(self):
+        return self.stack.peek().state
+
+    def pop(self):
+        return self.stack.pop().nodes
+
+    def parse(self):
+        self.push(0, None)
+        lexer = self.lexer
+        last_shift = 0
+        last_pos = 0
+        last_line = 0
+        last_token = None
+        action = [0,0]
+$ if {not(@inlined)}        
+        ign = None
+$ end if
+        
+        while 1:
+$ if {not(@inlined)}
+            token = lexer.peek()
+            while (token.TokenIndex == -1):
+                if(ign == None):
+                    ign = list()
+                token = lexer.next()
+                ign.append(token)
+                
+            token = lexer.peek()            
+            
+            if(ign != None):
+                ignoredTokens.setIn(token, ign)
+                ign = None
+                
+$ else
+            while (lexer.peek().TokenIndex == -1):
+                lexer.next()
+
+            token = lexer.peek()
+$ end if            
+            last_pos = token.getPos()
+            last_line = token.getLine()
+            last_token = token
+
+            index = token.TokenIndex
+            action[0] = actionTable[self.state()][0][1]
+            action[1] = actionTable[self.state()][0][2]
+
+            low = 1
+            high = len(actionTable[self.state()]) - 1
+
+            while (low <= high):
+                middle = (low + high) / 2
+
+                if (index < actionTable[self.state()][middle][0]):
+                    high = middle - 1
+                elif (index > actionTable[self.state()][middle][0]):
+                    low = middle + 1
+                else:
+                    action[0] = actionTable[self.state()][middle][1]
+                    action[1] = actionTable[self.state()][middle][2]
+                    break
+
+            if (action[0] == ACTION_SHIFT):
+$ if {@inlined}
+                nodeList = list()
+                nodeList.append(lexer.next())
+                self.push(action[1], nodeList)
+$ else
+                self.nodeList = list()
+                self.nodeList.append(lexer.next())
+                self.filter()                
+                self.push(action[1], self.nodeList)
+$ end if
+                last_shift = action[1]
+            elif (action[0] == ACTION_REDUCE):
+                if (action[1] >= 0 and action[1] <= ${count(rules/rule)-1}):
+$ if {/parser/@inlined}
+                    nodeList, leftside = newnode[action[1]](self)
+                    self.push(self.goTo(leftside), nodeList)
+$ else
+                    self.nodeList, leftside, should_filter = newnode[action[1]]()
+                    self.push(self.goTo(leftside), self.nodeList)
+                                        
+                    if should_filter:
+                        self.filter()
+$ end if
+            elif (action[0] == ACTION_ACCEPT):
+                node2 = lexer.next()
+                node1 = self.pop()[0]
+                node = Start(node1, node2)
+                return node
+            elif (action[0] == ACTION_ERROR):
+                raise ParserException(last_token, "[" + str(last_line) + "," + str(last_pos) + "] " + errorMessages[errors[action[1]]])
+    
+    def unescape (self, s):
+        _out_ = StringBuffer()
+      
+        for i in range(len(s)):
+            c = s[i]
+
+            if (c == '\\'):
+                if ((i + 1) < len(s)):
+                    i += 1
+                    if (s[i] == 'n'):
+                        _out_.append ("\n")
+                    elif (s[i] == 'r'):
+                        _out_.append("\r")
+                    elif (s[i] == '"'):
+                        _out_.append ("\"");
+                    elif (s[i] == '\\'):
+                        _out_.append ("\\");
+                    elif (s[i] == '0'):
+                        if (s[i:].startswith("000")):
+                            _out_.append("\000")
+                            i += 2
+                        else:
+                            _out_.append ("\\")
+                            _out_.append(s[i])
+                    elif (s[i] == 'u'):
+                        hstr = s[i+1:(i + 5)]
+                    
+                        if (len(hstr) == 4):
+                            try:
+                                _out_.append(unichr(int(hstr, 16)))
+                                i += 5
+                            except ValueError:
+                                _out_.append("\\")
+                                _out_.append(s[i])
+                        else:
+                            _out_.append("\\")
+                            _out_.append(s[i])
+                    else:
+                        _out_.append("\\")
+                        _out_.append(s[i])
+                else:
+                    _out_.append(c)
+            else:
+                _out_.append(c)
+              
+        return str(_out_)
+
+$ end template

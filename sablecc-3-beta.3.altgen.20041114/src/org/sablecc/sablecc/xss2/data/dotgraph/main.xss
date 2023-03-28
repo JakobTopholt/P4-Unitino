@@ -1,0 +1,87 @@
+$ // Whether to do DAG(tree) or not 
+$ param target_simple, target_tree, target_graph
+$
+$ // This is a recursive template applied on productions 
+$ template tree(prod = '')
+  $prod [shape=diamond,label="@name"]
+$   foreach {alt}
+$     set alt = $prod + '_alt_' + @ename
+  $alt [shape=box,label="${../@name}.@name"]
+  $prod -> $alt
+$     foreach enode in {elem}
+$       set elem = $alt + '_' + @ename
+$       if {@is_token}
+  $alt -> $elem [label="@name@modifier"]
+  $elem [shape=ellipse,label="@type"]
+$       else
+$         if {not(contains(concat('_',$prod,'_'), concat('_',@etype,'_')))}
+$           foreach {//prod[@ename=$enode/@etype]}
+$             set subtree = $elem + '_' + @ename
+  $alt -> $subtree [label="${$enode/@name}${$enode/@modifier}"]
+$             call tree(prod = $subtree)
+$           end
+$         else
+  $alt -> $elem [label="@name@modifier"]
+  $elem [shape=triangle,label="@type"]
+$         end if
+$       end if
+$     end foreach
+$   end foreach
+$ end template
+$
+$ template simple(prod = '')
+  $prod [shape=diamond,label="@name"]
+$   foreach {alt}
+$     set alt = $prod + '_alt_' + @ename
+  $alt [shape=box,label="${../@name}.@name"]
+  $prod -> $alt
+$     foreach enode in {elem}
+$       set elem = $alt + '_' + @ename
+$       if {@is_token}
+  $alt -> $elem [label="@name@modifier"]
+  $elem [shape=ellipse,label="@type"]
+$       else
+$         if {not(sablecc:toggle('dotgraph', @etype))}
+$           set subtree = $elem + '_' + @ename
+  $alt -> $subtree [label="@name@modifier"]
+$           foreach {//prod[@ename=$enode/@etype]}
+$             call simple(prod = $subtree)
+$           end
+$         else
+  $alt -> $elem [label="@name@modifier"]
+  $elem [shape=triangle,label="@type"]
+$         end if
+$       end if
+$     end foreach
+$   end foreach
+$ end template
+$
+digraph mygraph {
+$ choose
+$   when $target_simple
+$     foreach {//prod[position()=1]}
+$       call simple(prod = @ename)
+$     end foreach
+$   end when
+$   when $target_tree
+$     foreach {//prod[position()=1]}
+$       call tree(prod = @ename)
+$     end foreach
+$   end when
+$   when $target_graph
+$     foreach {//prod}
+  @ename [shape=diamond,label="@name"]
+$       foreach {alt}
+  @ename [shape=box,label="${../@name}.@name"]
+  ${../@ename} -> @ename
+$         foreach {elem}
+  ${../@ename} -> @etype [label="@name@modifier"]
+$           if {@is_token}
+  @etype [shape=ellipse,label="@type"]
+$           end if
+$         end foreach
+$       end foreach
+$     end foreach
+$     end when
+$ end choose
+}

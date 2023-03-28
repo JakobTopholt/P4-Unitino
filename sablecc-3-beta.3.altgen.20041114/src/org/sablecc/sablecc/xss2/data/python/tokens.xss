@@ -1,0 +1,107 @@
+$ template make_tokens()
+class Token(Node):
+    def __init__(self):
+        super(Token, self).__init__()
+        self.text = None
+        self.line = 0
+        self.pos = 0
+
+    def getText(self):
+        return self.text
+
+    def setText(self, text):
+        self.text = text
+
+    def getLine(self):
+        return self.line
+
+    def setLine(self, line):
+        self.line = line
+
+    def getPos(self):
+        return self.pos
+
+    def setPos(self, pos):
+        self.pos = pos
+
+    def __str__(self):
+        return self.text + " "
+    
+    def removeChild(self, child):
+        pass
+      
+    def replaceChild(self, oldChild,  newChild):
+        pass
+      
+$ // Generate all fixed token files 
+$ foreach {//token[@text]}
+
+class @ename(Token):
+$   if {@parser_index}
+    TokenIndex = @parser_index
+    
+$   else
+    TokenIndex = -1
+        
+$   end if
+    def __init__(self, line=0, pos=0):
+        super(@ename, self).__init__()
+        super(@ename, self).setText("${sablecc:string2escaped_unicode(@text)}")
+        self.setLine(line)
+        self.setPos(pos)
+
+    def clone(self):
+      return @ename(self.getLine(), self.getPos())
+
+    def __copy__(self):
+        return self.clone()
+        
+    def apply(self, analysis):
+        analysis.case@ename(self)
+
+    def setText(self, text):
+        raise RuntimeError("Cannot change @ename text.")
+
+$ end foreach
+
+$ // Generate all variable token files 
+$ foreach {//token[not(@text)]}
+class @ename(Token):
+$   if {@parser_index}
+    TokenIndex = @parser_index
+    
+$   else
+    TokenIndex = -1
+        
+$   end if
+    def __init__(self, text, line=0, pos=0):
+        super(@ename, self).__init__()    
+        self.setText(text)
+        self.setLine(line)
+        self.setPos(pos)
+        
+    def clone(self):
+      return @ename(self.getText(), self.getLine(), self.getPos())
+
+    def apply(self, analysis):
+       analysis.case@ename(self)
+      
+$ end foreach
+
+$ // Generate the EOF Token class
+class EOF(Token):
+    TokenIndex = ${tokens/eof/@parser_index}
+
+    def __init__(self, line=0, pos=0):
+        super(EOF, self).__init__()    
+        self.setText("")
+        self.setLine(line)
+        self.setPos(pos)
+
+    def clone(self):
+        return EOF(self.getLine(), self.getPos())
+
+    def apply(self, analysis):
+        analysis.caseEOF(self)
+
+$ end template

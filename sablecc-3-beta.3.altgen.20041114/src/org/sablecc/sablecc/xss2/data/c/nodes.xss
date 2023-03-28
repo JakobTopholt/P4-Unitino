@@ -1,0 +1,270 @@
+
+static int token2index[${count(tokens/token) + 1}] = {
+$ foreach {tokens/token}
+  [-if @parser_index-]@parser_index[-else-]-1[-end-],
+$ end foreach
+  ${tokens/eof/@parser_index} /* TEOF */
+};
+
+#define NODES_ALLOC $nodes_alloc
+#define TOKENCHUNK_ALLOC $tokens_alloc
+
+struct freelist;
+struct freelist
+{
+  struct freelist *next;
+};
+
+struct datalist;
+struct datalist
+{
+  struct datalist *next;
+  $nodes nodes[NODES_ALLOC];
+};
+
+struct tokenlist;
+struct tokenlist
+{
+  struct tokenlist *next;
+  char data[0];
+};
+
+$pools
+{
+  struct freelist *free_list;
+  struct datalist *data_list;
+  struct tokenlist *token_list;
+  char *token_begin;
+  int token_left;
+};
+
+$pools *${$prefix_function}pool_create ()
+{
+  $pools *ret = $malloc (sizeof ($pools));
+  ret->free_list = 0;
+  ret->data_list = 0;
+  ret->token_list = 0;
+  ret->token_begin = 0;
+  ret->token_left = 0;
+  return ret;
+}
+
+void ${$prefix_function}pool_destroy ($pools *pool)
+{
+  while ( pool->data_list )
+    {
+      struct datalist *data = pool->data_list;
+      pool->data_list = pool->data_list->next;
+      $free (data);
+    }
+  while ( pool->token_list )
+    {
+      struct tokenlist *token = pool->token_list;
+      pool->token_list = pool->token_list->next;
+      $free (token);
+    }
+  $free (pool);
+}
+
+static void enlarge_pool_nodes ($pools *pool)
+{
+  struct datalist *data = $malloc (sizeof (struct datalist));
+  int i;
+
+  data->next = pool->data_list;
+  pool->data_list = data;
+  for ( i = 0; i < NODES_ALLOC; i++ )
+    {
+      struct freelist *fl = (struct freelist *)&data->nodes[i];
+      fl->next = pool->free_list;
+      pool->free_list = fl;
+    }
+}
+
+static $inline_keyword $nodes *quick_alloc_node ($pools *pool)
+{
+  if ( !pool->free_list ) enlarge_pool_nodes (pool);
+  struct freelist *ret = pool->free_list;
+  pool->free_list = ret->next;
+  return ($nodes *)ret;
+}
+
+
+static $inline_keyword void quick_node_free ($pools *pool, $nodes *node)
+{
+  struct freelist *fn = (struct freelist *)node;
+  fn->next = pool->free_list;
+  pool->free_list = fn;
+}
+
+static $inline_keyword char * quick_alloc_token ($pools *pool, int len)
+{
+  /* I wonder if this alignment is really necessary for strings, investigate, XXX */
+  /* if ( len%4 ) len += 4 - len%4; */
+  if ( len > TOKENCHUNK_ALLOC )
+    {
+      struct tokenlist *token = $malloc (sizeof (struct tokenlist) + len);
+      if ( pool->token_list )
+        {
+          token->next = pool->token_list->next;
+          pool->token_list->next = token;
+        }
+      else
+        {
+          token->next = 0;
+          pool->token_list = token;
+        }
+      return token->data;
+    }
+
+  if ( pool->token_left < len )
+    {
+      struct tokenlist *token = $malloc (sizeof (struct tokenlist) + TOKENCHUNK_ALLOC);
+      token->next = pool->token_list;
+      pool->token_list = token;
+      pool->token_begin = token->data;
+      pool->token_left = TOKENCHUNK_ALLOC;
+    }
+
+  char *ret = pool->token_begin;
+  pool->token_left -= len;
+  pool->token_begin += len;
+  return ret;
+}
+
+$nodes *${$prefix_function}node_alloc_dirty ($pools *pool)
+{
+  return quick_alloc_node(pool);
+}
+
+$nodes *${$prefix_function}node_alloc_token ($pools *pool, enum ${$prefix_type}node_type type, const char *value, int len)
+{
+  $nodes *ret = quick_alloc_node (pool);
+  ret->type = type;
+  ret->c.token.len = len;
+  if ( len )
+    {
+      char *str = quick_alloc_token (pool, len + 1);
+      memcpy (str, value, len);
+      str[len] = 0;
+      ret->c.token.value = str;
+    }
+  ret->c.token.line = ret->c.token.pos = 0;
+  ret->next = 0;
+  return ret;
+}
+
+$nodes *${$prefix_function}node_alloc ($pools *pool, enum ${$prefix_type}node_type type)
+{
+  $nodes *ret = quick_alloc_node (pool);
+  ret->type = type;
+  if ( ${$prefix_macro}NODE_IS_TOKEN(ret) )
+    {
+      ret->c.token.value = "";
+      ret->c.token.len = 0;
+      ret->c.token.line = ret->c.token.pos = 0;
+    }
+  else
+    {
+      memset (ret->c.node_array, 0, sizeof ($nodes*) * ${$prefix_macro}PRODUCTION_ELEM_COUNT(type));
+    }
+  ret->next = 0;
+  return ret;
+}
+
+$nodes *${$prefix_function}node_clone ($pools *pool, $nodes *what)
+{
+  if ( !what ) return 0;
+  $nodes *ret = quick_alloc_node (pool);
+  ret->type = what->type;
+  if ( ${$prefix_macro}NODE_IS_TOKEN(ret) )
+    {
+      ret->c.token.len = what->c.token.len;
+      char *str = quick_alloc_token (pool, what->c.token.len + 1);
+      memcpy (str, what->c.token.value, what->c.token.len + 1);
+      ret->c.token.value = str;
+      ret->c.token.line = what->c.token.line;
+      ret->c.token.pos = what->c.token.pos;
+    }
+  else
+    {
+      int i;
+      for ( i = 0; i < ${$prefix_macro}PRODUCTION_ELEM_COUNT(ret->type); i++ )
+          ret->c.node_array[i] = ${$prefix_function}node_clone (pool, what->c.node_array[i]);
+    }
+
+  ret->next = ${$prefix_function}node_clone (pool, what->next);
+  return ret;
+}
+
+void ${$prefix_function}node_list_append ($nodes **list, $nodes *node)
+{
+  if ( !node ) return;
+
+  if ( !*list )
+    {
+      *list = node;
+    }
+  else
+    {
+      $nodes *last = *list;
+      while ( last->next ) last = last->next;
+      last->next = node;
+    }
+}
+
+void ${$prefix_function}node_list_remove ($nodes **list, $nodes *node)
+{
+  if ( *list == node )
+    {
+      *list = node->next;
+    }
+  else
+    {
+      $nodes *i = *list;
+      while ( i->next )
+        {
+          $nodes *parent = i;
+          i = i->next;
+          if ( i == node )
+            {
+              parent->next = i->next;
+              return;
+            }
+        }
+    }
+}
+
+void ${$prefix_function}node_free ($pools *pool, $nodes *node)
+{
+  do {
+      if ( ${$prefix_macro}NODE_IS_PRODUCTION(node) )
+        {
+          int i;
+          for ( i = 0; i < ${$prefix_macro}PRODUCTION_ELEM_COUNT(node->type); i++ )
+              ${$prefix_function}node_free (pool, node->c.node_array[i]);
+        }
+      $nodes *next = node->next;
+      quick_node_free (pool, node);
+      node = next;
+  } while (node);
+}
+
+const char * ${$prefix_function}node_name (const $nodes *node)
+{
+$ if {$omit_node_names = ''}
+  switch (${$prefix_macro}NODE_TYPE(node)) {
+$ foreach  {//token}
+    case ${$prefix_nodetype}@ename: return "@ename";
+$ end foreach
+    case ${$prefix_nodetype}TEOF: return "TEOF";
+$ foreach {//alt}
+    case ${$prefix_nodetype}@ename: return "@ename";
+$ end foreach
+    case ${$prefix_nodetype}Start: return "Start";
+    default: return "(unknown node type)";
+  }
+$ else
+  return "";
+$ end if
+}

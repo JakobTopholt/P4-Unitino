@@ -1,0 +1,220 @@
+$ template make_lexer()
+
+$ // generate the lexer.py
+############################# lexer.py ############################################# 
+
+class LexerException(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return self.value
+        
+# lexer states
+$   foreach {lexer_data/state}
+STATE_@name = @id
+$   end foreach
+
+accept_tokens = [None] * ${count(//token)}
+        
+$ foreach {//token}
+accept_tokens[${position()-1}] = lambda line, pos: [-if @text-]@ename(line, pos)[-else-]@ename(None, line, pos)[-end if-]
+$   end foreach
+
+$ if {count(//transition[@from!=@to])!=0}
+transition = {
+$   foreach {//token} 
+               "${@ename}" : {[-foreach {transition}-]STATE_@from:STATE_@to[-sep ','-][-end foreach-]}[-sep ','-]
+$   end foreach
+             }
+$ end if 
+
+lexer_gotoTable = [
+$ foreach {lexer_data/goto_table/state}
+                    [
+$   foreach {row}
+                      [
+$     foreach {goto}
+                        [@low, @high, @state],
+$     end foreach
+                      ],
+$   end foreach
+                    ],
+$ end foreach
+                  ] 
+                
+accept_table = [
+$ foreach {lexer_data/accept_table/state}
+                 [
+                   [-foreach {i}-]${.}, [-end foreach-]
+                 ],
+$ end foreach
+               ]
+             
+class Lexer(object):
+    def __init__(self, source):
+        if isinstance(source, StringType):
+            self.reader = PushbackReader(file(source, "r"))
+        else:
+            self.reader = PushbackReader(source)
+
+        self.token = None
+        self.state = STATE_${lexer_data/state/@name}
+        self.line = 0
+        self.pos = 0
+        self.cr = False
+        self.eof = False
+        self.text = StringBuffer()
+
+    def filter(self):
+        pass
+
+    def peek(self):
+        while(self.token == None):
+            self.token = self.getToken()
+            self.filter()
+        return self.token
+
+    def next(self):
+        while (self.token == None):
+            self.token = self.getToken()
+            self.filter()
+
+        result = self.token
+        self.token = None
+        return result
+
+    def getToken(self):
+        dfa_state = 0
+
+        start_pos = self.pos
+        start_line = self.line
+
+        accept_state = -1
+        accept_token = -1
+        accept_length = -1
+        accept_pos = -1
+        accept_line = -1
+        gotoTable = lexer_gotoTable[self.state]
+        accept = accept_table[self.state]
+        text = self.text
+        text.clear()
+
+        while 1:
+            c = self.getChar()
+
+            if(c != -1):
+                if (c == 10):
+                    if(self.cr):
+                        self.cr = False
+                    else:
+                        self.line = self.line + 1
+                        self.pos = 0
+                elif (c == 13):
+                    self.line = self.line + 1
+                    self.pos = 0
+                    self.cr = True
+                else:
+                    self.pos = self.pos + 1
+                    self.cr = False
+
+                text.append(chr(c))
+                
+                while 1:
+                    if (dfa_state < -1):
+                        oldState = (-2 -dfa_state)
+                    else:
+                        oldState = dfa_state
+
+                    dfa_state = -1
+
+                    tmp1 =  gotoTable[oldState]
+                    low = 0
+                    high = len(tmp1) - 1
+
+                    while (low <= high):
+                        middle = (low + high) / 2
+                        tmp2 = tmp1[middle]
+
+                        if(c < tmp2[0]):
+                            high = middle - 1
+                        elif (c > tmp2[1]):
+                            low = middle + 1
+                        else:
+                            dfa_state = tmp2[2]
+                            break
+                    if (dfa_state >= -1):
+                    	break
+            else:
+                dfa_state = -1
+
+            if (dfa_state >= 0):
+                if (accept[dfa_state] != -1):
+                    accept_state = dfa_state
+                    accept_token = accept[dfa_state]
+                    accept_length = len(text)
+                    accept_pos = self.pos
+                    accept_line = self.line
+            else:
+                if (accept_state != -1):
+                    if (accept_token >= 0 and accept_token <= ${count(//token) - 1}):
+                    	token = accept_tokens[accept_token](start_line + 1, start_pos + 1)
+                    	if token.getText() == None:
+                    	    token.setText(self.getText(accept_length))
+                    	
+                        self.pushBack(accept_length)
+                        self.pos = accept_pos
+                        self.line = accept_line
+$                    if {count(//transition[@from!=@to])!=0}                       
+                        self.state = transition[token.__class__.__name__][self.state]
+$                    end if  
+                      
+                        return token
+                else:
+                    if (len(text) > 0):
+                        raise LexerException("[" + str(start_line + 1) + "," + str(start_pos + 1) + "]" +" Unknown token: " + str(text))
+                    else:
+                        return EOF(start_line + 1, start_pos + 1)
+
+    def getChar(self):
+        if (self.eof):
+            return -1
+        c = self.reader.read()
+        
+        if (c == ""):
+            result = -1
+        else:
+            result = ord(c)
+
+        if(result == -1):
+            self.eof = True
+
+        return result
+
+    def pushBack(self, acceptLength):
+        text = self.text
+        length = len(text)
+        for i in range(length - 1, acceptLength - 1, -1):
+            self.eof = False
+            self.reader.unread(text.charAt(i))
+
+    def unread(self, token):
+        text = token.getText()
+        length = len(text)
+
+        for i in range(length-1, -1, -1):
+            self.eof = False
+            self.reader.unread(text[i])
+
+        self.pos = token.getPos() - 1
+        self.line = token.getLine() - 1
+
+    def getText(self, acceptLength):
+        sb = StringBuffer()
+        text = self.text
+        for i in range(acceptLength):
+            sb.append(text.charAt(i))
+
+        return str(sb)
+
+$ end template

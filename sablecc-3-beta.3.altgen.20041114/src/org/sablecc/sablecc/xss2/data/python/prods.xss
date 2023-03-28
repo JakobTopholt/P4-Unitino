@@ -1,0 +1,183 @@
+$ template make_prods()
+$
+$ // the first production name that goes into Start
+$ set baseprod = {//prod/@ename}
+
+$ // generate all alternative files
+$ foreach {//alt}
+class @ename(Node):
+$ // define constructor
+    def __init__ (self, [-foreach {elem}-]_@{name}_=None[-sep ','-][-end foreach-]):
+        super(@ename, self).__init__()
+$ // define subnodes
+$ foreach {elem}
+$   if @is_list
+        self._@{name}_ = list()
+$   else
+        self._@{name}_ = None
+$   end if
+$ end foreach
+$ foreach {elem}
+        if (_@{name}_ != None):
+$   if @is_list
+            self._@{name}_.extend(_@{name}_)
+$   else
+            self.set@ename(_@{name}_)
+$   end if
+$ end foreach
+
+$ // define clone()
+    def clone(self):
+        return @ename([-foreach {elem}-][-if @is_list-]self.cloneList(self._@{name}_)[-sep ','-][-else-]self.cloneNode(self._@{name}_)[-sep ','-][-end if-][-end foreach-])
+
+$ // define apply()
+    def apply(self, analysis):
+        analysis.case@ename(self)
+
+$ // define accessors
+$ foreach {elem}
+$   if @is_list
+    def get@ename(self):
+        return self._@{name}_
+
+    def set@ename(self, lst):
+        del self._@{name}_[0:len(self._@{name}_)]
+        self._@{name}_.extend(lst)
+        
+$   else
+    def get@ename (self):
+        return self._@{name}_
+
+    def set@ename(self, node):
+        if(self._@{name}_ != None):
+            self._@{name}_.setparent(None)
+
+        if (node != None):
+            if (node.getparent() != None):
+                node.getparent().removeChild(node)
+
+            node.setparent(self)
+
+        self._@{name}_ = node
+$   end if
+$ end foreach
+
+$ // define toString()
+    def __str__(self):
+        return '' [-foreach {elem}-]+ self.toString(self._@{name}_)[-end foreach-]
+    
+    def __repr__(self):
+        return "'" + self.__str__() + "'"
+        
+$ // define removeChild()
+    def removeChild(self, child):
+$ if {count(elem) = 0}
+        pass
+$ end if    
+$ foreach {elem}
+$   if @is_list
+        if child in self._@{name}_:
+            self._@{name}_.remove(child)
+            return
+$   else
+        if (self._@{name}_ == child):
+            self._@{name}_ = None
+            return
+$   end if
+$ end foreach
+
+$ // define replaceChild()
+    def replaceChild(self, oldChild, newChild):
+$ if {count(elem) = 0}
+        pass
+$ end if
+$ foreach {elem}
+$   if @is_list
+        for i in range(self._@{name}_):
+            if (self._@{name}_[i] == oldChild):
+                if (newChild != None):
+                    self._@{name}_[i] = newChild
+                    oldChild.setparent(None)
+                    return
+
+                del self._@{name}_[i]
+                oldChild.setparent(None)
+                return
+$   else
+        if (self._@{name}_ == oldChild):
+            self.set@ename(newChild)
+            return
+$   end if
+$ end foreach
+
+$ end foreach 
+
+class Start(Node):
+    def __init__(self, _base_=None, _eof_=None):
+        super(Start, self).__init__()
+        self._base_ = None
+        self._eof_ = None
+        self.set$baseprod(_base_)
+        self.setEOF(_eof_)
+
+    def clone(self):
+        return Start(self.cloneNode(self._base_), self.cloneNode(self._eof_))
+
+    def apply(self, analysis):
+        analysis.caseStart(self)
+
+    def get$baseprod(self):
+        return self._base_
+        
+    def set$baseprod(self, node):
+        if(self._base_ != None):
+            self._base_.setparent(None)
+
+        if(node != None):
+            if(node.getparent() != None):
+                node.getparent().removeChild(node)
+
+            node.setparent(self)
+
+        self._base_ = node
+
+    def getEOF(self):
+        return self._eof_
+        
+    def setEOF(self, node):
+        if(self._eof_ != None):
+            self._eof_.setparent(None)
+
+        if(node != None):
+            if(node.getparent() != None):
+                node.getparent().removeChild(node)
+
+            node.setparent(self)
+
+        self._eof_ = node
+
+    def removeChild(self, child):
+        if(self._base_ == child):
+            self._base_ = None
+            return
+
+        if(self._eof_ == child):
+            self._eof_ = None
+            return
+
+    def replaceChild(self, oldChild, newChild):
+        if(self._base_ == oldChild):
+            self.set$baseprod(newChild)
+            return
+
+        if(self._eof_ == oldChild):
+            self.setEOF(newChild)
+            return
+
+    def __str__(self):
+        return '' + self.toString(self._base_) + self.toString(self._eof_)
+    
+    def __repr__(self):
+        return "'" + self.__str__() + "'"
+        
+$ end template

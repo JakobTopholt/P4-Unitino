@@ -1,0 +1,33 @@
+$ param dest_dir = '.', target_build
+
+$ param package = @package
+$ param basedir = $dest_dir, namespace = {translate($package, '.', '_')}
+$ param libname = {translate($package, '.', '_')}
+$ param incdir = $basedir + '/' + $libname
+$ param streambuf = 'std::streambuf'
+
+$ include 'list.xss'
+$ include 'node.xss'
+$ include 'tokens.xss'
+$ include 'prods.xss'
+$ include 'typeinfo.xss'
+$ include 'analysis.xss'
+$ include 'lexer.xss'
+$ include 'parser.xss'
+$ include 'makesystem.xss'
+$ include 'utils.xss'
+
+$ call make_analysis()
+$ call make_typeinfo()
+$ call make_prods()
+$ call make_tokens()
+$ call make_node()
+$ call make_list()
+$ call make_lexer()
+$ call make_parser()
+
+$ if $target_build
+$   call make_makesystem()
+$   call make_utils()
+$ end
+

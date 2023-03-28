@@ -1,0 +1,721 @@
+
+$ if {$omit_long_errors = ''}
+static int perrors[${count(parser_data/errors/i)}] = {
+  [-foreach {parser_data/errors/i}-]${.}, [-if {position() mod 20 = 0}-]
+  [-end if-][-end-]
+};
+
+static const char *perrors_str[${count(parser_data/error_messages/msg)}] = {
+$ foreach {parser_data/error_messages/msg}
+  "${sablecc:string2escaped_unicode(.)}",
+$ end foreach
+};
+$ end if
+
+enum epaction_type { SHIFT = 0, REDUCE = 1, ACCEPT = 2, ERROR = 3 };
+struct paction
+{
+  int from;
+  enum epaction_type action;
+  int to;
+};
+
+static struct paction _p_a[${count(parser_data/action_table/row/action)}] = {
+$ foreach {parser_data/action_table/row}
+  /* state ${position() - 1} */
+$   foreach {action}
+    {@from, [-choose-][-when {@action=0}-]SHIFT[-end-][-when {@action=1}-]REDUCE[-end-][-when {@action=2}-]ACCEPT[-end-][-when {@action=3}-]ERROR[-end-][-end-], @to},
+$   end foreach
+$ end foreach
+};
+
+static int _p_acount[${count(parser_data/action_table/row)}] = {
+  [-foreach {parser_data/action_table/row}-]${count(action)}, [-if {position() mod 20 = 0}-]
+  [-end-][-end-]
+};
+
+struct pgoto
+{
+  int from;
+  int to;
+};
+
+static struct pgoto _p_g[${count(parser_data/goto_table/row/goto)}] = {
+$ foreach {parser_data/goto_table/row}
+  /* token ${position() - 1} */
+$   foreach {goto}
+    {@from, @to},
+$   end foreach
+$ end foreach
+};
+
+static int pgotos_count[${count(parser_data/goto_table/row)}] = {
+  [-foreach {parser_data/goto_table/row}-]${count(goto)}, [-if {position() mod 20 = 0}-]
+  [-end-][-end-]
+};
+
+static int parser_initialized = 0;
+static struct paction *pactions[${count(parser_data/action_table/row)}];
+static struct pgoto *pgotos[${count(parser_data/goto_table/row)}];
+
+$ if {$parser_inline = ''}
+enum ecommand {
+  CMD_POP,
+  CMD_FETCHNODE,
+  CMD_FETCHLIST,
+  CMD_ADDNODE,
+  CMD_ADDLIST,
+  CMD_MAKELIST,
+  CMD_MAKENODE,
+  CMD_RETURNNODE,
+  CMD_RETURNLIST
+};
+
+struct reduce_command {
+  enum ecommand cmd;
+  union {
+    struct {
+      int a1, a2, a3;
+    } init;
+    struct {
+      int result_id;
+    } pop;
+    struct {
+      int result_id;
+      int from_id;
+      int index;
+    } fetchnode;
+    struct {
+      int result_id;
+      int from_id;
+      int index;
+    } fetchlist;
+    struct {
+      int tolist_id;
+      int node_id;
+    } addnode;
+    struct {
+      int tolist_id;
+      int fromlist_id;
+    } addlist;
+    struct {
+      int result_id;
+      enum ${$prefix_type}node_type type;
+      int *args;
+    } makenode;
+    struct {
+      int result_id;
+    } makelist;
+    struct {
+      int node_id;
+    } returnnode;
+    struct {
+      int list_id;
+    } returnlist;
+  } u;
+};
+
+static struct reduce_command _p_rcmd[${count(rules/rule/action)}] = {
+$ foreach {rules/rule}
+  /* rule ${position()-1} */
+$   foreach {action}
+$     choose
+$       when {@cmd='POP'}
+  {CMD_POP, {{@result_id}}},
+$       end
+$       when {@cmd='FETCHNODE'}
+  {CMD_FETCHNODE, {{@result_id, @from_id, @index}}},
+$       end
+$       when {@cmd='FETCHLIST'}
+  {CMD_FETCHLIST, {{@result_id, @from_id, @index}}},
+$       end
+$       when {@cmd='ADDNODE'}
+  {CMD_ADDNODE, {{@tolist_id, @node_id}}},
+$       end
+$       when {@cmd='ADDLIST'}
+  {CMD_ADDLIST, {{@tolist_id, @fromlist_id}}},
+$       end
+$       when {@cmd='MAKENODE'}
+  {CMD_MAKENODE, {{@result_id, ${$prefix_nodetype}@etype}}},
+$       end
+$       when {@cmd='MAKELIST'}
+  {CMD_MAKELIST, {{@result_id}}},
+$       end
+$       when {@cmd='RETURNNODE'}
+$         if @node
+  {CMD_RETURNNODE, {{@node_id}}},
+$         else
+  {CMD_RETURNNODE, {{}}},
+$         end
+$       end
+$       when {@cmd='RETURNLIST'}
+  {CMD_RETURNLIST, {{@list_id}}},
+$       end
+$     end choose
+$   end foreach
+$ end foreach
+};
+
+static int _p_rcmd_args[${count(rules/rule/action/arg)}] = {
+$ foreach {rules/rule}
+  /* rule ${position()-1} */
+$   foreach {action}
+    /* action ${position()-1} */
+$     foreach {arg}
+      @id,
+$     end foreach
+$   end foreach
+$ end foreach
+};
+
+struct pcommandstr {
+  int count;
+  int leftside;
+  struct reduce_command *commands;
+};
+
+static struct pcommandstr pcommands[${count(rules/rule)}] = {
+$ foreach {rules/rule}
+  {${count(action)}, @leftside, 0}, /* @ename */
+$ end foreach
+};
+$ end if  //{$parser_inline = ''}
+
+static int alt_elem_types[${count(prods/prod/alt/elem) + 2}] = {
+$ foreach {prods/prod/alt}
+  /* alternative ${position()-1} */
+$   foreach {elem}
+    [-if {@is_list = 'true'}-]1[-else-]0[-end-],
+$   end foreach
+$ end foreach
+  /* Start */
+    0, 0
+};
+
+$subnodes ${$prefix_function}subnode_data[${count(prods/prod/alt) + 1}] = {
+$ foreach {prods/prod/alt}
+    {${count(elem)}, 0},
+$ end foreach
+    {2, 0},
+};
+
+static void parser_init()
+{
+  if ( parser_initialized ) return;
+
+  int i;
+$ if {$parser_inline = ''}
+  struct reduce_command *rcmd = _p_rcmd;
+  int *a = _p_rcmd_args;
+$ end if
+  int *et = alt_elem_types;
+
+  struct paction *actions = _p_a;
+  int *actions_count = _p_acount;
+
+  struct pgoto *gotos = _p_g;
+
+$ if {$parser_inline = ''}
+  for ( i = 0; i < ${count(rules/rule/action)}; i++ )
+    {
+      if ( _p_rcmd[i].cmd == CMD_MAKENODE )
+        {
+          _p_rcmd[i].u.makenode.args = a;
+          a += ${$prefix_function}subnode_data[_p_rcmd[i].u.makenode.type - ${$prefix_macro}FIRST_PRODUCTION].count;
+        }
+    }
+
+  for ( i = 0; i < ${count(rules/rule)}; i++ )
+    {
+      pcommands[i].commands = rcmd;
+      rcmd += pcommands[i].count;
+    }
+$ end if
+
+  for ( i = 0; i < ${count(prods/prod/alt)}; i++ )
+    {
+      ${$prefix_function}subnode_data[i].is_list = et;
+      et += ${$prefix_function}subnode_data[i].count;
+    }
+
+  for ( i = 0; i < ${count(parser_data/action_table/row)}; i++ )
+    {
+      pactions[i] = actions;
+      actions += actions_count[i];
+    }
+
+  for ( i = 0; i < ${count(parser_data/goto_table/row)}; i++ )
+    {
+      pgotos[i] = gotos;
+      gotos += pgotos_count[i];
+    }
+
+/*static struct paction *pactions[${count(parser_data/action_table/row)}]; */
+
+  parser_initialized = 1;
+}
+
+$parsers
+{
+  char *error;
+  $pools *pool;
+};
+
+$parsers *${$prefix_function}parser_create($pools *pool)
+{
+  if ( !parser_initialized ) parser_init ();
+  $parsers *ret = $malloc (sizeof ($parsers));
+  ret->error = 0;
+  ret->pool = pool;
+  return ret;
+}
+
+void ${$prefix_function}parser_destroy ($parsers *parser)
+{
+  if ( parser->error ) $free (parser->error);
+  $free (parser);
+}
+
+const char * ${$prefix_function}parser_get_error ($parsers *parser)
+{
+  return parser->error;
+}
+
+#define STACK_STATE_BUF_LEN $parser_initial_stack_size
+
+struct stack_entry
+{
+  $nodes *node;
+  $nodes *last;
+};
+
+struct stack_str
+{
+  int state;
+  struct stack_entry list[${rules/@maxreturns}];
+$ if {$release_discarded_nodes!=''}
+  int count;
+$ end if
+};
+
+#define LIST_APPEND_NODE(list,n) \
+  if ( n.node ) \
+  { \
+    if ( list.node ) \
+      { \
+        list.last->next = n.node; \
+        list.last = n.node; \
+      } \
+    else \
+      { \
+        list.node = n.node; \
+        list.last = n.node; \
+      } \
+  }
+
+#define LIST_APPEND_LIST(list,l) \
+  if ( l.node ) \
+    { \
+      if ( list.node ) \
+        { \
+          list.last->next = l.node; \
+          list.last = l.last; \
+        } \
+      else \
+        { \
+          list = l; \
+        } \
+    }
+
+static int goTo(int index, int state)
+{
+  struct pgoto *begin = pgotos[index];
+  int len = pgotos_count[index];
+  struct pgoto *end = begin + len;
+  struct pgoto *middle;
+  int half;
+
+  do
+    {
+      half = len >> 1;
+      middle = begin;
+      middle += half;
+      if ( middle->from < state )
+        {
+          begin = middle;
+          ++begin;
+          len = len - half - 1;
+        }
+      else
+        {
+          len = half;
+        }
+    }
+  while ( len > 0 );
+
+  if ( begin == end || begin->from != state )
+      return pgotos[index]->to;
+  else
+      return begin->to;
+}
+
+$nodes *${$prefix_function}parser_parse ($parsers *parser, ${$prefix_type}lexer_get_t get_fn, void *lexer_data)
+{
+  struct stack_str stack_buf[STACK_STATE_BUF_LEN];
+  struct stack_str *stack_begin = stack_buf;
+  struct stack_str *stack_end = stack_buf + STACK_STATE_BUF_LEN - 1;
+  struct stack_str *stackp = stack_begin;
+
+  $nodes *token = 0;
+  int index;
+
+  stackp->state = 0;
+$ if {$release_discarded_nodes!=''}
+  stackp->count = 0;
+$ end if
+
+  while (1)
+    {
+      if ( !token )
+        {
+          do {
+            token = get_fn(lexer_data);
+            if ( !token )
+              {
+                /* XXX free stackp */
+                parser->error = 0;
+                return 0;
+              }
+            index = token2index[token->type];
+            if ( index == -1 ) quick_node_free (parser->pool, token);
+          } while (index == -1);
+        }
+
+      int state = stackp->state;
+      struct paction *begin = pactions[state];
+      int len = _p_acount[state];
+      int half;
+      struct paction *end = begin + len;
+      struct paction *middle;
+
+      do
+        {
+          half = len >> 1;
+          middle = begin + half;
+          if ( middle->from < index )
+            {
+              begin = middle;
+              ++begin;
+              len = len - half - 1;
+            }
+          else
+            {
+              len = half;
+            }
+        }
+      while (len > 0);
+
+      if ( begin == end || begin->from != index ) begin = pactions[state];
+      int to = begin->to;
+
+/* printf ("READ: %s, state = %d, index = %d, action = %d, to = %d\n", node_name(token), state, index, begin->action, to); */
+
+      switch (begin->action)
+        {
+          case SHIFT: {
+            if ( stackp == stack_end )
+              {
+                if ( stack_begin == stack_buf )
+                  {
+                    int nlen = STACK_STATE_BUF_LEN * 2;
+                    stack_begin = $malloc (nlen * sizeof(struct stack_str));
+                    memcpy (stack_begin, stack_buf, STACK_STATE_BUF_LEN * sizeof(struct stack_str));
+                    stack_end = stack_begin + nlen - 1;
+                    stackp = stack_begin + STACK_STATE_BUF_LEN - 1;
+                  }
+                else
+                  {
+                    int slen = stack_end - stack_begin;
+                    int nlen = (slen + 1) * 2;
+                    stack_begin = $realloc (stack_begin, nlen * sizeof(struct stack_str));
+                    stack_end = stack_begin + nlen - 1;
+                    stackp = stack_begin + slen;
+                  }
+              }
+            ++stackp;
+            stackp->state = to;
+            stackp->list[0].node = token;
+$ if {$release_discarded_nodes!=''}
+            stackp->count = 1;
+$ end if
+            token = 0;
+            break;
+          }
+          case ACCEPT: {
+            $nodes *start = quick_alloc_node (parser->pool);
+            start->type = ${$prefix_nodetype}Start;
+            start->next = 0;
+            start->c.Start.$baseprod = stackp->list[0].node;
+            start->c.Start.TEOF = token;
+            return start;
+          }
+          case ERROR: {
+$ if {$omit_long_errors = ''}
+            parser->error = $malloc (64 + strlen (perrors_str[perrors[to]]));
+            sprintf (parser->error, "Parser: [%u,%u] %s", ${$prefix_macro}TOKEN_LINE(token),
+                ${$prefix_macro}TOKEN_POS(token), perrors_str[perrors[to]]);
+$ else
+            parser->error = $malloc (64);
+            sprintf (parser->error, "Parser: [%u,%u] parse error",
+                ${$prefix_macro}TOKEN_LINE(token), ${$prefix_macro}TOKEN_POS(token));
+$ end if
+            return 0;
+          }
+          case REDUCE: {
+$ if {$parser_inline = ''}
+            int cmds_count = pcommands[to].count;
+            int go_to = pcommands[to].leftside;
+            struct reduce_command *cmds = pcommands[to].commands;
+            struct stack_entry lists[${/parser/rules/@maxlists}];
+            struct stack_entry nodes[${/parser/rules/@maxnodes}];
+            struct stack_str *pops[${/parser/rules/@maxpops}];
+            struct stack_str result;
+            struct stack_entry *resultp = result.list;
+            int i;
+$ if {$release_discarded_nodes!=''}
+            struct stack_str *old_stackp = stackp;
+            result.count = 0;
+$ end if
+
+            for ( i = 0; i < cmds_count; i++ )
+              {
+                struct reduce_command *cmd = &cmds[i];
+                switch (cmd->cmd)
+                  {
+                    case CMD_POP: {
+                      pops[cmd->u.pop.result_id] = stackp--;
+                      break;
+                    }
+                    case CMD_FETCHNODE: {
+                      nodes[cmd->u.fetchnode.result_id].node =
+                          pops[cmd->u.fetchnode.from_id]->list[cmd->u.fetchnode.index].node;
+$ if {$release_discarded_nodes!=''}
+                      pops[cmd->u.fetchnode.from_id]->list[cmd->u.fetchnode.index].node = 0;
+$ end if
+                      break;
+                    }
+                    case CMD_FETCHLIST: {
+                      lists[cmd->u.fetchlist.result_id] =
+                          pops[cmd->u.fetchlist.from_id]->list[cmd->u.fetchlist.index];
+$ if {$release_discarded_nodes!=''}
+                      pops[cmd->u.fetchlist.from_id]->list[cmd->u.fetchlist.index].node = 0;
+$ end if
+                      break;
+                    }
+                    case CMD_ADDNODE: {
+                      LIST_APPEND_NODE(lists[cmd->u.addnode.tolist_id], nodes[cmd->u.addnode.node_id]);
+                      break;
+                    }
+                    case CMD_ADDLIST: {
+                      LIST_APPEND_LIST(lists[cmd->u.addlist.tolist_id], lists[cmd->u.addlist.fromlist_id]);
+                      break;
+                    }
+                    case CMD_MAKELIST: {
+                      lists[cmd->u.makelist.result_id].node = 0;
+                      break;
+                    }
+                    case CMD_MAKENODE: {
+                      int *args = cmd->u.makenode.args;
+                      int node_index = cmd->u.makenode.type - ${$prefix_macro}FIRST_PRODUCTION;
+                      int args_count = ${$prefix_function}subnode_data[node_index].count;
+                      int *is_list = ${$prefix_function}subnode_data[node_index].is_list;
+                      $nodes *node = quick_alloc_node (parser->pool);
+                      $nodes **subs = node->c.node_array;
+                      int i;
+                      node->type = cmd->u.makenode.type;
+                      node->next = 0;
+                      for ( i = 0; i < args_count; i++ )
+                        {
+                          if ( *is_list++ )
+                            {
+                              *subs++ = lists[args[i]].node;
+                            }
+                          else
+                            {
+                              if ( args[i] == -1 )
+                                  *subs++ = 0;
+                              else
+                                  *subs++ = nodes[args[i]].node;
+                            }
+                        }
+                      nodes[cmd->u.makenode.result_id].node = node;
+                      break;
+                    }
+                    case CMD_RETURNNODE: {
+                      if ( cmd->u.returnnode.node_id == -1 )
+                        {
+                          resultp->node = 0;
+                          resultp++;
+                        }
+                      else
+                        {
+                          resultp->node = nodes[cmd->u.returnnode.node_id].node;
+                          resultp++;
+                        }
+$ if {$release_discarded_nodes!=''}
+                      result.count++;
+$ end if
+                      break;
+                    }
+                    case CMD_RETURNLIST: {
+                      *resultp++ = lists[cmd->u.returnlist.list_id];
+$ if {$release_discarded_nodes!=''}
+                      result.count++;
+$ end if
+                      break;
+                    }
+                  }
+              }
+
+$ if {$release_discarded_nodes!=''}
+            while ( old_stackp != stackp )
+              {
+                int i;
+                for ( i = 0; i < old_stackp->count; i++ )
+                  {
+                    if ( old_stackp->list[i].node ) ${$prefix_function}node_free (parser->pool, old_stackp->list[i].node);
+                  }
+                old_stackp--;
+              }
+$ end if
+            result.state = goTo(go_to, stackp->state);
+            *++stackp = result;
+$ else
+            struct stack_str result;
+            struct stack_entry *resultp = result.list;
+            int go_to;
+$ if {$release_discarded_nodes!=''}
+            result.count = 0;
+$ end if
+            switch (to)
+              {
+$   foreach {rules/rule}
+                case @index: {
+$ // at first declarations, then definitions:
+$     foreach {action}
+$       choose
+$         when {@cmd='POP'}
+                  struct stack_str *@result;
+$         end
+$         when {@cmd='FETCHNODE'}
+                  struct stack_entry @result;
+$         end
+$         when {@cmd='FETCHLIST'}
+                  struct stack_entry @result;
+$         end
+$         when {@cmd='ADDNODE'}
+$         end
+$         when {@cmd='ADDLIST'}
+$         end
+$         when {@cmd='MAKENODE'}
+                  struct stack_entry @result;
+$         end
+$         when {@cmd='MAKELIST'}
+                  struct stack_entry @result;
+$         end
+$         when {@cmd='RETURNNODE'}
+$         end
+$         when {@cmd='RETURNLIST'}
+$         end
+$       end choose
+$     end foreach
+$ // now come definitions
+$     foreach {action}
+$       choose
+$         when {@cmd='POP'}
+                  @result = stackp--;
+$         end
+$         when {@cmd='FETCHNODE'}
+                  @result.node = @from->list[@index].node;
+$ if {$release_discarded_nodes!=''}
+                  @from->list[@index].node = 0;
+$ end if
+$         end
+$         when {@cmd='FETCHLIST'}
+                  @result = @from->list[@index];
+$ if {$release_discarded_nodes!=''}
+                  @from->list[@index].node = 0;
+$ end if
+$         end
+$         when {@cmd='ADDNODE'}
+                  LIST_APPEND_NODE(@tolist, @node);
+$         end
+$         when {@cmd='ADDLIST'}
+                  LIST_APPEND_LIST(@tolist, @fromlist);
+$         end
+$         when {@cmd='MAKENODE'}
+$           set result = @result
+                  $result.node = quick_alloc_node(parser->pool);
+                  $result.node->type = $prefix_nodetype@etype;
+$           foreach {arg}
+$             if @null
+                  $result.node->c.node_array[@id] = 0;
+$             else
+                  $result.node->c.node_array[@id] = ${.}.node;
+$             end if
+$           end foreach
+                  $result.node->next = 0;
+$         end
+$         when {@cmd='MAKELIST'}
+                  @result.node = @result.last = 0;
+$         end
+$         when {@cmd='RETURNNODE'}
+$           if @node
+                  resultp->node = @node.node;
+                  resultp++;
+$           else
+                  resultp->node = 0;
+                  resultp++;
+$           end
+$ if {$release_discarded_nodes!=''}
+                  result.count++;
+$ end if
+$         end
+$         when {@cmd='RETURNLIST'}
+                  *resultp++ = @list;
+$ if {$release_discarded_nodes!=''}
+                  result.count++;
+$ end if
+$         end
+$       end choose
+$     end foreach
+$ if {$release_discarded_nodes!=''}
+$     foreach {action}
+$       choose
+$         when {@cmd='POP'}
+                  {
+                    int i;
+                    for ( i = 0; i < @result->count; i++ )
+                      {
+                        if ( @result->list[i].node ) ${$prefix_function}node_free (parser->pool, @result->list[i].node);
+                      }
+                  }
+$         end
+$       end choose
+$     end foreach
+$ end if
+                  go_to = @leftside;
+                  break;
+                }
+$   end foreach
+              }
+            result.state = goTo(go_to, stackp->state);
+            *++stackp = result;
+$ end if
+            break;
+          }
+        }
+    }
+  return 0;
+}
+

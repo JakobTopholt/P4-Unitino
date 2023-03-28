@@ -1,0 +1,247 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>SableCC 3-beta.3.altgen.20041114 - Read Me</title>
+</head>
+<body bgcolor="#ffffff">
+<a name="top"></a>
+<center>
+<table width="100%" bgcolor="#f2ff80">
+  <tbody>
+    <tr align="center">
+      <td>
+      <h1><b><i><font size="+4">SableCC</font></i></b><!-- <FONT COLOR="red"><B>experimental version</B></FONT> --><!-- -->
+version<!-- --> 3-beta.3.altgen.20041114</h1>
+      <h2>ReadMe</h2>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<p>Welcome to <b><i><font size="+1">SableCC</font></i></b> version
+3-beta.3.altgen.20041114.</p>
+<!-- 
+    <P><FONT COLOR="red"><B>WARNING:</B></FONT> This is an EXPERIMENTAL version. <BR>
+       Each <B><I><FONT size=+1>SableCC</FONT></I></B> version is composed of three integers: 
+       "<i>major.minor.revision</i>".<BR>
+       If you want a <B>stable</B> version, pick a version with an <b>even</b> 
+       <i>minor</i> integer. (e.g. 14, 16, ...)</P>
+     -->
+<p>Please read this document carefully.</p>
+<a name="content"></a>
+<table width="100%" bgcolor="#f2ff80">
+  <tbody>
+    <tr>
+      <td>
+      <table width="100%">
+        <tbody>
+          <tr valign="top">
+            <td>
+            <h2>Content</h2>
+            </td>
+            <td align="right"><a href="#top">top</a></td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<ul>
+  <li> <a href="#start">Getting Started</a> </li>
+  <li> <a href="#license">License</a> </li>
+  <li> <a href="#documentation">Documentation</a> </li>
+  <li> <a href="#help">Getting Help</a> </li>
+  <li> <a href="#mailing-list">Mailing-list</a> </li>
+  <li> <a href="#donations">Donations</a> </li>
+</ul>
+<a name="start"></a>
+<table width="100%" bgcolor="#f2ff80">
+  <tbody>
+    <tr>
+      <td>
+      <table width="100%">
+        <tbody>
+          <tr valign="top">
+            <td>
+            <h2>Getting Started</h2>
+            </td>
+            <td align="right"><a href="#content">content</a></td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>Here are the minimal steps to get <b><i><font size="+1">SableCC</font></i></b>
+running.</p>
+<h3>If you got <tt>sablecc-3-beta.3.altgen.20041114.tar.gz</tt> (or <tt>sablecc-3-beta.3.altgen.20041114.zip</tt>)</h3>
+<ol>
+  <li> Decompress the file <tt>sablecc-3-beta.3.altgen.20041114.tar.gz</tt> (or <tt>sablecc-3-beta.3.altgen.20041114.zip</tt>):
+    <tt>
+    <pre>	  tar -xzvf sablecc-3-beta.3.altgen.20041114.tar.gz<br>	  </pre>
+    </tt> or <tt>
+    <pre>	  jar -xvf sablecc-3-beta.3.altgen.20041114.zip<br>      </pre>
+    </tt> </li>
+  <li> Go into the in <tt>sablecc-3-beta.3.altgen.20041114</tt> directory: <tt>
+    <pre>	  cd sablecc-3-beta.3.altgen.20041114<br>      </pre>
+    </tt> </li>
+  <li> You will find an executable <tt>sablecc.jar</tt> file in the <tt>lib</tt>
+directory: <tt>
+    <pre>	  java -jar lib/sablecc.jar<br>      </pre>
+    </tt> </li>
+</ol>
+<p>This is it. If you have <a href="http://jakarta.apache.org/ant/">Jakarta-Ant</a>
+and <a href="http://xml.apache.org/xerces-j/">Xerces</a> installed,
+you can install <b><i><font size="+1">SableCC</font></i></b> with the
+command: <tt>
+<pre>	ant -Dinstall.dir=<i>destination</i> install<br>    </pre>
+</tt> </p>
+<p>If you want to manually install <b><i><font size="+1">SableCC</font></i></b>,
+you must copy (and edit) the files <tt>bin/sablecc</tt> and <tt>lib/sablecc.jar</tt>
+(or <tt>bin\sablecc.bat</tt> and <tt>lib\sablecc.jar</tt>) to an
+appropriate location, and set your PATH environment variable
+appropriately. </p>
+<h3>If you got <tt>sablecc-3-beta.3.altgen.20041114-src.tar.gz</tt> (sources-only
+package)</h3>
+<ol>
+  <li> Decompress the file <tt>sablecc-3-beta.3.altgen.20041114-src.tar.gz</tt>: <tt>
+    <pre>	  tar -xzvf sablecc-3-beta.3.altgen.20041114-src.tar.gz<br>      </pre>
+    </tt> </li>
+  <li> Go into the in <tt>sablecc-3-beta.3.altgen.20041114</tt> directory: <tt>
+    <pre>	  cd sablecc-3-beta.3.altgen.20041114<br>      </pre>
+    </tt> </li>
+  <li> If you want an automatic build process, you need to have <a
+ href="http://jakarta.apache.org/ant/">Jakarta-Ant</a> and <a
+ href="http://xml.apache.org/xerces-j/">Xerces</a> installed. Simply
+type: <tt>
+    <pre>	  ant -Dinstall.dir=<i>destination</i> install<br>      </pre>
+    </tt> </li>
+</ol>
+<a name="license"></a>
+<table width="100%" bgcolor="#f2ff80">
+  <tbody>
+    <tr>
+      <td>
+      <table width="100%">
+        <tbody>
+          <tr valign="top">
+            <td>
+            <h2>License</h2>
+            </td>
+            <td align="right"><a href="#content">content</a></td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p><b><i><font size="+1">SableCC</font></i></b> is covered by the GNU
+Lesser General Public License. You can view the copyright notice and
+the exact terms of the license in the files <a href="LICENSE">LICENSE</a>,
+<a href="AUTHORS">AUTHORS</a> and <a href="COPYING-LESSER">COPYING-LESSER</a>.</p>
+<a name="documentation"></a>
+<table width="100%" bgcolor="#f2ff80">
+  <tbody>
+    <tr>
+      <td>
+      <table width="100%">
+        <tbody>
+          <tr valign="top">
+            <td>
+            <h2>Documentation</h2>
+            </td>
+            <td align="right"><a href="#content">content</a></td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>You can find complete and detailed documentation on the <b><i><font
+ size="+1">SableCC </font></i></b>framework and syntax at the
+following site: <a href="http://www.sablecc.org/">http://www.sablecc.org/</a>.</p>
+<a name="help"></a>
+<table width="100%" bgcolor="#f2ff80">
+  <tbody>
+    <tr>
+      <td>
+      <table width="100%">
+        <tbody>
+          <tr valign="top">
+            <td>
+            <h2>Getting Help</h2>
+            </td>
+            <td align="right"><a href="#content">content</a></td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>The easiest way of obtaining help is to get on the <i><a
+ href="#mailing-list"><b><font size="+1">SableCC</font></b> mailing-list</a></i>.
+Many <b><i><font size="+1">SableCC</font></i></b> users around the
+world are already on this mailing-list. This is the best pool of
+information available to you.</p>
+<a name="mailing-list"></a>
+<table width="100%" bgcolor="#f2ff80">
+  <tbody>
+    <tr>
+      <td>
+      <table width="100%">
+        <tbody>
+          <tr valign="top">
+            <td>
+            <h2>Mailing-list</h2>
+            </td>
+            <td align="right"><a href="#content">content</a></td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>To get on the <i><b><font size="+1">SableCC</font></b> mailing-list</i>,
+send an e-mail message to <a href="mailto:majordomo@sable.mcgill.ca">majordomo@sable.mcgill.ca</a>.
+Put '<b>subscribe sablecc-list your@email.address</b>' in the <b>body</b>
+of the message. Once you are on the list, you can send your questions.<span
+ style="text-decoration: underline;"><br>
+</span>You can also subscribe on the new SableCC mailing-list. To do
+so, go to <a href="http://www.sablecc.org/home/support.php">http://www.sablecc.org/home/support.php</a>
+and fill out the form ont this page.<a
+ href="mailto:sablecc-user@lists.sourceforge.net"><br>
+</a></p>
+<a name="donations"></a>
+<table width="100%" bgcolor="#f2ff80">
+  <tbody>
+    <tr>
+      <td>
+      <table width="100%">
+        <tbody>
+          <tr valign="top">
+            <td>
+            <h2>Donations</h2>
+            </td>
+            <td align="right"><a href="#content">content</a></td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>You are very welcome to express your appreciation of <b><i><font
+ size="+1">SableCC</font></i></b> through any kind of donation. If you
+would like to make a financial donation (or another kind of donation),
+or if you would like to fund further development of <b><i><font
+ size="+1">SableCC</font></i></b>, please send an email to Etienne M.
+Gagnon (<a href="mailto:egagnon@j-meg.com">etienne.gagnon@uqam.ca</a>).
+Thank you in advance. </p>
+</body>
+</html>

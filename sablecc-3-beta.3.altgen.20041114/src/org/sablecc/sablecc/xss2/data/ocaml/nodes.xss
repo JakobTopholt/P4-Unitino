@@ -1,0 +1,65 @@
+$ template make_nodes()
+$
+$ // the first production name that goes into Start
+$ set baseprod = {//prod/@ename}
+$ // generate node sum type
+module Nodes = struct
+open Tokens
+
+type 
+(* productions p_prod *)
+$ foreach {//prod}
+p_@name = [-if {count(alt) = 1}-]
+$  foreach {alt}
+       | @ename of a_${@name}
+$  end foreach
+[-else-]
+$  foreach {alt}
+       | @ename of a_${@name}_${../@name}
+$  end foreach
+[-end if-][-SEP 'and '-][-end foreach-](* alternatives a_alt *)
+$ foreach {//prod}
+$ set pname = @name
+$  foreach {alt}
+[-set an = @name-][-if {not(count(../alt) = 1)}-][-set an = {concat(@name, '_', $pname)}-][-end if-]and a_$an = {[-if {count(elem) = 0}-]empty_$an : bool[-end if-][-foreach {elem}-][-if {@is_token}-][-set nn='Tokens.token'-][-else-][-set nn = {concat ('p_',@type)}-][-end if-]
+    [-set ann = {concat($an, '_', @name)}-]$ann : $nn[-if @is_list-] list[-else-] option[-end if-][-sep ';'-][-end foreach-]
+}
+$  end foreach
+$ end foreach
+
+type prod = 
+$ foreach {//prod}
+   | @ename of p_@name
+$ end
+
+type node = Start of prod * Tokens.token | P of prod | T of Tokens.token
+          | Null_Node
+
+let cast_off_T x = (match x with T x -> Some x | Null_Node -> None | _ -> failwith "type error casting to T")
+$ foreach{//prod}
+let cast_off_@ename x = (match x with (P @ename p) -> Some p | Null_Node -> None | _ -> failwith "type error casting to @ename")
+$ end foreach
+
+let de_optionify = function (Some x) -> x | None -> failwith "tried to deoptionify None"
+let fog f g = function x -> f (g x)
+
+$ foreach{//prod}
+$ set pname = @name
+$  foreach {alt}
+[-set an = @name-][-if {not(count(../alt) = 1)}-][-set an = {concat(@name, '_', $pname)}-][-end if-]let a_$an [-foreach {elem}-]${@type}_${position()} [-end foreach-]=
+ { [-if {count(elem) = 0}-]empty_$an = false[-end if-] [-foreach {elem}-][-set ann = {concat($an, '_', @name)}-]$ann = [-if {@is_list}-]List.map (fog de_optionify [-end if-]cast_off_[-if {@is_token}-]T[-else-]@etype[-end if-][-if {@is_list}-])[-end if-] ${@type}_${position()}; [-end foreach-] }
+$  end foreach
+$ end foreach
+
+let getType n = match n with
+$ foreach {//alt}
+| P ${../@ename} ${@ename} _ -> "@ename"
+$ end foreach
+| _ -> "other"
+
+let string_of_node n = match n with
+| Start (s, _) -> "Start" 
+| P p -> (getType n) | T t -> (Tokens.getText t) | Null_Node -> "null"
+
+end
+$ end template

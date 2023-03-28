@@ -1,0 +1,471 @@
+
+XSS - XML based SableCC Stylesheets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+XSS stylesheets allow you to easily generate custom output from
+SableCC's. XSS was originally built on XML and XSL transforms but
+now works as a standalone system.
+
+The XSS produces output based on input data tree. It can be mapped
+into XML using the xml target.
+
+Therefore it is imperative to understand its structure. Generate one (XML).
+Inspect it in Mozilla or IE. Close and open elements. See what's
+inside. Know what the attributes represent. This is the basic structure:
+
+  parser
+    tokens
+      token*
+    prods
+      prod*
+        alt*
+          elem*
+    lexer_data
+      state*
+      accept_table
+        state*
+          i*
+      goto_table
+        state*
+          goto*
+    parser_data
+      action_table
+        row*
+          action*
+      goto_table
+        row*
+          action*
+      errors
+        i*
+      error_messages
+        msg*
+      rules
+        rule*
+          action*
+            arg*
+
+Out of all that the most interesting part is only the tiny top:
+
+  parser
+    tokens
+      token*
+    prods
+      prod*
+        alt*
+          elem*
+
+This contains the tokens and the structure of the abstract syntax tree.
+
+The stylesheet system implements a subset of the W3's XPath language
+to perform simple queries etc.
+
+The thing to understand is that the xpath expressions always work in the
+context of the element you're at. By default that element would be
+/parser. But if you do a foreach then inside the foreach content block the
+context changes to the element you're at.
+
+XSS is a mixed set of text and command blocks. In this document the
+command names are always in capitals. To go into and then out of
+command block [- and -] or for a whole line '$ ' at start are used.
+Additionally inside the text you can specify inline replaceble elements
+that are taken from current context.
+
+A little example:
+
+    @package
+
+    $ FOREACH {//token}
+    @name
+    $ END FOREACH
+
+This would output the package name (attribute named 'package' on /parser),
+then we'd loop over all the tokens and print their names. The command names
+in practice are case insensitive and you don't have to use the command
+name at END.
+
+
+* Inline outputing: @attrib, $var and ${<xpath-expr>}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Usage:
+    ..content..
+    @attrib
+    @{attrib}
+    $varname
+    ${<xpath-expr>}
+    ..content..
+
+These allow us to insert values from the current context element into
+the output.
+
+Examples:
+
+    @package
+
+    Mixed@{package}string.
+
+In case we are at top context (the /parser) outputs the package attribute
+of parser.
+
+    [-SET nick='Joe'-]
+    $nick
+
+Outputs the variable/parameter named 'nick'. You can SET or PARAM
+variables and also they're implicitly used at TEMPLATE/CALL.
+
+The shortcut $ and @ forms can be followed by a series of letters or
+numbers or underscores but it must start with a letter.
+
+    ${../@ename}
+
+This is the long xpath expression form. Insert the attribute 'ename'
+from parent element.
+
+Obviously to accomplish all this $ and @ are special symbols. To get them
+themselves into the output you just have to double them.
+
+    @@$$
+
+This should output '@$'. Inside the ${<xpath-expr>} the curly braces
+are also special and have to be doubled to be used. One more special
+escaped combination is '[--' - it is read as text and translated
+to '[-'. With single dash ([-) it would mean the start of a command.
+
+The shortcut @attrib and $var syntax can also be used where expression
+is expected inside command block (except foreach).
+
+
+* Commands
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Commands represent the control structure of a template. Commands
+allow conditional displaying, looping over elements and even
+specifying the output file name.
+
+XSS supports basically similar set of commands that are available
+in XSL. There are some differences tho:
+
+Notably we have IF-ELSE while there is no else construct in the XSL.
+
+Commands have to be placed into tags [- -].
+
+There is now also a new shortcut syntax for commands that take
+up only one line - if the first two characters of a line
+are '$ ' (dollar space) then the rest of line is implied as
+command and wrapped into [- .. -]:
+
+    This is from beginning of line
+    This is from beginning of line
+    This is from beginning of line
+    $ foreach {elem}
+    Same as writing:
+    [-foreach {elem}-]
+
+
+* XPath - supported functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+These are the currently implemented and supported functions:
+
+    position()
+    count(node-selection)
+    translate(string, from, to)
+    concat(str1,..)
+    not(expr)
+    string(expr)
+    contains(string,search)
+
+Also several non-standard functions are available:
+
+    reverse(node-selection)
+    sablecc:string2escaped_unicode(str)
+    sablecc:toxml(node-selection,ident-amount)
+    sablecc:toggle(domain-string,token-string)
+
+Separators:
+    /
+    //
+
+In xpath expressions these special nodes are supported:
+    .
+    ..
+
+No axis etc. are supported. 
+
+There is no director support for booleans - anything not null is considered
+true. The same goes for numbers - everything is converted to and from
+strings where necessary.
+
+Supported Xpath operators:
+    +
+    -
+    =
+    !=
+
+
+* FOREACH
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Usage:
+
+    [-FOREACH [name IN] <xpath-expr>-]
+    ..content..
+    [-END FOREACH-]
+
+Foreach allows you to loop over a set of elements and output the
+content for every one of them. The selection is provided by
+a xpath expression.
+
+If name is specified then a variable with that name is set
+to given element. That could also be accomplished with [-SET-].
+
+As you foreach through elements the context in which the content
+is evaluated changes to the element you're looping at.
+
+Examples:
+
+    [-FOREACH {//alt}-]
+
+Foreach over all elements in the document that are named 'alt'.
+
+    [-FOREACH {elem}-]
+
+Foreach over all XML elements named elem that are directly under
+current context.
+
+    [-FOREACH {//token[position()=1]}-]
+
+Loop over the first token (only one element).
+
+    [-FOREACH {//token[@value]}-]
+
+Loop over all tokens that have a value attribute (eg. fixed
+tokens).
+
+    [-FOREACH {elem[@is_list='true']}-]
+
+Loop over all elem-s that are under given context and
+additinally must meet the condition that they are lists.
+
+The need for 'name IN' construct is very rare. It comes when
+you need to cross-reference from one context into another.
+See java/lexer.xss where it's used in that form.
+
+
+* IF and IF .. ELSE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Usage:
+
+    [-IF <expr>-]
+    ..content..
+    [-END IF]
+
+    [-IF <expr>-]
+    ..content..
+    [-ELSE-]
+    ..content..
+    [-END IF-]
+
+IF allows you to ouput content depending on some test. The test
+would usually be an xpath expression.
+
+Examples:
+
+    [-IF {not(@is_list)}-]
+        System.out.println ("NOT A LIST!");
+    [-ELSE-]
+        System.out.println ("IS A LIST!");
+    [-END IF-]
+
+Test whether the element in current context does not have an
+attribute named is_list.
+
+
+* CHOOSE, WHEN and OTHERWISE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Usage:
+
+    [-CHOOSE-]
+      [-WHEN <expr>-]
+      ..content..
+      [-END WHEN-]
+      ..
+      [-OTHERWISE-]
+      ..content..
+      [-END OTHERWISE-]
+    [-END CHOOSE-]
+
+CHOOSE tests the WHEN conditions and when one is met its content
+is processed and outputed. After that nothing more is
+searched/outputed. But when no WHEN was found and OTHERWISE
+is present then its content is outputed.
+
+Example:
+
+    [-CHOOSE-]
+      [-WHEN {@age>64}-]
+      You are old and wise!
+      [-END WHEN]
+      [-WHEN {@age>32}-]
+      You should get married if you're not yet!
+      [-END WHEN]
+      [-WHEN {@age>18}-]
+      You can get drunk!
+      [-END WHEN-]
+      [-OTHERWISE-]
+      You need to grow a bit!
+      [-END OTHERWISE-]
+    [-END CHOOSE-]
+
+As you should guess this tests the current context element's attribute
+'age' and prints output depending on its value.
+
+
+* TEMPLATE and CALL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Usage:
+
+    [-TEMPLATE name([arg [= <expr>] [, ..]])-]
+    ..template content..
+    [-END TEMPLATE-]
+
+    [-CALL name([arg = <expr> [, ..]])-]
+
+There are people who are obsessed with reuse. These two commands
+provide that functionality. They allow you to write a template
+that can be later called in any place in your stylesheet.
+
+The arguments will be added as variables ($arg) and can be
+referenced inside the TEMPLATE.
+
+Example:
+
+    [-TEMPLATE myname(name, loves='Jesus')-]
+    Hello, my name is $name and I love $loves.
+    [-END TEMPLATE-]
+
+    [-CALL myname(name='John', loves='Jane')-]
+    [-CALL myname(name='Bob', loves='Jane')-]
+    [-CALL myname(name='Jane')-]
+
+Output:
+
+    Hello, my name is John and I love Jane.
+    Hello, my name is Bob and I love Jane.
+    Hello, my name is Jane and I love Jesus.
+
+As you can see you can provide default values for arguments.
+And you can omit any argument. Also argument order is
+unspecified.
+
+The context inside the template changes to where it was called from.
+
+
+* INCLUDE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Usage:
+
+    [-INCLUDE '<path>'-]
+
+You can split your stylesheets into multiple chunks and then assemble
+them using INCLUDE. The path is taken to be in the directory context
+of the calling stylesheet.
+
+Example:
+
+    [-INCLUDE 'library1.xss'-]
+    [-INCLUDE 'library2.xss'-]
+    [-INCLUDE 'library3.xss'-]
+
+
+* OUTPUT
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Usage:
+
+    [-OUTPUT <path-expr>-]
+    ..content..
+    [-END OUTPUT-]
+
+Output allows you to redirect all the content into a file specified by
+<path-expr>. The path-expr can be a xpath expression.
+
+Examples:
+
+    [-OUTPUT 'out.txt'-]
+    This output goes to out.txt!
+    [-END OUTPUT-]
+
+Produces a file named out.txt.
+
+    [-FOREACH {//token}-]
+    [-OUTPUT {concat(@ename,'.java')}-]
+    public class @ename {
+    ..
+    }
+    [-END OUTPUT-]
+    [-END FOREACH-]
+
+Loops over all tokens and creates a file for each of them.
+
+* SEP
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Usage:
+    [-SEP ','-]
+
+This must be used inside a FOREACH loop. It outputs its argument
+unless the FOREACH is processing its last element. So it's an
+easy way to provide separators between elements.
+
+Example:
+
+    [-FOREACH {//token}-]
+      @ename[-sep ', '-]
+    [-END-]
+
+
+* SET and PARAM
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Usage:
+    [-SET varname = <expr> [, ..] -]
+
+    [-PARAM parname [= <expr>] [, ..] -]
+
+XSS/XSL stylesheets can take arguments. The arguments have to be described
+using the PARAM command. For example the output directory were all files
+should be generated is such a PARAM.
+
+SET is used for variables inside loops and otherwise. SET is not an
+assignment but a context/scope dependant rebinding. So you can't really do
+imperative programming using it.
+
+SET is implicitly used at named FOREACH and also TEMPLATE/CALL.
+
+Wherever you define PARAM-s they are removed and placed into global
+scope outside any output generation. So PARAM-s can't be redefined.
+
+* PRINT
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Usage:
+    [-PRINT <expr>-]
+
+Used to simply print out an expression to output stream. Does not
+generate any white space (line breaks, etc).
+
+
+Example:
+
+    [-PRINT 'Hello, world!'-]
+
+
+* Comments 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Usage:
+    [-
+      // This is a comment.
+      // These won't be in the output
+      COMMAND
+    -]
+
+    [-!
+      This is also a comment, can contain [- and -]
+    !-]
+
+    $ // Comment
+
+
+

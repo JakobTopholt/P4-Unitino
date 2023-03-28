@@ -1,0 +1,570 @@
+$
+$ print {sablecc:varput('lexer_dfa_state_type', 'signed char')}
+$ foreach {lexer_data/accept_table/state}
+$   if {count(i) > 127}
+$     print {sablecc:varput('lexer_dfa_state_type', 'int')}
+$   end if
+$ end foreach
+$ set lexer_dfa_state_type = {sablecc:varget('lexer_dfa_state_type')}
+$
+$ if {count(tokens/token) < 255}
+$  set lexer_token_index_type = 'unsigned char'
+$  set lexer_token_index_error = '255'
+$ else
+$  set lexer_token_index_type = 'int'
+$  set lexer_token_index_error = '-1'
+$ end if
+$
+$ if {count(lexer_data/goto_table/state) <= 255}
+$   set lexer_transition_table_type = 'unsigned char'
+$ else
+$   set lexer_transition_table_type = 'enum elexer_status'
+$ end if
+$
+$ print {sablecc:varput('lexer_char_type', 'unsigned char')}
+$ foreach {lexer_data/goto_table/state/row/goto}
+$   if {@low > 255}
+$     print {sablecc:varput('lexer_char_type', 'int')}
+$   end if
+$   if {@high > 255}
+$     print {sablecc:varput('lexer_char_type', 'int')}
+$   end if
+$ end foreach
+$ set lexer_char_type = {sablecc:varget('lexer_char_type')}
+$
+$ print {sablecc:varput('lexer_gotocount_type', 'unsigned char')}
+$ foreach {lexer_data/goto_table/state/row}
+$   if {count(goto) > 255}
+$     print {sablecc:varput('lexer_gotocount_type', 'int')}
+$   end if
+$   if {count(goto) > 255}
+$     print {sablecc:varput('lexer_gotocount_type', 'int')}
+$   end if
+$ end foreach
+$ set lexer_gotocount_type = {sablecc:varget('lexer_gotocount_type')}
+$
+$
+struct lgoto3
+{
+  $lexer_char_type l, h;
+  $lexer_dfa_state_type s;
+};
+
+static struct lgoto3 _lg_d[${count(lexer_data/goto_table/state/row/goto)}] = {
+$ foreach {lexer_data/goto_table/state}
+$   set i = {position()}
+  /* state ${$i} */
+$   foreach {row}
+$     set j = {position()}
+    /* row ${$j} */
+$     foreach {goto}
+     {@low, @high, @state},
+$     end foreach
+$   end foreach
+$ end foreach
+};
+
+static int _lg_rc[${count(lexer_data/goto_table/state)}] = {
+$ foreach {lexer_data/goto_table/state}
+  ${count(row)},
+$ end foreach
+};
+
+static $lexer_gotocount_type _lg_gc[${count(lexer_data/goto_table/state/row)}] = {
+$ foreach {lexer_data/goto_table/state}
+$   set i = {position()}
+  /* state ${$i} */
+$   foreach {row}
+$     set j = {position()}
+    /* row ${$j} */
+    ${count(goto)},
+$   end foreach
+$ end foreach
+};
+
+static $lexer_token_index_type _la_d[${count(lexer_data/accept_table/state/i)}] = {
+$ foreach {lexer_data/accept_table/state}
+$   set i = {position()}
+  /* state ${$i} */
+  [-foreach {i}-][-if {string(.) = '-1'}-]$lexer_token_index_error[-else-]${.}[-end-], [-if {position() mod 16 = 0}-]
+  [-end if-][-end foreach-]
+$ end foreach
+};
+
+static int _la_c[${count(lexer_data/accept_table/state)}] = {
+$ foreach {lexer_data/accept_table/state}
+  ${count(i)},
+$ end foreach
+};
+
+enum elexer_state {
+$ foreach {lexer_data/state}
+    @name,
+$ end foreach
+};
+
+$ if {$omit_token_defaults = ''}
+static const char *token_defaults[${count(tokens/token)}] = {
+$ foreach token in {//token}
+$   if @text
+    "${sablecc:string2escaped_unicode(@text)}"[-sep ','-]
+$   else
+    NULL[-sep ','-]
+$   end if
+$ end foreach
+};
+$ end if
+
+static $lexer_transition_table_type lexer_transitions[${count(tokens/token)}][${count(lexer_data/state)}] = {
+$ foreach token in {//token}
+$ print '  {'
+$   foreach state in {/parser/lexer_data/state}
+$     if {$token/transition[@from=$state/@name]}
+$ print {$token/transition[@from=$state/@name]/@to} + ', '
+$     else
+$ print @name + ', '
+$     end if
+$   end foreach
+},
+$ end foreach
+};
+
+
+struct lgoto_row
+{
+  struct lgoto3 *gotos_begin;
+  $lexer_gotocount_type len;
+};
+
+struct lgoto_state
+{
+  struct lgoto_row *rows;
+  int c;
+};
+
+static int lexer_initialized = 0;
+static struct lgoto_state lgoto[${count(lexer_data/goto_table/state)}];
+static struct lgoto_row _lg_r[${count(lexer_data/goto_table/state/row)}];
+static $lexer_token_index_type *laccept[${count(lexer_data/accept_table/state)}];
+
+static void lexer_init ()
+{
+  int i;
+  struct lgoto3 *gotodatap = _lg_d;
+  $lexer_gotocount_type *gotocp = _lg_gc;
+  struct lgoto_row *rowsp = _lg_r;
+  $lexer_token_index_type *ladp = _la_d;
+
+  for ( i = 0; i < ${count(lexer_data/goto_table/state)}; i++ )
+    {
+      int row_count = _lg_rc[i];
+
+      lgoto[i].c = row_count;
+      lgoto[i].rows = rowsp;
+
+      while (row_count)
+         {
+          rowsp->len = *gotocp;
+          rowsp->gotos_begin = gotodatap;
+          gotodatap += *gotocp;
+          gotocp++;
+          rowsp++;
+          row_count--;
+        }
+    }
+
+  for ( i = 0; i < ${count(lexer_data/accept_table/state)}; i++ )
+    {
+      laccept[i] = ladp;
+      ladp += _la_c[i];
+    }
+
+  lexer_initialized = 1;
+}
+
+#define LEXER_BUFFERCHUNK_SIZE $lexer_backbuffer_chunk_size
+#define LEXER_INITIAL_TOKENBUF_SIZE $lexer_initial_tokenbuf_size
+
+typedef char lexer_buffer_element_type;
+
+struct lexer_buffer;
+struct lexer_buffer
+{
+  struct lexer_buffer *prev;
+  struct lexer_buffer *next;
+  lexer_buffer_element_type *begin;
+  lexer_buffer_element_type buf[LEXER_BUFFERCHUNK_SIZE];
+};
+
+$lexers
+{
+  $pools *pool;
+
+  enum elexer_state state;
+  int line, pos;
+  int cr, eof;
+
+  const char *begin, *end;
+  int close_file;
+  FILE *fin;
+
+  char *error;
+
+  /* this is messed up and unoptimal, work on this, only one buffer system is probably really needed */
+  struct lexer_buffer *bb;
+  char buf[1024];
+  char *tokenbuf;
+  int tokenbuf_size;
+
+  int unread_one;
+};
+
+static $inline_keyword int lexer_get_char ($lexers *lexer)
+{
+  if ( lexer->unread_one != -1 )
+    {
+      int ret = lexer->unread_one;
+      lexer->unread_one = -1;
+      return ret;
+    }
+
+  if ( lexer->bb )
+    {
+      if ( lexer->bb->begin != lexer->bb->buf + LEXER_BUFFERCHUNK_SIZE ) return *lexer->bb->begin++;
+      if ( lexer->bb->next )
+        {
+          lexer->bb = lexer->bb->next;
+          return *lexer->bb->begin++;
+        }
+    }
+
+  if ( lexer->begin != lexer->end ) return *lexer->begin++;
+
+  if ( lexer->fin )
+    {
+      size_t r = fread (lexer->buf, 1, sizeof (lexer->buf), lexer->fin);
+      lexer->begin = lexer->buf;
+      lexer->end = lexer->buf + r;
+      if ( r )
+        {
+          return *lexer->begin++;
+        }
+      else
+        {
+          if ( lexer->close_file ) fclose (lexer->fin);
+          lexer->fin = 0;
+        }
+    }
+
+  return -1;
+}
+
+static $inline_keyword void lexer_unread_int ($lexers *lexer, int c)
+{
+  if ( !lexer->bb )
+    {
+      lexer->bb = $malloc (sizeof (struct lexer_buffer));
+      lexer->bb->prev = lexer->bb->next = 0;
+      lexer->bb->begin = lexer->bb->buf + LEXER_BUFFERCHUNK_SIZE;
+    }
+
+  if ( lexer->bb->begin == lexer->bb->buf )
+    {
+      if ( !lexer->bb->prev )
+        {
+          lexer->bb->prev = $malloc (sizeof (struct lexer_buffer));
+          lexer->bb->prev->next = lexer->bb;
+          lexer->bb->prev->prev = 0;
+          lexer->bb->prev->begin = lexer->bb->prev->buf + LEXER_BUFFERCHUNK_SIZE;
+        }
+      lexer->bb = lexer->bb->prev;
+    }
+
+  *--lexer->bb->begin = c;
+}
+
+static $inline_keyword void text_push_back ($lexers *lexer, const char *buf, int n)
+{
+  if ( !lexer->bb )
+    {
+      lexer->bb = $malloc (sizeof (struct lexer_buffer));
+      lexer->bb->prev = lexer->bb->next = 0;
+      lexer->bb->begin = lexer->bb->buf + LEXER_BUFFERCHUNK_SIZE;
+    }
+
+  while ( n )
+    {
+      if ( lexer->bb->begin == lexer->bb->buf )
+        {
+          if ( !lexer->bb->prev )
+            {
+              lexer->bb->prev = $malloc (sizeof (struct lexer_buffer));
+              lexer->bb->prev->next = lexer->bb;
+              lexer->bb->prev->prev = 0;
+              lexer->bb->prev->begin = lexer->bb->prev->buf + LEXER_BUFFERCHUNK_SIZE;
+            }
+          lexer->bb = lexer->bb->prev;
+        }
+
+      int bs = lexer->bb->begin - lexer->bb->buf;
+      if ( bs > n ) bs = n;
+      memcpy (lexer->bb->begin - bs, buf - bs, bs);
+      lexer->bb->begin -= bs;
+      buf -= bs;
+      n -= bs;
+    }
+}
+
+struct ${$prefix_type}lexer * ${$prefix_function}lexer_create_from_path($pools *pool, const char *path)
+{
+  FILE *fin = fopen (path, "rb");
+  if ( !fin ) return 0;
+  struct ${$prefix_type}lexer *lexer = ${$prefix_function}lexer_create_from_file (pool, fin);
+  lexer->close_file = 1;
+  return lexer;
+}
+
+struct ${$prefix_type}lexer * ${$prefix_function}lexer_create_from_file($pools *pool, FILE *fin)
+{
+  struct ${$prefix_type}lexer *lexer = $malloc (sizeof (struct ${$prefix_type}lexer));
+  lexer->pool = pool;
+  lexer->line = lexer->pos = 0;
+  lexer->cr = lexer->eof = 0;
+  lexer->begin = lexer->end = 0;
+  lexer->close_file = 0;
+  lexer->fin = fin;
+  lexer->state = ${lexer_data/state/@name};
+  lexer->bb = 0;
+  lexer->error = 0;
+  lexer->tokenbuf_size = LEXER_INITIAL_TOKENBUF_SIZE;
+  lexer->tokenbuf = $malloc(lexer->tokenbuf_size);
+  lexer->unread_one = -1;
+  if ( !lexer_initialized ) lexer_init();
+  return lexer;
+}
+
+struct ${$prefix_type}lexer * ${$prefix_function}lexer_create_from_string($pools *pool, const char *str, int len)
+{
+  struct ${$prefix_type}lexer *lexer = $malloc (sizeof (struct ${$prefix_type}lexer));
+  lexer->pool = pool;
+  lexer->line = lexer->pos = 0;
+  lexer->cr = lexer->eof = 0;
+  lexer->begin = str;
+  lexer->end = str + len;
+  lexer->fin = 0;
+  lexer->state = ${lexer_data/state/@name};
+  lexer->bb = 0;
+  lexer->error = 0;
+  lexer->tokenbuf_size = LEXER_INITIAL_TOKENBUF_SIZE;
+  lexer->tokenbuf = $malloc(lexer->tokenbuf_size);
+  lexer->unread_one = -1;
+  if ( !lexer_initialized ) lexer_init();
+  return lexer;
+}
+
+void ${$prefix_function}lexer_destroy (struct ${$prefix_type}lexer *lexer)
+{
+  if ( lexer->bb )
+    {
+      while ( lexer->bb->prev ) lexer->bb = lexer->bb->prev;
+      while ( lexer->bb )
+        {
+          struct lexer_buffer *bd = lexer->bb;
+          lexer->bb = lexer->bb->next;
+          $free (bd);
+        }
+    }
+
+  if ( lexer->fin && lexer->close_file ) fclose (lexer->fin);
+  if ( lexer->error ) $free (lexer->error);
+  $free (lexer->tokenbuf);
+  $free (lexer);
+}
+
+const char * ${$prefix_function}lexer_get_error ($lexers *lexer)
+{
+  return lexer->error;
+}
+
+struct ${$prefix_type}node *${$prefix_function}lexer_get (struct ${$prefix_type}lexer *lexer)
+{
+  $lexer_dfa_state_type dfa_state = 0;
+  $lexer_token_index_type accept_token = $lexer_token_index_error;
+  int accept_length;
+  int accept_pos;
+  int accept_line;
+  int accept_cr;
+
+  $lexer_token_index_type *accept = laccept[lexer->state];
+  struct lgoto_row *goto_rows = lgoto[lexer->state].rows;
+
+  int line = lexer->line;
+  int pos = lexer->pos;
+  int cr = lexer->cr;
+
+  char *buf = lexer->tokenbuf;
+  char *bbegin = buf;
+  char *bend = buf + lexer->tokenbuf_size;
+
+  for (;;)
+    {
+      int c = lexer_get_char (lexer);
+
+      if ( c != -1 )
+        {
+          if ( c == 10 )
+            {
+              if ( cr )
+                {
+                  cr = 0;
+                }
+              else
+                {
+                  line++;
+                  pos = 0;
+                }
+            }
+          else if ( c == 13 )
+            {
+              line++;
+              pos = 0;
+              cr = 1;
+            }
+          else
+            {
+              pos++;
+              cr = 0;
+            }
+
+          if ( bbegin == bend )
+            {
+              int pos = bbegin - buf;
+              lexer->tokenbuf_size *= 2;
+              buf = lexer->tokenbuf = $realloc (lexer->tokenbuf, lexer->tokenbuf_size);
+              bbegin = buf + pos;
+              bend = buf + lexer->tokenbuf_size;
+            }
+          *bbegin++ = c;
+
+          do {
+              struct lgoto_row *row;
+              struct lgoto3 *gbegin, *gend;
+              $lexer_gotocount_type glen;
+
+              row = &goto_rows[(dfa_state < -1) ? (-2 -dfa_state) : dfa_state];
+              dfa_state = -1;
+
+              gbegin = row->gotos_begin;
+              glen = row->len;
+              gend = gbegin + glen;
+
+              while ( glen )
+                {
+                  $lexer_gotocount_type half = glen >> 1;
+                  struct lgoto3 *middle = gbegin + half;
+
+                  if ( c < middle->l )
+                    {
+                      gend = middle;
+                      glen = half;
+                    }
+                  else if ( c > middle->h )
+                    {
+                      gbegin = middle + 1;
+                      glen = glen - half - 1;
+                    }
+                  else
+                    {
+                      dfa_state = middle->s;
+                      break;
+                    }
+                }
+            }
+          while ( dfa_state < -1 );
+        }
+      else
+        {
+          dfa_state = -1;
+        }
+
+      if ( dfa_state >= 0 )
+        {
+          if ( accept[(int)dfa_state] != $lexer_token_index_error )
+            {
+              accept_token = accept[(int)dfa_state];
+              accept_pos = pos;
+              accept_line = line;
+              accept_cr = cr;
+              accept_length = bbegin - buf;
+            }
+        }
+      else
+        {
+          if ( accept_token != $lexer_token_index_error )
+            {
+              int read_back_count = (bbegin - buf) - accept_length;
+              if ( read_back_count == 1 && lexer->unread_one == -1 )
+                {
+                  lexer->unread_one = c;
+                }
+              else
+                {
+                  text_push_back (lexer, bbegin, read_back_count);
+                }
+              $nodes *token = quick_alloc_node(lexer->pool);
+              token->type = accept_token;
+              token->c.token.line = lexer->line + 1;
+              token->c.token.pos = lexer->pos + 1;
+              token->c.token.len = accept_length;
+              token->next = 0;
+
+              lexer->state = lexer_transitions[accept_token][lexer->state];
+              lexer->line = accept_line;
+              lexer->pos = accept_pos;
+              lexer->cr = accept_cr;
+
+$ if {$omit_token_defaults = ''}
+              if ( token_defaults[accept_token] )
+                {
+                  token->c.token.value = token_defaults[accept_token];
+                  return token;
+                }
+              else
+$ end if // !omit_token_defaults
+                {
+$ if {$omit_ignored_token_values != ''}
+                  if ( token2index[accept_token] == -1 )
+                    {
+                      token->c.token.value = "";
+                      token->c.token.len = 0;
+                      return token;
+                    }
+$ end if
+                  char *tdata = quick_alloc_token (lexer->pool, accept_length + 1);
+                  memcpy (tdata, buf, accept_length);
+                  tdata[accept_length] = 0;
+                  token->c.token.value = tdata;
+                  return token;
+                }
+            }
+          else
+            {
+              if ( bbegin != buf )
+                {
+                  lexer->error = $malloc (64 + (bbegin - buf));
+                  *bbegin = 0;
+                  sprintf (lexer->error, "Lexer: [%u,%u] Unknown token: %s",
+                      lexer->line + 1, lexer->pos + 1, buf);
+                  return 0;
+                }
+              else
+                {
+                  $nodes *token = ${$prefix_function}node_alloc_token (lexer->pool, ${$prefix_nodetype}TEOF, "", 0);
+                  token->c.token.line = lexer->line + 1;
+                  token->c.token.pos = lexer->pos + 1;
+                  return token;
+                }
+            }
+        }
+    }
+}

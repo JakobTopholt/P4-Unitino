@@ -1,0 +1,70 @@
+Inlining rules ::
+
+    1 -- Only non recursive productions can be inlined.
+	    ex : prod = elem1 elem2 elem3 ** ok
+	         prod = prod elem1        ** no
+
+    2 -- We (at first time) try to inline productions which imply 
+	 directly or undirectly a conflict.
+
+
+
+   Implementation :
+
+         %% Find a production imply in a conflict (Class Production.java in the code).
+
+	 %% Hashtable of prod_transfrom and corresponding alt_transform.
+	      exp
+		    {-> exp} =
+	        {plus}   exp plus factor
+		    {-> New exp.plus(exp, factor.exp)   } 	|
+		{minus}  exp minus factor
+		    {-> New exp.minus(exp, factor.exp)  } 	|
+                {factor} factor
+		    {-> factor.exp};
+
+			APlusExp.exp    ->  New exp.plus(exp, factor.exp)
+			AMinusExp.exp   ->  New exp.minus(exp, factor.exp)
+			AFactorExp.exp  ->  factor.exp
+
+	      exp_list
+		    {-> exp* } =
+	        {list} exp  xexp_list_tail
+	     	    {-> [exp xexp_list_tail.exp] } 		|
+	        {single_start_word} begin exp T.end
+	     	    {-> [exp] } 				|
+	        {single_start_symbol} begin exp r_bkt
+	     	    {-> [exp] } 				|
+	        {single_start_word2} l_bkt exp T.end
+	     	    {-> [exp] } 				|
+	        {single_start_symbol2} l_bkt exp r_bkt
+	     	    {-> [exp] };
+
+		       AListExpList.exp		      ->  [exp xexp_list_tail.exp]
+		       ASingleStartWordExpList.exp    ->  [exp]
+		       ASingleStartSymbolExpList.exp  ->  [exp]
+		       ASingleStartWord2ExpList.exp   ->  [exp]
+		       ASingleStartSymbol2ExpList.exp ->  [exp]
+	 
+	 
+	 :::: WARNING ::::
+	      Symbol tables of alt_transform terms must be constructed only
+	      when starting the inlining of this production.
+	 %% Inline a production imply  ::
+		   
+		   - delete an alternative from a production and replace it
+		     by a new inlined alternative (the result can be one or more alternatives).
+		   
+		   - transformation of alternatives in which this production occurs.
+		   	 ** create one or more new alternative with the same 
+			    elements except the one we want to transform.
+			 ** For those new created alternatives, update their alt_transform
+			    according to previous(old) alt_transform.
+		   
+		   - delete the production inlined from list of productions
+		        ( AProductions.java : removeChild() ).
+
+
+	 %% Pseudo-code of production inlining ::
+
+	    	   

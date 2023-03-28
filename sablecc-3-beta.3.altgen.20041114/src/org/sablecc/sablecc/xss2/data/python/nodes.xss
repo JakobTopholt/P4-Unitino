@@ -1,0 +1,68 @@
+$ template make_nodes()
+
+$ include 'tokens.xss'
+$ include 'prods.xss'
+
+$ // generate the nodes.py
+############################# nodes.py ############################################## 
+
+class Node(object):
+    def __init__(self):
+        if self.__class__ is Node:
+            raise TypeError("Node class can not be instantiated.")
+        self.parent = None
+
+    def clone(self):
+        abstract()
+		
+    def getparent(self):
+        return self.parent
+
+    def setparent(self, parent):
+        self.parent = parent
+
+    def removeChild(self, child):
+    	abstract()
+    	
+    def replaceChild(self, oldChild, newChild):
+    	abstract()
+
+    def replaceBy(self, node):
+        if (self.parent != None):
+            self.parent.replaceChild(self, node)
+
+    def toString(self, other):
+        if isinstance(other, ListType):
+            sb = StringBuffer()
+
+            for node in other:
+                s.append(node)
+
+            return str(sb)
+        
+        if (other != None):
+            return str(other)
+
+        return ''
+        
+    def cloneNode(self, node):
+        if(node != None):
+            return node.clone()
+
+        return None
+
+    def cloneList(self, lst):
+        clone = list()
+
+        for node in lst:
+            clone.append(node.clone())
+
+        return clone
+
+    def apply(self, analysis):
+        abstract()
+
+$ call make_tokens()
+$ call make_prods()
+     
+$ end template
