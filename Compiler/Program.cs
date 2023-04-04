@@ -46,3 +46,26 @@ class SomeVisitor : Analysis
 {
     
 }
+
+
+// Avoid overriding Case[NodeName], because this contains how it's children should be overriden
+// Instead call either In[NodeName] or Out[NodeName] to insert actioncode
+class AnotherVisitor : DepthFirstAdapter
+{
+    public override void InStart(Start node)
+    {
+        
+    }
+    public override void CaseStart(Start node)
+    {
+        InStart(node); // Always called before children are visited
+        node.GetPGrammar().Apply(this); //children gets visited
+        OutStart(node); //always called after children are visited
+    }
+
+    public override void OutStart(Start node)
+    {
+        
+    }
+}
+
