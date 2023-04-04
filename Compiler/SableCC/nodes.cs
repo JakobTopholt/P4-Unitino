@@ -4,7 +4,7 @@ using System;
 using System.Collections;
 using System.Text;
 
-namespace org.sablecc.sablecc.node {
+namespace Moduino.node {
 
 public abstract class Node : Switchable, ICloneable
 {
@@ -268,4 +268,4 @@ public class TypedList : IList
       list.RemoveAt(index);
     }
 }
-} // namespace org.sablecc.sablecc.node
+} // namespace Moduino.node
