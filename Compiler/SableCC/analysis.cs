@@ -16,14 +16,21 @@ public interface Analysis : Switch
 
     void CaseStart(Start node);
     void CaseAGrammar(AGrammar node);
-    void CaseAStmt(AStmt node);
+    void CaseAProgFunc(AProgFunc node);
+    void CaseANewFunc(ANewFunc node);
+    void CaseAExpStmt(AExpStmt node);
+    void CaseAAssignStmt(AAssignStmt node);
+    void CaseADeclStmt(ADeclStmt node);
+    void CaseAFunccallStmt(AFunccallStmt node);
     void CaseAPlusExp(APlusExp node);
     void CaseAMinusExp(AMinusExp node);
     void CaseADivExp(ADivExp node);
     void CaseAMultExp(AMultExp node);
     void CaseANumberExp(ANumberExp node);
+    void CaseAId(AId node);
 
     void CaseTProg(TProg node);
+    void CaseTInt(TInt node);
     void CaseTLBkt(TLBkt node);
     void CaseTRBkt(TRBkt node);
     void CaseTLPar(TLPar node);
@@ -41,7 +48,7 @@ public interface Analysis : Switch
     void CaseTComma(TComma node);
     void CaseTSemicolon(TSemicolon node);
     void CaseTColon(TColon node);
-    void CaseTId(TId node);
+    void CaseTTid(TTid node);
     void CaseTChar(TChar node);
     void CaseTNumber(TNumber node);
     void CaseTHex(THex node);
@@ -118,7 +125,27 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
-    public virtual void CaseAStmt(AStmt node)
+    public virtual void CaseAProgFunc(AProgFunc node)
+    {
+        DefaultCase(node);
+    }
+    public virtual void CaseANewFunc(ANewFunc node)
+    {
+        DefaultCase(node);
+    }
+    public virtual void CaseAExpStmt(AExpStmt node)
+    {
+        DefaultCase(node);
+    }
+    public virtual void CaseAAssignStmt(AAssignStmt node)
+    {
+        DefaultCase(node);
+    }
+    public virtual void CaseADeclStmt(ADeclStmt node)
+    {
+        DefaultCase(node);
+    }
+    public virtual void CaseAFunccallStmt(AFunccallStmt node)
     {
         DefaultCase(node);
     }
@@ -142,8 +169,16 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
+    public virtual void CaseAId(AId node)
+    {
+        DefaultCase(node);
+    }
 
     public virtual void CaseTProg(TProg node)
+    {
+        DefaultCase(node);
+    }
+    public virtual void CaseTInt(TInt node)
     {
         DefaultCase(node);
     }
@@ -215,7 +250,7 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
-    public virtual void CaseTId(TId node)
+    public virtual void CaseTTid(TTid node)
     {
         DefaultCase(node);
     }
@@ -297,33 +332,144 @@ public class DepthFirstAdapter : AnalysisAdapter
     {
         InAGrammar(node);
         {
-            Object[] temp = new Object[node.GetExp().Count];
-            node.GetExp().CopyTo(temp, 0);
+            Object[] temp = new Object[node.GetFunc().Count];
+            node.GetFunc().CopyTo(temp, 0);
             for(int i = 0; i < temp.Length; i++)
             {
-                ((PExp) temp[i]).Apply(this);
+                ((PFunc) temp[i]).Apply(this);
             }
         }
         OutAGrammar(node);
     }
-    public virtual void InAStmt(AStmt node)
+    public virtual void InAProgFunc(AProgFunc node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutAStmt(AStmt node)
+    public virtual void OutAProgFunc(AProgFunc node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseAStmt(AStmt node)
+    public override void CaseAProgFunc(AProgFunc node)
     {
-        InAStmt(node);
+        InAProgFunc(node);
+        {
+            Object[] temp = new Object[node.GetStmt().Count];
+            node.GetStmt().CopyTo(temp, 0);
+            for(int i = 0; i < temp.Length; i++)
+            {
+                ((PStmt) temp[i]).Apply(this);
+            }
+        }
+        OutAProgFunc(node);
+    }
+    public virtual void InANewFunc(ANewFunc node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutANewFunc(ANewFunc node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseANewFunc(ANewFunc node)
+    {
+        InANewFunc(node);
+        if(node.GetId() != null)
+        {
+            node.GetId().Apply(this);
+        }
+        {
+            Object[] temp = new Object[node.GetStmt().Count];
+            node.GetStmt().CopyTo(temp, 0);
+            for(int i = 0; i < temp.Length; i++)
+            {
+                ((PStmt) temp[i]).Apply(this);
+            }
+        }
+        OutANewFunc(node);
+    }
+    public virtual void InAExpStmt(AExpStmt node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAExpStmt(AExpStmt node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAExpStmt(AExpStmt node)
+    {
+        InAExpStmt(node);
         if(node.GetExp() != null)
         {
             node.GetExp().Apply(this);
         }
-        OutAStmt(node);
+        OutAExpStmt(node);
+    }
+    public virtual void InAAssignStmt(AAssignStmt node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAAssignStmt(AAssignStmt node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAAssignStmt(AAssignStmt node)
+    {
+        InAAssignStmt(node);
+        if(node.GetId() != null)
+        {
+            node.GetId().Apply(this);
+        }
+        if(node.GetExp() != null)
+        {
+            node.GetExp().Apply(this);
+        }
+        OutAAssignStmt(node);
+    }
+    public virtual void InADeclStmt(ADeclStmt node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutADeclStmt(ADeclStmt node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseADeclStmt(ADeclStmt node)
+    {
+        InADeclStmt(node);
+        if(node.GetId() != null)
+        {
+            node.GetId().Apply(this);
+        }
+        OutADeclStmt(node);
+    }
+    public virtual void InAFunccallStmt(AFunccallStmt node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAFunccallStmt(AFunccallStmt node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAFunccallStmt(AFunccallStmt node)
+    {
+        InAFunccallStmt(node);
+        if(node.GetId() != null)
+        {
+            node.GetId().Apply(this);
+        }
+        OutAFunccallStmt(node);
     }
     public virtual void InAPlusExp(APlusExp node)
     {
@@ -435,6 +581,25 @@ public class DepthFirstAdapter : AnalysisAdapter
             node.GetNumber().Apply(this);
         }
         OutANumberExp(node);
+    }
+    public virtual void InAId(AId node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAId(AId node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAId(AId node)
+    {
+        InAId(node);
+        if(node.GetTid() != null)
+        {
+            node.GetTid().Apply(this);
+        }
+        OutAId(node);
     }
 }
 
@@ -481,33 +646,144 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
     {
         InAGrammar(node);
         {
-            Object[] temp = new Object[node.GetExp().Count];
-            node.GetExp().CopyTo(temp, 0);
+            Object[] temp = new Object[node.GetFunc().Count];
+            node.GetFunc().CopyTo(temp, 0);
             for(int i = temp.Length - 1; i >= 0; i--)
             {
-                ((PExp) temp[i]).Apply(this);
+                ((PFunc) temp[i]).Apply(this);
             }
         }
         OutAGrammar(node);
     }
-    public virtual void InAStmt(AStmt node)
+    public virtual void InAProgFunc(AProgFunc node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutAStmt(AStmt node)
+    public virtual void OutAProgFunc(AProgFunc node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseAStmt(AStmt node)
+    public override void CaseAProgFunc(AProgFunc node)
     {
-        InAStmt(node);
+        InAProgFunc(node);
+        {
+            Object[] temp = new Object[node.GetStmt().Count];
+            node.GetStmt().CopyTo(temp, 0);
+            for(int i = temp.Length - 1; i >= 0; i--)
+            {
+                ((PStmt) temp[i]).Apply(this);
+            }
+        }
+        OutAProgFunc(node);
+    }
+    public virtual void InANewFunc(ANewFunc node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutANewFunc(ANewFunc node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseANewFunc(ANewFunc node)
+    {
+        InANewFunc(node);
+        {
+            Object[] temp = new Object[node.GetStmt().Count];
+            node.GetStmt().CopyTo(temp, 0);
+            for(int i = temp.Length - 1; i >= 0; i--)
+            {
+                ((PStmt) temp[i]).Apply(this);
+            }
+        }
+        if(node.GetId() != null)
+        {
+            node.GetId().Apply(this);
+        }
+        OutANewFunc(node);
+    }
+    public virtual void InAExpStmt(AExpStmt node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAExpStmt(AExpStmt node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAExpStmt(AExpStmt node)
+    {
+        InAExpStmt(node);
         if(node.GetExp() != null)
         {
             node.GetExp().Apply(this);
         }
-        OutAStmt(node);
+        OutAExpStmt(node);
+    }
+    public virtual void InAAssignStmt(AAssignStmt node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAAssignStmt(AAssignStmt node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAAssignStmt(AAssignStmt node)
+    {
+        InAAssignStmt(node);
+        if(node.GetExp() != null)
+        {
+            node.GetExp().Apply(this);
+        }
+        if(node.GetId() != null)
+        {
+            node.GetId().Apply(this);
+        }
+        OutAAssignStmt(node);
+    }
+    public virtual void InADeclStmt(ADeclStmt node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutADeclStmt(ADeclStmt node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseADeclStmt(ADeclStmt node)
+    {
+        InADeclStmt(node);
+        if(node.GetId() != null)
+        {
+            node.GetId().Apply(this);
+        }
+        OutADeclStmt(node);
+    }
+    public virtual void InAFunccallStmt(AFunccallStmt node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAFunccallStmt(AFunccallStmt node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAFunccallStmt(AFunccallStmt node)
+    {
+        InAFunccallStmt(node);
+        if(node.GetId() != null)
+        {
+            node.GetId().Apply(this);
+        }
+        OutAFunccallStmt(node);
     }
     public virtual void InAPlusExp(APlusExp node)
     {
@@ -619,6 +895,25 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
             node.GetNumber().Apply(this);
         }
         OutANumberExp(node);
+    }
+    public virtual void InAId(AId node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAId(AId node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAId(AId node)
+    {
+        InAId(node);
+        if(node.GetTid() != null)
+        {
+            node.GetTid().Apply(this);
+        }
+        OutAId(node);
     }
 }
 } // namespace Moduino.analysis

@@ -30,6 +30,7 @@ Helpers
 Tokens
 
     prog = 'Prog';
+    int = 'int';
 
     l_bkt = '[';
     r_bkt = ']';
@@ -52,7 +53,7 @@ Tokens
     semicolon = ';';
     colon = ':';
 
-    id = id_part ('_' id_part)*;
+    tid = id_part ('_' id_part)*;
 
     char = ''' not_cr_lf ''';
     number = digit+;
@@ -70,12 +71,18 @@ Ignored Tokens
     comment;
 
 Productions
+    grammar = func_list {-> New grammar([func_list.func])};
+    func_list {-> func*} = {list} func func_list {-> [func.func, func_list.func]} 
+                         | {single} func {-> [func.func]};
+    func {-> func} = {prog} prog l_brace stmt_list r_brace {-> New func.prog([stmt_list.stmt])}
+                   | {new} P.id l_brace stmt_list r_brace {-> New func.new(id.id, [stmt_list.stmt])};
 
-    grammar = prog l_brace stmt_list r_brace {-> New grammar ([stmt_list.exp])};
-    stmt_list {-> exp*} = {list} stmt semicolon stmt_list {-> [stmt.exp, stmt_list.exp]} 
-                       | {single} stmt {-> [stmt.exp]};
-    stmt {-> exp} = exp {-> exp};
-
+    stmt_list {-> stmt*} = {list} stmt semicolon stmt_list {-> [stmt.stmt, stmt_list.stmt]} 
+                       | {single} stmt {-> [stmt.stmt]}; //TODO: Fix bug so that last semicolon also requires semicolon
+    stmt {-> stmt} = {exp} exp {-> New stmt.exp(exp.exp)}
+                   | {assign} P.id equal exp {-> New stmt.assign(id.id, exp.exp)}
+                   | {decl} int P.id {-> New stmt.decl(id.id)}
+                   | {funccall} P.id l_par r_par {-> New stmt.funccall(id.id)};
      
     exp {-> exp} = {plus} exp plus factor {-> New exp.plus (exp.exp, factor.exp) }
                  | {minus} exp minus factor {-> New exp.minus (exp.exp, factor.exp) }
@@ -87,12 +94,20 @@ Productions
 
     term {-> exp} = {expr} l_par exp r_par {-> exp.exp }
                   | {number} number {-> New exp.number(number) };
+    id {-> P.id} = tid {-> New id(tid)};
+
 
 Abstract Syntax Tree
-    grammar = exp+;
-    stmt = exp;
+    grammar = func*;
+    func = {prog} stmt+
+         | {new} id stmt+;
+    stmt = {exp} exp
+         | {assign} id exp
+         | {decl} id
+         | {funccall} id; // TODO: Controlstructures
     exp = {plus}    [l]:exp  [r]:exp 
         | {minus}   [l]:exp  [r]:exp 
         | {div}     [l]:exp  [r]:exp 
         | {mult}    [l]:exp  [r]:exp 
-        | {number}  number;
+        | {number}  number; // TODO: function with return value
+    id = tid;

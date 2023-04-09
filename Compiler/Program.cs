@@ -11,11 +11,15 @@ Start start;
     Parser parser = new (lexer);
     start = parser.Parse();
 }
+// PrettyPrint Visitor
 start.Apply(new PrettyPrint());
+
+// TODO Visitor 1: scope-check/symbol table
+// TODO Visitor 2: type checking
+// TODO Visitor 3: optional compiler optimization (lecture 20)
+
+// CodeGen Visitor
 using CodeGen codegen = new (Directory.GetCurrentDirectory() + "/../../../output.ino");
 start.Apply(codegen);
 
-// TODO visitors:
-// 1: 3 visitors: scope-check/symbol table, type checking and types (lecture 10-12)
-// 2: optional compiler optimization (lecture 20)
-// 3: code generator (depending on target language lecture 15-18)
+
