@@ -7,8 +7,7 @@ namespace Compiler.Visitors;
 // On lowest level such as id and number there is no concrete value, but rather only the string
 // Another branch will fix this, so ignore this for now. Until then just use the value in the .toString method as shown
 // in CaseANumberExp.
-
-// TODO: Convert unit to functions in Arduino. A future branch will handle usage of the functions. so ex:
+// Convert unit to functions in Arduino. A future branch will handle usage of the functions. so ex:
 // unit Time : int {
 //      ms => (6+5);
 //      s => 5*4:
