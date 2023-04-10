@@ -1,1 +1,10 @@
+unit tid : int {
+    mango => (6+5);
+    banan => (5*2);
+}
+unit fart : int {
+    hej => 3-2;
+    nej => 4+2;
+}
+
 Prog {5+7*5-3+(5*7); 2+5*3 }

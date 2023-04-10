@@ -16,14 +16,19 @@ public interface Analysis : Switch
 
     void CaseStart(Start node);
     void CaseAGrammar(AGrammar node);
+    void CaseAUnit(AUnit node);
+    void CaseASubunit(ASubunit node);
     void CaseAStmt(AStmt node);
     void CaseAPlusExp(APlusExp node);
     void CaseAMinusExp(AMinusExp node);
     void CaseADivExp(ADivExp node);
     void CaseAMultExp(AMultExp node);
     void CaseANumberExp(ANumberExp node);
+    void CaseAId(AId node);
 
     void CaseTProg(TProg node);
+    void CaseTTunit(TTunit node);
+    void CaseTInt(TInt node);
     void CaseTLBkt(TLBkt node);
     void CaseTRBkt(TRBkt node);
     void CaseTLPar(TLPar node);
@@ -41,7 +46,7 @@ public interface Analysis : Switch
     void CaseTComma(TComma node);
     void CaseTSemicolon(TSemicolon node);
     void CaseTColon(TColon node);
-    void CaseTId(TId node);
+    void CaseTTid(TTid node);
     void CaseTChar(TChar node);
     void CaseTNumber(TNumber node);
     void CaseTHex(THex node);
@@ -118,6 +123,14 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
+    public virtual void CaseAUnit(AUnit node)
+    {
+        DefaultCase(node);
+    }
+    public virtual void CaseASubunit(ASubunit node)
+    {
+        DefaultCase(node);
+    }
     public virtual void CaseAStmt(AStmt node)
     {
         DefaultCase(node);
@@ -142,8 +155,20 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
+    public virtual void CaseAId(AId node)
+    {
+        DefaultCase(node);
+    }
 
     public virtual void CaseTProg(TProg node)
+    {
+        DefaultCase(node);
+    }
+    public virtual void CaseTTunit(TTunit node)
+    {
+        DefaultCase(node);
+    }
+    public virtual void CaseTInt(TInt node)
     {
         DefaultCase(node);
     }
@@ -215,7 +240,7 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
-    public virtual void CaseTId(TId node)
+    public virtual void CaseTTid(TTid node)
     {
         DefaultCase(node);
     }
@@ -297,6 +322,14 @@ public class DepthFirstAdapter : AnalysisAdapter
     {
         InAGrammar(node);
         {
+            Object[] temp = new Object[node.GetUnit().Count];
+            node.GetUnit().CopyTo(temp, 0);
+            for(int i = 0; i < temp.Length; i++)
+            {
+                ((PUnit) temp[i]).Apply(this);
+            }
+        }
+        {
             Object[] temp = new Object[node.GetExp().Count];
             node.GetExp().CopyTo(temp, 0);
             for(int i = 0; i < temp.Length; i++)
@@ -305,6 +338,60 @@ public class DepthFirstAdapter : AnalysisAdapter
             }
         }
         OutAGrammar(node);
+    }
+    public virtual void InAUnit(AUnit node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAUnit(AUnit node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAUnit(AUnit node)
+    {
+        InAUnit(node);
+        if(node.GetId() != null)
+        {
+            node.GetId().Apply(this);
+        }
+        if(node.GetInt() != null)
+        {
+            node.GetInt().Apply(this);
+        }
+        {
+            Object[] temp = new Object[node.GetSubunit().Count];
+            node.GetSubunit().CopyTo(temp, 0);
+            for(int i = 0; i < temp.Length; i++)
+            {
+                ((PSubunit) temp[i]).Apply(this);
+            }
+        }
+        OutAUnit(node);
+    }
+    public virtual void InASubunit(ASubunit node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutASubunit(ASubunit node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseASubunit(ASubunit node)
+    {
+        InASubunit(node);
+        if(node.GetId() != null)
+        {
+            node.GetId().Apply(this);
+        }
+        if(node.GetExp() != null)
+        {
+            node.GetExp().Apply(this);
+        }
+        OutASubunit(node);
     }
     public virtual void InAStmt(AStmt node)
     {
@@ -435,6 +522,25 @@ public class DepthFirstAdapter : AnalysisAdapter
             node.GetNumber().Apply(this);
         }
         OutANumberExp(node);
+    }
+    public virtual void InAId(AId node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAId(AId node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAId(AId node)
+    {
+        InAId(node);
+        if(node.GetTid() != null)
+        {
+            node.GetTid().Apply(this);
+        }
+        OutAId(node);
     }
 }
 
@@ -488,7 +594,69 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
                 ((PExp) temp[i]).Apply(this);
             }
         }
+        {
+            Object[] temp = new Object[node.GetUnit().Count];
+            node.GetUnit().CopyTo(temp, 0);
+            for(int i = temp.Length - 1; i >= 0; i--)
+            {
+                ((PUnit) temp[i]).Apply(this);
+            }
+        }
         OutAGrammar(node);
+    }
+    public virtual void InAUnit(AUnit node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAUnit(AUnit node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAUnit(AUnit node)
+    {
+        InAUnit(node);
+        {
+            Object[] temp = new Object[node.GetSubunit().Count];
+            node.GetSubunit().CopyTo(temp, 0);
+            for(int i = temp.Length - 1; i >= 0; i--)
+            {
+                ((PSubunit) temp[i]).Apply(this);
+            }
+        }
+        if(node.GetInt() != null)
+        {
+            node.GetInt().Apply(this);
+        }
+        if(node.GetId() != null)
+        {
+            node.GetId().Apply(this);
+        }
+        OutAUnit(node);
+    }
+    public virtual void InASubunit(ASubunit node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutASubunit(ASubunit node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseASubunit(ASubunit node)
+    {
+        InASubunit(node);
+        if(node.GetExp() != null)
+        {
+            node.GetExp().Apply(this);
+        }
+        if(node.GetId() != null)
+        {
+            node.GetId().Apply(this);
+        }
+        OutASubunit(node);
     }
     public virtual void InAStmt(AStmt node)
     {
@@ -619,6 +787,25 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
             node.GetNumber().Apply(this);
         }
         OutANumberExp(node);
+    }
+    public virtual void InAId(AId node)
+    {
+        DefaultIn(node);
+    }
+
+    public virtual void OutAId(AId node)
+    {
+        DefaultOut(node);
+    }
+
+    public override void CaseAId(AId node)
+    {
+        InAId(node);
+        if(node.GetTid() != null)
+        {
+            node.GetTid().Apply(this);
+        }
+        OutAId(node);
     }
 }
 } // namespace Moduino.analysis

@@ -30,6 +30,8 @@ Helpers
 Tokens
 
     prog = 'Prog';
+    tunit = 'unit';
+    int = 'int';
 
     l_bkt = '[';
     r_bkt = ']';
@@ -46,13 +48,13 @@ Tokens
     equal = '=';
     q_mark = '?';
     bar = '|';
-    arrow = '->';
+    arrow = '=>';
 
     comma = ',';
     semicolon = ';';
     colon = ':';
 
-    id = id_part ('_' id_part)*;
+    tid = id_part ('_' id_part)*;
 
     char = ''' not_cr_lf ''';
     number = digit+;
@@ -71,7 +73,16 @@ Ignored Tokens
 
 Productions
 
-    grammar = prog l_brace stmt_list r_brace {-> New grammar ([stmt_list.exp])};
+    grammar = unit_list prog l_brace stmt_list r_brace {-> New grammar ([unit_list.unit], [stmt_list.exp])};
+
+    unit_list {-> unit*} = {list} unit unit_list {-> [unit.unit, unit_list.unit]}
+                         | {single} unit {-> [unit.unit]};
+    unit {-> unit} = tunit id colon int l_brace subunit_list r_brace {-> New unit(id.id, int, [subunit_list.subunit])};
+    subunit_list {-> subunit*} = {list} subunit subunit_list {-> [subunit.subunit, subunit_list.subunit]}
+                               | {single} subunit {-> [subunit.subunit]};
+    subunit {-> subunit} = id arrow stmt semicolon {-> New subunit(id.id, stmt.exp)}; //TODO allow value token and stmt block
+
+
     stmt_list {-> exp*} = {list} stmt semicolon stmt_list {-> [stmt.exp, stmt_list.exp]} 
                        | {single} stmt {-> [stmt.exp]};
     stmt {-> exp} = exp {-> exp};
@@ -88,11 +99,19 @@ Productions
     term {-> exp} = {expr} l_par exp r_par {-> exp.exp }
                   | {number} number {-> New exp.number(number) };
 
+
+    id {-> id} = tid {-> New id(tid)};
+
 Abstract Syntax Tree
-    grammar = exp+;
+    grammar = unit+ exp+;
+    unit = id int subunit*;
+    subunit = id exp; //TODO: fix to stmt
+
     stmt = exp;
     exp = {plus}    [l]:exp  [r]:exp 
         | {minus}   [l]:exp  [r]:exp 
         | {div}     [l]:exp  [r]:exp 
         | {mult}    [l]:exp  [r]:exp 
         | {number}  number;
+
+    id = tid;

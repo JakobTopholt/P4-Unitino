@@ -46,119 +46,129 @@ internal class TokenIndex : AnalysisAdapter
         index = 0;
     }
 
-    public override void CaseTLBkt(TLBkt node)
+    public override void CaseTTunit(TTunit node)
     {
         index = 1;
     }
 
-    public override void CaseTRBkt(TRBkt node)
+    public override void CaseTInt(TInt node)
     {
         index = 2;
     }
 
-    public override void CaseTLPar(TLPar node)
+    public override void CaseTLBkt(TLBkt node)
     {
         index = 3;
     }
 
-    public override void CaseTRPar(TRPar node)
+    public override void CaseTRBkt(TRBkt node)
     {
         index = 4;
     }
 
-    public override void CaseTLBrace(TLBrace node)
+    public override void CaseTLPar(TLPar node)
     {
         index = 5;
     }
 
-    public override void CaseTRBrace(TRBrace node)
+    public override void CaseTRPar(TRPar node)
     {
         index = 6;
     }
 
-    public override void CaseTPlus(TPlus node)
+    public override void CaseTLBrace(TLBrace node)
     {
         index = 7;
     }
 
-    public override void CaseTMinus(TMinus node)
+    public override void CaseTRBrace(TRBrace node)
     {
         index = 8;
     }
 
-    public override void CaseTSlash(TSlash node)
+    public override void CaseTPlus(TPlus node)
     {
         index = 9;
     }
 
-    public override void CaseTStar(TStar node)
+    public override void CaseTMinus(TMinus node)
     {
         index = 10;
     }
 
-    public override void CaseTEqual(TEqual node)
+    public override void CaseTSlash(TSlash node)
     {
         index = 11;
     }
 
-    public override void CaseTQMark(TQMark node)
+    public override void CaseTStar(TStar node)
     {
         index = 12;
     }
 
-    public override void CaseTBar(TBar node)
+    public override void CaseTEqual(TEqual node)
     {
         index = 13;
     }
 
-    public override void CaseTArrow(TArrow node)
+    public override void CaseTQMark(TQMark node)
     {
         index = 14;
     }
 
-    public override void CaseTComma(TComma node)
+    public override void CaseTBar(TBar node)
     {
         index = 15;
     }
 
-    public override void CaseTSemicolon(TSemicolon node)
+    public override void CaseTArrow(TArrow node)
     {
         index = 16;
     }
 
-    public override void CaseTColon(TColon node)
+    public override void CaseTComma(TComma node)
     {
         index = 17;
     }
 
-    public override void CaseTId(TId node)
+    public override void CaseTSemicolon(TSemicolon node)
     {
         index = 18;
     }
 
-    public override void CaseTChar(TChar node)
+    public override void CaseTColon(TColon node)
     {
         index = 19;
     }
 
-    public override void CaseTNumber(TNumber node)
+    public override void CaseTTid(TTid node)
     {
         index = 20;
     }
 
-    public override void CaseTHex(THex node)
+    public override void CaseTChar(TChar node)
     {
         index = 21;
     }
 
-    public override void CaseTString(TString node)
+    public override void CaseTNumber(TNumber node)
     {
         index = 22;
     }
 
-    public override void CaseEOF(EOF node)
+    public override void CaseTHex(THex node)
     {
         index = 23;
+    }
+
+    public override void CaseTString(TString node)
+    {
+        index = 24;
+    }
+
+    public override void CaseEOF(EOF node)
+    {
+        index = 25;
     }
 }
 
@@ -351,37 +361,79 @@ public class Parser
                     case 6:
         {
       ArrayList list = New6();
-      Push(GoTo(3), list);
+      Push(GoTo(4), list);
         }
         break;
                     case 7:
         {
       ArrayList list = New7();
-      Push(GoTo(4), list);
+      Push(GoTo(5), list);
         }
         break;
                     case 8:
         {
       ArrayList list = New8();
-      Push(GoTo(4), list);
+      Push(GoTo(5), list);
         }
         break;
                     case 9:
         {
       ArrayList list = New9();
-      Push(GoTo(4), list);
+      Push(GoTo(6), list);
         }
         break;
                     case 10:
         {
       ArrayList list = New10();
-      Push(GoTo(5), list);
+      Push(GoTo(7), list);
         }
         break;
                     case 11:
         {
       ArrayList list = New11();
-      Push(GoTo(5), list);
+      Push(GoTo(7), list);
+        }
+        break;
+                    case 12:
+        {
+      ArrayList list = New12();
+      Push(GoTo(7), list);
+        }
+        break;
+                    case 13:
+        {
+      ArrayList list = New13();
+      Push(GoTo(8), list);
+        }
+        break;
+                    case 14:
+        {
+      ArrayList list = New14();
+      Push(GoTo(8), list);
+        }
+        break;
+                    case 15:
+        {
+      ArrayList list = New15();
+      Push(GoTo(8), list);
+        }
+        break;
+                    case 16:
+        {
+      ArrayList list = New16();
+      Push(GoTo(9), list);
+        }
+        break;
+                    case 17:
+        {
+      ArrayList list = New17();
+      Push(GoTo(9), list);
+        }
+        break;
+                    case 18:
+        {
+      ArrayList list = New18();
+      Push(GoTo(10), list);
         }
         break;
                     }
@@ -404,23 +456,137 @@ public class Parser
     ArrayList New0()
     {
         ArrayList nodeList = new ArrayList();
+        ArrayList nodeArrayList5 = (ArrayList) Pop();
         ArrayList nodeArrayList4 = (ArrayList) Pop();
         ArrayList nodeArrayList3 = (ArrayList) Pop();
         ArrayList nodeArrayList2 = (ArrayList) Pop();
         ArrayList nodeArrayList1 = (ArrayList) Pop();
         TypedList listNode3 = new TypedList();
-        TypedList listNode2 = (TypedList)nodeArrayList3[0];
+        TypedList listNode5 = new TypedList();
+        TypedList listNode2 = (TypedList)nodeArrayList1[0];
         if ( listNode2 != null )
         {
             listNode3.AddAll(listNode2);
         }
+        TypedList listNode4 = (TypedList)nodeArrayList4[0];
+        if ( listNode4 != null )
+        {
+            listNode5.AddAll(listNode4);
+        }
         AGrammar pgrammarNode1 = new AGrammar (
-              listNode3
+              listNode3,
+              listNode5
         );
         nodeList.Add(pgrammarNode1);
         return nodeList;
     }
     ArrayList New1()
+    {
+        ArrayList nodeList = new ArrayList();
+        ArrayList nodeArrayList2 = (ArrayList) Pop();
+        ArrayList nodeArrayList1 = (ArrayList) Pop();
+        TypedList listNode3 = new TypedList();
+        PUnit punitNode1 = (PUnit)nodeArrayList1[0];
+        TypedList listNode2 = (TypedList)nodeArrayList2[0];
+        if ( punitNode1 != null )
+        {
+            listNode3.Add(punitNode1);
+        }
+        if ( listNode2 != null )
+        {
+            listNode3.AddAll(listNode2);
+        }
+        nodeList.Add(listNode3);
+        return nodeList;
+    }
+    ArrayList New2()
+    {
+        ArrayList nodeList = new ArrayList();
+        ArrayList nodeArrayList1 = (ArrayList) Pop();
+        TypedList listNode2 = new TypedList();
+        PUnit punitNode1 = (PUnit)nodeArrayList1[0];
+        if ( punitNode1 != null )
+        {
+            listNode2.Add(punitNode1);
+        }
+        nodeList.Add(listNode2);
+        return nodeList;
+    }
+    ArrayList New3()
+    {
+        ArrayList nodeList = new ArrayList();
+        ArrayList nodeArrayList7 = (ArrayList) Pop();
+        ArrayList nodeArrayList6 = (ArrayList) Pop();
+        ArrayList nodeArrayList5 = (ArrayList) Pop();
+        ArrayList nodeArrayList4 = (ArrayList) Pop();
+        ArrayList nodeArrayList3 = (ArrayList) Pop();
+        ArrayList nodeArrayList2 = (ArrayList) Pop();
+        ArrayList nodeArrayList1 = (ArrayList) Pop();
+        TypedList listNode5 = new TypedList();
+        PId pidNode2 = (PId)nodeArrayList2[0];
+        TInt tintNode3 = (TInt)nodeArrayList4[0];
+        TypedList listNode4 = (TypedList)nodeArrayList6[0];
+        if ( listNode4 != null )
+        {
+            listNode5.AddAll(listNode4);
+        }
+        AUnit punitNode1 = new AUnit (
+              pidNode2,
+              tintNode3,
+              listNode5
+        );
+        nodeList.Add(punitNode1);
+        return nodeList;
+    }
+    ArrayList New4()
+    {
+        ArrayList nodeList = new ArrayList();
+        ArrayList nodeArrayList2 = (ArrayList) Pop();
+        ArrayList nodeArrayList1 = (ArrayList) Pop();
+        TypedList listNode3 = new TypedList();
+        PSubunit psubunitNode1 = (PSubunit)nodeArrayList1[0];
+        TypedList listNode2 = (TypedList)nodeArrayList2[0];
+        if ( psubunitNode1 != null )
+        {
+            listNode3.Add(psubunitNode1);
+        }
+        if ( listNode2 != null )
+        {
+            listNode3.AddAll(listNode2);
+        }
+        nodeList.Add(listNode3);
+        return nodeList;
+    }
+    ArrayList New5()
+    {
+        ArrayList nodeList = new ArrayList();
+        ArrayList nodeArrayList1 = (ArrayList) Pop();
+        TypedList listNode2 = new TypedList();
+        PSubunit psubunitNode1 = (PSubunit)nodeArrayList1[0];
+        if ( psubunitNode1 != null )
+        {
+            listNode2.Add(psubunitNode1);
+        }
+        nodeList.Add(listNode2);
+        return nodeList;
+    }
+    ArrayList New6()
+    {
+        ArrayList nodeList = new ArrayList();
+        ArrayList nodeArrayList4 = (ArrayList) Pop();
+        ArrayList nodeArrayList3 = (ArrayList) Pop();
+        ArrayList nodeArrayList2 = (ArrayList) Pop();
+        ArrayList nodeArrayList1 = (ArrayList) Pop();
+        PId pidNode2 = (PId)nodeArrayList1[0];
+        PExp pexpNode3 = (PExp)nodeArrayList3[0];
+        ASubunit psubunitNode1 = new ASubunit (
+              pidNode2,
+              pexpNode3
+        );
+        nodeList.Add(psubunitNode1);
+        return nodeList;
+    }
+    ArrayList New7()
     {
         ArrayList nodeList = new ArrayList();
         ArrayList nodeArrayList3 = (ArrayList) Pop();
@@ -440,7 +606,7 @@ public class Parser
         nodeList.Add(listNode3);
         return nodeList;
     }
-    ArrayList New2()
+    ArrayList New8()
     {
         ArrayList nodeList = new ArrayList();
         ArrayList nodeArrayList1 = (ArrayList) Pop();
@@ -451,82 +617,6 @@ public class Parser
             listNode2.Add(pexpNode1);
         }
         nodeList.Add(listNode2);
-        return nodeList;
-    }
-    ArrayList New3()
-    {
-        ArrayList nodeList = new ArrayList();
-        ArrayList nodeArrayList1 = (ArrayList) Pop();
-        PExp pexpNode1 = (PExp)nodeArrayList1[0];
-        nodeList.Add(pexpNode1);
-        return nodeList;
-    }
-    ArrayList New4()
-    {
-        ArrayList nodeList = new ArrayList();
-        ArrayList nodeArrayList3 = (ArrayList) Pop();
-        ArrayList nodeArrayList2 = (ArrayList) Pop();
-        ArrayList nodeArrayList1 = (ArrayList) Pop();
-        PExp pexpNode2 = (PExp)nodeArrayList1[0];
-        PExp pexpNode3 = (PExp)nodeArrayList3[0];
-        APlusExp pexpNode1 = new APlusExp (
-              pexpNode2,
-              pexpNode3
-        );
-        nodeList.Add(pexpNode1);
-        return nodeList;
-    }
-    ArrayList New5()
-    {
-        ArrayList nodeList = new ArrayList();
-        ArrayList nodeArrayList3 = (ArrayList) Pop();
-        ArrayList nodeArrayList2 = (ArrayList) Pop();
-        ArrayList nodeArrayList1 = (ArrayList) Pop();
-        PExp pexpNode2 = (PExp)nodeArrayList1[0];
-        PExp pexpNode3 = (PExp)nodeArrayList3[0];
-        AMinusExp pexpNode1 = new AMinusExp (
-              pexpNode2,
-              pexpNode3
-        );
-        nodeList.Add(pexpNode1);
-        return nodeList;
-    }
-    ArrayList New6()
-    {
-        ArrayList nodeList = new ArrayList();
-        ArrayList nodeArrayList1 = (ArrayList) Pop();
-        PExp pexpNode1 = (PExp)nodeArrayList1[0];
-        nodeList.Add(pexpNode1);
-        return nodeList;
-    }
-    ArrayList New7()
-    {
-        ArrayList nodeList = new ArrayList();
-        ArrayList nodeArrayList3 = (ArrayList) Pop();
-        ArrayList nodeArrayList2 = (ArrayList) Pop();
-        ArrayList nodeArrayList1 = (ArrayList) Pop();
-        PExp pexpNode2 = (PExp)nodeArrayList1[0];
-        PExp pexpNode3 = (PExp)nodeArrayList3[0];
-        AMultExp pexpNode1 = new AMultExp (
-              pexpNode2,
-              pexpNode3
-        );
-        nodeList.Add(pexpNode1);
-        return nodeList;
-    }
-    ArrayList New8()
-    {
-        ArrayList nodeList = new ArrayList();
-        ArrayList nodeArrayList3 = (ArrayList) Pop();
-        ArrayList nodeArrayList2 = (ArrayList) Pop();
-        ArrayList nodeArrayList1 = (ArrayList) Pop();
-        PExp pexpNode2 = (PExp)nodeArrayList1[0];
-        PExp pexpNode3 = (PExp)nodeArrayList3[0];
-        ADivExp pexpNode1 = new ADivExp (
-              pexpNode2,
-              pexpNode3
-        );
-        nodeList.Add(pexpNode1);
         return nodeList;
     }
     ArrayList New9()
@@ -543,11 +633,87 @@ public class Parser
         ArrayList nodeArrayList3 = (ArrayList) Pop();
         ArrayList nodeArrayList2 = (ArrayList) Pop();
         ArrayList nodeArrayList1 = (ArrayList) Pop();
-        PExp pexpNode1 = (PExp)nodeArrayList2[0];
+        PExp pexpNode2 = (PExp)nodeArrayList1[0];
+        PExp pexpNode3 = (PExp)nodeArrayList3[0];
+        APlusExp pexpNode1 = new APlusExp (
+              pexpNode2,
+              pexpNode3
+        );
         nodeList.Add(pexpNode1);
         return nodeList;
     }
     ArrayList New11()
+    {
+        ArrayList nodeList = new ArrayList();
+        ArrayList nodeArrayList3 = (ArrayList) Pop();
+        ArrayList nodeArrayList2 = (ArrayList) Pop();
+        ArrayList nodeArrayList1 = (ArrayList) Pop();
+        PExp pexpNode2 = (PExp)nodeArrayList1[0];
+        PExp pexpNode3 = (PExp)nodeArrayList3[0];
+        AMinusExp pexpNode1 = new AMinusExp (
+              pexpNode2,
+              pexpNode3
+        );
+        nodeList.Add(pexpNode1);
+        return nodeList;
+    }
+    ArrayList New12()
+    {
+        ArrayList nodeList = new ArrayList();
+        ArrayList nodeArrayList1 = (ArrayList) Pop();
+        PExp pexpNode1 = (PExp)nodeArrayList1[0];
+        nodeList.Add(pexpNode1);
+        return nodeList;
+    }
+    ArrayList New13()
+    {
+        ArrayList nodeList = new ArrayList();
+        ArrayList nodeArrayList3 = (ArrayList) Pop();
+        ArrayList nodeArrayList2 = (ArrayList) Pop();
+        ArrayList nodeArrayList1 = (ArrayList) Pop();
+        PExp pexpNode2 = (PExp)nodeArrayList1[0];
+        PExp pexpNode3 = (PExp)nodeArrayList3[0];
+        AMultExp pexpNode1 = new AMultExp (
+              pexpNode2,
+              pexpNode3
+        );
+        nodeList.Add(pexpNode1);
+        return nodeList;
+    }
+    ArrayList New14()
+    {
+        ArrayList nodeList = new ArrayList();
+        ArrayList nodeArrayList3 = (ArrayList) Pop();
+        ArrayList nodeArrayList2 = (ArrayList) Pop();
+        ArrayList nodeArrayList1 = (ArrayList) Pop();
+        PExp pexpNode2 = (PExp)nodeArrayList1[0];
+        PExp pexpNode3 = (PExp)nodeArrayList3[0];
+        ADivExp pexpNode1 = new ADivExp (
+              pexpNode2,
+              pexpNode3
+        );
+        nodeList.Add(pexpNode1);
+        return nodeList;
+    }
+    ArrayList New15()
+    {
+        ArrayList nodeList = new ArrayList();
+        ArrayList nodeArrayList1 = (ArrayList) Pop();
+        PExp pexpNode1 = (PExp)nodeArrayList1[0];
+        nodeList.Add(pexpNode1);
+        return nodeList;
+    }
+    ArrayList New16()
+    {
+        ArrayList nodeList = new ArrayList();
+        ArrayList nodeArrayList3 = (ArrayList) Pop();
+        ArrayList nodeArrayList2 = (ArrayList) Pop();
+        ArrayList nodeArrayList1 = (ArrayList) Pop();
+        PExp pexpNode1 = (PExp)nodeArrayList2[0];
+        nodeList.Add(pexpNode1);
+        return nodeList;
+    }
+    ArrayList New17()
     {
         ArrayList nodeList = new ArrayList();
         ArrayList nodeArrayList1 = (ArrayList) Pop();
@@ -558,109 +724,184 @@ public class Parser
         nodeList.Add(pexpNode1);
         return nodeList;
     }
+    ArrayList New18()
+    {
+        ArrayList nodeList = new ArrayList();
+        ArrayList nodeArrayList1 = (ArrayList) Pop();
+        TTid ttidNode2 = (TTid)nodeArrayList1[0];
+        AId pidNode1 = new AId (
+              ttidNode2
+        );
+        nodeList.Add(pidNode1);
+        return nodeList;
+    }
 
     private static int[][][] actionTable = {
       new int[][] {
         new int[] {-1, 3, 0},
-        new int[] {0, 0, 1},
+        new int[] {1, 0, 1},
       },
       new int[][] {
         new int[] {-1, 3, 1},
-        new int[] {5, 0, 3},
+        new int[] {20, 0, 5},
       },
       new int[][] {
         new int[] {-1, 3, 2},
-        new int[] {23, 2, -1},
+        new int[] {25, 2, -1},
       },
       new int[][] {
         new int[] {-1, 3, 3},
-        new int[] {3, 0, 4},
-        new int[] {20, 0, 5},
-      },
-      new int[][] {
-        new int[] {-1, 3, 4},
-        new int[] {3, 0, 4},
-        new int[] {20, 0, 5},
-      },
-      new int[][] {
-        new int[] {-1, 1, 11},
-      },
-      new int[][] {
-        new int[] {-1, 3, 6},
-        new int[] {6, 0, 12},
+        new int[] {0, 0, 7},
       },
       new int[][] {
         new int[] {-1, 1, 2},
-        new int[] {16, 0, 13},
+        new int[] {1, 0, 1},
       },
       new int[][] {
-        new int[] {-1, 1, 3},
-        new int[] {7, 0, 14},
-        new int[] {8, 0, 15},
+        new int[] {-1, 1, 18},
       },
       new int[][] {
-        new int[] {-1, 1, 6},
-        new int[] {9, 0, 16},
-        new int[] {10, 0, 17},
+        new int[] {-1, 3, 6},
+        new int[] {19, 0, 9},
       },
       new int[][] {
-        new int[] {-1, 1, 9},
-      },
-      new int[][] {
-        new int[] {-1, 3, 11},
-        new int[] {4, 0, 18},
-        new int[] {7, 0, 14},
-        new int[] {8, 0, 15},
-      },
-      new int[][] {
-        new int[] {-1, 1, 0},
-      },
-      new int[][] {
-        new int[] {-1, 3, 13},
-        new int[] {3, 0, 4},
-        new int[] {20, 0, 5},
-      },
-      new int[][] {
-        new int[] {-1, 3, 14},
-        new int[] {3, 0, 4},
-        new int[] {20, 0, 5},
-      },
-      new int[][] {
-        new int[] {-1, 3, 15},
-        new int[] {3, 0, 4},
-        new int[] {20, 0, 5},
-      },
-      new int[][] {
-        new int[] {-1, 3, 16},
-        new int[] {3, 0, 4},
-        new int[] {20, 0, 5},
-      },
-      new int[][] {
-        new int[] {-1, 3, 17},
-        new int[] {3, 0, 4},
-        new int[] {20, 0, 5},
-      },
-      new int[][] {
-        new int[] {-1, 1, 10},
+        new int[] {-1, 3, 7},
+        new int[] {7, 0, 10},
       },
       new int[][] {
         new int[] {-1, 1, 1},
       },
       new int[][] {
-        new int[] {-1, 1, 4},
-        new int[] {9, 0, 16},
-        new int[] {10, 0, 17},
+        new int[] {-1, 3, 9},
+        new int[] {2, 0, 11},
       },
       new int[][] {
-        new int[] {-1, 1, 5},
-        new int[] {9, 0, 16},
-        new int[] {10, 0, 17},
+        new int[] {-1, 3, 10},
+        new int[] {5, 0, 12},
+        new int[] {22, 0, 13},
+      },
+      new int[][] {
+        new int[] {-1, 3, 11},
+        new int[] {7, 0, 19},
+      },
+      new int[][] {
+        new int[] {-1, 3, 12},
+        new int[] {5, 0, 12},
+        new int[] {22, 0, 13},
+      },
+      new int[][] {
+        new int[] {-1, 1, 17},
+      },
+      new int[][] {
+        new int[] {-1, 3, 14},
+        new int[] {8, 0, 21},
       },
       new int[][] {
         new int[] {-1, 1, 8},
+        new int[] {18, 0, 22},
+      },
+      new int[][] {
+        new int[] {-1, 1, 9},
+        new int[] {9, 0, 23},
+        new int[] {10, 0, 24},
+      },
+      new int[][] {
+        new int[] {-1, 1, 12},
+        new int[] {11, 0, 25},
+        new int[] {12, 0, 26},
+      },
+      new int[][] {
+        new int[] {-1, 1, 15},
+      },
+      new int[][] {
+        new int[] {-1, 3, 19},
+        new int[] {20, 0, 5},
+      },
+      new int[][] {
+        new int[] {-1, 3, 20},
+        new int[] {6, 0, 30},
+        new int[] {9, 0, 23},
+        new int[] {10, 0, 24},
+      },
+      new int[][] {
+        new int[] {-1, 1, 0},
+      },
+      new int[][] {
+        new int[] {-1, 3, 22},
+        new int[] {5, 0, 12},
+        new int[] {22, 0, 13},
+      },
+      new int[][] {
+        new int[] {-1, 3, 23},
+        new int[] {5, 0, 12},
+        new int[] {22, 0, 13},
+      },
+      new int[][] {
+        new int[] {-1, 3, 24},
+        new int[] {5, 0, 12},
+        new int[] {22, 0, 13},
+      },
+      new int[][] {
+        new int[] {-1, 3, 25},
+        new int[] {5, 0, 12},
+        new int[] {22, 0, 13},
+      },
+      new int[][] {
+        new int[] {-1, 3, 26},
+        new int[] {5, 0, 12},
+        new int[] {22, 0, 13},
+      },
+      new int[][] {
+        new int[] {-1, 3, 27},
+        new int[] {8, 0, 36},
+      },
+      new int[][] {
+        new int[] {-1, 1, 5},
+        new int[] {20, 0, 5},
+      },
+      new int[][] {
+        new int[] {-1, 3, 29},
+        new int[] {16, 0, 38},
+      },
+      new int[][] {
+        new int[] {-1, 1, 16},
       },
       new int[][] {
         new int[] {-1, 1, 7},
+      },
+      new int[][] {
+        new int[] {-1, 1, 10},
+        new int[] {11, 0, 25},
+        new int[] {12, 0, 26},
+      },
+      new int[][] {
+        new int[] {-1, 1, 11},
+        new int[] {11, 0, 25},
+        new int[] {12, 0, 26},
+      },
+      new int[][] {
+        new int[] {-1, 1, 14},
+      },
+      new int[][] {
+        new int[] {-1, 1, 13},
+      },
+      new int[][] {
+        new int[] {-1, 1, 3},
+      },
+      new int[][] {
+        new int[] {-1, 1, 4},
+      },
+      new int[][] {
+        new int[] {-1, 3, 38},
+        new int[] {5, 0, 12},
+        new int[] {22, 0, 13},
+      },
+      new int[][] {
+        new int[] {-1, 3, 39},
+        new int[] {18, 0, 40},
+      },
+      new int[][] {
+        new int[] {-1, 1, 6},
       },
     };
 
@@ -669,43 +910,72 @@ public class Parser
         new int[] {-1, 2},
       },
       new int[][] {
-        new int[] {-1, 6},
-        new int[] {13, 19},
+        new int[] {-1, 3},
+        new int[] {4, 8},
       },
       new int[][] {
-        new int[] {-1, 7},
+        new int[] {-1, 4},
       },
       new int[][] {
-        new int[] {-1, 8},
-        new int[] {4, 11},
+        new int[] {-1, 27},
+        new int[] {28, 37},
       },
       new int[][] {
-        new int[] {-1, 9},
-        new int[] {14, 20},
-        new int[] {15, 21},
+        new int[] {-1, 28},
       },
       new int[][] {
-        new int[] {-1, 10},
-        new int[] {16, 22},
-        new int[] {17, 23},
+        new int[] {-1, 14},
+        new int[] {22, 31},
+      },
+      new int[][] {
+        new int[] {-1, 15},
+        new int[] {38, 39},
+      },
+      new int[][] {
+        new int[] {-1, 16},
+        new int[] {12, 20},
+      },
+      new int[][] {
+        new int[] {-1, 17},
+        new int[] {23, 32},
+        new int[] {24, 33},
+      },
+      new int[][] {
+        new int[] {-1, 18},
+        new int[] {25, 34},
+        new int[] {26, 35},
+      },
+      new int[][] {
+        new int[] {-1, 29},
+        new int[] {1, 6},
       },
     };
 
     private static String[] errorMessages = {
-      "expecting: 'Prog'",
-      "expecting: '{'",
+      "expecting: 'unit'",
+      "expecting: tid",
       "expecting: EOF",
+      "expecting: 'Prog'",
+      "expecting: 'Prog', 'unit'",
+      "expecting: '=>', ':'",
+      "expecting: ':'",
+      "expecting: '{'",
+      "expecting: 'int'",
       "expecting: '(', number",
       "expecting: ')', '}', '+', '-', '/', '*', ';'",
       "expecting: '}'",
       "expecting: '}', ';'",
       "expecting: '}', '+', '-', ';'",
       "expecting: ')', '+', '-'",
+      "expecting: '}', tid",
+      "expecting: '=>'",
+      "expecting: ';'",
     };
 
     private static int[] errors = {
-      0, 1, 2, 3, 3, 4, 5, 6, 7, 4, 4, 8, 2, 3, 3, 3, 
-      3, 3, 4, 5, 4, 4, 4, 4, 
+      0, 1, 2, 3, 4, 5, 6, 7, 3, 8, 9, 7, 9, 10, 11, 12, 
+      13, 10, 10, 1, 14, 2, 9, 9, 9, 9, 9, 11, 15, 16, 10, 11, 
+      10, 10, 10, 10, 4, 11, 9, 17, 15, 
     };
 }
 }

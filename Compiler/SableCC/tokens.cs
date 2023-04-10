@@ -34,6 +34,56 @@ public sealed class TProg : Token
     }
 }
 
+public sealed class TTunit : Token
+{
+    public TTunit(string text)
+    {
+        Text = text;
+    }
+
+    public TTunit(string text, int line, int pos)
+    {
+        Text = text;
+        Line = line;
+        Pos = pos;
+    }
+
+    public override Object Clone()
+    {
+      return new TTunit(Text, Line, Pos);
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseTTunit(this);
+    }
+}
+
+public sealed class TInt : Token
+{
+    public TInt(string text)
+    {
+        Text = text;
+    }
+
+    public TInt(string text, int line, int pos)
+    {
+        Text = text;
+        Line = line;
+        Pos = pos;
+    }
+
+    public override Object Clone()
+    {
+      return new TInt(Text, Line, Pos);
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseTInt(this);
+    }
+}
+
 public sealed class TLBkt : Token
 {
     public TLBkt(string text)
@@ -459,14 +509,14 @@ public sealed class TColon : Token
     }
 }
 
-public sealed class TId : Token
+public sealed class TTid : Token
 {
-    public TId(string text)
+    public TTid(string text)
     {
         Text = text;
     }
 
-    public TId(string text, int line, int pos)
+    public TTid(string text, int line, int pos)
     {
         Text = text;
         Line = line;
@@ -475,12 +525,12 @@ public sealed class TId : Token
 
     public override Object Clone()
     {
-      return new TId(Text, Line, Pos);
+      return new TTid(Text, Line, Pos);
     }
 
     public override void Apply(Switch sw)
     {
-        ((Analysis) sw).CaseTId(this);
+        ((Analysis) sw).CaseTTid(this);
     }
 }
 

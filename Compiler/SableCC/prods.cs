@@ -12,6 +12,14 @@ public abstract class PGrammar : Node
 {
 }
 
+public abstract class PUnit : Node
+{
+}
+
+public abstract class PSubunit : Node
+{
+}
+
 public abstract class PStmt : Node
 {
 }
@@ -20,20 +28,30 @@ public abstract class PExp : Node
 {
 }
 
+public abstract class PId : Node
+{
+}
+
 
 public sealed class AGrammar : PGrammar
 {
+    private TypedList _unit_;
     private TypedList _exp_;
 
     public AGrammar ()
     {
+        this._unit_ = new TypedList(new Unit_Cast(this));
         this._exp_ = new TypedList(new Exp_Cast(this));
     }
 
     public AGrammar (
+            IList _unit_,
             IList _exp_
     )
     {
+        this._unit_ = new TypedList(new Unit_Cast(this));
+        this._unit_.Clear();
+        this._unit_.AddAll(_unit_);
         this._exp_ = new TypedList(new Exp_Cast(this));
         this._exp_.Clear();
         this._exp_.AddAll(_exp_);
@@ -42,6 +60,7 @@ public sealed class AGrammar : PGrammar
     public override Object Clone()
     {
         return new AGrammar (
+            CloneList (_unit_),
             CloneList (_exp_)
         );
     }
@@ -51,6 +70,16 @@ public sealed class AGrammar : PGrammar
         ((Analysis) sw).CaseAGrammar(this);
     }
 
+    public IList GetUnit ()
+    {
+        return _unit_;
+    }
+
+    public void setUnit (IList list)
+    {
+        _unit_.Clear();
+        _unit_.AddAll(list);
+    }
     public IList GetExp ()
     {
         return _exp_;
@@ -65,12 +94,18 @@ public sealed class AGrammar : PGrammar
     public override string ToString()
     {
         return ""
+            + ToString (_unit_)
             + ToString (_exp_)
         ;
     }
 
     internal override void RemoveChild(Node child)
     {
+        if ( _unit_.Contains(child) )
+        {
+            _unit_.Remove(child);
+            return;
+        }
         if ( _exp_.Contains(child) )
         {
             _exp_.Remove(child);
@@ -80,6 +115,23 @@ public sealed class AGrammar : PGrammar
 
     internal override void ReplaceChild(Node oldChild, Node newChild)
     {
+        for ( int i = 0; i < _unit_.Count; i++ )
+        {
+            Node n = (Node)_unit_[i];
+            if(n == oldChild)
+            {
+                if(newChild != null)
+                {
+                    _unit_[i] = newChild;
+                    oldChild.Parent(null);
+                    return;
+                }
+
+                _unit_.RemoveAt(i);
+                oldChild.Parent(null);
+                return;
+            }
+        }
         for ( int i = 0; i < _exp_.Count; i++ )
         {
             Node n = (Node)_exp_[i];
@@ -99,6 +151,41 @@ public sealed class AGrammar : PGrammar
         }
     }
 
+    private class Unit_Cast : Cast
+    {
+        AGrammar obj;
+
+        internal Unit_Cast (AGrammar obj)
+        {
+          this.obj = obj;
+        }
+
+        public Object Cast(Object o)
+        {
+            PUnit node = (PUnit) o;
+
+            if((node.Parent() != null) &&
+                (node.Parent() != obj))
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            if((node.Parent() == null) ||
+                (node.Parent() != obj))
+            {
+                node.Parent(obj);
+            }
+
+            return node;
+        }
+
+        public Object UnCast(Object o)
+        {
+            PUnit node = (PUnit) o;
+            node.Parent(null);
+            return node;
+        }
+    }
     private class Exp_Cast : Cast
     {
         AGrammar obj;
@@ -134,6 +221,315 @@ public sealed class AGrammar : PGrammar
             return node;
         }
     }
+}
+public sealed class AUnit : PUnit
+{
+    private PId _id_;
+    private TInt _int_;
+    private TypedList _subunit_;
+
+    public AUnit ()
+    {
+        this._subunit_ = new TypedList(new Subunit_Cast(this));
+    }
+
+    public AUnit (
+            PId _id_,
+            TInt _int_,
+            IList _subunit_
+    )
+    {
+        SetId (_id_);
+        SetInt (_int_);
+        this._subunit_ = new TypedList(new Subunit_Cast(this));
+        this._subunit_.Clear();
+        this._subunit_.AddAll(_subunit_);
+    }
+
+    public override Object Clone()
+    {
+        return new AUnit (
+            (PId)CloneNode (_id_),
+            (TInt)CloneNode (_int_),
+            CloneList (_subunit_)
+        );
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseAUnit(this);
+    }
+
+    public PId GetId ()
+    {
+        return _id_;
+    }
+
+    public void SetId (PId node)
+    {
+        if(_id_ != null)
+        {
+            _id_.Parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.Parent() != null)
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            node.Parent(this);
+        }
+
+        _id_ = node;
+    }
+    public TInt GetInt ()
+    {
+        return _int_;
+    }
+
+    public void SetInt (TInt node)
+    {
+        if(_int_ != null)
+        {
+            _int_.Parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.Parent() != null)
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            node.Parent(this);
+        }
+
+        _int_ = node;
+    }
+    public IList GetSubunit ()
+    {
+        return _subunit_;
+    }
+
+    public void setSubunit (IList list)
+    {
+        _subunit_.Clear();
+        _subunit_.AddAll(list);
+    }
+
+    public override string ToString()
+    {
+        return ""
+            + ToString (_id_)
+            + ToString (_int_)
+            + ToString (_subunit_)
+        ;
+    }
+
+    internal override void RemoveChild(Node child)
+    {
+        if ( _id_ == child )
+        {
+            _id_ = null;
+            return;
+        }
+        if ( _int_ == child )
+        {
+            _int_ = null;
+            return;
+        }
+        if ( _subunit_.Contains(child) )
+        {
+            _subunit_.Remove(child);
+            return;
+        }
+    }
+
+    internal override void ReplaceChild(Node oldChild, Node newChild)
+    {
+        if ( _id_ == oldChild )
+        {
+            SetId ((PId) newChild);
+            return;
+        }
+        if ( _int_ == oldChild )
+        {
+            SetInt ((TInt) newChild);
+            return;
+        }
+        for ( int i = 0; i < _subunit_.Count; i++ )
+        {
+            Node n = (Node)_subunit_[i];
+            if(n == oldChild)
+            {
+                if(newChild != null)
+                {
+                    _subunit_[i] = newChild;
+                    oldChild.Parent(null);
+                    return;
+                }
+
+                _subunit_.RemoveAt(i);
+                oldChild.Parent(null);
+                return;
+            }
+        }
+    }
+
+    private class Subunit_Cast : Cast
+    {
+        AUnit obj;
+
+        internal Subunit_Cast (AUnit obj)
+        {
+          this.obj = obj;
+        }
+
+        public Object Cast(Object o)
+        {
+            PSubunit node = (PSubunit) o;
+
+            if((node.Parent() != null) &&
+                (node.Parent() != obj))
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            if((node.Parent() == null) ||
+                (node.Parent() != obj))
+            {
+                node.Parent(obj);
+            }
+
+            return node;
+        }
+
+        public Object UnCast(Object o)
+        {
+            PSubunit node = (PSubunit) o;
+            node.Parent(null);
+            return node;
+        }
+    }
+}
+public sealed class ASubunit : PSubunit
+{
+    private PId _id_;
+    private PExp _exp_;
+
+    public ASubunit ()
+    {
+    }
+
+    public ASubunit (
+            PId _id_,
+            PExp _exp_
+    )
+    {
+        SetId (_id_);
+        SetExp (_exp_);
+    }
+
+    public override Object Clone()
+    {
+        return new ASubunit (
+            (PId)CloneNode (_id_),
+            (PExp)CloneNode (_exp_)
+        );
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseASubunit(this);
+    }
+
+    public PId GetId ()
+    {
+        return _id_;
+    }
+
+    public void SetId (PId node)
+    {
+        if(_id_ != null)
+        {
+            _id_.Parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.Parent() != null)
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            node.Parent(this);
+        }
+
+        _id_ = node;
+    }
+    public PExp GetExp ()
+    {
+        return _exp_;
+    }
+
+    public void SetExp (PExp node)
+    {
+        if(_exp_ != null)
+        {
+            _exp_.Parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.Parent() != null)
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            node.Parent(this);
+        }
+
+        _exp_ = node;
+    }
+
+    public override string ToString()
+    {
+        return ""
+            + ToString (_id_)
+            + ToString (_exp_)
+        ;
+    }
+
+    internal override void RemoveChild(Node child)
+    {
+        if ( _id_ == child )
+        {
+            _id_ = null;
+            return;
+        }
+        if ( _exp_ == child )
+        {
+            _exp_ = null;
+            return;
+        }
+    }
+
+    internal override void ReplaceChild(Node oldChild, Node newChild)
+    {
+        if ( _id_ == oldChild )
+        {
+            SetId ((PId) newChild);
+            return;
+        }
+        if ( _exp_ == oldChild )
+        {
+            SetExp ((PExp) newChild);
+            return;
+        }
+    }
+
 }
 public sealed class AStmt : PStmt
 {
@@ -754,6 +1150,84 @@ public sealed class ANumberExp : PExp
         if ( _number_ == oldChild )
         {
             SetNumber ((TNumber) newChild);
+            return;
+        }
+    }
+
+}
+public sealed class AId : PId
+{
+    private TTid _tid_;
+
+    public AId ()
+    {
+    }
+
+    public AId (
+            TTid _tid_
+    )
+    {
+        SetTid (_tid_);
+    }
+
+    public override Object Clone()
+    {
+        return new AId (
+            (TTid)CloneNode (_tid_)
+        );
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseAId(this);
+    }
+
+    public TTid GetTid ()
+    {
+        return _tid_;
+    }
+
+    public void SetTid (TTid node)
+    {
+        if(_tid_ != null)
+        {
+            _tid_.Parent(null);
+        }
+
+        if(node != null)
+        {
+            if(node.Parent() != null)
+            {
+                node.Parent().RemoveChild(node);
+            }
+
+            node.Parent(this);
+        }
+
+        _tid_ = node;
+    }
+
+    public override string ToString()
+    {
+        return ""
+            + ToString (_tid_)
+        ;
+    }
+
+    internal override void RemoveChild(Node child)
+    {
+        if ( _tid_ == child )
+        {
+            _tid_ = null;
+            return;
+        }
+    }
+
+    internal override void ReplaceChild(Node oldChild, Node newChild)
+    {
+        if ( _tid_ == oldChild )
+        {
+            SetTid ((TTid) newChild);
             return;
         }
     }
