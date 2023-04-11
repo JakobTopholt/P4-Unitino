@@ -11,4 +11,8 @@
       <Folder Include="SableCC" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="grammar.sablecc3" />
+    </ItemGroup>
+
 </Project>

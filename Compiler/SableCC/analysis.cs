@@ -2,9 +2,9 @@
 
 using System;
 using System.Collections;
-using org.sablecc.sablecc.node;
+using Moduino.node;
 
-namespace org.sablecc.sablecc.analysis {
+namespace Moduino.analysis {
 
 
 public interface Analysis : Switch
@@ -16,69 +16,14 @@ public interface Analysis : Switch
 
     void CaseStart(Start node);
     void CaseAGrammar(AGrammar node);
-    void CaseAHelpers(AHelpers node);
-    void CaseAHelperDef(AHelperDef node);
-    void CaseAStates(AStates node);
-    void CaseATokens(ATokens node);
-    void CaseATokenDef(ATokenDef node);
-    void CaseAStateList(AStateList node);
-    void CaseAStateListTail(AStateListTail node);
-    void CaseATransition(ATransition node);
-    void CaseAIgnTokens(AIgnTokens node);
-    void CaseARegExp(ARegExp node);
-    void CaseAConcat(AConcat node);
-    void CaseAUnExp(AUnExp node);
-    void CaseACharBasic(ACharBasic node);
-    void CaseASetBasic(ASetBasic node);
-    void CaseAStringBasic(AStringBasic node);
-    void CaseAIdBasic(AIdBasic node);
-    void CaseARegExpBasic(ARegExpBasic node);
-    void CaseACharChar(ACharChar node);
-    void CaseADecChar(ADecChar node);
-    void CaseAHexChar(AHexChar node);
-    void CaseAOperationSet(AOperationSet node);
-    void CaseAIntervalSet(AIntervalSet node);
-    void CaseAStarUnOp(AStarUnOp node);
-    void CaseAQMarkUnOp(AQMarkUnOp node);
-    void CaseAPlusUnOp(APlusUnOp node);
-    void CaseAPlusBinOp(APlusBinOp node);
-    void CaseAMinusBinOp(AMinusBinOp node);
-    void CaseAProductions(AProductions node);
-    void CaseAProd(AProd node);
-    void CaseAParsedAlt(AParsedAlt node);
-    void CaseAAltTransform(AAltTransform node);
-    void CaseANewTerm(ANewTerm node);
-    void CaseAListTerm(AListTerm node);
-    void CaseASimpleTerm(ASimpleTerm node);
-    void CaseANullTerm(ANullTerm node);
-    void CaseANewListTerm(ANewListTerm node);
-    void CaseASimpleListTerm(ASimpleListTerm node);
-    void CaseAProdName(AProdName node);
-    void CaseAElem(AElem node);
-    void CaseATokenSpecifier(ATokenSpecifier node);
-    void CaseAProductionSpecifier(AProductionSpecifier node);
-    void CaseAAst(AAst node);
-    void CaseAAstProd(AAstProd node);
-    void CaseAAstAlt(AAstAlt node);
+    void CaseAStmt(AStmt node);
+    void CaseAPlusExp(APlusExp node);
+    void CaseAMinusExp(AMinusExp node);
+    void CaseADivExp(ADivExp node);
+    void CaseAMultExp(AMultExp node);
+    void CaseANumberExp(ANumberExp node);
 
-    void CaseTPkgId(TPkgId node);
-    void CaseTPackage(TPackage node);
-    void CaseTStates(TStates node);
-    void CaseTHelpers(THelpers node);
-    void CaseTTokens(TTokens node);
-    void CaseTIgnored(TIgnored node);
-    void CaseTProductions(TProductions node);
-    void CaseTAbstract(TAbstract node);
-    void CaseTSyntax(TSyntax node);
-    void CaseTTree(TTree node);
-    void CaseTNew(TNew node);
-    void CaseTNull(TNull node);
-    void CaseTTokenSpecifier(TTokenSpecifier node);
-    void CaseTProductionSpecifier(TProductionSpecifier node);
-    void CaseTDot(TDot node);
-    void CaseTDDot(TDDot node);
-    void CaseTSemicolon(TSemicolon node);
-    void CaseTEqual(TEqual node);
+    void CaseTProg(TProg node);
     void CaseTLBkt(TLBkt node);
     void CaseTRBkt(TRBkt node);
     void CaseTLPar(TLPar node);
@@ -87,17 +32,19 @@ public interface Analysis : Switch
     void CaseTRBrace(TRBrace node);
     void CaseTPlus(TPlus node);
     void CaseTMinus(TMinus node);
-    void CaseTQMark(TQMark node);
-    void CaseTStar(TStar node);
-    void CaseTBar(TBar node);
-    void CaseTComma(TComma node);
     void CaseTSlash(TSlash node);
+    void CaseTStar(TStar node);
+    void CaseTEqual(TEqual node);
+    void CaseTQMark(TQMark node);
+    void CaseTBar(TBar node);
     void CaseTArrow(TArrow node);
+    void CaseTComma(TComma node);
+    void CaseTSemicolon(TSemicolon node);
     void CaseTColon(TColon node);
     void CaseTId(TId node);
     void CaseTChar(TChar node);
-    void CaseTDecChar(TDecChar node);
-    void CaseTHexChar(THexChar node);
+    void CaseTNumber(TNumber node);
+    void CaseTHex(THex node);
     void CaseTString(TString node);
     void CaseTBlank(TBlank node);
     void CaseTComment(TComment node);
@@ -171,252 +118,32 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
-    public virtual void CaseAHelpers(AHelpers node)
+    public virtual void CaseAStmt(AStmt node)
     {
         DefaultCase(node);
     }
-    public virtual void CaseAHelperDef(AHelperDef node)
+    public virtual void CaseAPlusExp(APlusExp node)
     {
         DefaultCase(node);
     }
-    public virtual void CaseAStates(AStates node)
+    public virtual void CaseAMinusExp(AMinusExp node)
     {
         DefaultCase(node);
     }
-    public virtual void CaseATokens(ATokens node)
+    public virtual void CaseADivExp(ADivExp node)
     {
         DefaultCase(node);
     }
-    public virtual void CaseATokenDef(ATokenDef node)
+    public virtual void CaseAMultExp(AMultExp node)
     {
         DefaultCase(node);
     }
-    public virtual void CaseAStateList(AStateList node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAStateListTail(AStateListTail node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseATransition(ATransition node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAIgnTokens(AIgnTokens node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseARegExp(ARegExp node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAConcat(AConcat node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAUnExp(AUnExp node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseACharBasic(ACharBasic node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseASetBasic(ASetBasic node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAStringBasic(AStringBasic node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAIdBasic(AIdBasic node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseARegExpBasic(ARegExpBasic node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseACharChar(ACharChar node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseADecChar(ADecChar node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAHexChar(AHexChar node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAOperationSet(AOperationSet node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAIntervalSet(AIntervalSet node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAStarUnOp(AStarUnOp node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAQMarkUnOp(AQMarkUnOp node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAPlusUnOp(APlusUnOp node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAPlusBinOp(APlusBinOp node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAMinusBinOp(AMinusBinOp node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAProductions(AProductions node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAProd(AProd node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAParsedAlt(AParsedAlt node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAAltTransform(AAltTransform node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseANewTerm(ANewTerm node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAListTerm(AListTerm node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseASimpleTerm(ASimpleTerm node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseANullTerm(ANullTerm node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseANewListTerm(ANewListTerm node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseASimpleListTerm(ASimpleListTerm node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAProdName(AProdName node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAElem(AElem node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseATokenSpecifier(ATokenSpecifier node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAProductionSpecifier(AProductionSpecifier node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAAst(AAst node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAAstProd(AAstProd node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseAAstAlt(AAstAlt node)
+    public virtual void CaseANumberExp(ANumberExp node)
     {
         DefaultCase(node);
     }
 
-    public virtual void CaseTPkgId(TPkgId node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTPackage(TPackage node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTStates(TStates node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTHelpers(THelpers node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTTokens(TTokens node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTIgnored(TIgnored node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTProductions(TProductions node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTAbstract(TAbstract node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTSyntax(TSyntax node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTTree(TTree node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTNew(TNew node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTNull(TNull node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTTokenSpecifier(TTokenSpecifier node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTProductionSpecifier(TProductionSpecifier node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTDot(TDot node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTDDot(TDDot node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTSemicolon(TSemicolon node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTEqual(TEqual node)
+    public virtual void CaseTProg(TProg node)
     {
         DefaultCase(node);
     }
@@ -452,7 +179,7 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
-    public virtual void CaseTQMark(TQMark node)
+    public virtual void CaseTSlash(TSlash node)
     {
         DefaultCase(node);
     }
@@ -460,7 +187,19 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
+    public virtual void CaseTEqual(TEqual node)
+    {
+        DefaultCase(node);
+    }
+    public virtual void CaseTQMark(TQMark node)
+    {
+        DefaultCase(node);
+    }
     public virtual void CaseTBar(TBar node)
+    {
+        DefaultCase(node);
+    }
+    public virtual void CaseTArrow(TArrow node)
     {
         DefaultCase(node);
     }
@@ -468,11 +207,7 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
-    public virtual void CaseTSlash(TSlash node)
-    {
-        DefaultCase(node);
-    }
-    public virtual void CaseTArrow(TArrow node)
+    public virtual void CaseTSemicolon(TSemicolon node)
     {
         DefaultCase(node);
     }
@@ -488,11 +223,11 @@ public class AnalysisAdapter : Analysis
     {
         DefaultCase(node);
     }
-    public virtual void CaseTDecChar(TDecChar node)
+    public virtual void CaseTNumber(TNumber node)
     {
         DefaultCase(node);
     }
-    public virtual void CaseTHexChar(THexChar node)
+    public virtual void CaseTHex(THex node)
     {
         DefaultCase(node);
     }
@@ -562,1062 +297,144 @@ public class DepthFirstAdapter : AnalysisAdapter
     {
         InAGrammar(node);
         {
-            Object[] temp = new Object[node.GetPackage().Count];
-            node.GetPackage().CopyTo(temp, 0);
+            Object[] temp = new Object[node.GetExp().Count];
+            node.GetExp().CopyTo(temp, 0);
             for(int i = 0; i < temp.Length; i++)
             {
-                ((TPkgId) temp[i]).Apply(this);
+                ((PExp) temp[i]).Apply(this);
             }
-        }
-        if(node.GetHelpers() != null)
-        {
-            node.GetHelpers().Apply(this);
-        }
-        if(node.GetStates() != null)
-        {
-            node.GetStates().Apply(this);
-        }
-        if(node.GetTokens() != null)
-        {
-            node.GetTokens().Apply(this);
-        }
-        if(node.GetIgnTokens() != null)
-        {
-            node.GetIgnTokens().Apply(this);
-        }
-        if(node.GetProductions() != null)
-        {
-            node.GetProductions().Apply(this);
-        }
-        if(node.GetAst() != null)
-        {
-            node.GetAst().Apply(this);
         }
         OutAGrammar(node);
     }
-    public virtual void InAHelpers(AHelpers node)
+    public virtual void InAStmt(AStmt node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutAHelpers(AHelpers node)
+    public virtual void OutAStmt(AStmt node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseAHelpers(AHelpers node)
+    public override void CaseAStmt(AStmt node)
     {
-        InAHelpers(node);
+        InAStmt(node);
+        if(node.GetExp() != null)
         {
-            Object[] temp = new Object[node.GetHelperDefs().Count];
-            node.GetHelperDefs().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PHelperDef) temp[i]).Apply(this);
-            }
+            node.GetExp().Apply(this);
         }
-        OutAHelpers(node);
+        OutAStmt(node);
     }
-    public virtual void InAHelperDef(AHelperDef node)
+    public virtual void InAPlusExp(APlusExp node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutAHelperDef(AHelperDef node)
+    public virtual void OutAPlusExp(APlusExp node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseAHelperDef(AHelperDef node)
+    public override void CaseAPlusExp(APlusExp node)
     {
-        InAHelperDef(node);
-        if(node.GetId() != null)
+        InAPlusExp(node);
+        if(node.GetL() != null)
         {
-            node.GetId().Apply(this);
+            node.GetL().Apply(this);
         }
-        if(node.GetRegExp() != null)
+        if(node.GetR() != null)
         {
-            node.GetRegExp().Apply(this);
+            node.GetR().Apply(this);
         }
-        OutAHelperDef(node);
+        OutAPlusExp(node);
     }
-    public virtual void InAStates(AStates node)
+    public virtual void InAMinusExp(AMinusExp node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutAStates(AStates node)
+    public virtual void OutAMinusExp(AMinusExp node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseAStates(AStates node)
+    public override void CaseAMinusExp(AMinusExp node)
     {
-        InAStates(node);
+        InAMinusExp(node);
+        if(node.GetL() != null)
         {
-            Object[] temp = new Object[node.GetListId().Count];
-            node.GetListId().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((TId) temp[i]).Apply(this);
-            }
+            node.GetL().Apply(this);
         }
-        OutAStates(node);
+        if(node.GetR() != null)
+        {
+            node.GetR().Apply(this);
+        }
+        OutAMinusExp(node);
     }
-    public virtual void InATokens(ATokens node)
+    public virtual void InADivExp(ADivExp node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutATokens(ATokens node)
+    public virtual void OutADivExp(ADivExp node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseATokens(ATokens node)
+    public override void CaseADivExp(ADivExp node)
     {
-        InATokens(node);
+        InADivExp(node);
+        if(node.GetL() != null)
         {
-            Object[] temp = new Object[node.GetTokenDefs().Count];
-            node.GetTokenDefs().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PTokenDef) temp[i]).Apply(this);
-            }
+            node.GetL().Apply(this);
         }
-        OutATokens(node);
+        if(node.GetR() != null)
+        {
+            node.GetR().Apply(this);
+        }
+        OutADivExp(node);
     }
-    public virtual void InATokenDef(ATokenDef node)
+    public virtual void InAMultExp(AMultExp node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutATokenDef(ATokenDef node)
+    public virtual void OutAMultExp(AMultExp node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseATokenDef(ATokenDef node)
+    public override void CaseAMultExp(AMultExp node)
     {
-        InATokenDef(node);
-        if(node.GetStateList() != null)
+        InAMultExp(node);
+        if(node.GetL() != null)
         {
-            node.GetStateList().Apply(this);
+            node.GetL().Apply(this);
         }
-        if(node.GetId() != null)
+        if(node.GetR() != null)
         {
-            node.GetId().Apply(this);
+            node.GetR().Apply(this);
         }
-        if(node.GetRegExp() != null)
-        {
-            node.GetRegExp().Apply(this);
-        }
-        if(node.GetSlash() != null)
-        {
-            node.GetSlash().Apply(this);
-        }
-        if(node.GetLookAhead() != null)
-        {
-            node.GetLookAhead().Apply(this);
-        }
-        OutATokenDef(node);
+        OutAMultExp(node);
     }
-    public virtual void InAStateList(AStateList node)
+    public virtual void InANumberExp(ANumberExp node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutAStateList(AStateList node)
+    public virtual void OutANumberExp(ANumberExp node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseAStateList(AStateList node)
+    public override void CaseANumberExp(ANumberExp node)
     {
-        InAStateList(node);
-        if(node.GetId() != null)
+        InANumberExp(node);
+        if(node.GetNumber() != null)
         {
-            node.GetId().Apply(this);
+            node.GetNumber().Apply(this);
         }
-        if(node.GetTransition() != null)
-        {
-            node.GetTransition().Apply(this);
-        }
-        {
-            Object[] temp = new Object[node.GetStateLists().Count];
-            node.GetStateLists().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PStateListTail) temp[i]).Apply(this);
-            }
-        }
-        OutAStateList(node);
-    }
-    public virtual void InAStateListTail(AStateListTail node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAStateListTail(AStateListTail node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAStateListTail(AStateListTail node)
-    {
-        InAStateListTail(node);
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        if(node.GetTransition() != null)
-        {
-            node.GetTransition().Apply(this);
-        }
-        OutAStateListTail(node);
-    }
-    public virtual void InATransition(ATransition node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutATransition(ATransition node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseATransition(ATransition node)
-    {
-        InATransition(node);
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        OutATransition(node);
-    }
-    public virtual void InAIgnTokens(AIgnTokens node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAIgnTokens(AIgnTokens node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAIgnTokens(AIgnTokens node)
-    {
-        InAIgnTokens(node);
-        {
-            Object[] temp = new Object[node.GetListId().Count];
-            node.GetListId().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((TId) temp[i]).Apply(this);
-            }
-        }
-        OutAIgnTokens(node);
-    }
-    public virtual void InARegExp(ARegExp node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutARegExp(ARegExp node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseARegExp(ARegExp node)
-    {
-        InARegExp(node);
-        {
-            Object[] temp = new Object[node.GetConcats().Count];
-            node.GetConcats().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PConcat) temp[i]).Apply(this);
-            }
-        }
-        OutARegExp(node);
-    }
-    public virtual void InAConcat(AConcat node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAConcat(AConcat node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAConcat(AConcat node)
-    {
-        InAConcat(node);
-        {
-            Object[] temp = new Object[node.GetUnExps().Count];
-            node.GetUnExps().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PUnExp) temp[i]).Apply(this);
-            }
-        }
-        OutAConcat(node);
-    }
-    public virtual void InAUnExp(AUnExp node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAUnExp(AUnExp node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAUnExp(AUnExp node)
-    {
-        InAUnExp(node);
-        if(node.GetBasic() != null)
-        {
-            node.GetBasic().Apply(this);
-        }
-        if(node.GetUnOp() != null)
-        {
-            node.GetUnOp().Apply(this);
-        }
-        OutAUnExp(node);
-    }
-    public virtual void InACharBasic(ACharBasic node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutACharBasic(ACharBasic node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseACharBasic(ACharBasic node)
-    {
-        InACharBasic(node);
-        if(node.GetChar() != null)
-        {
-            node.GetChar().Apply(this);
-        }
-        OutACharBasic(node);
-    }
-    public virtual void InASetBasic(ASetBasic node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutASetBasic(ASetBasic node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseASetBasic(ASetBasic node)
-    {
-        InASetBasic(node);
-        if(node.GetSet() != null)
-        {
-            node.GetSet().Apply(this);
-        }
-        OutASetBasic(node);
-    }
-    public virtual void InAStringBasic(AStringBasic node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAStringBasic(AStringBasic node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAStringBasic(AStringBasic node)
-    {
-        InAStringBasic(node);
-        if(node.GetString() != null)
-        {
-            node.GetString().Apply(this);
-        }
-        OutAStringBasic(node);
-    }
-    public virtual void InAIdBasic(AIdBasic node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAIdBasic(AIdBasic node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAIdBasic(AIdBasic node)
-    {
-        InAIdBasic(node);
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        OutAIdBasic(node);
-    }
-    public virtual void InARegExpBasic(ARegExpBasic node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutARegExpBasic(ARegExpBasic node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseARegExpBasic(ARegExpBasic node)
-    {
-        InARegExpBasic(node);
-        if(node.GetRegExp() != null)
-        {
-            node.GetRegExp().Apply(this);
-        }
-        OutARegExpBasic(node);
-    }
-    public virtual void InACharChar(ACharChar node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutACharChar(ACharChar node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseACharChar(ACharChar node)
-    {
-        InACharChar(node);
-        if(node.GetChar() != null)
-        {
-            node.GetChar().Apply(this);
-        }
-        OutACharChar(node);
-    }
-    public virtual void InADecChar(ADecChar node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutADecChar(ADecChar node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseADecChar(ADecChar node)
-    {
-        InADecChar(node);
-        if(node.GetDecChar() != null)
-        {
-            node.GetDecChar().Apply(this);
-        }
-        OutADecChar(node);
-    }
-    public virtual void InAHexChar(AHexChar node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAHexChar(AHexChar node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAHexChar(AHexChar node)
-    {
-        InAHexChar(node);
-        if(node.GetHexChar() != null)
-        {
-            node.GetHexChar().Apply(this);
-        }
-        OutAHexChar(node);
-    }
-    public virtual void InAOperationSet(AOperationSet node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAOperationSet(AOperationSet node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAOperationSet(AOperationSet node)
-    {
-        InAOperationSet(node);
-        if(node.GetLeft() != null)
-        {
-            node.GetLeft().Apply(this);
-        }
-        if(node.GetBinOp() != null)
-        {
-            node.GetBinOp().Apply(this);
-        }
-        if(node.GetRight() != null)
-        {
-            node.GetRight().Apply(this);
-        }
-        OutAOperationSet(node);
-    }
-    public virtual void InAIntervalSet(AIntervalSet node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAIntervalSet(AIntervalSet node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAIntervalSet(AIntervalSet node)
-    {
-        InAIntervalSet(node);
-        if(node.GetLeft() != null)
-        {
-            node.GetLeft().Apply(this);
-        }
-        if(node.GetRight() != null)
-        {
-            node.GetRight().Apply(this);
-        }
-        OutAIntervalSet(node);
-    }
-    public virtual void InAStarUnOp(AStarUnOp node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAStarUnOp(AStarUnOp node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAStarUnOp(AStarUnOp node)
-    {
-        InAStarUnOp(node);
-        if(node.GetStar() != null)
-        {
-            node.GetStar().Apply(this);
-        }
-        OutAStarUnOp(node);
-    }
-    public virtual void InAQMarkUnOp(AQMarkUnOp node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAQMarkUnOp(AQMarkUnOp node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAQMarkUnOp(AQMarkUnOp node)
-    {
-        InAQMarkUnOp(node);
-        if(node.GetQMark() != null)
-        {
-            node.GetQMark().Apply(this);
-        }
-        OutAQMarkUnOp(node);
-    }
-    public virtual void InAPlusUnOp(APlusUnOp node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAPlusUnOp(APlusUnOp node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAPlusUnOp(APlusUnOp node)
-    {
-        InAPlusUnOp(node);
-        if(node.GetPlus() != null)
-        {
-            node.GetPlus().Apply(this);
-        }
-        OutAPlusUnOp(node);
-    }
-    public virtual void InAPlusBinOp(APlusBinOp node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAPlusBinOp(APlusBinOp node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAPlusBinOp(APlusBinOp node)
-    {
-        InAPlusBinOp(node);
-        OutAPlusBinOp(node);
-    }
-    public virtual void InAMinusBinOp(AMinusBinOp node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAMinusBinOp(AMinusBinOp node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAMinusBinOp(AMinusBinOp node)
-    {
-        InAMinusBinOp(node);
-        OutAMinusBinOp(node);
-    }
-    public virtual void InAProductions(AProductions node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAProductions(AProductions node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAProductions(AProductions node)
-    {
-        InAProductions(node);
-        {
-            Object[] temp = new Object[node.GetProds().Count];
-            node.GetProds().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PProd) temp[i]).Apply(this);
-            }
-        }
-        OutAProductions(node);
-    }
-    public virtual void InAProd(AProd node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAProd(AProd node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAProd(AProd node)
-    {
-        InAProd(node);
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        if(node.GetArrow() != null)
-        {
-            node.GetArrow().Apply(this);
-        }
-        {
-            Object[] temp = new Object[node.GetProdTransform().Count];
-            node.GetProdTransform().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PElem) temp[i]).Apply(this);
-            }
-        }
-        {
-            Object[] temp = new Object[node.GetAlts().Count];
-            node.GetAlts().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PAlt) temp[i]).Apply(this);
-            }
-        }
-        OutAProd(node);
-    }
-    public virtual void InAParsedAlt(AParsedAlt node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAParsedAlt(AParsedAlt node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAParsedAlt(AParsedAlt node)
-    {
-        InAParsedAlt(node);
-        if(node.GetAltName() != null)
-        {
-            node.GetAltName().Apply(this);
-        }
-        {
-            Object[] temp = new Object[node.GetElems().Count];
-            node.GetElems().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PElem) temp[i]).Apply(this);
-            }
-        }
-        if(node.GetAltTransform() != null)
-        {
-            node.GetAltTransform().Apply(this);
-        }
-        OutAParsedAlt(node);
-    }
-    public virtual void InAAltTransform(AAltTransform node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAAltTransform(AAltTransform node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAAltTransform(AAltTransform node)
-    {
-        InAAltTransform(node);
-        if(node.GetLBrace() != null)
-        {
-            node.GetLBrace().Apply(this);
-        }
-        {
-            Object[] temp = new Object[node.GetTerms().Count];
-            node.GetTerms().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PTerm) temp[i]).Apply(this);
-            }
-        }
-        if(node.GetRBrace() != null)
-        {
-            node.GetRBrace().Apply(this);
-        }
-        OutAAltTransform(node);
-    }
-    public virtual void InANewTerm(ANewTerm node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutANewTerm(ANewTerm node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseANewTerm(ANewTerm node)
-    {
-        InANewTerm(node);
-        if(node.GetProdName() != null)
-        {
-            node.GetProdName().Apply(this);
-        }
-        if(node.GetLPar() != null)
-        {
-            node.GetLPar().Apply(this);
-        }
-        {
-            Object[] temp = new Object[node.GetParams().Count];
-            node.GetParams().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PTerm) temp[i]).Apply(this);
-            }
-        }
-        OutANewTerm(node);
-    }
-    public virtual void InAListTerm(AListTerm node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAListTerm(AListTerm node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAListTerm(AListTerm node)
-    {
-        InAListTerm(node);
-        if(node.GetLBkt() != null)
-        {
-            node.GetLBkt().Apply(this);
-        }
-        {
-            Object[] temp = new Object[node.GetListTerms().Count];
-            node.GetListTerms().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PListTerm) temp[i]).Apply(this);
-            }
-        }
-        OutAListTerm(node);
-    }
-    public virtual void InASimpleTerm(ASimpleTerm node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutASimpleTerm(ASimpleTerm node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseASimpleTerm(ASimpleTerm node)
-    {
-        InASimpleTerm(node);
-        if(node.GetSpecifier() != null)
-        {
-            node.GetSpecifier().Apply(this);
-        }
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        if(node.GetSimpleTermTail() != null)
-        {
-            node.GetSimpleTermTail().Apply(this);
-        }
-        OutASimpleTerm(node);
-    }
-    public virtual void InANullTerm(ANullTerm node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutANullTerm(ANullTerm node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseANullTerm(ANullTerm node)
-    {
-        InANullTerm(node);
-        OutANullTerm(node);
-    }
-    public virtual void InANewListTerm(ANewListTerm node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutANewListTerm(ANewListTerm node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseANewListTerm(ANewListTerm node)
-    {
-        InANewListTerm(node);
-        if(node.GetProdName() != null)
-        {
-            node.GetProdName().Apply(this);
-        }
-        if(node.GetLPar() != null)
-        {
-            node.GetLPar().Apply(this);
-        }
-        {
-            Object[] temp = new Object[node.GetParams().Count];
-            node.GetParams().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PTerm) temp[i]).Apply(this);
-            }
-        }
-        OutANewListTerm(node);
-    }
-    public virtual void InASimpleListTerm(ASimpleListTerm node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutASimpleListTerm(ASimpleListTerm node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseASimpleListTerm(ASimpleListTerm node)
-    {
-        InASimpleListTerm(node);
-        if(node.GetSpecifier() != null)
-        {
-            node.GetSpecifier().Apply(this);
-        }
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        if(node.GetSimpleTermTail() != null)
-        {
-            node.GetSimpleTermTail().Apply(this);
-        }
-        OutASimpleListTerm(node);
-    }
-    public virtual void InAProdName(AProdName node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAProdName(AProdName node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAProdName(AProdName node)
-    {
-        InAProdName(node);
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        if(node.GetProdNameTail() != null)
-        {
-            node.GetProdNameTail().Apply(this);
-        }
-        OutAProdName(node);
-    }
-    public virtual void InAElem(AElem node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAElem(AElem node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAElem(AElem node)
-    {
-        InAElem(node);
-        if(node.GetElemName() != null)
-        {
-            node.GetElemName().Apply(this);
-        }
-        if(node.GetSpecifier() != null)
-        {
-            node.GetSpecifier().Apply(this);
-        }
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        if(node.GetUnOp() != null)
-        {
-            node.GetUnOp().Apply(this);
-        }
-        OutAElem(node);
-    }
-    public virtual void InATokenSpecifier(ATokenSpecifier node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutATokenSpecifier(ATokenSpecifier node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseATokenSpecifier(ATokenSpecifier node)
-    {
-        InATokenSpecifier(node);
-        OutATokenSpecifier(node);
-    }
-    public virtual void InAProductionSpecifier(AProductionSpecifier node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAProductionSpecifier(AProductionSpecifier node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAProductionSpecifier(AProductionSpecifier node)
-    {
-        InAProductionSpecifier(node);
-        OutAProductionSpecifier(node);
-    }
-    public virtual void InAAst(AAst node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAAst(AAst node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAAst(AAst node)
-    {
-        InAAst(node);
-        {
-            Object[] temp = new Object[node.GetProds().Count];
-            node.GetProds().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PAstProd) temp[i]).Apply(this);
-            }
-        }
-        OutAAst(node);
-    }
-    public virtual void InAAstProd(AAstProd node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAAstProd(AAstProd node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAAstProd(AAstProd node)
-    {
-        InAAstProd(node);
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        {
-            Object[] temp = new Object[node.GetAlts().Count];
-            node.GetAlts().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PAstAlt) temp[i]).Apply(this);
-            }
-        }
-        OutAAstProd(node);
-    }
-    public virtual void InAAstAlt(AAstAlt node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAAstAlt(AAstAlt node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAAstAlt(AAstAlt node)
-    {
-        InAAstAlt(node);
-        if(node.GetAltName() != null)
-        {
-            node.GetAltName().Apply(this);
-        }
-        {
-            Object[] temp = new Object[node.GetElems().Count];
-            node.GetElems().CopyTo(temp, 0);
-            for(int i = 0; i < temp.Length; i++)
-            {
-                ((PElem) temp[i]).Apply(this);
-            }
-        }
-        OutAAstAlt(node);
+        OutANumberExp(node);
     }
 }
 
@@ -1663,1063 +480,145 @@ public class ReversedDepthFirstAdapter : AnalysisAdapter
     public override void CaseAGrammar(AGrammar node)
     {
         InAGrammar(node);
-        if(node.GetAst() != null)
         {
-            node.GetAst().Apply(this);
-        }
-        if(node.GetProductions() != null)
-        {
-            node.GetProductions().Apply(this);
-        }
-        if(node.GetIgnTokens() != null)
-        {
-            node.GetIgnTokens().Apply(this);
-        }
-        if(node.GetTokens() != null)
-        {
-            node.GetTokens().Apply(this);
-        }
-        if(node.GetStates() != null)
-        {
-            node.GetStates().Apply(this);
-        }
-        if(node.GetHelpers() != null)
-        {
-            node.GetHelpers().Apply(this);
-        }
-        {
-            Object[] temp = new Object[node.GetPackage().Count];
-            node.GetPackage().CopyTo(temp, 0);
+            Object[] temp = new Object[node.GetExp().Count];
+            node.GetExp().CopyTo(temp, 0);
             for(int i = temp.Length - 1; i >= 0; i--)
             {
-                ((TPkgId) temp[i]).Apply(this);
+                ((PExp) temp[i]).Apply(this);
             }
         }
         OutAGrammar(node);
     }
-    public virtual void InAHelpers(AHelpers node)
+    public virtual void InAStmt(AStmt node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutAHelpers(AHelpers node)
+    public virtual void OutAStmt(AStmt node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseAHelpers(AHelpers node)
+    public override void CaseAStmt(AStmt node)
     {
-        InAHelpers(node);
+        InAStmt(node);
+        if(node.GetExp() != null)
         {
-            Object[] temp = new Object[node.GetHelperDefs().Count];
-            node.GetHelperDefs().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PHelperDef) temp[i]).Apply(this);
-            }
+            node.GetExp().Apply(this);
         }
-        OutAHelpers(node);
+        OutAStmt(node);
     }
-    public virtual void InAHelperDef(AHelperDef node)
+    public virtual void InAPlusExp(APlusExp node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutAHelperDef(AHelperDef node)
+    public virtual void OutAPlusExp(APlusExp node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseAHelperDef(AHelperDef node)
+    public override void CaseAPlusExp(APlusExp node)
     {
-        InAHelperDef(node);
-        if(node.GetRegExp() != null)
+        InAPlusExp(node);
+        if(node.GetR() != null)
         {
-            node.GetRegExp().Apply(this);
+            node.GetR().Apply(this);
         }
-        if(node.GetId() != null)
+        if(node.GetL() != null)
         {
-            node.GetId().Apply(this);
+            node.GetL().Apply(this);
         }
-        OutAHelperDef(node);
+        OutAPlusExp(node);
     }
-    public virtual void InAStates(AStates node)
+    public virtual void InAMinusExp(AMinusExp node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutAStates(AStates node)
+    public virtual void OutAMinusExp(AMinusExp node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseAStates(AStates node)
+    public override void CaseAMinusExp(AMinusExp node)
     {
-        InAStates(node);
+        InAMinusExp(node);
+        if(node.GetR() != null)
         {
-            Object[] temp = new Object[node.GetListId().Count];
-            node.GetListId().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((TId) temp[i]).Apply(this);
-            }
+            node.GetR().Apply(this);
         }
-        OutAStates(node);
+        if(node.GetL() != null)
+        {
+            node.GetL().Apply(this);
+        }
+        OutAMinusExp(node);
     }
-    public virtual void InATokens(ATokens node)
+    public virtual void InADivExp(ADivExp node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutATokens(ATokens node)
+    public virtual void OutADivExp(ADivExp node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseATokens(ATokens node)
+    public override void CaseADivExp(ADivExp node)
     {
-        InATokens(node);
+        InADivExp(node);
+        if(node.GetR() != null)
         {
-            Object[] temp = new Object[node.GetTokenDefs().Count];
-            node.GetTokenDefs().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PTokenDef) temp[i]).Apply(this);
-            }
+            node.GetR().Apply(this);
         }
-        OutATokens(node);
+        if(node.GetL() != null)
+        {
+            node.GetL().Apply(this);
+        }
+        OutADivExp(node);
     }
-    public virtual void InATokenDef(ATokenDef node)
+    public virtual void InAMultExp(AMultExp node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutATokenDef(ATokenDef node)
+    public virtual void OutAMultExp(AMultExp node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseATokenDef(ATokenDef node)
+    public override void CaseAMultExp(AMultExp node)
     {
-        InATokenDef(node);
-        if(node.GetLookAhead() != null)
+        InAMultExp(node);
+        if(node.GetR() != null)
         {
-            node.GetLookAhead().Apply(this);
+            node.GetR().Apply(this);
         }
-        if(node.GetSlash() != null)
+        if(node.GetL() != null)
         {
-            node.GetSlash().Apply(this);
+            node.GetL().Apply(this);
         }
-        if(node.GetRegExp() != null)
-        {
-            node.GetRegExp().Apply(this);
-        }
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        if(node.GetStateList() != null)
-        {
-            node.GetStateList().Apply(this);
-        }
-        OutATokenDef(node);
+        OutAMultExp(node);
     }
-    public virtual void InAStateList(AStateList node)
+    public virtual void InANumberExp(ANumberExp node)
     {
         DefaultIn(node);
     }
 
-    public virtual void OutAStateList(AStateList node)
+    public virtual void OutANumberExp(ANumberExp node)
     {
         DefaultOut(node);
     }
 
-    public override void CaseAStateList(AStateList node)
+    public override void CaseANumberExp(ANumberExp node)
     {
-        InAStateList(node);
+        InANumberExp(node);
+        if(node.GetNumber() != null)
         {
-            Object[] temp = new Object[node.GetStateLists().Count];
-            node.GetStateLists().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PStateListTail) temp[i]).Apply(this);
-            }
+            node.GetNumber().Apply(this);
         }
-        if(node.GetTransition() != null)
-        {
-            node.GetTransition().Apply(this);
-        }
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        OutAStateList(node);
-    }
-    public virtual void InAStateListTail(AStateListTail node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAStateListTail(AStateListTail node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAStateListTail(AStateListTail node)
-    {
-        InAStateListTail(node);
-        if(node.GetTransition() != null)
-        {
-            node.GetTransition().Apply(this);
-        }
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        OutAStateListTail(node);
-    }
-    public virtual void InATransition(ATransition node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutATransition(ATransition node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseATransition(ATransition node)
-    {
-        InATransition(node);
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        OutATransition(node);
-    }
-    public virtual void InAIgnTokens(AIgnTokens node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAIgnTokens(AIgnTokens node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAIgnTokens(AIgnTokens node)
-    {
-        InAIgnTokens(node);
-        {
-            Object[] temp = new Object[node.GetListId().Count];
-            node.GetListId().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((TId) temp[i]).Apply(this);
-            }
-        }
-        OutAIgnTokens(node);
-    }
-    public virtual void InARegExp(ARegExp node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutARegExp(ARegExp node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseARegExp(ARegExp node)
-    {
-        InARegExp(node);
-        {
-            Object[] temp = new Object[node.GetConcats().Count];
-            node.GetConcats().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PConcat) temp[i]).Apply(this);
-            }
-        }
-        OutARegExp(node);
-    }
-    public virtual void InAConcat(AConcat node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAConcat(AConcat node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAConcat(AConcat node)
-    {
-        InAConcat(node);
-        {
-            Object[] temp = new Object[node.GetUnExps().Count];
-            node.GetUnExps().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PUnExp) temp[i]).Apply(this);
-            }
-        }
-        OutAConcat(node);
-    }
-    public virtual void InAUnExp(AUnExp node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAUnExp(AUnExp node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAUnExp(AUnExp node)
-    {
-        InAUnExp(node);
-        if(node.GetUnOp() != null)
-        {
-            node.GetUnOp().Apply(this);
-        }
-        if(node.GetBasic() != null)
-        {
-            node.GetBasic().Apply(this);
-        }
-        OutAUnExp(node);
-    }
-    public virtual void InACharBasic(ACharBasic node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutACharBasic(ACharBasic node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseACharBasic(ACharBasic node)
-    {
-        InACharBasic(node);
-        if(node.GetChar() != null)
-        {
-            node.GetChar().Apply(this);
-        }
-        OutACharBasic(node);
-    }
-    public virtual void InASetBasic(ASetBasic node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutASetBasic(ASetBasic node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseASetBasic(ASetBasic node)
-    {
-        InASetBasic(node);
-        if(node.GetSet() != null)
-        {
-            node.GetSet().Apply(this);
-        }
-        OutASetBasic(node);
-    }
-    public virtual void InAStringBasic(AStringBasic node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAStringBasic(AStringBasic node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAStringBasic(AStringBasic node)
-    {
-        InAStringBasic(node);
-        if(node.GetString() != null)
-        {
-            node.GetString().Apply(this);
-        }
-        OutAStringBasic(node);
-    }
-    public virtual void InAIdBasic(AIdBasic node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAIdBasic(AIdBasic node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAIdBasic(AIdBasic node)
-    {
-        InAIdBasic(node);
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        OutAIdBasic(node);
-    }
-    public virtual void InARegExpBasic(ARegExpBasic node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutARegExpBasic(ARegExpBasic node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseARegExpBasic(ARegExpBasic node)
-    {
-        InARegExpBasic(node);
-        if(node.GetRegExp() != null)
-        {
-            node.GetRegExp().Apply(this);
-        }
-        OutARegExpBasic(node);
-    }
-    public virtual void InACharChar(ACharChar node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutACharChar(ACharChar node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseACharChar(ACharChar node)
-    {
-        InACharChar(node);
-        if(node.GetChar() != null)
-        {
-            node.GetChar().Apply(this);
-        }
-        OutACharChar(node);
-    }
-    public virtual void InADecChar(ADecChar node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutADecChar(ADecChar node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseADecChar(ADecChar node)
-    {
-        InADecChar(node);
-        if(node.GetDecChar() != null)
-        {
-            node.GetDecChar().Apply(this);
-        }
-        OutADecChar(node);
-    }
-    public virtual void InAHexChar(AHexChar node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAHexChar(AHexChar node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAHexChar(AHexChar node)
-    {
-        InAHexChar(node);
-        if(node.GetHexChar() != null)
-        {
-            node.GetHexChar().Apply(this);
-        }
-        OutAHexChar(node);
-    }
-    public virtual void InAOperationSet(AOperationSet node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAOperationSet(AOperationSet node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAOperationSet(AOperationSet node)
-    {
-        InAOperationSet(node);
-        if(node.GetRight() != null)
-        {
-            node.GetRight().Apply(this);
-        }
-        if(node.GetBinOp() != null)
-        {
-            node.GetBinOp().Apply(this);
-        }
-        if(node.GetLeft() != null)
-        {
-            node.GetLeft().Apply(this);
-        }
-        OutAOperationSet(node);
-    }
-    public virtual void InAIntervalSet(AIntervalSet node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAIntervalSet(AIntervalSet node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAIntervalSet(AIntervalSet node)
-    {
-        InAIntervalSet(node);
-        if(node.GetRight() != null)
-        {
-            node.GetRight().Apply(this);
-        }
-        if(node.GetLeft() != null)
-        {
-            node.GetLeft().Apply(this);
-        }
-        OutAIntervalSet(node);
-    }
-    public virtual void InAStarUnOp(AStarUnOp node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAStarUnOp(AStarUnOp node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAStarUnOp(AStarUnOp node)
-    {
-        InAStarUnOp(node);
-        if(node.GetStar() != null)
-        {
-            node.GetStar().Apply(this);
-        }
-        OutAStarUnOp(node);
-    }
-    public virtual void InAQMarkUnOp(AQMarkUnOp node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAQMarkUnOp(AQMarkUnOp node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAQMarkUnOp(AQMarkUnOp node)
-    {
-        InAQMarkUnOp(node);
-        if(node.GetQMark() != null)
-        {
-            node.GetQMark().Apply(this);
-        }
-        OutAQMarkUnOp(node);
-    }
-    public virtual void InAPlusUnOp(APlusUnOp node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAPlusUnOp(APlusUnOp node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAPlusUnOp(APlusUnOp node)
-    {
-        InAPlusUnOp(node);
-        if(node.GetPlus() != null)
-        {
-            node.GetPlus().Apply(this);
-        }
-        OutAPlusUnOp(node);
-    }
-    public virtual void InAPlusBinOp(APlusBinOp node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAPlusBinOp(APlusBinOp node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAPlusBinOp(APlusBinOp node)
-    {
-        InAPlusBinOp(node);
-        OutAPlusBinOp(node);
-    }
-    public virtual void InAMinusBinOp(AMinusBinOp node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAMinusBinOp(AMinusBinOp node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAMinusBinOp(AMinusBinOp node)
-    {
-        InAMinusBinOp(node);
-        OutAMinusBinOp(node);
-    }
-    public virtual void InAProductions(AProductions node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAProductions(AProductions node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAProductions(AProductions node)
-    {
-        InAProductions(node);
-        {
-            Object[] temp = new Object[node.GetProds().Count];
-            node.GetProds().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PProd) temp[i]).Apply(this);
-            }
-        }
-        OutAProductions(node);
-    }
-    public virtual void InAProd(AProd node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAProd(AProd node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAProd(AProd node)
-    {
-        InAProd(node);
-        {
-            Object[] temp = new Object[node.GetAlts().Count];
-            node.GetAlts().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PAlt) temp[i]).Apply(this);
-            }
-        }
-        {
-            Object[] temp = new Object[node.GetProdTransform().Count];
-            node.GetProdTransform().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PElem) temp[i]).Apply(this);
-            }
-        }
-        if(node.GetArrow() != null)
-        {
-            node.GetArrow().Apply(this);
-        }
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        OutAProd(node);
-    }
-    public virtual void InAParsedAlt(AParsedAlt node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAParsedAlt(AParsedAlt node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAParsedAlt(AParsedAlt node)
-    {
-        InAParsedAlt(node);
-        if(node.GetAltTransform() != null)
-        {
-            node.GetAltTransform().Apply(this);
-        }
-        {
-            Object[] temp = new Object[node.GetElems().Count];
-            node.GetElems().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PElem) temp[i]).Apply(this);
-            }
-        }
-        if(node.GetAltName() != null)
-        {
-            node.GetAltName().Apply(this);
-        }
-        OutAParsedAlt(node);
-    }
-    public virtual void InAAltTransform(AAltTransform node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAAltTransform(AAltTransform node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAAltTransform(AAltTransform node)
-    {
-        InAAltTransform(node);
-        if(node.GetRBrace() != null)
-        {
-            node.GetRBrace().Apply(this);
-        }
-        {
-            Object[] temp = new Object[node.GetTerms().Count];
-            node.GetTerms().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PTerm) temp[i]).Apply(this);
-            }
-        }
-        if(node.GetLBrace() != null)
-        {
-            node.GetLBrace().Apply(this);
-        }
-        OutAAltTransform(node);
-    }
-    public virtual void InANewTerm(ANewTerm node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutANewTerm(ANewTerm node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseANewTerm(ANewTerm node)
-    {
-        InANewTerm(node);
-        {
-            Object[] temp = new Object[node.GetParams().Count];
-            node.GetParams().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PTerm) temp[i]).Apply(this);
-            }
-        }
-        if(node.GetLPar() != null)
-        {
-            node.GetLPar().Apply(this);
-        }
-        if(node.GetProdName() != null)
-        {
-            node.GetProdName().Apply(this);
-        }
-        OutANewTerm(node);
-    }
-    public virtual void InAListTerm(AListTerm node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAListTerm(AListTerm node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAListTerm(AListTerm node)
-    {
-        InAListTerm(node);
-        {
-            Object[] temp = new Object[node.GetListTerms().Count];
-            node.GetListTerms().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PListTerm) temp[i]).Apply(this);
-            }
-        }
-        if(node.GetLBkt() != null)
-        {
-            node.GetLBkt().Apply(this);
-        }
-        OutAListTerm(node);
-    }
-    public virtual void InASimpleTerm(ASimpleTerm node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutASimpleTerm(ASimpleTerm node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseASimpleTerm(ASimpleTerm node)
-    {
-        InASimpleTerm(node);
-        if(node.GetSimpleTermTail() != null)
-        {
-            node.GetSimpleTermTail().Apply(this);
-        }
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        if(node.GetSpecifier() != null)
-        {
-            node.GetSpecifier().Apply(this);
-        }
-        OutASimpleTerm(node);
-    }
-    public virtual void InANullTerm(ANullTerm node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutANullTerm(ANullTerm node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseANullTerm(ANullTerm node)
-    {
-        InANullTerm(node);
-        OutANullTerm(node);
-    }
-    public virtual void InANewListTerm(ANewListTerm node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutANewListTerm(ANewListTerm node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseANewListTerm(ANewListTerm node)
-    {
-        InANewListTerm(node);
-        {
-            Object[] temp = new Object[node.GetParams().Count];
-            node.GetParams().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PTerm) temp[i]).Apply(this);
-            }
-        }
-        if(node.GetLPar() != null)
-        {
-            node.GetLPar().Apply(this);
-        }
-        if(node.GetProdName() != null)
-        {
-            node.GetProdName().Apply(this);
-        }
-        OutANewListTerm(node);
-    }
-    public virtual void InASimpleListTerm(ASimpleListTerm node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutASimpleListTerm(ASimpleListTerm node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseASimpleListTerm(ASimpleListTerm node)
-    {
-        InASimpleListTerm(node);
-        if(node.GetSimpleTermTail() != null)
-        {
-            node.GetSimpleTermTail().Apply(this);
-        }
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        if(node.GetSpecifier() != null)
-        {
-            node.GetSpecifier().Apply(this);
-        }
-        OutASimpleListTerm(node);
-    }
-    public virtual void InAProdName(AProdName node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAProdName(AProdName node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAProdName(AProdName node)
-    {
-        InAProdName(node);
-        if(node.GetProdNameTail() != null)
-        {
-            node.GetProdNameTail().Apply(this);
-        }
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        OutAProdName(node);
-    }
-    public virtual void InAElem(AElem node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAElem(AElem node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAElem(AElem node)
-    {
-        InAElem(node);
-        if(node.GetUnOp() != null)
-        {
-            node.GetUnOp().Apply(this);
-        }
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        if(node.GetSpecifier() != null)
-        {
-            node.GetSpecifier().Apply(this);
-        }
-        if(node.GetElemName() != null)
-        {
-            node.GetElemName().Apply(this);
-        }
-        OutAElem(node);
-    }
-    public virtual void InATokenSpecifier(ATokenSpecifier node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutATokenSpecifier(ATokenSpecifier node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseATokenSpecifier(ATokenSpecifier node)
-    {
-        InATokenSpecifier(node);
-        OutATokenSpecifier(node);
-    }
-    public virtual void InAProductionSpecifier(AProductionSpecifier node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAProductionSpecifier(AProductionSpecifier node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAProductionSpecifier(AProductionSpecifier node)
-    {
-        InAProductionSpecifier(node);
-        OutAProductionSpecifier(node);
-    }
-    public virtual void InAAst(AAst node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAAst(AAst node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAAst(AAst node)
-    {
-        InAAst(node);
-        {
-            Object[] temp = new Object[node.GetProds().Count];
-            node.GetProds().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PAstProd) temp[i]).Apply(this);
-            }
-        }
-        OutAAst(node);
-    }
-    public virtual void InAAstProd(AAstProd node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAAstProd(AAstProd node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAAstProd(AAstProd node)
-    {
-        InAAstProd(node);
-        {
-            Object[] temp = new Object[node.GetAlts().Count];
-            node.GetAlts().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PAstAlt) temp[i]).Apply(this);
-            }
-        }
-        if(node.GetId() != null)
-        {
-            node.GetId().Apply(this);
-        }
-        OutAAstProd(node);
-    }
-    public virtual void InAAstAlt(AAstAlt node)
-    {
-        DefaultIn(node);
-    }
-
-    public virtual void OutAAstAlt(AAstAlt node)
-    {
-        DefaultOut(node);
-    }
-
-    public override void CaseAAstAlt(AAstAlt node)
-    {
-        InAAstAlt(node);
-        {
-            Object[] temp = new Object[node.GetElems().Count];
-            node.GetElems().CopyTo(temp, 0);
-            for(int i = temp.Length - 1; i >= 0; i--)
-            {
-                ((PElem) temp[i]).Apply(this);
-            }
-        }
-        if(node.GetAltName() != null)
-        {
-            node.GetAltName().Apply(this);
-        }
-        OutAAstAlt(node);
+        OutANumberExp(node);
     }
 }
-} // namespace org.sablecc.sablecc.analysis
+} // namespace Moduino.analysis

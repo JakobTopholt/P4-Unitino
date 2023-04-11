@@ -2,3 +2,4 @@
 /.idea
 /Compiler/obj
 /Compiler/bin
+*.ino
