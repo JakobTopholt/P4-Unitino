@@ -3,6 +3,10 @@ using Moduino.node;
 
 namespace Compiler.Visitors;
 
+// Codegeneration to Arduino code (Arduino code --> c++ --> avr)
+// Hver AST node skal have "action code" som generer nodens tilsvarende logik i Arduino kode.
+// Forestil det som en prettyprinter men til et andet sprog.
+
 // TODO: Check grammar.sablecc3 AST for how the tree will look.
 // On lowest level such as id and number there is no concrete value, but rather only the string
 // Another branch will fix this, so ignore this for now. Until then just use the value in the .toString method as shown
