@@ -2,4 +2,7 @@
 /.idea
 /Compiler/obj
 /Compiler/bin
+/Compiler/SableCC/
 *.ino
+/UnitTest/bin
+/UnitTest/obj
