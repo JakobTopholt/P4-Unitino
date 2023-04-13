@@ -31,6 +31,7 @@ Tokens
 
     prog = 'Prog';
     int = 'int';
+    tfunc = 'func';
 
     l_bkt = '[';
     r_bkt = ']';
@@ -75,7 +76,7 @@ Productions
     func_list {-> func*} = {list} func func_list {-> [func.func, func_list.func]} 
                          | {single} func {-> [func.func]};
     func {-> func} = {prog} prog l_brace stmt_list r_brace {-> New func.prog([stmt_list.stmt])}
-                   | {new} P.id l_brace stmt_list r_brace {-> New func.new(id.id, [stmt_list.stmt])};
+                   | {new} tfunc P.id l_brace stmt_list r_brace {-> New func.new(id.id, [stmt_list.stmt])};
 
     stmt_list {-> stmt*} = {list} stmt semicolon stmt_list {-> [stmt.stmt, stmt_list.stmt]} 
                        | {single} stmt {-> [stmt.stmt]}; //TODO: Fix bug so that last semicolon also requires semicolon

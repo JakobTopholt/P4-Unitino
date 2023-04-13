@@ -31,6 +31,7 @@ public interface Analysis : Switch
 
     void CaseTProg(TProg node);
     void CaseTInt(TInt node);
+    void CaseTTfunc(TTfunc node);
     void CaseTLBkt(TLBkt node);
     void CaseTRBkt(TRBkt node);
     void CaseTLPar(TLPar node);
@@ -179,6 +180,10 @@ public class AnalysisAdapter : Analysis
         DefaultCase(node);
     }
     public virtual void CaseTInt(TInt node)
+    {
+        DefaultCase(node);
+    }
+    public virtual void CaseTTfunc(TTfunc node)
     {
         DefaultCase(node);
     }

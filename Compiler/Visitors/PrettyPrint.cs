@@ -1,5 +1,6 @@
 using Moduino.analysis;
 using Moduino.node;
+using Moduino.parser;
 
 namespace Compiler.Visitors;
 
@@ -9,55 +10,83 @@ namespace Compiler.Visitors;
 
 class PrettyPrint : DepthFirstAdapter
 {
-    private int _indent = -1;
     private void Print(string s)
     {
-        Console.Write(new string(' ', _indent * 2) + s);
+        Console.Write(s);
     }
 
     private void PrintPrecedence(Node L, Node R, string ope)
     {
-        Console.Write("(");
         L.Apply(this);
         Console.Write(ope);
         R.Apply(this);
-        Console.Write(")");
     }
     
     public override void DefaultIn(Node node)
     {
-        Console.Write("\n");
-        _indent++;
     }
 
     public override void DefaultOut(Node node)
     {
-        _indent--;
+        //Console.WriteLine("\n");
     }
 
-    public override void InStart(Start node)
+    public override void InAProgFunc(AProgFunc node)
     {
-        base.InStart(node);
-        Print("Start ");
+        Console.Write("prog {");
     }
-    
-    public override void CaseAGrammar(AGrammar node)
-    {
-        base.InAGrammar(node);
-        Print("Grammar\n");
-        _indent++;
-        
-        foreach (Node child in node.GetFunc())
-        {
-            Print("");
-            child.Apply(this);
-            Console.Write(";\n");
-        }
 
-        _indent--;
-        base.OutAGrammar(node);
+    public override void OutAProgFunc(AProgFunc node)
+    {
+        Console.WriteLine("}");
     }
-    
+
+    public override void InANewFunc(ANewFunc node)
+    {
+        Console.Write("func " + node.GetId() + "{");
+    }
+
+    public override void OutAExpStmt(AExpStmt node)
+    {
+        if (node.Parent() is ANewFunc)
+            Console.Write(";");
+    }
+
+    public override void InADeclStmt(ADeclStmt node)
+    {
+        Console.Write(" int " + node.GetId());
+    }
+
+    public override void OutADeclStmt(ADeclStmt node)
+    {
+        Console.Write(";");
+    }
+
+    public override void InAAssignStmt(AAssignStmt node)
+    {
+        Console.Write(" " + node.GetId() + "= ");
+    }
+
+    public override void OutAAssignStmt(AAssignStmt node)
+    {
+        Console.Write(";");
+    }
+
+    public override void OutANewFunc(ANewFunc node)
+    {
+        Console.WriteLine("}");
+    }
+
+    public override void InAFunccallStmt(AFunccallStmt node)
+    {
+        Console.Write(" " + node + "()");
+    }
+
+    public override void OutAFunccallStmt(AFunccallStmt node)
+    {
+        Console.Write("");
+    }
+
     public override void CaseADivExp(ADivExp node)
     {
         PrintPrecedence(node.GetL(),node.GetR(),"/");

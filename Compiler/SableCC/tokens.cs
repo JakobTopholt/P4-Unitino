@@ -59,6 +59,31 @@ public sealed class TInt : Token
     }
 }
 
+public sealed class TTfunc : Token
+{
+    public TTfunc(string text)
+    {
+        Text = text;
+    }
+
+    public TTfunc(string text, int line, int pos)
+    {
+        Text = text;
+        Line = line;
+        Pos = pos;
+    }
+
+    public override Object Clone()
+    {
+      return new TTfunc(Text, Line, Pos);
+    }
+
+    public override void Apply(Switch sw)
+    {
+        ((Analysis) sw).CaseTTfunc(this);
+    }
+}
+
 public sealed class TLBkt : Token
 {
     public TLBkt(string text)
