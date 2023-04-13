@@ -1,4 +1,5 @@
 ﻿using Moduino.analysis;
+using Moduino.node;
 
 namespace Compiler.Visitors;
 
@@ -11,5 +12,35 @@ namespace Compiler.Visitors;
 
 public class UnitVisitor : DepthFirstAdapter
 {
+    enum Type
+    {
+        Exception,
+        Int
+    }
+    
+    // Dictionary used to store information on the type of each node
+    // Used then to evaluate which type an expression should yield.
+    private Dictionary<Node, Type> nodeTypes = new();
+    public void EvaluateType(Node node)
+    {
+        Type l = nodeTypes[node.GetL()];
+        Type r = nodeTypes[node.GetR()];
+        switch (l, r)
+        {
+            case { l: Type.Int, r: Type.Int }:
+            {
+                
+                break;
+            }
+        }
+    }
+
+    public override void OutANumberExp(ANumberExp node)
+    {
+        if (int.TryParse(node.ToString(), out int a))
+        {
+            nodeTypes.Add(node, Type.Int);
+        }
+    }
     
 }
