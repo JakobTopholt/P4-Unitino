@@ -21,6 +21,9 @@ public class UnitVisitor : DepthFirstAdapter
     // Dictionary used to store information on the type of each node
     // Used then to evaluate which type an expression should yield.
     private Dictionary<Node, Type> nodeTypes = new();
+    
+    // Vil gerne kunne switche evaluate type function based on node type
+    // Evaluate "generic" type and allow int --> but not float --> as an example.
     public void EvaluateType(Node node)
     {
         Type l = nodeTypes[node.GetL()];
