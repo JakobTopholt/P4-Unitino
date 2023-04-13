@@ -3,26 +3,32 @@ using Moduino.node;
 
 namespace Compiler.Visitors;
 
-class PrettyPrint : DepthFirstAdapter
+public class PrettyPrint : DepthFirstAdapter
 {
     private int _indent = -1;
+    private TextWriter output;
+
+    public PrettyPrint(TextWriter? output = null)
+    {
+        this.output = output ?? Console.Out;
+    }
     private void Print(string s)
     {
-        Console.Write(new string(' ', _indent * 2) + s);
+        output.Write(new string(' ', _indent * 2) + s);
     }
 
     private void PrintPrecedence(Node L, Node R, string ope)
     {
-        Console.Write("(");
+        output.Write("(");
         L.Apply(this);
-        Console.Write(ope);
+        output.Write(ope);
         R.Apply(this);
-        Console.Write(")");
+        output.Write(")");
     }
     
     public override void DefaultIn(Node node)
     {
-        Console.Write("\n");
+        output.Write("\n");
         _indent++;
     }
 
@@ -34,7 +40,7 @@ class PrettyPrint : DepthFirstAdapter
     public override void InStart(Start node)
     {
         base.InStart(node);
-        Print("Start ");
+        Print("Start");
     }
     
     public override void CaseAGrammar(AGrammar node)
@@ -47,7 +53,7 @@ class PrettyPrint : DepthFirstAdapter
         {
             Print("");
             child.Apply(this);
-            Console.Write(";\n");
+            output.Write(";\n");
         }
 
         _indent--;
@@ -76,6 +82,6 @@ class PrettyPrint : DepthFirstAdapter
 
     public override void CaseANumberExp(ANumberExp node)
     {
-        Console.Write(int.Parse(node.ToString()) + "");
+        output.Write(int.Parse(node.ToString()) + "");
     }
 }
