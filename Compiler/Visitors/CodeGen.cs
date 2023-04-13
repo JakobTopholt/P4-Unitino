@@ -1,4 +1,5 @@
-﻿using Moduino.analysis;
+﻿using System.Text.RegularExpressions;
+using Moduino.analysis;
 using Moduino.node;
 
 namespace Compiler.Visitors;
@@ -27,6 +28,7 @@ class CodeGen : DepthFirstAdapter, IDisposable
 {
     private StreamWriter writer;
     private FileStream stream;
+    private static readonly Regex whiteSpace = new(@"\s+");
     public CodeGen(string dest)
     {
         stream = File.Create(dest);
@@ -61,6 +63,45 @@ class CodeGen : DepthFirstAdapter, IDisposable
             child.Apply(this);
             writer.WriteLine(";");
         }
+        foreach (Node child in node.GetUnit())
+        {
+            
+            child.Apply(this);
+        }
+    }
+
+    public override void CaseAUnit(AUnit node)
+    {
+        InAUnit(node);
+        foreach (ASubunit subUnit in node.GetSubunit())
+        {
+            InAUnit(node);
+            subUnit.Apply(this);
+            OutAUnit(node);
+        }
+    }
+    public override void InAUnit(AUnit node)
+    {
+        string? name = whiteSpace.Replace(node.GetId().ToString(),"");
+        string? type = whiteSpace.Replace(node.GetInt().ToString(),"");
+        writer.Write($"{type} {name}"); // int time
+    }
+
+    public override void OutAUnit(AUnit node)
+    {
+        string? type = whiteSpace.Replace(node.GetInt().ToString(),"");
+        writer.Write("}\n");
+    }
+    public override void InASubunit(ASubunit node)
+    {
+        string? subUnitId = whiteSpace.Replace(node.GetId().ToString(),"");
+        string? type = whiteSpace.Replace(node.ToString(), "");
+        writer.Write($"{subUnitId}({type} value){{\n return");
+        
+    }
+    public override void OutASubunit(ASubunit node)
+    {
+       writer.Write("}");
     }
 
     public override void CaseADivExp(ADivExp node)
