@@ -49,39 +49,16 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             child.Apply(this);
         }
     }
-
-    public override void CaseAUnit(AUnit node)
-    {
-        InAUnit(node);
-        foreach (ASubunit subUnit in node.GetSubunit())
-        {
-            InAUnit(node);
-            subUnit.Apply(this);
-            OutAUnit(node);
-        }
-    }
-    public override void InAUnit(AUnit node)
-    {
-        string? name = whiteSpace.Replace(node.GetId().ToString(),"");
-        string? type = whiteSpace.Replace(node.GetInt().ToString(),"");
-        writer.Write($"{type} {name}"); // int time
-    }
-
-    public override void OutAUnit(AUnit node)
-    {
-        string? type = whiteSpace.Replace(node.GetInt().ToString(),"");
-        writer.Write("}\n");
-    }
     public override void InASubunit(ASubunit node)
     {
+        string? unitId = whiteSpace.Replace(((AUnit)node.Parent()).GetId().ToString(),"");
         string? subUnitId = whiteSpace.Replace(node.GetId().ToString(),"");
-        string? type = whiteSpace.Replace(node.ToString(), "");
-        writer.Write($"{subUnitId}({type} value){{\n return");
-        
+        string? type = whiteSpace.Replace(((AUnit)node.Parent()).GetInt().ToString(), "");
+        writer.Write($"{type} {unitId}{subUnitId}({type} value){{\n return");
     }
     public override void OutASubunit(ASubunit node)
     {
-       writer.Write("}");
+       writer.Write(";\n}\n");
     }
 
     public override void CaseADivExp(ADivExp node)
