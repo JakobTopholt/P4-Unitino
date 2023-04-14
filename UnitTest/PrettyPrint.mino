@@ -14,3 +14,32 @@ StartGrammar(5+2);
 void setup() {
   int i0 = (5+2);
 }
+//////
+unit tid : int {
+    mango => (6+5);
+    banan => (5*2);
+}
+unit fart : int {
+    hej => 3-2;
+    nej => 4+2;
+}
+Prog {5+2}
+////
+gd
+////
+void setup() {
+  int i0 = (5+2);
+int tidmango(int value){
+ return(6+5);
+}
+int tidbanan(int value){
+ return(5*2);
+}
+int farthej(int value){
+ return(3-2);
+}
+int fartnej(int value){
+ return(4+2);
+}
+}
+//////

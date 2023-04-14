@@ -73,7 +73,7 @@ Ignored Tokens
 
 Productions
 
-    grammar = unit_list prog l_brace stmt_list r_brace {-> New grammar ([unit_list.unit], [stmt_list.exp])};
+    grammar = unit_list? prog l_brace stmt_list r_brace {-> New grammar ([unit_list.unit], [stmt_list.exp])};
 
     unit_list {-> unit*} = {list} unit unit_list {-> [unit.unit, unit_list.unit]}
                          | {single} unit {-> [unit.unit]};
