@@ -9,7 +9,7 @@ namespace Compiler.Visitors;
 // ms to find the function UnitTimems(). Make sure to throw compileerror if there's 2 declarations of the same string
 // Also create a dictionary for Dictionary<string, List<string>> so that Time a = 50ms; or Time b = (6+5*7/2)ms can be
 // recognized in the future
-
+/*
 public class UnitVisitor : DepthFirstAdapter
 {
     enum Type
@@ -43,4 +43,4 @@ public class UnitVisitor : DepthFirstAdapter
         }
     }
     
-}
+}*/

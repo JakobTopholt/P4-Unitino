@@ -40,23 +40,23 @@ public class PrettyPrint : DepthFirstAdapter
     {
         string? name = node.GetId().ToString();
         string? type = node.GetInt().ToString();
-        Console.Write($"unit {name}: {type} {{\n");
+        output.Write($"unit {name}: {type} {{\n");
     }
 
     public override void OutAUnit(AUnit node)
     {
-        Console.Write("}\n");
+        output.Write("}\n");
     }
 
     public override void InASubunit(ASubunit node)
     {
         string? name = node.GetId().ToString();
-        Console.Write($" {name}=>");
+        output.Write($"  {name}=>");
     }
 
     public override void OutASubunit(ASubunit node)
     {
-        Console.Write(";\n");
+        output.Write(";\n");
     }
 
     public override void DefaultOut(Node node)
@@ -80,7 +80,7 @@ public class PrettyPrint : DepthFirstAdapter
         {
             Print("");
             child.Apply(this);
-            Console.Write(";\n");
+            output.Write(";\n");
         }
 
         foreach (Node child in node.GetUnit())
@@ -125,6 +125,6 @@ public class PrettyPrint : DepthFirstAdapter
     
     public override void CaseANumberExp(ANumberExp node)
     {
-        Console.Write(int.Parse(node.ToString()) + "");
+        output.Write(int.Parse(node.ToString()) + "");
     }
 }
