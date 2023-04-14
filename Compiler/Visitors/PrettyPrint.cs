@@ -7,26 +7,32 @@ namespace Compiler.Visitors;
 // Check thesis part 3 from discord. Best case, prettyprint reprints the program as it was written so that:
 // program.txt --(SableCC)-> Concrete Syntax Tree --(SableCC)-> Abstract Syntax Tree --(PrettyPrint)-> program.txt (don't overwrite program tho ;)) 
 
-class PrettyPrint : DepthFirstAdapter
+public class PrettyPrint : DepthFirstAdapter
 {
     private int _indent = -1;
+    private TextWriter output;
+
+    public PrettyPrint(TextWriter? output = null)
+    {
+        this.output = output ?? Console.Out;
+    }
     private void Print(string s)
     {
-        Console.Write(new string(' ', _indent * 2) + s);
+        output.Write(new string(' ', _indent * 2) + s);
     }
 
     private void PrintPrecedence(Node L, Node R, string ope)
     {
-        Console.Write("(");
+        output.Write("(");
         L.Apply(this);
-        Console.Write(ope);
+        output.Write(ope);
         R.Apply(this);
-        Console.Write(")");
+        output.Write(")");
     }
     
     public override void DefaultIn(Node node)
     {
-        Console.Write("\n");
+        output.Write("\n");
         _indent++;
     }
     
