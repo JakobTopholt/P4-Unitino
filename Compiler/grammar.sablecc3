@@ -30,8 +30,13 @@ Helpers
 Tokens
 
     prog = 'Prog';
-    int = 'int';
     tfunc = 'func';
+
+    tint = 'int';
+    tdecimal = 'decimal';
+    tbool = 'bool';
+    tchar = 'char';
+    tstring = 'string';
 
     l_bkt = '[';
     r_bkt = ']';
@@ -67,7 +72,6 @@ Tokens
 
 
 Ignored Tokens
-
     blank,
     comment;
 
@@ -75,27 +79,31 @@ Productions
     grammar = func_list {-> New grammar([func_list.func])};
     func_list {-> func*} = {list} func func_list {-> [func.func, func_list.func]} 
                          | {single} func {-> [func.func]};
+    stmt_list {-> stmt*} = {list} stmt stmt_list {-> [stmt.stmt, stmt_list.stmt]} 
+                       | {single} stmt {-> [stmt.stmt]};
     func {-> func} = {prog} prog l_brace stmt_list r_brace {-> New func.prog([stmt_list.stmt])}
                    | {new} tfunc P.id l_brace stmt_list r_brace {-> New func.new(id.id, [stmt_list.stmt])};
-
-    stmt_list {-> stmt*} = {list} stmt semicolon stmt_list {-> [stmt.stmt, stmt_list.stmt]} 
-                       | {single} stmt {-> [stmt.stmt]}; //TODO: Fix bug so that last semicolon also requires semicolon
-    stmt {-> stmt} = {exp} exp {-> New stmt.exp(exp.exp)}
-                   | {assign} P.id equal exp {-> New stmt.assign(id.id, exp.exp)}
-                   | {decl} int P.id {-> New stmt.decl(id.id)}
-                   | {funccall} P.id l_par r_par {-> New stmt.funccall(id.id)};
+    stmt {-> stmt} = {exp} exp semicolon {-> New stmt.exp(exp.exp)}
+                   | {assign} P.id equal exp semicolon {-> New stmt.assign(id.id, exp.exp)}
+                   | {decl} decl semicolon {-> New stmt.decl(decl.decl)}
+                   | {funccall} P.id l_par r_par semicolon {-> New stmt.funccall(id.id)};
      
     exp {-> exp} = {plus} exp plus factor {-> New exp.plus (exp.exp, factor.exp) }
                  | {minus} exp minus factor {-> New exp.minus (exp.exp, factor.exp) }
                  | {factor} factor {-> factor.exp };
 
-    factor {-> exp} = {mult} factor star term {-> New exp.mult (factor.exp, term.exp) }
+    factor {-> exp} = {mult} factor star term {-> New exp.mult (factor.exp, term.exp) } //TODO: Modulo %
                     | {div} factor slash term {-> New exp.div (factor.exp, term.exp) }
                     | {term} term {-> term.exp };
 
     term {-> exp} = {expr} l_par exp r_par {-> exp.exp }
                   | {number} number {-> New exp.number(number) };
     id {-> P.id} = tid {-> New id(tid)};
+    decl {-> decl} = {int} tint id {-> New decl.int (id.id)}
+                   | {decimal} tdecimal id {-> New decl.decimal (id.id)}
+                   | {bool} tbool id {-> New decl.bool (id.id)}
+                   | {char} tchar id {-> New decl.char (id.id)}
+                   | {string} tstring id {-> New decl.string (id.id)};
 
 
 Abstract Syntax Tree
@@ -104,7 +112,7 @@ Abstract Syntax Tree
          | {new} id stmt+;
     stmt = {exp} exp
          | {assign} id exp
-         | {decl} id
+         | {decl} decl
          | {funccall} id; // TODO: Controlstructures
     exp = {plus}    [l]:exp  [r]:exp 
         | {minus}   [l]:exp  [r]:exp 
@@ -112,3 +120,8 @@ Abstract Syntax Tree
         | {mult}    [l]:exp  [r]:exp 
         | {number}  number; // TODO: function with return value
     id = tid;
+    decl = {int} id
+         | {decimal} id
+         | {bool} id
+         | {char} id
+         | {string} id;
