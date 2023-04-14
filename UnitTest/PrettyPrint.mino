@@ -1,16 +1,31 @@
-Prog {5+7*5-3+(5*7); 2+5*3 }
+Prog {5+7*5-3+(5*7); 2+5*3; }
 ////
-StartGrammar(((5+(7*5))-3)+(5*7));(2+(5*3));
+StartGrammar(5+7*5-3+5*7;2+5*3;);
 ////
 void setup() {
-  int i0 = (((5+(7*5))-3)+(5*7));
-  int i1 = (2+(5*3));
+  int i0 = 5+7*5-3+5*7;
+  int i1 = 2+5*3;
 }
 //////
-Prog {5+2}
+Prog {5+2;}
 ////
-StartGrammar(5+2);
+StartGrammar(5+2;);
 ////
 void setup() {
-  int i0 = (5+2);
+  int i0 = 5+2;
+}
+//////
+Prog {5+7*5-3+5*7; }
+func hejmeddig{75; a = 5; int a; b(); }
+////
+StartGrammar(5+2;);
+////
+void setup() {
+  int i0 = 5+7*5-3+5*7;
+}
+func void hejmeddig {
+    75;
+    a = 5;
+    int a;
+    b();
 }

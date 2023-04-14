@@ -1,4 +1,11 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeInspection/PencilsConfiguration/ActualSeverity/@EntryValue">INFO</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=195dffaf_002Dcdbd_002D4176_002Dbb7a_002D4fc3fd5d890b/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="CodeGen #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests.CodeGen&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests.PrettyPrint&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=30aa6109_002D08b7_002D424d_002D83bb_002Daa04b3a7d147/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Tests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests.CodeGen&lt;/TestId&gt;&#xD;
@@ -6,6 +13,12 @@
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=3de5ab7c_002D380a_002D4df2_002D9f32_002D81db840a46c0/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="CodeGen" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests.CodeGen&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests.PrettyPrint&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a42cd340_002Df694_002D40f8_002D992c_002D027e7a8d4c12/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="CodeGen #3" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests.CodeGen&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests.PrettyPrint&lt;/TestId&gt;&#xD;

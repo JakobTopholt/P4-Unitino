@@ -40,7 +40,7 @@ public class VisitorTests
                 Start ast = new Parser(new Lexer(reader)).Parse();
                 testCases.Add(new TestCase(ast, 
                     whiteSpace.Replace(prettyPrint, ""), 
-                    codeGen.Remove(0, 1).ReplaceLineEndings()));
+                    codeGen.Remove(0, 2).ReplaceLineEndings()));
             }
         }
     }
@@ -71,7 +71,7 @@ public class VisitorTests
             writer.Flush();
             Console.WriteLine(stream.Length);
             string code = Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int) stream.Length);
-            Assert.That(code, Is.EqualTo(testCase.CodeGen.ReplaceLineEndings()));
+            Assert.That(code.ReplaceLineEndings(), Is.EqualTo(testCase.CodeGen));
         }
     }
 }

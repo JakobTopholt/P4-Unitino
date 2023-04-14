@@ -26,35 +26,77 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     {
         this.writer = writer;
     }
-
+ 
     void Precedence(Node L, Node R, string ope)
     {
-        writer.Write("(");
         L.Apply(this);
         writer.Write(ope);
         R.Apply(this);
-        writer.Write(")");
     }
-
-    public override void InStart(Start node)
+    
+    public override void InAProgFunc(AProgFunc node)
     {
         writer.WriteLine("void setup() {");
-    }
 
-    public override void OutStart(Start node)
+    }
+    
+    public override void OutAProgFunc(AProgFunc node)
     {
         writer.WriteLine("}");
     }
 
-    public override void CaseAGrammar(AGrammar node)
+    public override void InANewFunc(ANewFunc node)
     {
-        int i = 0;
-        foreach (Node child in node.GetFunc())
-        {
+        writer.WriteLine("func void " + node.GetId() + "{");
+    }
+
+    public override void OutANewFunc(ANewFunc node)
+    {
+        writer.WriteLine("}");
+    }
+
+    int i = 0;
+    public override void InAExpStmt(AExpStmt node)
+    {
+        if (node.Parent() is not ANewFunc)
             writer.Write($"  int i{i++} = ");
-            child.Apply(this);
-            writer.WriteLine(";");
-        }
+        else
+            writer.Write("    ");
+    }
+    
+    public override void OutAExpStmt(AExpStmt node)
+    {
+        writer.WriteLine(";");
+    }
+
+    public override void InADeclStmt(ADeclStmt node)
+    {
+        writer.Write("    int " + node.GetDecl().ToString().Trim());
+    }
+
+    public override void OutADeclStmt(ADeclStmt node)
+    {
+        writer.WriteLine(";");
+    }
+
+    public override void InAAssignStmt(AAssignStmt node)
+    {
+        writer.Write("    " + node.GetId() + "= ");
+    }
+
+    public override void OutAAssignStmt(AAssignStmt node)
+    {
+        writer.WriteLine(";");
+    }
+
+    public override void InAFunccallStmt(AFunccallStmt node)
+    {
+        writer.Write("    " + node.GetId().ToString().Trim() + "()");
+    }
+
+    public override void OutAFunccallStmt(AFunccallStmt node)
+    {
+        writer.WriteLine(";");
     }
 
     public override void CaseADivExp(ADivExp node)
@@ -79,7 +121,8 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseANumberExp(ANumberExp node)
     {
-        writer.Write(int.Parse(node.ToString()));
+        if(node.Parent() is not ANewFunc)
+            writer.Write(int.Parse(node.ToString()));
     }
 
     public void Dispose()

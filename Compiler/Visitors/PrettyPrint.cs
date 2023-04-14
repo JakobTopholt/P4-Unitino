@@ -8,9 +8,8 @@ namespace Compiler.Visitors;
 // Check thesis part 3 from discord. Best case, prettyprint reprints the program as it was written so that:
 // program.txt --(SableCC)-> Concrete Syntax Tree --(SableCC)-> Abstract Syntax Tree --(PrettyPrint)-> program.txt (don't overwrite program tho ;)) 
 
-class PrettyPrint : DepthFirstAdapter
+public class PrettyPrint : DepthFirstAdapter
 {
-    private int _indent = -1;
     private TextWriter output;
 
     public PrettyPrint(TextWriter? output = null)
@@ -31,7 +30,7 @@ class PrettyPrint : DepthFirstAdapter
 
     public override void InAProgFunc(AProgFunc node)
     {
-        output.Write("prog {");
+        output.Write("Prog {");
     }
 
     public override void OutAProgFunc(AProgFunc node)
@@ -42,6 +41,7 @@ class PrettyPrint : DepthFirstAdapter
     public override void InANewFunc(ANewFunc node)
     {
         output.Write("func " + node.GetId() + "{");
+    }
 
     public override void OutAExpStmt(AExpStmt node)
     {
@@ -51,7 +51,7 @@ class PrettyPrint : DepthFirstAdapter
 
     public override void InADeclStmt(ADeclStmt node)
     {
-        output.Write(" int " + node.GetId());
+        output.Write(" int " + node.GetDecl());
     }
 
     public override void OutADeclStmt(ADeclStmt node)
