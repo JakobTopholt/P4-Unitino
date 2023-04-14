@@ -14,12 +14,17 @@ Start start;
 // PrettyPrint Visitor
 start.Apply(new PrettyPrint());
 
+// Codegen Visitor
+{
+    using FileStream stream = File.Create(Directory.GetCurrentDirectory() + "/../../../output.ino");
+    using StreamWriter writer = new(stream);
+    using CodeGen codegen = new (writer);
+    start.Apply(codegen);
+}
+
 // TODO Visitor 1: scope-check/symbol table
 // TODO Visitor 2: type checking
 // TODO Visitor 3: optional compiler optimization (lecture 20)
 
-// CodeGen Visitor
-using CodeGen codegen = new (Directory.GetCurrentDirectory() + "/../../../output.ino");
-start.Apply(codegen);
 
 

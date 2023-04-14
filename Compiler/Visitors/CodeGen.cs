@@ -1,4 +1,6 @@
-﻿using Moduino.analysis;
+﻿using System;
+using System.IO;
+using Moduino.analysis;
 using Moduino.node;
 // TODO: Check grammar.sablecc3 AST for how the tree will look.
 // On lowest level such as id and number there is no concrete value, but rather only the string
@@ -16,14 +18,13 @@ using Moduino.node;
 
 namespace Compiler.Visitors;
 
-class CodeGen : DepthFirstAdapter, IDisposable
+public class CodeGen : DepthFirstAdapter, IDisposable
 {
+    //private StreamWriter writer;
     private StreamWriter writer;
-    private FileStream stream;
-    public CodeGen(string dest)
+    public CodeGen(StreamWriter writer)
     {
-        stream = File.Create(dest);
-        writer = new(stream);
+        this.writer = writer;
     }
 
     void Precedence(Node L, Node R, string ope)
@@ -84,6 +85,5 @@ class CodeGen : DepthFirstAdapter, IDisposable
     public void Dispose()
     {
         writer.Dispose();
-        stream.Dispose();
     }
 }

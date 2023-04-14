@@ -10,81 +10,78 @@ namespace Compiler.Visitors;
 
 class PrettyPrint : DepthFirstAdapter
 {
+    private int _indent = -1;
+    private TextWriter output;
+
+    public PrettyPrint(TextWriter? output = null)
+    {
+        this.output = output ?? Console.Out;
+    }
     private void Print(string s)
     {
-        Console.Write(s);
+        output.Write(s);
     }
 
     private void PrintPrecedence(Node L, Node R, string ope)
     {
         L.Apply(this);
-        Console.Write(ope);
+        output.Write(ope);
         R.Apply(this);
-    }
-    
-    public override void DefaultIn(Node node)
-    {
-    }
-
-    public override void DefaultOut(Node node)
-    {
-        //Console.WriteLine("\n");
     }
 
     public override void InAProgFunc(AProgFunc node)
     {
-        Console.Write("prog {");
+        output.Write("prog {");
     }
 
     public override void OutAProgFunc(AProgFunc node)
     {
-        Console.WriteLine("}");
+        output.WriteLine("}");
     }
 
     public override void InANewFunc(ANewFunc node)
     {
-        Console.Write("func " + node.GetId() + "{");
-    }
+        output.Write("func " + node.GetId() + "{");
 
     public override void OutAExpStmt(AExpStmt node)
     {
         if (node.Parent() is ANewFunc)
-            Console.Write(";");
+            output.Write(";");
     }
 
     public override void InADeclStmt(ADeclStmt node)
     {
-        Console.Write(" int " + node.GetId());
+        output.Write(" int " + node.GetId());
     }
 
     public override void OutADeclStmt(ADeclStmt node)
     {
-        Console.Write(";");
+        output.Write(";");
     }
 
     public override void InAAssignStmt(AAssignStmt node)
     {
-        Console.Write(" " + node.GetId() + "= ");
+        output.Write(" " + node.GetId() + "= ");
     }
 
     public override void OutAAssignStmt(AAssignStmt node)
     {
-        Console.Write(";");
+        output.Write(";");
     }
 
     public override void OutANewFunc(ANewFunc node)
     {
-        Console.WriteLine("}");
+        output.WriteLine("}");
     }
 
     public override void InAFunccallStmt(AFunccallStmt node)
     {
-        Console.Write(" " + node + "()");
+        output.Write(" " + node + "()");
     }
 
     public override void OutAFunccallStmt(AFunccallStmt node)
     {
-        Console.Write("");
+        output.Write("");
     }
 
     public override void CaseADivExp(ADivExp node)
@@ -109,6 +106,6 @@ class PrettyPrint : DepthFirstAdapter
 
     public override void CaseANumberExp(ANumberExp node)
     {
-        Console.Write(int.Parse(node.ToString()) + "");
+        output.Write(int.Parse(node.ToString()) + "");
     }
 }
