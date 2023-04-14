@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="SableCC" />
+      <Folder Include="obj" />
     </ItemGroup>
 
     <ItemGroup>

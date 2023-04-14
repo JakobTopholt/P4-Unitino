@@ -1,38 +1,18 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using Moduino.analysis;
 using Moduino.node;
 
 namespace Compiler.Visitors;
 
-// Codegeneration to Arduino code (Arduino code --> c++ --> avr)
-// Hver AST node skal have "action code" som generer nodens tilsvarende logik i Arduino kode.
-// Forestil det som en prettyprinter men til et andet sprog.
-
-// TODO: Check grammar.sablecc3 AST for how the tree will look.
-// On lowest level such as id and number there is no concrete value, but rather only the string
-// Another branch will fix this, so ignore this for now. Until then just use the value in the .toString method as shown
-// in CaseANumberExp.
-// Convert unit to functions in Arduino. A future branch will handle usage of the functions. so ex:
-// unit Time : int {
-//      ms => (6+5);
-//      s => 5*4:
-// }
-// => int Timems(int value) { // value unused for now
-//      return (6+5)
-// }
-// int Times(int value) {
-//      return 5*4;
-// }
-
-class CodeGen : DepthFirstAdapter, IDisposable
+public class CodeGen : DepthFirstAdapter, IDisposable
 {
+    //private StreamWriter writer;
     private StreamWriter writer;
     private FileStream stream;
     private static readonly Regex whiteSpace = new(@"\s+");
-    public CodeGen(string dest)
+    public CodeGen(StreamWriter writer)
     {
-        stream = File.Create(dest);
-        writer = new(stream);
+        this.writer = writer;
     }
 
     void Precedence(Node L, Node R, string ope)
@@ -132,6 +112,5 @@ class CodeGen : DepthFirstAdapter, IDisposable
     public void Dispose()
     {
         writer.Dispose();
-        stream.Dispose();
     }
 }

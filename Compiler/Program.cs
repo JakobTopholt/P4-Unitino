@@ -12,8 +12,12 @@ Start start;
     start = parser.Parse();
 }
 start.Apply(new PrettyPrint());
-using CodeGen codegen = new (Directory.GetCurrentDirectory() + "/../../../output.ino");
-start.Apply(codegen);
+{
+    using FileStream stream = File.Create(Directory.GetCurrentDirectory() + "/../../../output.ino");
+    using StreamWriter writer = new(stream);
+    using CodeGen codegen = new (writer);
+    start.Apply(codegen);
+}
 
 // TODO visitors:
 // 1: 3 visitors: scope-check/symbol table, type checking and types (lecture 10-12)
