@@ -40,7 +40,7 @@ public class VisitorTests
                 Start ast = new Parser(new Lexer(reader)).Parse();
                 testCases.Add(new TestCase(ast, 
                     whiteSpace.Replace(prettyPrint, ""), 
-                    codeGen.Remove(0, 1).ReplaceLineEndings()));
+                    codeGen.Remove(0, 2).ReplaceLineEndings()));
             }
         }
     }
@@ -54,7 +54,7 @@ public class VisitorTests
             TextWriter output = new StringWriter(sb);
             testCase.Ast.Apply(new PrettyPrint(output));
             Assert.That(whiteSpace.Replace(sb.ToString(), ""), 
-                Is.EqualTo(testCase.PrettyPrint));
+                Is.EqualTo(testCase.PrettyPrint.ReplaceLineEndings()));
         }
     }
 
@@ -63,15 +63,15 @@ public class VisitorTests
     {
         foreach (TestCase testCase in testCases)
         {
-            Console.WriteLine(testCase.Ast + "\n" + testCase.CodeGen + "\n" + testCase.PrettyPrint);
+            Console.WriteLine(testCase.Ast + "\n" + testCase.CodeGen + "\n");
             using MemoryStream stream = new();
             using StreamWriter writer = new(stream);
             CodeGen codeGen = new(writer);
             testCase.Ast.Apply(codeGen);
             writer.Flush();
-            Console.WriteLine(stream.Length);
+            //Console.WriteLine(stream.Length);
             string code = Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int) stream.Length);
-            Assert.That(code, Is.EqualTo(testCase.CodeGen.ReplaceLineEndings()));
+            Assert.That(code.ReplaceLineEndings(), Is.EqualTo(testCase.CodeGen));
         }
     }
 }
