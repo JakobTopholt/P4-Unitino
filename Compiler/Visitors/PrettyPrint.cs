@@ -36,7 +36,7 @@ public class PrettyPrint : DepthFirstAdapter
     public override void InAUnit(AUnit node)
     {
         string? name = node.GetId().ToString();
-        string? type = node.GetInt().ToString();
+        string? type = node.GetTint().ToString();
         output.Write($"unit {name}: {type} {{\n");
     }
     public override void OutAUnit(AUnit node)
