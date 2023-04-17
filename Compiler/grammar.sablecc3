@@ -94,8 +94,8 @@ Productions
                    | {assign} P.id equal exp semicolon {-> New stmt.assign(id.id, exp.exp)}
                    | {decl} decl semicolon {-> New stmt.decl(decl.decl)}
                    | {funccall} P.id l_par r_par semicolon {-> New stmt.funccall(id.id)};
-    unit {-> unit} = tunit id colon int l_brace subunit_list r_brace {-> New unit(id.id, int, [subunit_list.subunit])};
-    subunit {-> subunit} = id arrow stmt semicolon {-> New subunit(id.id, stmt.exp)}; //TODO allow value token and stmt block
+    unit {-> unit} = tunit id colon tint l_brace subunit_list r_brace {-> New unit(id.id, tint, [subunit_list.subunit])};
+    subunit {-> subunit} = id arrow stmt semicolon {-> New subunit(id.id, stmt.stmt)}; //TODO allow value token and stmt block
 
     exp {-> exp} = {plus} exp plus factor {-> New exp.plus (exp.exp, factor.exp) }
                  | {minus} exp minus factor {-> New exp.minus (exp.exp, factor.exp) }
@@ -117,8 +117,8 @@ Productions
 
 Abstract Syntax Tree
     grammar = unit* func*;
-    unit = id int subunit*;
-    subunit = id exp; //TODO: fix to stmt
+    unit = id tint subunit*;
+    subunit = id stmt; //TODO: fix to stmt
     func = {prog} stmt+
          | {new} id stmt+;
     stmt = {exp} exp
