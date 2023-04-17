@@ -1,2 +1,12 @@
-Prog {5+7*5-3+(5*7) } //example of expr
-func hejmeddig{75; a = 5; int a; b() } //example of stmt
+Prog {5+7*5-3+(5*7); } //example of expr
+func hejmeddig{75; a = 5; int a; b(); } //example of stmt
+
+unit tid : int {
+    mango => (6+5);
+    banan => (5*2);
+}
+unit fart : int {
+    hej => 3-2;
+    nej => 4+2;
+}
+Prog {5+7*5-3+(5*7); 2+5*3 } 

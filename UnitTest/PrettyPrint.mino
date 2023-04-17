@@ -7,16 +7,8 @@ void setup() {
   int i1 = 2+5*3;
 }
 //////
-Prog {5+2;}
-////
-StartGrammar(5+2;);
-////
-void setup() {
-  int i0 = 5+2;
-}
-//////
 Prog {5+7*5-3+5*7; }
-func hejmeddig{75; a = 5; int a; b(); }
+func hejmeddig{75; a = 5; int a; b(); string c; char d; bool e; decimal f;}
 ////
 StartGrammar(5+2;);
 ////
@@ -28,4 +20,37 @@ func void hejmeddig {
     a = 5;
     int a;
     b();
+    string c;
+    char d;
+    bool e;
+    decimal f;
 }
+//////
+unit tid : int {
+    mango => (6+5);
+    banan => (5*2);
+}
+unit fart : int {
+    hej => 3-2;
+    nej => 4+2;
+}
+Prog {5+2}
+////
+gd
+////
+void setup() {
+  int i0 = (5+2);
+int tidmango(int value){
+ return(6+5);
+}
+int tidbanan(int value){
+ return(5*2);
+}
+int farthej(int value){
+ return(3-2);
+}
+int fartnej(int value){
+ return(4+2);
+}
+}
+//////
