@@ -167,7 +167,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     {
         string? unitId = whiteSpace.Replace(((AUnit)node.Parent()).GetId().ToString(),"");
         string? subUnitId = whiteSpace.Replace(node.GetId().ToString(),"");
-        string? type = whiteSpace.Replace(((AUnit)node.Parent()).GetInt().ToString(), "");
+        string? type = whiteSpace.Replace(((AUnit)node.Parent()).GetTint().ToString(), "");
         writer.Write($"{type} {unitId}{subUnitId}({type} value){{\n return");
     }
     public override void OutASubunit(ASubunit node)
