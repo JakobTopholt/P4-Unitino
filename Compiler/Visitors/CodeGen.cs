@@ -1,4 +1,5 @@
-﻿using System;
+using System.Text.RegularExpressions;
+using System;
 using System.IO;
 using Moduino.analysis;
 using Moduino.node;
@@ -22,6 +23,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 {
     //private StreamWriter writer;
     private StreamWriter writer;
+    private static readonly Regex whiteSpace = new(@"\s+");
     public CodeGen(StreamWriter writer)
     {
         this.writer = writer;
@@ -29,9 +31,11 @@ public class CodeGen : DepthFirstAdapter, IDisposable
  
     void Precedence(Node L, Node R, string ope)
     {
+        writer.Write("(");
         L.Apply(this);
         writer.Write(ope);
         R.Apply(this);
+        writer.Write(")");
     }
     
     public override void InAProgFunc(AProgFunc node)
@@ -159,6 +163,18 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         if(node.Parent() is not ANewFunc)
             writer.Write(int.Parse(node.ToString()));
     }
+    public override void InASubunit(ASubunit node)
+    {
+        string? unitId = whiteSpace.Replace(((AUnit)node.Parent()).GetId().ToString(),"");
+        string? subUnitId = whiteSpace.Replace(node.GetId().ToString(),"");
+        string? type = whiteSpace.Replace(((AUnit)node.Parent()).GetInt().ToString(), "");
+        writer.Write($"{type} {unitId}{subUnitId}({type} value){{\n return");
+    }
+    public override void OutASubunit(ASubunit node)
+    {
+        writer.Write(";\n}\n");
+    }
+    
 
     public void Dispose()
     {

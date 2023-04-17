@@ -37,6 +37,7 @@ Tokens
     tbool = 'bool';
     tchar = 'char';
     tstring = 'string';
+    tunit = 'unit';
 
     l_bkt = '[';
     r_bkt = ']';
@@ -53,7 +54,7 @@ Tokens
     equal = '=';
     q_mark = '?';
     bar = '|';
-    arrow = '->';
+    arrow = '=>';
 
     comma = ',';
     semicolon = ';';
@@ -72,22 +73,30 @@ Tokens
 
 
 Ignored Tokens
+
     blank,
     comment;
 
 Productions
-    grammar = func_list {-> New grammar([func_list.func])};
+    grammar = unit_list? func_list {-> New grammar([unit_list.unit], [func_list.func])};
     func_list {-> func*} = {list} func func_list {-> [func.func, func_list.func]} 
                          | {single} func {-> [func.func]};
     stmt_list {-> stmt*} = {list} stmt stmt_list {-> [stmt.stmt, stmt_list.stmt]} 
                        | {single} stmt {-> [stmt.stmt]};
+    unit_list {-> unit*} = {list} unit unit_list {-> [unit.unit, unit_list.unit]}
+                             | {single} unit {-> [unit.unit]};
+    subunit_list {-> subunit*} = {list} subunit subunit_list {-> [subunit.subunit, subunit_list.subunit]}
+                                   | {single} subunit {-> [subunit.subunit]};
+                             
     func {-> func} = {prog} prog l_brace stmt_list r_brace {-> New func.prog([stmt_list.stmt])}
                    | {new} tfunc P.id l_brace stmt_list r_brace {-> New func.new(id.id, [stmt_list.stmt])};
     stmt {-> stmt} = {exp} exp semicolon {-> New stmt.exp(exp.exp)}
                    | {assign} P.id equal exp semicolon {-> New stmt.assign(id.id, exp.exp)}
                    | {decl} decl semicolon {-> New stmt.decl(decl.decl)}
                    | {funccall} P.id l_par r_par semicolon {-> New stmt.funccall(id.id)};
-     
+    unit {-> unit} = tunit id colon int l_brace subunit_list r_brace {-> New unit(id.id, int, [subunit_list.subunit])};
+    subunit {-> subunit} = id arrow stmt semicolon {-> New subunit(id.id, stmt.exp)}; //TODO allow value token and stmt block
+
     exp {-> exp} = {plus} exp plus factor {-> New exp.plus (exp.exp, factor.exp) }
                  | {minus} exp minus factor {-> New exp.minus (exp.exp, factor.exp) }
                  | {factor} factor {-> factor.exp };
@@ -107,7 +116,9 @@ Productions
 
 
 Abstract Syntax Tree
-    grammar = func*;
+    grammar = unit* func*;
+    unit = id int subunit*;
+    subunit = id exp; //TODO: fix to stmt
     func = {prog} stmt+
          | {new} id stmt+;
     stmt = {exp} exp
