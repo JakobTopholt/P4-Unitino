@@ -40,5 +40,9 @@ public enum Symbol
     Int, 
     ok, 
     notOk,
-    func
+    func,
+    Bool,
+    Decimal,
+    Char,
+    String
 }

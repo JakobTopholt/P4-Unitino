@@ -19,9 +19,41 @@ public class SymbolTable : DepthFirstAdapter
         currentScope = new Scope(currentScope);
         _scopes.Add(currentScope);
     }
+    //mangler Funktions parametre
 
     public override void OutANewFunc(ANewFunc node)
     {
         currentScope = currentScope.getParent();
+    }
+
+    public override void InABoolDecl(ABoolDecl node)
+    {
+        currentScope.addSymbol(node,Symbol.Bool);
+        
+    }
+
+    public override void InAStringDecl(AStringDecl node)
+    {
+        currentScope.addSymbol(node,Symbol.String);
+    }
+
+    public override void InACharDecl(ACharDecl node)
+    {
+        currentScope.addSymbol(node,Symbol.Char);
+    }
+
+    public override void InAIntDecl(AIntDecl node)
+    {
+        currentScope.addSymbol(node,Symbol.Int);
+    }
+
+    public override void InADecimalDecl(ADecimalDecl node)
+    {
+        currentScope.addSymbol(node,Symbol.Decimal);
+    }
+
+    public override void InAAssignStmt(AAssignStmt node)
+    {
+        
     }
 }
