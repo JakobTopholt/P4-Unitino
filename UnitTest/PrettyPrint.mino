@@ -29,3 +29,57 @@ func void hejmeddig {
     int a;
     b();
 }
+//////
+func scoped {
+    for(int a; 6+5; a = 1) {
+        if (7) {
+            while (1) {
+                int b;
+            }
+        }
+        else if (5+2) {
+            do {
+                bool c;
+            } while (5+2)
+        }
+        else {
+            decimal d;
+        }
+    }
+}
+////
+func scoped {
+    for(int a; 6+5; a = 1) {
+        if (7) {
+            while (1) {
+                int b;
+            }
+        }
+        else if (5+2) {
+            do {
+                bool c;
+            } while (5+2)
+        }
+        else {
+            decimal d;
+        }
+    }
+}
+////
+func void scoped {
+    for(int a; 6+5; a = 1) {
+        if (7) {
+            while (1) {
+                int b;
+            }
+        }
+        else if (5+2) {
+            do {
+                bool c;
+            } while (5+2)
+        }
+        else {
+            decimal d;
+        }
+    }
+}

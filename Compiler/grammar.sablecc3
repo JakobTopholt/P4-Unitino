@@ -31,6 +31,12 @@ Tokens
 
     prog = 'Prog';
     tfunc = 'func';
+    if = 'if';
+    else = 'else';
+    for = 'for';
+    do = 'do';
+    while = 'while';
+    return = 'return';
 
     tint = 'int';
     tdecimal = 'decimal';
@@ -81,29 +87,40 @@ Productions
                          | {single} func {-> [func.func]};
     stmt_list {-> stmt*} = {list} stmt stmt_list {-> [stmt.stmt, stmt_list.stmt]} 
                        | {single} stmt {-> [stmt.stmt]};
+
     func {-> func} = {prog} prog l_brace stmt_list r_brace {-> New func.prog([stmt_list.stmt])}
                    | {new} tfunc P.id l_brace stmt_list r_brace {-> New func.new(id.id, [stmt_list.stmt])};
     stmt {-> stmt} = {exp} exp semicolon {-> New stmt.exp(exp.exp)}
-                   | {assign} P.id equal exp semicolon {-> New stmt.assign(id.id, exp.exp)}
+                   | {assign} assign semicolon {-> assign.stmt}
                    | {decl} decl semicolon {-> New stmt.decl(decl.decl)}
-                   | {funccall} P.id l_par r_par semicolon {-> New stmt.funccall(id.id)};
+                   | {funccall} P.id l_par r_par semicolon {-> New stmt.funccall(id.id)}
+                   | {return} return exp semicolon {-> New stmt.return(exp.exp)}
+                   | {scoped} scoped {-> New stmt.scoped(scoped.scoped)};
+
+    scoped {-> scoped} = {if} if l_par exp r_par l_brace stmt_list r_brace {-> New scoped.if(exp.exp, [stmt_list.stmt])}
+                       | {else} else l_brace stmt_list r_brace {-> New scoped.else([stmt_list.stmt])}
+                       | {elseif} else if l_par exp r_par l_brace stmt_list r_brace {-> New scoped.elseif(exp.exp, [stmt_list.stmt])}
+                       | {for} for l_par [init]:decl [fst]:semicolon [cond]:exp [snd]:semicolon [incre]:assign r_par l_brace stmt_list r_brace {-> New scoped.for(init.decl, cond.exp, incre.stmt, [stmt_list.stmt])}
+                       | {while} while l_par exp r_par l_brace stmt_list r_brace {-> New scoped.while(exp.exp, [stmt_list.stmt])}
+                       | {dowhile} do l_brace stmt_list r_brace while l_par exp r_par {-> New scoped.dowhile([stmt_list.stmt], exp.exp)};
      
     exp {-> exp} = {plus} exp plus factor {-> New exp.plus (exp.exp, factor.exp) }
                  | {minus} exp minus factor {-> New exp.minus (exp.exp, factor.exp) }
                  | {factor} factor {-> factor.exp };
-
-    factor {-> exp} = {mult} factor star term {-> New exp.mult (factor.exp, term.exp) } //TODO: Modulo %
-                    | {div} factor slash term {-> New exp.div (factor.exp, term.exp) }
-                    | {term} term {-> term.exp };
-
-    term {-> exp} = {expr} l_par exp r_par {-> exp.exp }
-                  | {number} number {-> New exp.number(number) };
-    id {-> P.id} = tid {-> New id(tid)};
     decl {-> decl} = {int} tint id {-> New decl.int (id.id)}
                    | {decimal} tdecimal id {-> New decl.decimal (id.id)}
                    | {bool} tbool id {-> New decl.bool (id.id)}
                    | {char} tchar id {-> New decl.char (id.id)}
                    | {string} tstring id {-> New decl.string (id.id)};
+    assign {-> stmt} = P.id equal exp {-> New stmt.assign(id.id, exp.exp)};
+
+    factor {-> exp} = {mult} factor star term {-> New exp.mult (factor.exp, term.exp) } //TODO: Modulo %
+                    | {div} factor slash term {-> New exp.div (factor.exp, term.exp) }
+                    | {term} term {-> term.exp };
+
+    term {-> exp} = {exp} l_par exp r_par {-> exp.exp }
+                  | {number} number {-> New exp.number(number) };
+    id {-> P.id} = tid {-> New id(tid)};
 
 
 Abstract Syntax Tree
@@ -113,15 +130,23 @@ Abstract Syntax Tree
     stmt = {exp} exp
          | {assign} id exp
          | {decl} decl
-         | {funccall} id; // TODO: Controlstructures
+         | {funccall} id
+         | {return} exp
+         | {scoped} scoped;
+    scoped = {if} exp stmt+
+           | {else} stmt+
+           | {elseif} exp stmt+
+           | {for} [init]:decl [cond]:exp [incre]:stmt stmt+
+           | {while} exp stmt+
+           | {dowhile} stmt+ exp; //TODO: Switch
     exp = {plus}    [l]:exp  [r]:exp 
         | {minus}   [l]:exp  [r]:exp 
         | {div}     [l]:exp  [r]:exp 
         | {mult}    [l]:exp  [r]:exp 
         | {number}  number; // TODO: function with return value
-    id = tid;
     decl = {int} id
          | {decimal} id
          | {bool} id
          | {char} id
          | {string} id;
+    id = tid;
