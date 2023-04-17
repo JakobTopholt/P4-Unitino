@@ -32,6 +32,28 @@ public class PrettyPrint : DepthFirstAdapter
     {
         output.Write("Prog {");
     }
+    
+    public override void InAUnit(AUnit node)
+    {
+        string? name = node.GetId().ToString();
+        string? type = node.GetTint().ToString();
+        output.Write($"unit {name}: {type} {{\n");
+    }
+    public override void OutAUnit(AUnit node)
+    {
+        output.Write("}\n");
+    }
+
+    public override void InASubunit(ASubunit node)
+    {
+        string? name = node.GetId().ToString();
+        output.Write($"  {name}=>");
+    }
+
+    public override void OutASubunit(ASubunit node)
+    {
+        output.Write(";\n");
+    }
 
     public override void OutAProgFunc(AProgFunc node)
     {
@@ -89,11 +111,6 @@ public class PrettyPrint : DepthFirstAdapter
         PrintPrecedence(node.GetL(),node.GetR(),"/");
     }
 
-    public override void CaseAMinusExp(AMinusExp node)
-    {
-        PrintPrecedence(node.GetL(),node.GetR(),"-");
-    }
-
     public override void CaseAMultExp(AMultExp node)
     {
         PrintPrecedence(node.GetL(),node.GetR(),"*");
@@ -103,7 +120,12 @@ public class PrettyPrint : DepthFirstAdapter
     {
         PrintPrecedence(node.GetL(), node.GetR(), "+");
     }
-
+    
+    public override void CaseAMinusExp(AMinusExp node)
+    {
+        PrintPrecedence(node.GetL(),node.GetR(),"-");
+    }
+    
     public override void CaseANumberExp(ANumberExp node)
     {
         output.Write(int.Parse(node.ToString()) + "");
