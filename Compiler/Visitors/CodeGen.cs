@@ -69,9 +69,44 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         writer.WriteLine(";");
     }
 
-    public override void InADeclStmt(ADeclStmt node)
+    public override void CaseAIntDecl(AIntDecl node)
     {
-        writer.Write("    int " + node.GetDecl().ToString().Trim());
+        if(node.Parent().Parent() is ANewFunc or AProgFunc)
+            writer.Write("    int " + node.GetId().ToString().Trim());
+        else
+            writer.Write("int " + node.GetId().ToString().Trim());
+    }
+
+    public override void InABoolDecl(ABoolDecl node)
+    {
+        if(node.Parent().Parent() is ANewFunc or AProgFunc)
+            writer.Write("    bool " + node.GetId().ToString().Trim());
+        else
+            writer.Write("bool " + node.GetId().ToString().Trim());
+    }
+
+    public override void InADecimalDecl(ADecimalDecl node)
+    {
+        if(node.Parent().Parent() is ANewFunc or AProgFunc)
+            writer.Write("    decimal " + node.GetId().ToString().Trim());
+        else
+            writer.Write("decimal " + node.GetId().ToString().Trim());
+    }
+
+    public override void InACharDecl(ACharDecl node)
+    {
+        if(node.Parent().Parent() is ANewFunc or AProgFunc)
+            writer.Write("    char " + node.GetId().ToString().Trim());
+        else
+            writer.Write("char " + node.GetId().ToString().Trim());
+    }
+
+    public override void InAStringDecl(AStringDecl node)
+    {
+        if(node.Parent().Parent() is ANewFunc or AProgFunc)
+            writer.Write("    string " + node.GetId().ToString().Trim());
+        else
+            writer.Write("string " + node.GetId().ToString().Trim());
     }
 
     public override void OutADeclStmt(ADeclStmt node)
