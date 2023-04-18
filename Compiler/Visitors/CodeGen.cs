@@ -127,16 +127,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     {
         writer.WriteLine(";");
     }
-
-    public override void InAFunccallStmt(AFunccallStmt node)
-    {
-        writer.Write("    " + node.GetId().ToString().Trim() + "()");
-    }
-
-    public override void OutAFunccallStmt(AFunccallStmt node)
-    {
-        writer.WriteLine(";");
-    }
+    
 
     public override void CaseADivExp(ADivExp node)
     {

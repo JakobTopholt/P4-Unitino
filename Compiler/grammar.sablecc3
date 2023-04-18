@@ -59,11 +59,12 @@ Tokens
     comma = ',';
     semicolon = ';';
     colon = ':';
+    dot = '.';
 
     tid = id_part ('_' id_part)*;
 
     char = ''' not_cr_lf ''';
-    number = digit+;
+    tnumber = digit+;
     hex = '0' ('x' | 'X') hex_digit+;
 
     string = ''' [not_cr_lf - ''']+ ''';
@@ -82,20 +83,22 @@ Productions
     func_list {-> func*} = {list} func func_list {-> [func.func, func_list.func]} 
                          | {single} func {-> [func.func]};
     stmt_list {-> stmt*} = {list} stmt stmt_list {-> [stmt.stmt, stmt_list.stmt]} 
-                       | {single} stmt {-> [stmt.stmt]};
+                         | {single} stmt {-> [stmt.stmt]};
     unit_list {-> unit*} = {list} unit unit_list {-> [unit.unit, unit_list.unit]}
-                             | {single} unit {-> [unit.unit]};
+                         | {single} unit {-> [unit.unit]};
     subunit_list {-> subunit*} = {list} subunit subunit_list {-> [subunit.subunit, subunit_list.subunit]}
-                                   | {single} subunit {-> [subunit.subunit]};
+                               | {single} subunit {-> [subunit.subunit]};
+    groupunit_list {-> singleunit*} = {list} singleunit dot groupunit_list {-> [singleunit.singleunit, groupunit_list.singleunit]} //For usage in expr
+                              | {single} singleunit {-> [singleunit.singleunit]};
                              
     func {-> func} = {prog} prog l_brace stmt_list r_brace {-> New func.prog([stmt_list.stmt])}
                    | {new} tfunc P.id l_brace stmt_list r_brace {-> New func.new(id.id, [stmt_list.stmt])};
     stmt {-> stmt} = {exp} exp semicolon {-> New stmt.exp(exp.exp)}
                    | {assign} P.id equal exp semicolon {-> New stmt.assign(id.id, exp.exp)}
-                   | {decl} decl semicolon {-> New stmt.decl(decl.decl)}
-                   | {funccall} P.id l_par r_par semicolon {-> New stmt.funccall(id.id)};
+                   | {decl} decl semicolon {-> New stmt.decl(decl.decl)};
     unit {-> unit} = tunit id colon tint l_brace subunit_list r_brace {-> New unit(id.id, tint, [subunit_list.subunit])};
-    subunit {-> subunit} = id arrow stmt semicolon {-> New subunit(id.id, stmt.stmt)}; //TODO allow value token and stmt block
+    subunit {-> subunit} = id arrow stmt {-> New subunit(id.id, stmt.stmt)}; //TODO allow value token and stmt block
+    singleunit {-> singleunit} = number id {-> New singleunit(number.number, id.id)}; //For usage in expr
 
     exp {-> exp} = {plus} exp plus factor {-> New exp.plus (exp.exp, factor.exp) }
                  | {minus} exp minus factor {-> New exp.minus (exp.exp, factor.exp) }
@@ -105,8 +108,12 @@ Productions
                     | {div} factor slash term {-> New exp.div (factor.exp, term.exp) }
                     | {term} term {-> term.exp };
 
-    term {-> exp} = {expr} l_par exp r_par {-> exp.exp }
-                  | {number} number {-> New exp.number(number) };
+    term {-> exp} = {exp} l_par exp r_par {-> exp.exp }
+                  | {number} number {-> New exp.number(number.number) }
+                  | {funccall} id l_par r_par {-> New exp.funccall(id.id)}
+                  | {decimal} [l]:number dot [r]:number {-> New exp.decimal(l.number, r.number)}
+                  | {units} groupunit_list {-> New exp.units([groupunit_list.singleunit])};
+    number {-> number} = tnumber {-> New number(tnumber)};
     id {-> P.id} = tid {-> New id(tid)};
     decl {-> decl} = {int} tint id {-> New decl.int (id.id)}
                    | {decimal} tdecimal id {-> New decl.decimal (id.id)}
@@ -118,18 +125,22 @@ Productions
 Abstract Syntax Tree
     grammar = unit* func*;
     unit = id tint subunit*;
-    subunit = id stmt; //TODO: fix to stmt
+    subunit = id stmt;
     func = {prog} stmt+
          | {new} id stmt+;
     stmt = {exp} exp
          | {assign} id exp
-         | {decl} decl
-         | {funccall} id; // TODO: Controlstructures
+         | {decl} decl; // TODO: Controlstructures
     exp = {plus}    [l]:exp  [r]:exp 
         | {minus}   [l]:exp  [r]:exp 
         | {div}     [l]:exp  [r]:exp 
         | {mult}    [l]:exp  [r]:exp 
-        | {number}  number; // TODO: function with return value
+        | {number}  number // TODO: function with return value
+        | {funccall} id
+        | {decimal} [l]:number [r]:number
+        | {units} singleunit+;
+    number = tnumber;
+    singleunit = number id;
     id = tid;
     decl = {int} id
          | {decimal} id
