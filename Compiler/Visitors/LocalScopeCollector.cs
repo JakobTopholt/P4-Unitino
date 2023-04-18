@@ -13,6 +13,7 @@ public class LocalScopeCollector : DepthFirstAdapter
 
     // Implement methods for collecting local variables and functions
     // declaration 
+    // if scope.parent != null
     
     
     // LocalvarDecl
@@ -35,15 +36,40 @@ public class LocalScopeCollector : DepthFirstAdapter
         // Add the function to the symbol table
         _symbolTable.Add(new SymbolTableEntry(funcName, returnType, SymbolTable.FunctionReturnType));
         
+        _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.func);
         // Enter functionscope
         _symbolTable.EnterScope();
     }
+    //mangler Funktions parametre
 
     public override void OutANewFunc(ANewFunc node) {
-        
-        
-        
         // Exit functionscope
         _symbolTable.ExitScope();
+    }
+
+    public override void InABoolDecl(ABoolDecl node)
+    {
+        _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Bool);
+        
+    }
+
+    public override void InAStringDecl(AStringDecl node)
+    {
+        _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.String);
+    }
+
+    public override void InACharDecl(ACharDecl node)
+    {
+        _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Char);
+    }
+
+    public override void InAIntDecl(AIntDecl node)
+    {
+        _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Int);
+    }
+
+    public override void InADecimalDecl(ADecimalDecl node)
+    {
+        _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Decimal);
     }
 }

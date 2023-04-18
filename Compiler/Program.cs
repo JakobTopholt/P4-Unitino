@@ -24,17 +24,17 @@ start.Apply(new PrettyPrint());
 
 // TODO Visitor 1: scope-check/symbol table
 // create symbolTable
-SymbolTable symbolTable = new SymbolTable();
+// SymbolTable symbolTable = new SymbolTable();
 
 // GlobalScopeCollector
-start.Apply(new GlobalScopeCollector(symbolTable));
+// start.Apply(new GlobalScopeCollector(symbolTable));
 
 // LocalScopeCollector
-// start.Apply(new LocalScopeCollector());
+// start.Apply(new LocalScopeCollector(symbolTable));
 
 // TODO Visitor 2: type checking
 // TypeChecker
-// start.Apply(new TypeChecker());
+// start.Apply(new TypeChecker(SymbolTable));
 
 // TODO Visitor 3: optional compiler optimization (lecture 20)
 

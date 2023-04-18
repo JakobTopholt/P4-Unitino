@@ -8,30 +8,31 @@ namespace Compiler.Visitors;
 //scopes.Add(currentScope);
 
 //currentScope = new Scope(currentScope);
-/*
+
+
 public class Scope
 {
-    private Dictionary<Node, Symbol> scope = new();
-    private Scope? parent;
+    private Dictionary<string, Symbol> _symbols = new();
+    private Scope? _parent;
 
     public Scope getParent()
     {
-        return parent;
+        return _parent;
     }
 
     public Scope(Scope? parent)
     {
-        this.parent = parent;
+        this._parent = parent;
     }
 
-    Symbol? getSymbol(Node node)
+    Symbol? getSymbol(string identifier)
     {
-        return scope.ContainsKey(node) ? scope[node] : parent?.getSymbol(node);
+        return _symbols.ContainsKey(identifier) ? _symbols[identifier] : _parent?.getSymbol(identifier);
     }
 
-    public void addSymbol(Node node, Symbol symbol)
+    public void addSymbol(string identifier, Symbol symbol)
     {
-        scope.Add(node, symbol);
+         _symbols.Add(identifier, symbol);
     }
 }
 
@@ -46,4 +47,3 @@ public enum Symbol
     Char,
     String
 }
-*/

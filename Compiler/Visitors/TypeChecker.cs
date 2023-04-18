@@ -14,9 +14,9 @@ public class TypeChecker : DepthFirstAdapter
     // Implement methods for type checking
     
     public override void OutAAssignStmt(AAssignStmt node) {
-        string varName = node.ToString();
+        string varName = node.GetId().ToString();
         string varType = _symbolTable.Get(varName).Type;
-        string exprType = GetExpressionType(node.Expression);
+        string exprType = GetExpressionType(node.GetExp());
 
         // Check if the types match
         if (varType != exprType) {
