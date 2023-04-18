@@ -11,6 +11,12 @@ public class TypeChecker : DepthFirstAdapter
         this._symbolTable = symbolTable;
     }
 
+    
+    // TASKS
+    // 1.
+    // Der sgu lidt frit slag til at begynde her
+    
+    
     // Implement methods for type checking
     
     public override void OutAAssignStmt(AAssignStmt node) {

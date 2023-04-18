@@ -20,8 +20,11 @@ public class GlobalScopeCollector : DepthFirstAdapter
     public override void InANewFunc(ANewFunc node)
     {
         _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.func);
+        
+        // Mangler også at store funktions parametre her
+        // Se task 4 i LocalScopeCollector
     }
-    //mangler Funktions parametre
+   
 
     
     public override void InABoolDecl(ABoolDecl node)
