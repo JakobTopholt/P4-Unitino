@@ -8,7 +8,7 @@ namespace Compiler.Visitors;
 //scopes.Add(currentScope);
 
 //currentScope = new Scope(currentScope);
-
+/*
 public class Scope
 {
     private Dictionary<Node, Symbol> scope = new();
@@ -46,3 +46,4 @@ public enum Symbol
     Char,
     String
 }
+*/

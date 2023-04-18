@@ -23,7 +23,16 @@ start.Apply(new PrettyPrint());
 }
 
 // TODO Visitor 1: scope-check/symbol table
+// GlobalScopeCollector
+// start.Apply(new GlobalScopeCollector());
+
+// LocalScopeCollector
+// start.Apply(new LocalScopeCollector());
+
 // TODO Visitor 2: type checking
+// TypeChecker
+// start.Apply(new TypeChecker());
+
 // TODO Visitor 3: optional compiler optimization (lecture 20)
 
 
