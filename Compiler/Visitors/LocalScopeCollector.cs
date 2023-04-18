@@ -40,6 +40,9 @@ public class LocalScopeCollector : DepthFirstAdapter
     }
 
     public override void OutANewFunc(ANewFunc node) {
+        
+        
+        
         // Exit functionscope
         _symbolTable.ExitScope();
     }

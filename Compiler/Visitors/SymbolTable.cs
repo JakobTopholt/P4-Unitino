@@ -42,6 +42,8 @@ public class SymbolTable {
     }
 
     public SymbolTableEntry Get(string name) {
+        // Tjek currentscope?
+        
         return _entries.LastOrDefault(entry => entry.Name == name);
     }
     
