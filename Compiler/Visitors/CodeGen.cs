@@ -31,45 +31,41 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     void Precedence(Node L, Node R, string ope)
     {
-        writer.Write("(");
-        L.Apply(this);
-        writer.Write(ope);
-        R.Apply(this);
-        writer.Write(")");
+        if (L.Parent().Parent().Parent() is ASubunit)
+        {
+            Indent("(");
+            L.Apply(this);
+            writer.Write(ope);
+            R.Apply(this);
+            Indent(")");
+        }
+        else
+        {
+            L.Apply(this);
+            writer.Write(ope);
+            R.Apply(this);
+        }
     }
-    private int _indent = -1;
+    private int _indent = 0;
     private void Indent(string s)
     {
         writer.Write(new string(' ', _indent * 4) + s);
     }
-
-    public override void DefaultIn(Node node)
-    {
-        _indent++;
-    }
-
-    public override void DefaultOut(Node node)
-    {
-        _indent--;
-    }
-
+    
     public override void InAProgFunc(AProgFunc node)
     {
-        _indent--;
         Indent("void setup() {\r\n");
         _indent++;
     }
-    
+
     public override void OutAProgFunc(AProgFunc node)
     {
         _indent--;
         Indent("}\r\n");
-        _indent++;
     }
 
     public override void InANewFunc(ANewFunc node)
     {
-        _indent--;
         Indent("func void " + node.GetId() + "{\r\n");
         _indent++;
     }
@@ -78,13 +74,12 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     {
         _indent--;
         Indent("}\r\n");
-        _indent++;
     }
 
     int i = 0;
     public override void InAExpStmt(AExpStmt node)
     {
-        if (node.Parent() is not ANewFunc)
+        if (node.Parent() is AProgFunc)
             Indent($"int i{i++} = ");
         else
             Indent("");
@@ -92,18 +87,14 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     
     public override void OutAExpStmt(AExpStmt node)
     {
-        _indent--;
-        Indent(";\r\n");
-        _indent++;
+        writer.Write(";\r\n");
     }
 
     public override void InAIntDecl(AIntDecl node)
     {
         if (node.Parent().Parent() is ANewFunc or AProgFunc)
         {
-            _indent--;
             Indent(("int " + node.GetId().ToString().Trim()));
-            _indent++;
         }
         else
             Indent("int " + node.GetId().ToString().Trim());
@@ -113,9 +104,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     {
         if (node.Parent().Parent() is ANewFunc or AProgFunc)
         {
-            _indent--;
             Indent(("bool " + node.GetId().ToString().Trim()));
-            _indent++;
         }
         else
             Indent("bool " + node.GetId().ToString().Trim());
@@ -124,11 +113,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void InADecimalDecl(ADecimalDecl node)
     {
         if (node.Parent().Parent() is ANewFunc or AProgFunc)
-        {
-            _indent--;
             Indent(("decimal " + node.GetId().ToString().Trim()));
-            _indent++;
-        }
         else
             Indent("decimal " + node.GetId().ToString().Trim());
     }
@@ -136,11 +121,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void InACharDecl(ACharDecl node)
     {
         if (node.Parent().Parent() is ANewFunc or AProgFunc)
-        {
-            _indent--;
             Indent(("char " + node.GetId().ToString().Trim()));
-            _indent++;
-        }
         else
             Indent("char " + node.GetId().ToString().Trim());
     }
@@ -148,20 +129,14 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void InAStringDecl(AStringDecl node)
     {
         if (node.Parent().Parent() is ANewFunc or AProgFunc)
-        {
-            _indent--;
             Indent(("string " + node.GetId().ToString().Trim()));
-            _indent++;
-        }
         else
             Indent("string " + node.GetId().ToString().Trim());
     }
 
     public override void OutADeclStmt(ADeclStmt node)
     {
-        _indent--;
         Indent(";\r\n");
-        _indent++;
     }
 
     public override void InAAssignStmt(AAssignStmt node)
@@ -171,9 +146,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void OutAAssignStmt(AAssignStmt node)
     {
-        _indent--;
         Indent(";\r\n");
-        _indent++;
     }
 
     public override void InAFunccallStmt(AFunccallStmt node)
@@ -183,9 +156,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void OutAFunccallStmt(AFunccallStmt node)
     {
-        _indent--;
         Indent(";\r\n");
-        _indent++;
     }
 
     public override void CaseADivExp(ADivExp node)
@@ -218,11 +189,14 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         string? unitId = whiteSpace.Replace(((AUnit)node.Parent()).GetId().ToString(),"");
         string? subUnitId = whiteSpace.Replace(node.GetId().ToString(),"");
         string? type = whiteSpace.Replace(((AUnit)node.Parent()).GetTint().ToString(), "");
-        writer.Write($"{type} {unitId}{subUnitId}({type} value){{\n return");
+        Indent($"{type} {unitId}{subUnitId}({type} value){{\n");
+        _indent++;
+        Indent("return");
+        _indent--;
     }
     public override void OutASubunit(ASubunit node)
     {
-        writer.Write(";\n}\n");
+        Indent("}\n");
     }
     
 
