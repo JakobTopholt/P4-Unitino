@@ -1,4 +1,5 @@
 using Moduino.analysis;
+using Moduino.node;
 
 namespace Compiler.Visitors;
 
@@ -12,14 +13,16 @@ public class GlobalScopeCollector : DepthFirstAdapter
     
     // Implement methods for collecting global variables
     
-    
-    // Find ud af hvad er declaration statement fx hedder i vores AST
-    public override void InAVarDeclarationStatement(AVarDeclarationStatement node)
+    // Declaration statements
+    public override void InADeclStmt(ADeclStmt node)
     {
-        string varName = node.Id.Text;
-        string varType = node.Type.ToString().Trim();
+        // Save identifier 
+        string identifier = node.ToString();
+        
+        // Save type
+        string type = node.GetType().ToString();
 
         // Add the global variable to the symbol table
-        _symbolTable.Add(new SymbolTableEntry(varName, varType, SymbolTable.GlobalScope));
+        _symbolTable.Add(new SymbolTableEntry(identifier, type, SymbolTable.GlobalScope));
     }
 }

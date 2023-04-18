@@ -23,8 +23,11 @@ start.Apply(new PrettyPrint());
 }
 
 // TODO Visitor 1: scope-check/symbol table
+// create symbolTable
+SymbolTable symbolTable = new SymbolTable();
+
 // GlobalScopeCollector
-// start.Apply(new GlobalScopeCollector());
+start.Apply(new GlobalScopeCollector(symbolTable));
 
 // LocalScopeCollector
 // start.Apply(new LocalScopeCollector());

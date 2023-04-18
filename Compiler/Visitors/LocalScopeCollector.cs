@@ -1,4 +1,5 @@
 using Moduino.analysis;
+using Moduino.node;
 
 namespace Compiler.Visitors;
 
@@ -11,26 +12,35 @@ public class LocalScopeCollector : DepthFirstAdapter
     }
 
     // Implement methods for collecting local variables and functions
+    // declaration 
     
     
-    public override void InLocalVarDeclaration(LocalVarDeclaration node) {
-        string varName = node.Id.Text;
-        string varType = node.Type.ToString().Trim();
+    // LocalvarDecl
+    public override void InADeclStmt(ADeclStmt node) {
+        // Save identifier 
+        string identifier = node.ToString();
+        
+        // Save type
+        string type = node.GetType().ToString();
 
         // Add the local variable to the symbol table
-        _symbolTable.Add(new SymbolTableEntry(varName, varType, _symbolTable.CurrentScopeLevel));
+        _symbolTable.Add(new SymbolTableEntry(identifier, type, _symbolTable.CurrentScopeLevel));
     }
     
-    public override void InFunctionDeclaration(FunctionDeclaration node) {
-        string funcName = node.Id.Text;
-        string returnType = node.Type.ToString().Trim();
+    // function declaration
+    public override void InANewFunc(ANewFunc node) {
+        string funcName = node.ToString();
+        string returnType = node.GetType().ToString();
 
-        // Add the function return type to the symbol table
+        // Add the function to the symbol table
         _symbolTable.Add(new SymbolTableEntry(funcName, returnType, SymbolTable.FunctionReturnType));
-
-        // Process the function body and add local variables to the symbol table
+        
+        // Enter functionscope
         _symbolTable.EnterScope();
-        node.FunctionBody.Apply(this);
+    }
+
+    public override void OutANewFunc(ANewFunc node) {
+        // Exit functionscope
         _symbolTable.ExitScope();
     }
 }

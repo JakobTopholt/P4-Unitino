@@ -13,8 +13,8 @@ public class TypeChecker : DepthFirstAdapter
 
     // Implement methods for type checking
     
-    public override void OutAssignmentStatement(AssignmentStatement node) {
-        string varName = node.Id.Text;
+    public override void OutAAssignStmt(AAssignStmt node) {
+        string varName = node.ToString();
         string varType = _symbolTable.Get(varName).Type;
         string exprType = GetExpressionType(node.Expression);
 
