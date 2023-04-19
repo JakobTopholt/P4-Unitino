@@ -95,7 +95,7 @@ Productions
                    | {decl} decl semicolon {-> New stmt.decl(decl.decl)}
                    | {funccall} P.id l_par r_par semicolon {-> New stmt.funccall(id.id)};
     unit {-> unit} = tunit id colon tint l_brace subunit_list r_brace {-> New unit(id.id, tint, [subunit_list.subunit])};
-    subunit {-> subunit} = id arrow stmt semicolon {-> New subunit(id.id, stmt.stmt)}; //TODO allow value token and stmt block
+    subunit {-> subunit} = id arrow stmt {-> New subunit(id.id, stmt.stmt)}; //TODO allow value token and stmt block
 
     exp {-> exp} = {plus} exp plus factor {-> New exp.plus (exp.exp, factor.exp) }
                  | {minus} exp minus factor {-> New exp.minus (exp.exp, factor.exp) }
