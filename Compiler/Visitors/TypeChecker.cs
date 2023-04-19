@@ -16,6 +16,9 @@ public class TypeChecker : DepthFirstAdapter
     // 1.
     // Der sgu lidt frit slag til at begynde her
     
+    // Benyt Visitorpattern ordentligt
+    // Lav typecheckning på outCase da, dens children på det tidspunkt allerede er kørt
+    
     
     // Implement methods for type checking
     

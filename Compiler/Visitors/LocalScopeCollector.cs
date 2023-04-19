@@ -27,6 +27,9 @@ public class LocalScopeCollector : DepthFirstAdapter
     // 4 
     // Mangler at håndtere funktions parametre - De skal implementeres i CFG grammaren først (tror jeg?)
     
+    // 5
+    // Check for foward referencing when checking assignment. If not declared before (also in global) it is an illegal assignment
+    
     
     // Collecting functions and their return values
     public override void InANewFunc(ANewFunc node) {
