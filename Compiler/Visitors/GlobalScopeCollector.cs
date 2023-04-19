@@ -5,12 +5,6 @@ namespace Compiler.Visitors;
 
 public class GlobalScopeCollector : DepthFirstAdapter
 {
-    private SymbolTable _symbolTable;
-
-    public GlobalScopeCollector(SymbolTable symbolTable) {
-        this._symbolTable = symbolTable;
-    }
-    
     public override void CaseANewFunc(ANewFunc node)
     {
         InANewFunc(node);
@@ -19,7 +13,7 @@ public class GlobalScopeCollector : DepthFirstAdapter
     
     public override void InANewFunc(ANewFunc node)
     {
-        _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.func);
+        SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.func);
         
         // Mangler også at store funktions parametre her
         // Se task 4 i LocalScopeCollector
@@ -29,29 +23,33 @@ public class GlobalScopeCollector : DepthFirstAdapter
     
     public override void InABoolDecl(ABoolDecl node)
     {
-        //isDeclared.Add(node.GetId().ToString(),Symbol.Bool);
-        _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Bool);
+        SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.Bool);
         
     }
 
     public override void InAStringDecl(AStringDecl node)
     {
-        _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.String);
+        SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.String);
     }
 
     public override void InACharDecl(ACharDecl node)
     {
-        _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Char);
+        SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.Char);
     }
 
     public override void InAIntDecl(AIntDecl node)
     {
-        _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Int);
+        SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.Int);
     }
 
     public override void InADecimalDecl(ADecimalDecl node)
     {
-        _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Decimal);
+        SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.Decimal);
+    }
+
+    public override void OutStart(Start node)
+    {
+        SymbolTable.ResetScope();
     }
 
     // Assignments

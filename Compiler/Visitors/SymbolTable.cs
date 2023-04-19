@@ -1,45 +1,78 @@
-﻿using Compiler.Visitors;
-using Moduino.analysis;
 using Moduino.node;
 
 namespace Compiler.Visitors;
 
 public class SymbolTable
 {
-    private Scope _currentScope;
-    private List<Scope> _scopes = new ();
-    public SymbolTable()
-    {
-        _currentScope = new Scope(null);
-        _scopes.Add(_currentScope); //Global scope
-    }
+    private Dictionary<string, Symbol> _symbols = new();
+    private Dictionary<string, Symbol> _symbolsReturnType = new();
+    private SymbolTable? _parent;
 
-    public void AddSymbol(string identifier, Symbol symbol)
-    {
-        //TODO: Mangler tjek for at må ikke deklarerer variable med samme id to gange i samme scope
-        _currentScope.AddSymbol(identifier, symbol);
-    }
-
-    public void AddReturnSymbol(string identifier, Symbol symbol)
-    {
-        _currentScope.AddReturnSymbol(identifier, symbol);
-    }
-
-    public Scope GetCurrentScope()
-    {
-        return _currentScope;
-    }
-    public Scope
+    private static SymbolTable _currentSymbolTable = new (null);
+    private static List<SymbolTable> allTables = new() { _currentSymbolTable };
     
-    public void EnterScope()
+    public static SymbolTable GetCurrentScope() => _currentSymbolTable;
+    public static void EnterScope() => _currentSymbolTable = new SymbolTable(_currentSymbolTable);
+    public static void ExitScope() => _currentSymbolTable = _currentSymbolTable.GetParent();
+    public static void ResetScope() => _currentSymbolTable = allTables[0];
+
+    public static void AddSymbol(string identifier, Symbol symbol)
     {
-        _currentScope = new Scope(_currentScope);
-        _scopes.Add(_currentScope);
+        _currentSymbolTable._symbols.Add(identifier, symbol);
     }
 
-    public void ExitScope()
+    public static void AddReturnSymbol(string identifier, Symbol returnVal)
     {
-        _currentScope = _currentScope.GetParent();
+        switch (_currentSymbolTable._symbols[identifier])
+        {
+            case Symbol.func:
+                _currentSymbolTable._symbolsReturnType.Add(identifier, returnVal);
+                break;
+            default:
+                // throw exception is not a function
+                break;
+        }
     }
     
+    private SymbolTable GetParent()
+    {
+        return _parent;
+    }
+
+    private SymbolTable(SymbolTable? parent)
+    {
+        _parent = parent;
+        allTables.Add(this);
+    }
+
+    public Symbol? GetSymbol(string identifier)
+    {
+        return _symbols.TryGetValue(identifier, out Symbol symbol) ? symbol : _parent?.GetSymbol(identifier);
+    }
+
+    public Symbol? GetReturnSymbol(string identifier)
+    {
+        // Check if identifier is a functionSymbol just for good measure
+        // This function should throw an exception if null is returned
+        switch (_symbols[identifier])
+        {
+            case Symbol.func:
+                // Return the return type/symbol of function
+                return _symbolsReturnType.TryGetValue(identifier, out Symbol value) ? value : null;
+            default:
+                return null;
+        }
+    }
+}
+
+public enum Symbol
+{
+    Bool,
+    Int, 
+    Decimal,
+    Char,
+    String,
+    func,
+    ok, 
+    notOk,
 }

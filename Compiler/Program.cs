@@ -23,15 +23,12 @@ start.Apply(new PrettyPrint());
 }
 
 // TODO Visitor 1: scope-check/symbol table
-
 // SymbolTable
-SymbolTable symbolTable = new SymbolTable();
-
 // GlobalScopeCollector - globale variabler gemmes i table (skal funktioner?)
-// start.Apply(new GlobalScopeCollector(symbolTable));
+// start.Apply(new GlobalScopeCollector());
 
 // LocalScopeCollector - lokale variabler + funktioner og deres retur gemmes i table
-// start.Apply(new LocalScopeCollector(symbolTable));
+// start.Apply(new LocalScopeCollector());
 
 // TODO Visitor 2: type checking
 // Tredje scan -  type checking - ok/not ok
