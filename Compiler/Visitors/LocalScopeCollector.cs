@@ -6,7 +6,7 @@ namespace Compiler.Visitors;
 public class LocalScopeCollector : DepthFirstAdapter
 {
     private SymbolTable _symbolTable;
-
+    
     public LocalScopeCollector(SymbolTable symbolTable) {
         this._symbolTable = symbolTable;
     }
@@ -14,7 +14,7 @@ public class LocalScopeCollector : DepthFirstAdapter
     // TASKS
     // 1.
     // Make sure to only store local variables and not the global ones from before
-    // Can be done by checking if currentScope's parent is not null (scope.parent != null)
+    // Can be done by checking if currentScope's parent is not null (scope.parent != null) 
     
     // 2.
     // Implement methods for getting a type from the nodes. (Type refers to Symbol enumerator)
@@ -28,14 +28,25 @@ public class LocalScopeCollector : DepthFirstAdapter
     // Mangler at håndtere funktions parametre - De skal implementeres i CFG grammaren først (tror jeg?)
     
     // 5
-    // Check for foward referencing when checking assignment. If not declared before (also in global) it is an illegal assignment
+    // Check for forward referencing when checking assignment. If not declared before (also in global) it is an illegal assignment
     
     
     // Collecting functions and their return values
+    /*public void IsDeclared(Node node)
+    {
+        string symbol = (_symbolTable.GetCurrentScope().GetSymbol(node));
+        if ()
+        {
+            
+        }
+    }*/
+    
+    
     public override void InANewFunc(ANewFunc node) {
+        
         string funcName = node.GetId().ToString();
         string returnType = node.GetType().ToString();
-
+        
         // Add the function to the symbol table
         _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.func);
         // Add the returnType of the function to the symbol table
@@ -54,27 +65,46 @@ public class LocalScopeCollector : DepthFirstAdapter
     // Collecting local variables
     public override void InABoolDecl(ABoolDecl node)
     {
-        _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Bool);
+        if (expr)
+        {
+            
+        }
         
+        if (node.Parent() != null)
+        {
+            _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Bool);
+        }
     }
 
     public override void InAStringDecl(AStringDecl node)
     {
-        _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.String);
+        if (node.Parent() != null)
+        {
+            _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.String);
+        }
     }
 
     public override void InACharDecl(ACharDecl node)
     {
-        _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Char);
+        if (node.Parent() != null)
+        {
+            _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Char);
+        }
     }
 
     public override void InAIntDecl(AIntDecl node)
     {
-        _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Int);
+        if (node.Parent() != null)
+        {
+            _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Int);
+        }
     }
 
     public override void InADecimalDecl(ADecimalDecl node)
     {
-        _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Decimal);
+        if (node.Parent() != null)
+        {
+            _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Decimal);
+        }
     }
 }

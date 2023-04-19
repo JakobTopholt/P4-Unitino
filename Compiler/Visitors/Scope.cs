@@ -17,7 +17,7 @@ public class Scope
     {
         this._parent = parent;
     }
-
+    
     public Symbol? GetSymbol(string identifier)
     {
         return _symbols.ContainsKey(identifier) ? _symbols[identifier] : _parent?.GetSymbol(identifier);

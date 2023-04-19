@@ -6,6 +6,7 @@ namespace Compiler.Visitors;
 public class GlobalScopeCollector : DepthFirstAdapter
 {
     private SymbolTable _symbolTable;
+    //public Dictionary<string, Symbol> isDeclared = new Dictionary<string, Symbol>();
 
     public GlobalScopeCollector(SymbolTable symbolTable) {
         this._symbolTable = symbolTable;
@@ -29,6 +30,7 @@ public class GlobalScopeCollector : DepthFirstAdapter
     
     public override void InABoolDecl(ABoolDecl node)
     {
+        //isDeclared.Add(node.GetId().ToString(),Symbol.Bool);
         _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Bool);
         
     }
@@ -54,10 +56,13 @@ public class GlobalScopeCollector : DepthFirstAdapter
     }
 
     // Assignments
-    /*
+    
     public override void InAAssignStmt(AAssignStmt node)
     {
-        
+        if (!SymbolTable.ContainsKey(node.GetId().ToString()))
+        {
+            //throw exception that it isnt declared yet 
+        }    
     }
-    */
+    
 }

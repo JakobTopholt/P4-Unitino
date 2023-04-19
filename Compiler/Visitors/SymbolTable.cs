@@ -16,6 +16,7 @@ public class SymbolTable
 
     public void AddSymbol(string identifier, Symbol symbol)
     {
+        //TODO: Mangler tjek for at må ikke deklarerer variable med samme id to gange i samme scope
         _currentScope.AddSymbol(identifier, symbol);
     }
 
@@ -28,6 +29,7 @@ public class SymbolTable
     {
         return _currentScope;
     }
+    public Scope
     
     public void EnterScope()
     {
