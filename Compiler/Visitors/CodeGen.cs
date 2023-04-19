@@ -28,106 +28,136 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     {
         this.writer = writer;
     }
- 
+
     void Precedence(Node L, Node R, string ope)
     {
-        writer.Write("(");
-        L.Apply(this);
-        writer.Write(ope);
-        R.Apply(this);
-        writer.Write(")");
+        if (L.Parent().Parent().Parent() is ASubunit)
+        {
+            Indent("(");
+            L.Apply(this);
+            writer.Write(ope);
+            R.Apply(this);
+            Indent(")");
+        }
+        else
+        {
+            L.Apply(this);
+            writer.Write(ope);
+            R.Apply(this);
+        }
+    }
+    private int _indent = 0;
+    private void Indent(string s)
+    {
+        writer.Write(new string(' ', _indent * 4) + s);
     }
     
     public override void InAProgFunc(AProgFunc node)
     {
-        writer.WriteLine("void setup() {");
-
+        Indent("void setup() {\r\n");
+        _indent++;
     }
-    
+
     public override void OutAProgFunc(AProgFunc node)
     {
-        writer.WriteLine("}");
+        _indent--;
+        Indent("}\r\n");
     }
 
     public override void InANewFunc(ANewFunc node)
     {
-        writer.WriteLine("func void " + node.GetId() + "{");
+        Indent("func void " + node.GetId() + "{\r\n");
+        _indent++;
     }
 
     public override void OutANewFunc(ANewFunc node)
     {
-        writer.WriteLine("}");
+        _indent--;
+        Indent("}\r\n");
     }
 
     int i = 0;
     public override void InAExpStmt(AExpStmt node)
     {
-        if (node.Parent() is not ANewFunc)
-            writer.Write($"  int i{i++} = ");
+        if (node.Parent() is AProgFunc)
+            Indent($"int i{i++} = ");
         else
-            writer.Write("    ");
+            Indent("");
     }
     
     public override void OutAExpStmt(AExpStmt node)
     {
-        writer.WriteLine(";");
+        writer.Write(";\r\n");
     }
 
-    public override void CaseAIntDecl(AIntDecl node)
+    public override void InAIntDecl(AIntDecl node)
     {
-        if(node.Parent().Parent() is ANewFunc or AProgFunc)
-            writer.Write("    int " + node.GetId().ToString().Trim());
+        if (node.Parent().Parent() is ANewFunc or AProgFunc)
+        {
+            Indent(("int " + node.GetId().ToString().Trim()));
+        }
         else
-            writer.Write("int " + node.GetId().ToString().Trim());
+            Indent("int " + node.GetId().ToString().Trim());
     }
 
     public override void InABoolDecl(ABoolDecl node)
     {
-        if(node.Parent().Parent() is ANewFunc or AProgFunc)
-            writer.Write("    bool " + node.GetId().ToString().Trim());
+        if (node.Parent().Parent() is ANewFunc or AProgFunc)
+        {
+            Indent(("bool " + node.GetId().ToString().Trim()));
+        }
         else
-            writer.Write("bool " + node.GetId().ToString().Trim());
+            Indent("bool " + node.GetId().ToString().Trim());
     }
 
     public override void InADecimalDecl(ADecimalDecl node)
     {
-        if(node.Parent().Parent() is ANewFunc or AProgFunc)
-            writer.Write("    decimal " + node.GetId().ToString().Trim());
+        if (node.Parent().Parent() is ANewFunc or AProgFunc)
+            Indent(("decimal " + node.GetId().ToString().Trim()));
         else
-            writer.Write("decimal " + node.GetId().ToString().Trim());
+            Indent("decimal " + node.GetId().ToString().Trim());
     }
 
     public override void InACharDecl(ACharDecl node)
     {
-        if(node.Parent().Parent() is ANewFunc or AProgFunc)
-            writer.Write("    char " + node.GetId().ToString().Trim());
+        if (node.Parent().Parent() is ANewFunc or AProgFunc)
+            Indent(("char " + node.GetId().ToString().Trim()));
         else
-            writer.Write("char " + node.GetId().ToString().Trim());
+            Indent("char " + node.GetId().ToString().Trim());
     }
-
+    
     public override void InAStringDecl(AStringDecl node)
     {
-        if(node.Parent().Parent() is ANewFunc or AProgFunc)
-            writer.Write("    string " + node.GetId().ToString().Trim());
+        if (node.Parent().Parent() is ANewFunc or AProgFunc)
+            Indent(("string " + node.GetId().ToString().Trim()));
         else
-            writer.Write("string " + node.GetId().ToString().Trim());
+            Indent("string " + node.GetId().ToString().Trim());
     }
 
     public override void OutADeclStmt(ADeclStmt node)
     {
-        writer.WriteLine(";");
+        Indent(";\r\n");
     }
 
     public override void InAAssignStmt(AAssignStmt node)
     {
-        writer.Write("    " + node.GetId() + "= ");
+        Indent(node.GetId() + "= ");
     }
 
     public override void OutAAssignStmt(AAssignStmt node)
     {
-        writer.WriteLine(";");
+        Indent(";\r\n");
     }
-    
+
+    public override void InAFunccallStmt(AFunccallStmt node)
+    {
+        Indent(node.GetId().ToString().Trim() + "()");
+    }
+
+    public override void OutAFunccallStmt(AFunccallStmt node)
+    {
+        Indent(";\r\n");
+    }
 
     public override void CaseADivExp(ADivExp node)
     {
@@ -159,11 +189,14 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         string? unitId = whiteSpace.Replace(((AUnit)node.Parent()).GetId().ToString(),"");
         string? subUnitId = whiteSpace.Replace(node.GetId().ToString(),"");
         string? type = whiteSpace.Replace(((AUnit)node.Parent()).GetTint().ToString(), "");
-        writer.Write($"{type} {unitId}{subUnitId}({type} value){{\n return");
+        Indent($"{type} {unitId}{subUnitId}({type} value){{\n");
+        _indent++;
+        Indent("return");
+        _indent--;
     }
     public override void OutASubunit(ASubunit node)
     {
-        writer.Write(";\n}\n");
+        Indent("}\n");
     }
     
 
