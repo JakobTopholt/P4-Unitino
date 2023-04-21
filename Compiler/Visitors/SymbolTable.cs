@@ -40,6 +40,7 @@ public class SymbolTable
     public static Symbol? GetSymbol(string identifier) => _currentSymbolTable.GetCurrentSymbol(identifier);
     private Symbol? GetCurrentSymbol(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentSymbol(identifier);
     private Symbol? GetCurrentSymbol(Node node) => nodeToSymbol.TryGetValue(node, out Symbol symbol) ? symbol : parent?.GetCurrentSymbol(node);
+    public static bool IsInCurrentScope(PId id) => _currentSymbolTable.idToNode.ContainsKey(id.ToString());
 }
 
 public enum Symbol
