@@ -48,30 +48,36 @@ public class VisitorTests
     [Test]
     public void PrettyPrint()
     {
-        foreach (TestCase testCase in testCases)
+        Assert.Multiple(() =>
         {
-            StringBuilder sb = new();
-            TextWriter output = new StringWriter(sb);
-            testCase.Ast.Apply(new PrettyPrint(output));
-            Assert.That(whiteSpace.Replace(sb.ToString(), ""), 
-                Is.EqualTo(testCase.PrettyPrint.ReplaceLineEndings()));
-        }
+            foreach (TestCase testCase in testCases)
+            {
+                StringBuilder sb = new();
+                TextWriter output = new StringWriter(sb);
+                testCase.Ast.Apply(new PrettyPrint(output));
+                Assert.That(whiteSpace.Replace(sb.ToString(), ""), 
+                    Is.EqualTo(testCase.PrettyPrint.ReplaceLineEndings()));
+            }
+        });
     }
 
     [Test]
     public void CodeGen()
     {
-        foreach (TestCase testCase in testCases)
+        Assert.Multiple(() =>
         {
-            Console.WriteLine(testCase.Ast + "\n" + testCase.CodeGen + "\n");
-            using MemoryStream stream = new();
-            using StreamWriter writer = new(stream);
-            CodeGen codeGen = new(writer);
-            testCase.Ast.Apply(codeGen);
-            writer.Flush();
-            //Console.WriteLine(stream.Length);
-            string code = Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int) stream.Length);
-            Assert.That(code.ReplaceLineEndings(), Is.EqualTo(testCase.CodeGen));
-        }
+            foreach (TestCase testCase in testCases)
+            {
+                Console.WriteLine(testCase.Ast + "\n" + testCase.CodeGen + "\n");
+                using MemoryStream stream = new();
+                using StreamWriter writer = new(stream);
+                CodeGen codeGen = new(writer);
+                testCase.Ast.Apply(codeGen);
+                writer.Flush();
+                //Console.WriteLine(stream.Length);
+                string code = Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int) stream.Length);
+                Assert.That(code.ReplaceLineEndings(), Is.EqualTo(testCase.CodeGen));
+            }
+        });
     }
 }
