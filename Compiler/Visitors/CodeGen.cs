@@ -21,7 +21,6 @@ namespace Compiler.Visitors;
 
 public class CodeGen : DepthFirstAdapter, IDisposable
 {
-    //private StreamWriter writer;
     private StreamWriter writer;
     private static readonly Regex whiteSpace = new(@"\s+");
     public CodeGen(StreamWriter writer)
@@ -31,20 +30,12 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     void Precedence(Node L, Node R, string ope)
     {
-        if (L.Parent().Parent().Parent() is ASubunit)
-        {
-            Indent("(");
-            L.Apply(this);
-            writer.Write(ope);
-            R.Apply(this);
-            Indent(")");
-        }
-        else
-        {
-            L.Apply(this);
-            writer.Write(ope);
-            R.Apply(this);
-        }
+        writer.Write(L.Parent().Parent().Parent() is ASubunit ? "(" : "");
+        L.Apply(this);
+        writer.Write(ope);
+        R.Apply(this);
+        writer.Write(L.Parent().Parent().Parent() is ASubunit ? ")" : "");
+        writer.Write(L.Parent().Parent() is AForScoped ? "; " : "");
     }
     private int _indent = 0;
     private void Indent(string s)
@@ -61,7 +52,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void OutAProgFunc(AProgFunc node)
     {
         _indent--;
-        Indent("}\r\n");
+        Indent("}");
     }
 
     public override void InANewFunc(ANewFunc node)
@@ -73,31 +64,136 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void OutANewFunc(ANewFunc node)
     {
         _indent--;
-        Indent("}\r\n");
+        Indent("}");
     }
 
-    int i = 0;
-    public override void InAExpStmt(AExpStmt node)
+    /*-------------------------------------Control Structures---------------------------------------------------------*/
+    public override void CaseAIfScoped(AIfScoped node)
     {
-        if (node.Parent() is AProgFunc)
-            Indent($"int i{i++} = ");
-        else
-            Indent("");
+        Indent("if(");
+        node.GetExp().Apply(this);
+        writer.WriteLine(") {");
+        _indent++;
+        foreach (Node o in node.GetStmt())
+        {
+            o.Apply(this);
+        }
+        _indent--;
+        OutAIfScoped(node);
     }
+
+    public override void OutAIfScoped(AIfScoped node)
+    {
+        Indent("}\n");
+    }
+
+    public override void CaseAForScoped(AForScoped node)
+    {
+        Indent("for(");
+        node.GetInit().Apply(this);
+        node.GetCond().Apply(this);
+        node.GetIncre().Apply(this);
+        writer.WriteLine(") {");
+        _indent++;
+        foreach (Node o in node.GetStmt())
+        {
+            o.Apply(this);
+        }
+        _indent--;
+        OutAForScoped(node);
+    }
+
+    public override void OutAForScoped(AForScoped node)
+    {
+        Indent("}\n");
+    }
+
+    public override void CaseAWhileScoped(AWhileScoped node)
+    {
+        Indent("while(");
+        node.GetExp().Apply(this);
+        writer.WriteLine(") {");
+        _indent++;
+        foreach (Node o in node.GetStmt())
+        {
+            o.Apply(this);
+        }
+        _indent--;
+        OutAWhileScoped(node);
+    }
+
+    public override void OutAWhileScoped(AWhileScoped node)
+    {
+        Indent("}\n");
+    }
+
+    public override void CaseAElseifScoped(AElseifScoped node)
+    {
+        Indent("else if(");
+        node.GetExp().Apply(this);
+        writer.WriteLine(") {");
+        _indent++;
+        foreach (Node o in node.GetStmt())
+        {
+            o.Apply(this);
+        }
+        _indent--;
+        OutAElseifScoped(node);
+    }
+
+    public override void OutAElseifScoped(AElseifScoped node)
+    {
+        Indent("}\n");
+    }
+
+    public override void CaseAElseScoped(AElseScoped node)
+    {
+        Indent("else {\n");
+        _indent++;
+        foreach (Node o in node.GetStmt())
+        {
+            o.Apply(this);
+        }
+        _indent--;
+        OutAElseScoped(node);
+    }
+
+    public override void OutAElseScoped(AElseScoped node)
+    {
+        Indent("}\n");
+    }
+
+    public override void CaseADowhileScoped(ADowhileScoped node)
+    {
+        Indent("do {\n");
+        _indent++;
+        foreach (Node o in node.GetStmt())
+        {
+            o.Apply(this);
+        }
+        _indent--;
+        Indent("} while(");
+        node.GetExp().Apply(this);
+        writer.Write(")\n");
+    }
+
+    public override void OutADowhileScoped(ADowhileScoped node)
+    {
+        Indent(")\n");
+    }
+
+    /*-------------------------------------Decl-----------------------------------------------------------------------*/
     
-    public override void OutAExpStmt(AExpStmt node)
-    {
-        writer.Write(";\r\n");
-    }
-
     public override void InAIntDecl(AIntDecl node)
     {
         if (node.Parent().Parent() is ANewFunc or AProgFunc)
         {
-            Indent(("int " + node.GetId().ToString().Trim()));
+            Indent(("int " + node.GetId().ToString().Trim()) + ";");
         }
+        else if(node.Parent() is AForScoped)
+            writer.Write("int " + node.GetId().ToString().Trim() + "; ");
         else
-            Indent("int " + node.GetId().ToString().Trim());
+            Indent(("int " + node.GetId().ToString().Trim()));
     }
 
     public override void InABoolDecl(ABoolDecl node)
@@ -133,20 +229,38 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         else
             Indent("string " + node.GetId().ToString().Trim());
     }
+    
+    int i = 0;
+    public override void InAExpStmt(AExpStmt node)
+    {
+        if (node.Parent() is AProgFunc)
+            Indent($"int i{i++} = ");
+        else
+            Indent("");
+    }
+    
+    /*---------------------------------------------ExpStmt------------------------------------------------------------*/
+    public override void OutAExpStmt(AExpStmt node)
+    {
+        writer.Write(";");
+    }
 
     public override void OutADeclStmt(ADeclStmt node)
     {
-        Indent(";\r\n");
+        writer.Write(node.Parent() is AForScoped ? "; " : ";\r\n");
     }
 
     public override void InAAssignStmt(AAssignStmt node)
     {
-        Indent(node.GetId() + "= ");
+        if(node.Parent() is AForScoped) 
+            writer.Write(node.GetId() + "= ");
+        else
+            Indent(node.GetId() + "= ");
     }
 
     public override void OutAAssignStmt(AAssignStmt node)
     {
-        Indent(";\r\n");
+        writer.Write(node.Parent() is AForScoped ? "" : ";\r\n");
     }
 
     public override void InAFunccallStmt(AFunccallStmt node)
@@ -156,9 +270,11 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void OutAFunccallStmt(AFunccallStmt node)
     {
-        Indent(";\r\n");
+        writer.Write(";");
     }
 
+    
+    /*--------------------------------- CaseExp ----------------------------------------------------------------------*/
     public override void CaseADivExp(ADivExp node)
     {
         Precedence(node.GetL(),node.GetR(),"/");
