@@ -13,7 +13,7 @@ public class GlobalScopeCollector : DepthFirstAdapter
     
     public override void InANewFunc(ANewFunc node)
     {
-        SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.func);
+        SymbolTable.AddId(node.GetId(), node, Symbol.func);
         
         // Mangler også at store funktions parametre her
         // Se task 4 i LocalScopeCollector
@@ -23,28 +23,28 @@ public class GlobalScopeCollector : DepthFirstAdapter
     
     public override void InABoolDecl(ABoolDecl node)
     {
-        SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.Bool);
+        SymbolTable.AddId(node.GetId(), node, Symbol.Bool);
         
     }
 
     public override void InAStringDecl(AStringDecl node)
     {
-        SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.String);
+        SymbolTable.AddId(node.GetId(), node, Symbol.String);
     }
 
     public override void InACharDecl(ACharDecl node)
     {
-        SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.Char);
+        SymbolTable.AddId(node.GetId(), node, Symbol.Char);
     }
 
     public override void InAIntDecl(AIntDecl node)
     {
-        SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.Int);
+        SymbolTable.AddId(node.GetId(), node, Symbol.Int);
     }
 
     public override void InADecimalDecl(ADecimalDecl node)
     {
-        SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.Decimal);
+        SymbolTable.AddId(node.GetId(), node, Symbol.Decimal);
     }
 
     public override void OutStart(Start node)

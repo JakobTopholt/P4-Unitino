@@ -38,16 +38,13 @@ public class TypeChecker : DepthFirstAdapter
     
     public override void InANewFunc(ANewFunc node) {
         
-        string funcName = node.GetId().ToString();
-        string returnType = node.GetType().ToString();
-        
-        // Add the function to the symbol table
-        SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.func);
-        // Add the returnType of the function to the symbol table
-        SymbolTable.AddReturnSymbol(node.GetId().ToString(), node.getReturnType());
+        SymbolTable.AddId(node.GetId(), node, Symbol.func);
 
         // Funktions parametre
         // De skal stores her (tænker jeg)
+        // Foreach paremeter in node.getparemeters
+        //   SymbolTable.AddId(parameter.id, parameter,
+        //      intparameter => symbol.int, boolparameter => symbol.bool)
         
         SymbolTable.EnterScope();
     }
@@ -61,7 +58,7 @@ public class TypeChecker : DepthFirstAdapter
     {
         if (node.Parent() != null)
         {
-            SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.Bool);
+            SymbolTable.AddId(node.GetId(), node, Symbol.Bool);
         }
     }
 
@@ -69,7 +66,7 @@ public class TypeChecker : DepthFirstAdapter
     {
         if (node.Parent() != null)
         {
-            SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.String);
+            SymbolTable.AddId(node.GetId(), node, Symbol.String);
         }
     }
 
@@ -77,7 +74,7 @@ public class TypeChecker : DepthFirstAdapter
     {
         if (node.Parent() != null)
         {
-            SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.Char);
+            SymbolTable.AddId(node.GetId(), node, Symbol.Char);
         }
     }
 
@@ -85,7 +82,7 @@ public class TypeChecker : DepthFirstAdapter
     {
         if (node.Parent() != null)
         {
-            SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.Int);
+            SymbolTable.AddId(node.GetId(), node, Symbol.Int);
         }
     }
 
@@ -94,7 +91,7 @@ public class TypeChecker : DepthFirstAdapter
 
         if (node.Parent() != null)
         {
-            SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.Decimal);
+            SymbolTable.AddId(node.GetId(), node, Symbol.Decimal);
         }
     }
     //Expressions
@@ -109,13 +106,13 @@ public class TypeChecker : DepthFirstAdapter
         switch (l)
         {
             case Symbol.Int when r is Symbol.Int:
-                SymbolTable.AddSymbol(node,Symbol.Int);
+                SymbolTable.AddNode(node, Symbol.Int);
                 break;
             case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal or Symbol.Int:
-                SymbolTable.AddSymbol(node,Symbol.Decimal);
+                SymbolTable.AddNode(node, Symbol.Decimal);
                 break;
             default:
-                SymbolTable.AddSymbol(node,Symbol.notOk);
+                SymbolTable.AddNode(node, Symbol.notOk);
                 break;
         }
     }
@@ -127,13 +124,13 @@ public class TypeChecker : DepthFirstAdapter
         switch (l)
         {
             case Symbol.Int when r is Symbol.Int:
-                SymbolTable.AddSymbol(node,Symbol.Int);
+                SymbolTable.AddNode(node,Symbol.Int);
                 break;
             case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal or Symbol.Int:
-                SymbolTable.AddSymbol(node,Symbol.Decimal);
+                SymbolTable.AddNode(node,Symbol.Decimal);
                 break;
             default:
-                SymbolTable.AddSymbol(node,Symbol.notOk);
+                SymbolTable.AddNode(node,Symbol.notOk);
                 break;
         }
     }
@@ -146,19 +143,19 @@ public class TypeChecker : DepthFirstAdapter
         switch (l)
         {
             case Symbol.Int when r is Symbol.Int:
-                SymbolTable.AddSymbol(node,Symbol.Int);
+                SymbolTable.AddNode(node,Symbol.Int);
                 break;
             case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal or Symbol.Int:
-                SymbolTable.AddSymbol(node,Symbol.Decimal);
+                SymbolTable.AddNode(node,Symbol.Decimal);
                 break;
             case Symbol.Int or Symbol.String when r is Symbol.Int or Symbol.String:
-                SymbolTable.AddSymbol(node,Symbol.String);
+                SymbolTable.AddNode(node,Symbol.String);
                 break;
             case Symbol.Decimal or Symbol.String when r is Symbol.Decimal or Symbol.String:
-                SymbolTable.AddSymbol(node,Symbol.String);
+                SymbolTable.AddNode(node,Symbol.String);
                 break;
             default:
-                SymbolTable.AddSymbol(node,Symbol.notOk);
+                SymbolTable.AddNode(node,Symbol.notOk);
                 break;
         }
         
@@ -172,27 +169,23 @@ public class TypeChecker : DepthFirstAdapter
         switch (l)
         {
             case Symbol.Int when r is Symbol.Int:
-                SymbolTable.AddSymbol(node, Symbol.Int);
+                SymbolTable.AddNode(node, Symbol.Int);
                 break;
             case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal or Symbol.Int:
-                SymbolTable.AddSymbol(node, Symbol.Decimal);
+                SymbolTable.AddNode(node, Symbol.Decimal);
                 break;
             default:
-                SymbolTable.AddSymbol(node, Symbol.notOk);
+                SymbolTable.AddNode(node, Symbol.notOk);
                 break;
         }
     }
 
 
     public override void OutAAssignStmt(AAssignStmt node) {
-        string varName = node.GetId().ToString();
-        string varType = SymbolTable.GetSymbolType(varName);
-        string exprType = GetExpressionType(node.GetExp());
+        Symbol? type = SymbolTable.GetSymbol("" + node.GetId());
+        Symbol? exprType = SymbolTable.GetSymbol(node.GetExp());
 
-        // Check if the types match
-        if (varType != exprType) {
-            throw new InvalidOperationException($"Type mismatch in assignment statement: Expected '{varType}', found '{exprType}'.");
-        }
-   
+        // if types match stmt is ok, else notok
+        SymbolTable.AddNode(node, type != exprType ? Symbol.notOk : Symbol.ok);
     }
 }

@@ -4,65 +4,42 @@ namespace Compiler.Visitors;
 
 public class SymbolTable
 {
-    private Dictionary<string, Symbol> _symbols = new();
-    private Dictionary<string, Symbol> _symbolsReturnType = new();
-    private SymbolTable? _parent;
+    private readonly Dictionary<string, Node> idToNode = new();
+    private readonly Dictionary<Node, Symbol> nodeToSymbol = new();
+    private readonly SymbolTable? parent;
 
     private static SymbolTable _currentSymbolTable = new (null);
-    private static List<SymbolTable> allTables = new() { _currentSymbolTable };
-    
-    public static SymbolTable GetCurrentScope() => _currentSymbolTable;
+    private static readonly List<SymbolTable> AllTables = new() { _currentSymbolTable };
     public static void EnterScope() => _currentSymbolTable = new SymbolTable(_currentSymbolTable);
-    public static void ExitScope() => _currentSymbolTable = _currentSymbolTable.GetParent();
-    public static void ResetScope() => _currentSymbolTable = allTables[0];
-
-    public static void AddSymbol(string identifier, Symbol symbol)
+    public static void ExitScope()
     {
-        _currentSymbolTable._symbols.Add(identifier, symbol);
+        if (_currentSymbolTable.parent != null) 
+            _currentSymbolTable = _currentSymbolTable.parent;
     }
 
-    public static void AddReturnSymbol(string identifier, Symbol returnVal)
+    public static void ResetScope() => _currentSymbolTable = AllTables[0];
+
+    public static void AddId(PId identifier, Node node, Symbol symbol)
     {
-        switch (_currentSymbolTable._symbols[identifier])
-        {
-            case Symbol.func:
-                _currentSymbolTable._symbolsReturnType.Add(identifier, returnVal);
-                break;
-            default:
-                // throw exception is not a function
-                break;
-        }
+        _currentSymbolTable.idToNode.Add("" + identifier, node);
+        AddNode(node, symbol);
+    }
+
+    public static void AddNode(Node node, Symbol symbol)
+    {
+        _currentSymbolTable.nodeToSymbol.Add(node, symbol);
     }
     
-    private SymbolTable GetParent()
-    {
-        return _parent;
-    }
-
     private SymbolTable(SymbolTable? parent)
     {
-        _parent = parent;
-        allTables.Add(this);
+        this.parent = parent;
+        AllTables.Add(this);
     }
 
-    public Symbol? GetSymbol(string identifier)
-    {
-        return _symbols.TryGetValue(identifier, out Symbol symbol) ? symbol : _parent?.GetSymbol(identifier);
-    }
-
-    public Symbol? GetReturnSymbol(string identifier)
-    {
-        // Check if identifier is a functionSymbol just for good measure
-        // This function should throw an exception if null is returned
-        switch (_symbols[identifier])
-        {
-            case Symbol.func:
-                // Return the return type/symbol of function
-                return _symbolsReturnType.TryGetValue(identifier, out Symbol value) ? value : null;
-            default:
-                return null;
-        }
-    }
+    public static Symbol? GetSymbol(Node node) => _currentSymbolTable.GetCurrentSymbol(node);
+    public static Symbol? GetSymbol(string identifier) => _currentSymbolTable.GetCurrentSymbol(identifier);
+    private Symbol? GetCurrentSymbol(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentSymbol(identifier);
+    private Symbol? GetCurrentSymbol(Node node) => nodeToSymbol.TryGetValue(node, out Symbol symbol) ? symbol : parent?.GetCurrentSymbol(node);
 }
 
 public enum Symbol
