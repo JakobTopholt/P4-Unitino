@@ -5,12 +5,6 @@ namespace Compiler.Visitors;
 
 public class TypeChecker : DepthFirstAdapter
 {
-    private SymbolTable _symbolTable;
-    
-    public TypeChecker(SymbolTable symbolTable) {
-        this._symbolTable = symbolTable;
-    }
-
     // TASKS
     // 1.
     // Make sure to only store local variables and not the global ones from before
@@ -48,18 +42,18 @@ public class TypeChecker : DepthFirstAdapter
         string returnType = node.GetType().ToString();
         
         // Add the function to the symbol table
-        _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.func);
+        SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.func);
         // Add the returnType of the function to the symbol table
-        _symbolTable.AddReturnSymbol(node.GetId().ToString(), node.getReturnType());
+        SymbolTable.AddReturnSymbol(node.GetId().ToString(), node.getReturnType());
 
         // Funktions parametre
         // De skal stores her (tænker jeg)
         
-        _symbolTable.EnterScope();
+        SymbolTable.EnterScope();
     }
     public override void OutANewFunc(ANewFunc node) 
     {
-        _symbolTable.ExitScope();
+        SymbolTable.ExitScope();
     }
 
     // Collecting local variables
@@ -67,7 +61,7 @@ public class TypeChecker : DepthFirstAdapter
     {
         if (node.Parent() != null)
         {
-            _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Bool);
+            SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.Bool);
         }
     }
 
@@ -75,7 +69,7 @@ public class TypeChecker : DepthFirstAdapter
     {
         if (node.Parent() != null)
         {
-            _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.String);
+            SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.String);
         }
     }
 
@@ -83,7 +77,7 @@ public class TypeChecker : DepthFirstAdapter
     {
         if (node.Parent() != null)
         {
-            _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Char);
+            SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.Char);
         }
     }
 
@@ -91,7 +85,7 @@ public class TypeChecker : DepthFirstAdapter
     {
         if (node.Parent() != null)
         {
-            _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Int);
+            SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.Int);
         }
     }
 
@@ -100,7 +94,7 @@ public class TypeChecker : DepthFirstAdapter
 
         if (node.Parent() != null)
         {
-            _symbolTable.AddSymbol(node.GetId().ToString(), Symbol.Decimal);
+            SymbolTable.AddSymbol(node.GetId().ToString(), Symbol.Decimal);
         }
     }
     //Expressions
@@ -110,61 +104,61 @@ public class TypeChecker : DepthFirstAdapter
     {
         //Node l = node.GetL();
         //Node r = node.GetR();
-        var l =_symbolTable.GetCurrentScope().GetSymbol(node.GetL());
-        var r = _symbolTable.GetCurrentScope().GetSymbol(node.GetR());
+        var l =SymbolTable.GetSymbol(node.GetL());
+        var r = SymbolTable.GetSymbol(node.GetR());
         switch (l)
         {
             case Symbol.Int when r is Symbol.Int:
-                _symbolTable.GetCurrentScope().AddSymbol(node,Symbol.Int);
+                SymbolTable.AddSymbol(node,Symbol.Int);
                 break;
             case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal or Symbol.Int:
-                _symbolTable.GetCurrentScope().AddSymbol(node,Symbol.Decimal);
+                SymbolTable.AddSymbol(node,Symbol.Decimal);
                 break;
             default:
-                _symbolTable.GetCurrentScope().AddSymbol(node,Symbol.notOk);
+                SymbolTable.AddSymbol(node,Symbol.notOk);
                 break;
         }
     }
 
     public override void OutAMultExp(AMultExp node)
     {
-        var l =_symbolTable.GetCurrentScope().GetSymbol(node.GetL());
-        var r = _symbolTable.GetCurrentScope().GetSymbol(node.GetR());
+        var l =SymbolTable.GetSymbol(node.GetL());
+        var r = SymbolTable.GetSymbol(node.GetR());
         switch (l)
         {
             case Symbol.Int when r is Symbol.Int:
-                _symbolTable.GetCurrentScope().AddSymbol(node,Symbol.Int);
+                SymbolTable.AddSymbol(node,Symbol.Int);
                 break;
             case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal or Symbol.Int:
-                _symbolTable.GetCurrentScope().AddSymbol(node,Symbol.Decimal);
+                SymbolTable.AddSymbol(node,Symbol.Decimal);
                 break;
             default:
-                _symbolTable.GetCurrentScope().AddSymbol(node,Symbol.notOk);
+                SymbolTable.AddSymbol(node,Symbol.notOk);
                 break;
         }
     }
 
     public override void OutAPlusExp(APlusExp node)
     {
-        var l =_symbolTable.GetCurrentScope().GetSymbol(node.GetL());
-        var r = _symbolTable.GetCurrentScope().GetSymbol(node.GetR());
+        var l =SymbolTable.GetSymbol(node.GetL());
+        var r = SymbolTable.GetSymbol(node.GetR());
         
         switch (l)
         {
             case Symbol.Int when r is Symbol.Int:
-                _symbolTable.GetCurrentScope().AddSymbol(node,Symbol.Int);
+                SymbolTable.AddSymbol(node,Symbol.Int);
                 break;
             case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal or Symbol.Int:
-                _symbolTable.GetCurrentScope().AddSymbol(node,Symbol.Decimal);
+                SymbolTable.AddSymbol(node,Symbol.Decimal);
                 break;
             case Symbol.Int or Symbol.String when r is Symbol.Int or Symbol.String:
-                _symbolTable.GetCurrentScope().AddSymbol(node,Symbol.String);
+                SymbolTable.AddSymbol(node,Symbol.String);
                 break;
             case Symbol.Decimal or Symbol.String when r is Symbol.Decimal or Symbol.String:
-                _symbolTable.GetCurrentScope().AddSymbol(node,Symbol.String);
+                SymbolTable.AddSymbol(node,Symbol.String);
                 break;
             default:
-                _symbolTable.GetCurrentScope().AddSymbol(node,Symbol.notOk);
+                SymbolTable.AddSymbol(node,Symbol.notOk);
                 break;
         }
         
@@ -172,19 +166,19 @@ public class TypeChecker : DepthFirstAdapter
 
     public override void OutAMinusExp(AMinusExp node)
     {
-        var l = _symbolTable.GetCurrentScope().GetSymbol(node.GetL());
-        var r = _symbolTable.GetCurrentScope().GetSymbol(node.GetR());
+        var l = SymbolTable.GetSymbol(node.GetL());
+        var r = SymbolTable.GetSymbol(node.GetR());
 
         switch (l)
         {
             case Symbol.Int when r is Symbol.Int:
-                _symbolTable.GetCurrentScope().AddSymbol(node,Symbol.Int);
+                SymbolTable.AddSymbol(node, Symbol.Int);
                 break;
             case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal or Symbol.Int:
-                _symbolTable.GetCurrentScope().AddSymbol(node,Symbol.Decimal);
+                SymbolTable.AddSymbol(node, Symbol.Decimal);
                 break;
             default:
-                _symbolTable.GetCurrentScope().AddSymbol(node,Symbol.notOk);
+                SymbolTable.AddSymbol(node, Symbol.notOk);
                 break;
         }
     }
@@ -192,7 +186,7 @@ public class TypeChecker : DepthFirstAdapter
 
     public override void OutAAssignStmt(AAssignStmt node) {
         string varName = node.GetId().ToString();
-        string varType = _symbolTable.Get(varName).Type;
+        string varType = SymbolTable.GetSymbolType(varName);
         string exprType = GetExpressionType(node.GetExp());
 
         // Check if the types match
