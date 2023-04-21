@@ -36,6 +36,11 @@ public class SymbolTable
         AllTables.Add(this);
     }
 
+    /*public bool IsDeclared (Symbol node)
+    {
+        
+    }*/
+
     public static Symbol? GetSymbol(Node node) => _currentSymbolTable.GetCurrentSymbol(node);
     public static Symbol? GetSymbol(string identifier) => _currentSymbolTable.GetCurrentSymbol(identifier);
     private Symbol? GetCurrentSymbol(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentSymbol(identifier);
