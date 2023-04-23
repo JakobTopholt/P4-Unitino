@@ -10,41 +10,46 @@ public class GlobalScopeCollector : DepthFirstAdapter
         InANewFunc(node);
         OutANewFunc(node);
     }
-    
+
     public override void InANewFunc(ANewFunc node)
     {
-        SymbolTable.AddId(node.GetId(), node, Symbol.func);
-        
+        Symbol? funcId = SymbolTable.GetSymbol(node.GetId());
+        //throw new Exception("lmao, already declared");
+        SymbolTable.AddId(node.GetId(), node, funcId != null ? Symbol.notOk : Symbol.func);
         // Mangler også at store funktions parametre her
         // Se task 4 i LocalScopeCollector
     }
-   
 
-    
+
+
     public override void InABoolDecl(ABoolDecl node)
     {
-        SymbolTable.AddId(node.GetId(), node, Symbol.Bool);
-        
+        Symbol? boolId = SymbolTable.GetSymbol(node.GetId());
+        SymbolTable.AddId(node.GetId(), node, boolId != null ? Symbol.notOk : Symbol.Bool);
     }
 
     public override void InAStringDecl(AStringDecl node)
     {
-        SymbolTable.AddId(node.GetId(), node, Symbol.String);
+        Symbol? stringId = SymbolTable.GetSymbol(node.GetId());
+        SymbolTable.AddId(node.GetId(), node, stringId != null ? Symbol.notOk : Symbol.String);
     }
-
+    
     public override void InACharDecl(ACharDecl node)
     {
-        SymbolTable.AddId(node.GetId(), node, Symbol.Char);
+        Symbol? charId = SymbolTable.GetSymbol(node.GetId());
+        SymbolTable.AddId(node.GetId(), node, charId != null ? Symbol.notOk : Symbol.Char);
     }
 
     public override void InAIntDecl(AIntDecl node)
     {
-        SymbolTable.AddId(node.GetId(), node, Symbol.Int);
+        Symbol? intId = SymbolTable.GetSymbol(node.GetId());
+        SymbolTable.AddId(node.GetId(), node, intId != null ? Symbol.notOk : Symbol.Int);
     }
 
     public override void InADecimalDecl(ADecimalDecl node)
     {
-        SymbolTable.AddId(node.GetId(), node, Symbol.Decimal);
+        Symbol? decimalId = SymbolTable.GetSymbol(node.GetId());
+        SymbolTable.AddId(node.GetId(), node, decimalId != null ? Symbol.notOk :Symbol.Decimal);
     }
 
     public override void OutStart(Start node)
