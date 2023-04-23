@@ -24,6 +24,18 @@ public class TypeChecker : DepthFirstAdapter
     // 5
     // Check for forward referencing when checking assignment. If not declared before (also in global) it is an illegal assignment DONE
     
+    // 6
+    // make sure you cant declare the same identifier twice
+
+    // 7
+    // Typecast precedence
+    // We need to implement an understanding of the types precedence. int --> float,  float --> string eg. basicly the implicit typecasting
+    // This is probably a feauture we will have to work on more, when we want to implement precedence for custom unit types.
+
+    // 8
+    // Implement two global scope passes. One to catch free floating variables and next to store gloabl functions which type return need to be evauluated.
+    // This requires local variables to be stored temporarly while evaluating the global.
+    // Global varaibles --> Function types --> ok/notok
     
     // Collecting functions and their return values
     
