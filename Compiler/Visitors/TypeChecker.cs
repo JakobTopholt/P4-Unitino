@@ -9,21 +9,40 @@ public class TypeChecker : DepthFirstAdapter
     // 1.
     // Make sure to only store local variables and not the global ones from before
     // Can be done by checking if currentScope's parent is not null (scope.parent != null) 
+    // Tjek om nima er done
     
     // 2.
     // Implement methods for getting a type from the nodes. (Type refers to Symbol enumerator)
     // Right now node.GetType() will give the node's type (eg. ANeWFunc node) and not the type of the value in the node.
+    // Lav weekenden
 
     // 3 
     // Implement all the declarations, assignments and all nodes which need to be scanned by the visitor
     // I think control structures such as eg. for loops also will have local scopes so must be handled aswell (When/if we want to implement it)
+    // Weekenden
     
     // 4 
     // Mangler at håndtere funktions parametre - De skal implementeres i CFG grammaren først (tror jeg?)
+    // Weekenden sidste prioritet
+    
     
     // 5
     // Check for forward referencing when checking assignment. If not declared before (also in global) it is an illegal assignment
+    // Tjek om Nima er done
     
+    // 6
+    // make sure you cant declare the same identifier twice
+    // Tjek om Nima er done
+    
+    // 7
+    // Typecast precedence
+    // We need to implement an understanding of the types precedence. int --> float,  float --> string eg. basicly the implicit typecasting
+    // This is probably a feauture we will have to work on more, when we want to implement precedence for custom unit types.
+    
+    // 8
+    // Implement two global scope passes. One to catch free floating variables and next to store gloabl functions which type return need to be evauluated.
+    // This requires local variables to be stored temporarly while evaluating the global.
+    // Global varaibles --> Function types --> ok/notok
     
     // Collecting functions and their return values
     /*public void IsDeclared(Node node)
@@ -39,6 +58,9 @@ public class TypeChecker : DepthFirstAdapter
     public override void InANewFunc(ANewFunc node) {
         
         SymbolTable.AddId(node.GetId(), node, Symbol.func);
+        
+        // Hvis det ikke er void funktion skal den Add in Symbol til returSymbolet.
+        
 
         // Funktions parametre
         // De skal stores her (tænker jeg)
@@ -185,7 +207,7 @@ public class TypeChecker : DepthFirstAdapter
         Symbol? type = SymbolTable.GetSymbol("" + node.GetId());
         Symbol? exprType = SymbolTable.GetSymbol(node.GetExp());
 
-        // if types match stmt is ok, else notok
+        // if types match stmt is ok, else notOk
         SymbolTable.AddNode(node, type != exprType ? Symbol.notOk : Symbol.ok);
     }
 }
