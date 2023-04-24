@@ -5,6 +5,7 @@ namespace Compiler.Visitors;
 
 public class GlobalScopeCollector : DepthFirstAdapter
 {
+    
     public override void CaseANewFunc(ANewFunc node)
     {
         InANewFunc(node);
@@ -57,6 +58,49 @@ public class GlobalScopeCollector : DepthFirstAdapter
         SymbolTable.ResetScope();
     }
     
+    public override void OutASubunit(ASubunit node)
+    {
+        if (SymbolTable.IsInCurrentScope(node.GetId()))
+        {
+            SymbolTable.AddId(node.GetId(),node,Symbol.notOk);
+        }
+        else
+        {
+            //ved ikke om dette er rigtigt. 
+            AExpStmt stmt = (AExpStmt)node.GetStmt();
+            Symbol? exprType = SymbolTable.GetSymbol(stmt.GetExp());
+            Symbol? type = SymbolTable.GetSymbol(node.GetId().Parent());
+            SymbolTable.AddId(node.GetId(),node, type != exprType? Symbol.notOk : Symbol.ok);
+            //tilføj tjek om der evalueres til ok eller ej?
+            //tilføjer subunit til dens parent i Dictionary
+            SymbolTable._currentSymbolTable.SubunitToUnit.Add(node.GetId().ToString().Replace(" ", ""),
+                    type == exprType? (AUnit)node.Parent() : null);
+        }
+    }
+
+    public override void OutASingleunit(ASingleunit node)
+    {
+        //tilføjer simpleunit f.eks: 5ms til typen f.eks Time
+        var singleUnit = SymbolTable._currentSymbolTable.SubunitToUnit[node.GetId().ToString().Replace(" ", "")];
+        SymbolTable._currentSymbolTable.nodeToUnit.Add(node,singleUnit); 
+    }
+    
+    public override void OutAUnitsExp(AUnitsExp node)
+    {
+        //tager den første unit såsom 5ms og sammenligner med de andre efterfølgende.
+        var aUnit = SymbolTable._currentSymbolTable.nodeToUnit[(ASingleunit)node.GetSingleunit()[0]];
+        foreach (ASingleunit singleunit in node.GetSingleunit())
+        {
+            if (SymbolTable._currentSymbolTable.nodeToUnit[singleunit] != aUnit)
+            {
+                //ikke sikker
+                SymbolTable.AddNode(node,Symbol.notOk);
+                return;
+            }
+        }
+        SymbolTable._currentSymbolTable.nodeToUnit.Add(node,aUnit);
+        
+    }
 
     // Assignments
     

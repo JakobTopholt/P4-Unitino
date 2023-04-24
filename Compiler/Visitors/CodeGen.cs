@@ -149,12 +149,12 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         Indent(";\r\n");
     }
 
-    public override void InAFunccallStmt(AFunccallStmt node)
+    public override void InAFunccallExp(AFunccallExp node)
     {
         Indent(node.GetId().ToString().Trim() + "()");
     }
 
-    public override void OutAFunccallStmt(AFunccallStmt node)
+    public override void OutAFunccallExp(AFunccallExp node)
     {
         Indent(";\r\n");
     }
