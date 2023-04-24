@@ -31,6 +31,12 @@ Tokens
 
     prog = 'Prog';
     tfunc = 'func';
+    if = 'if';
+    else = 'else';
+    for = 'for';
+    do = 'do';
+    while = 'while';
+    treturn = 'return';
 
     tint = 'int';
     tdecimal = 'decimal';
@@ -38,6 +44,7 @@ Tokens
     tchar = 'char';
     tstring = 'string';
     tunit = 'unit';
+    tvalue = 'value';
 
     l_bkt = '[';
     r_bkt = ']';
@@ -45,6 +52,10 @@ Tokens
     r_par = ')';
     l_brace =  '{';
     r_brace =  '}';
+    
+    tplusplus = '++';
+    tminusminus = '--';
+    tplusassign = '+=';
 
     plus = '+';
     minus = '-';
@@ -59,11 +70,12 @@ Tokens
     comma = ',';
     semicolon = ';';
     colon = ':';
+    dot = '.';
 
     tid = id_part ('_' id_part)*;
 
     char = ''' not_cr_lf ''';
-    number = digit+;
+    tnumber = digit+;
     hex = '0' ('x' | 'X') hex_digit+;
 
     string = ''' [not_cr_lf - ''']+ ''';
@@ -73,66 +85,125 @@ Tokens
 
 
 Ignored Tokens
-
     blank,
     comment;
 
 Productions
-    grammar = unit_list? func_list {-> New grammar([unit_list.unit], [func_list.func])};
+    grammar = funcunit {-> New grammar([funcunit.funcunit])};
+    funcunit_list {-> funcunit*} = {list} funcunit funcunit_list {-> [funcunit.funcunit, funcunit_list.funcunit]}
+                                 | {single} funcunit {-> [funcunit.funcunit]};
     func_list {-> func*} = {list} func func_list {-> [func.func, func_list.func]} 
                          | {single} func {-> [func.func]};
     stmt_list {-> stmt*} = {list} stmt stmt_list {-> [stmt.stmt, stmt_list.stmt]} 
-                       | {single} stmt {-> [stmt.stmt]};
+                         | {single} stmt {-> [stmt.stmt]};
     unit_list {-> unit*} = {list} unit unit_list {-> [unit.unit, unit_list.unit]}
-                             | {single} unit {-> [unit.unit]};
+                         | {single} unit {-> [unit.unit]};
     subunit_list {-> subunit*} = {list} subunit subunit_list {-> [subunit.subunit, subunit_list.subunit]}
-                                   | {single} subunit {-> [subunit.subunit]};
+                               | {single} subunit {-> [subunit.subunit]};
+    groupunit_list {-> singleunit*} = {list} singleunit dot groupunit_list {-> [singleunit.singleunit, groupunit_list.singleunit]} //For usage in expr
+                                    | {single} singleunit {-> [singleunit.singleunit]};
                              
+    funcunit {-> funcunit} = {unit} unit_list {-> New funcunit.unit([unit_list.unit])}
+                           | {func} func_list {-> New funcunit.func([func_list.func])};
     func {-> func} = {prog} prog l_brace stmt_list r_brace {-> New func.prog([stmt_list.stmt])}
-                   | {new} tfunc P.id l_brace stmt_list r_brace {-> New func.new(id.id, [stmt_list.stmt])};
-    stmt {-> stmt} = {exp} exp semicolon {-> New stmt.exp(exp.exp)}
-                   | {assign} P.id equal exp semicolon {-> New stmt.assign(id.id, exp.exp)}
-                   | {decl} decl semicolon {-> New stmt.decl(decl.decl)}
-                   | {funccall} P.id l_par r_par semicolon {-> New stmt.funccall(id.id)};
-    unit {-> unit} = tunit id colon tint l_brace subunit_list r_brace {-> New unit(id.id, tint, [subunit_list.subunit])};
-    subunit {-> subunit} = id arrow stmt {-> New subunit(id.id, stmt.stmt)}; //TODO allow value token and stmt block
+                   | {new} tfunc id l_brace stmt_list r_brace {-> New func.new(id.id, [stmt_list.stmt])};
+    stmt {-> stmt} = {assign} assign semicolon {-> assign.stmt}
+                   | {decl} unittype id semicolon {-> New stmt.decl(unittype.unittype, id.id)}
+                   | {declass} unittype id equal exp semicolon {-> New stmt.declass(unittype.unittype, id.id, exp.exp)}
+                   | {funccall} id l_par r_par semicolon {-> New stmt.funccall(id.id)}
+                   | {return} treturn exp semicolon {-> New stmt.return(exp.exp)}
+                   | {scoped} scoped {-> New stmt.scoped(scoped.scoped)};
+
+    scoped {-> scoped} = {if} if l_par exp r_par l_brace stmt_list r_brace {-> New scoped.if(exp.exp, [stmt_list.stmt])}
+                       | {else} else l_brace stmt_list r_brace {-> New scoped.else([stmt_list.stmt])}
+                       | {elseif} else if l_par exp r_par l_brace stmt_list r_brace {-> New scoped.elseif(exp.exp, [stmt_list.stmt])}
+                       | {for} for l_par [init]:stmt [fst]:semicolon [cond]:exp [snd]:semicolon [incre]:assign r_par l_brace stmt_list r_brace {-> New scoped.for(init.stmt, cond.exp, incre.stmt, [stmt_list.stmt])}
+                       | {while} while l_par exp r_par l_brace stmt_list r_brace {-> New scoped.while(exp.exp, [stmt_list.stmt])}
+                       | {dowhile} do l_brace stmt_list r_brace while l_par exp r_par {-> New scoped.dowhile([stmt_list.stmt], exp.exp)};
+     
+    unit {-> unit} = tunit id colon unittype l_brace subunit_list r_brace {-> New unit(id.id, unittype.unittype, [subunit_list.subunit])};
+    subunit {-> subunit} = id arrow exp semicolon {-> New subunit(id.id, exp.exp)}; //TODO allow value token and stmt block
+    singleunit {-> singleunit} = number id {-> New singleunit(number.number, id.id)}; //For usage in expr
+    unittype {-> unittype} = {int} tint {-> New unittype.int()}
+                           | {deciaml} tdecimal {-> New unittype.decimal()}
+                           | {bool} tbool {-> New unittype.bool()}
+                           | {char} tchar {-> New unittype.char()}
+                           | {string} tstring {-> New unittype.string()}
+                           | {customtype} id {-> New unittype.customtype(id.id)};
 
     exp {-> exp} = {plus} exp plus factor {-> New exp.plus (exp.exp, factor.exp) }
                  | {minus} exp minus factor {-> New exp.minus (exp.exp, factor.exp) }
                  | {factor} factor {-> factor.exp };
+    assign {-> stmt} = id equal exp {-> New stmt.assign(id.id, exp.exp)};
 
     factor {-> exp} = {mult} factor star term {-> New exp.mult (factor.exp, term.exp) } //TODO: Modulo %
                     | {div} factor slash term {-> New exp.div (factor.exp, term.exp) }
                     | {term} term {-> term.exp };
 
-    term {-> exp} = {expr} l_par exp r_par {-> exp.exp }
-                  | {number} number {-> New exp.number(number) };
-    id {-> P.id} = tid {-> New id(tid)};
-    decl {-> decl} = {int} tint id {-> New decl.int (id.id)}
-                   | {decimal} tdecimal id {-> New decl.decimal (id.id)}
-                   | {bool} tbool id {-> New decl.bool (id.id)}
-                   | {char} tchar id {-> New decl.char (id.id)}
-                   | {string} tstring id {-> New decl.string (id.id)};
+    term {-> exp} = {exp} l_par exp r_par {-> exp.exp}
+                  | {id} id {-> New exp.id(id.id)}
+                  | {funccall} id l_par r_par {-> New exp.funccall(id.id)}
+                  | {decimal} [l]:number dot [r]:number {-> New exp.decimal(l.number, r.number)}
+                  | {units} groupunit_list {-> New exp.units([groupunit_list.singleunit])}
+                  | {negid} minus id {-> New exp.negid(id.id)}
+                  | {value} tvalue {-> New exp.value()}
+                  | {negvalue} minus tvalue {-> New exp.negvalue()}
+                  | {number} number {-> New exp.number(number.number)}
+                  | {negnumber} minus number {-> New exp.negnumber(number.number)}
+                  | {unarypostfix} unary id {-> New exp.unarypostfix(unary.unary, id.id)}
+                  | {unarysuffix} id unary {-> New exp.unarysuffix(id.id, unary.unary)};
+    unary {-> unary} = {plusplus} tplusplus {-> New unary.plusplus()}
+                     | {minusminus} tminusminus {-> New unary.minusminus()};
+    number {-> number} = tnumber {-> New number(tnumber)};
+    id {-> id} = tid {-> New id(tid)};
 
 
 Abstract Syntax Tree
-    grammar = unit* func*;
-    unit = id tint subunit*;
-    subunit = id stmt; //TODO: fix to stmt
+    grammar = funcunit*;
+    funcunit = {unit} unit*
+             | {func} func*;
+    unit = id unittype subunit*;
+    subunit = id exp;
+    unittype = {int} //unit or type
+             | {decimal}
+             | {bool}
+             | {char}
+             | {string}
+             | {customtype} id;
     func = {prog} stmt+
-         | {new} id stmt+;
+         | {new} id stmt+
+         | {newtype} unittype id stmt+;
     stmt = {exp} exp
          | {assign} id exp
-         | {decl} decl
-         | {funccall} id; // TODO: Controlstructures
+         | {plusassign} id exp
+         | {decl} unittype id
+         | {declass} unittype id exp
+         | {funccall} id
+         | {return} exp // TODO: ensure that exp doesn't contain funccall to new. only allow newtype
+         | {scoped} scoped;
+    scoped = {if} exp stmt+
+           | {else} stmt+
+           | {elseif} exp stmt+
+           | {for} [init]:stmt [cond]:exp [incre]:stmt stmt+
+           | {while} exp stmt+
+           | {dowhile} stmt+ exp; //TODO: Switch
     exp = {plus}    [l]:exp  [r]:exp 
         | {minus}   [l]:exp  [r]:exp 
         | {div}     [l]:exp  [r]:exp 
         | {mult}    [l]:exp  [r]:exp 
-        | {number}  number; // TODO: function with return value
-    id = tid;
-    decl = {int} id
-         | {decimal} id
-         | {bool} id
-         | {char} id
-         | {string} id; // TODO: Arrays
+        | {number}  number
+        | {value} // TODO: function with paremeters value
+        | {funccall} id
+        | {decimal} [l]:number [r]:number
+        | {units} singleunit+
+        | {negvalue}
+        | {negnumber} number
+        | {unarypostfix} unary id
+        | {unarysuffix} id unary
+        | {id} id
+        | {negid} id; // TODO: function with return value
+    number = tnumber;
+    singleunit = number id;
+    unary = {plusplus}
+          | {minusminus};
+    id = tid; // TODO: Arrays
