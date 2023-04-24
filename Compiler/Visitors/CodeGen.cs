@@ -35,30 +35,43 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         writer.Write(ope);
         R.Apply(this);
         writer.Write(L.Parent().Parent().Parent() is ASubunit ? ")" : "");
-        writer.Write(L.Parent().Parent() is AForScoped ? "; " : "");
     }
     private int _indent = 0;
     private void Indent(string s)
     {
         writer.Write(new string(' ', _indent * 4) + s);
     }
-    
-    public override void InAProgFunc(AProgFunc node)
+
+    public override void CaseAProgFunc(AProgFunc node)
     {
         Indent("void setup() {\r\n");
         _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                writer.Write(";");
+        }
+        OutAProgFunc(node);
     }
 
     public override void OutAProgFunc(AProgFunc node)
     {
         _indent--;
-        Indent("}");
+        Indent("}\n");
     }
-
-    public override void InANewFunc(ANewFunc node)
+    
+    public override void CaseANewFunc(ANewFunc node)
     {
         Indent("func void " + node.GetId() + "{\r\n");
         _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                writer.Write(";");
+        }
+        OutANewFunc(node);
     }
 
     public override void OutANewFunc(ANewFunc node)
@@ -74,9 +87,11 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         node.GetExp().Apply(this);
         writer.WriteLine(") {");
         _indent++;
-        foreach (Node o in node.GetStmt())
+        foreach (Node child in node.GetStmt())
         {
-            o.Apply(this);
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                writer.WriteLine(";");
         }
         _indent--;
         OutAIfScoped(node);
@@ -89,15 +104,22 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseAForScoped(AForScoped node)
     {
+        int _indentholder = _indent;
         Indent("for(");
+        _indent = 0;
         node.GetInit().Apply(this);
+        writer.Write(("; "));
         node.GetCond().Apply(this);
+        writer.Write(("; "));
         node.GetIncre().Apply(this);
         writer.WriteLine(") {");
+        _indent = _indentholder;
         _indent++;
-        foreach (Node o in node.GetStmt())
+        foreach (Node child in node.GetStmt())
         {
-            o.Apply(this);
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                writer.WriteLine(";");
         }
         _indent--;
         OutAForScoped(node);
@@ -114,9 +136,11 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         node.GetExp().Apply(this);
         writer.WriteLine(") {");
         _indent++;
-        foreach (Node o in node.GetStmt())
+        foreach (Node child in node.GetStmt())
         {
-            o.Apply(this);
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                writer.WriteLine(";");
         }
         _indent--;
         OutAWhileScoped(node);
@@ -133,9 +157,11 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         node.GetExp().Apply(this);
         writer.WriteLine(") {");
         _indent++;
-        foreach (Node o in node.GetStmt())
+        foreach (Node child in node.GetStmt())
         {
-            o.Apply(this);
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                writer.WriteLine(";");
         }
         _indent--;
         OutAElseifScoped(node);
@@ -150,9 +176,11 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     {
         Indent("else {\n");
         _indent++;
-        foreach (Node o in node.GetStmt())
+        foreach (Node child in node.GetStmt())
         {
-            o.Apply(this);
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                writer.WriteLine(";");
         }
         _indent--;
         OutAElseScoped(node);
@@ -167,9 +195,11 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     {
         Indent("do {\n");
         _indent++;
-        foreach (Node o in node.GetStmt())
+        foreach (Node child in node.GetStmt())
         {
-            o.Apply(this);
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                writer.WriteLine(";");
         }
         _indent--;
         Indent("} while(");
@@ -186,48 +216,27 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     
     public override void InAIntDecl(AIntDecl node)
     {
-        if (node.Parent().Parent() is ANewFunc or AProgFunc)
-        {
-            Indent(("int " + node.GetId().ToString().Trim()) + ";");
-        }
-        else if(node.Parent() is AForScoped)
-            writer.Write("int " + node.GetId().ToString().Trim() + "; ");
-        else
-            Indent(("int " + node.GetId().ToString().Trim()));
+        Indent(("int " + node.GetId().ToString().Trim()));
     }
 
     public override void InABoolDecl(ABoolDecl node)
     {
-        if (node.Parent().Parent() is ANewFunc or AProgFunc)
-        {
-            Indent(("bool " + node.GetId().ToString().Trim()));
-        }
-        else
-            Indent("bool " + node.GetId().ToString().Trim());
+        Indent("bool " + node.GetId().ToString().Trim());
     }
 
     public override void InADecimalDecl(ADecimalDecl node)
     {
-        if (node.Parent().Parent() is ANewFunc or AProgFunc)
-            Indent(("decimal " + node.GetId().ToString().Trim()));
-        else
-            Indent("decimal " + node.GetId().ToString().Trim());
+        Indent("decimal " + node.GetId().ToString().Trim());
     }
 
     public override void InACharDecl(ACharDecl node)
     {
-        if (node.Parent().Parent() is ANewFunc or AProgFunc)
-            Indent(("char " + node.GetId().ToString().Trim()));
-        else
-            Indent("char " + node.GetId().ToString().Trim());
+        Indent("char " + node.GetId().ToString().Trim());
     }
     
     public override void InAStringDecl(AStringDecl node)
     {
-        if (node.Parent().Parent() is ANewFunc or AProgFunc)
-            Indent(("string " + node.GetId().ToString().Trim()));
-        else
-            Indent("string " + node.GetId().ToString().Trim());
+        Indent("string " + node.GetId().ToString().Trim());
     }
     
     int i = 0;
@@ -240,27 +249,10 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     }
     
     /*---------------------------------------------ExpStmt------------------------------------------------------------*/
-    public override void OutAExpStmt(AExpStmt node)
-    {
-        writer.Write(";");
-    }
-
-    public override void OutADeclStmt(ADeclStmt node)
-    {
-        writer.Write(node.Parent() is AForScoped ? "; " : ";\r\n");
-    }
 
     public override void InAAssignStmt(AAssignStmt node)
     {
-        if(node.Parent() is AForScoped) 
-            writer.Write(node.GetId() + "= ");
-        else
-            Indent(node.GetId() + "= ");
-    }
-
-    public override void OutAAssignStmt(AAssignStmt node)
-    {
-        writer.Write(node.Parent() is AForScoped ? "" : ";\r\n");
+        Indent(node.GetId() + "= ");
     }
 
     public override void InAFunccallStmt(AFunccallStmt node)
@@ -268,12 +260,6 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         Indent(node.GetId().ToString().Trim() + "()");
     }
 
-    public override void OutAFunccallStmt(AFunccallStmt node)
-    {
-        writer.Write(";");
-    }
-
-    
     /*--------------------------------- CaseExp ----------------------------------------------------------------------*/
     public override void CaseADivExp(ADivExp node)
     {

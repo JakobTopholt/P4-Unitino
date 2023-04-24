@@ -1,53 +1,53 @@
 func scoped {
-    for(int a; 6+5; a = 1) {
-        if(7) {
-            while(1) {
-                int b;
-            }
-        }
-        else if(5+2) {
-            do {
-                bool c;
-            } while(5+2)
-        }
-        else {
-            decimal d;
+    if(7) {
+        for(int i; 11+6; i = 1) {
+            a = 5;
+            11+6;
+            b();
+            int a;
+            string c;
         }
     }
+    else {
+        a = 6;
+    }
+    do {
+        a = 11;
+    } while(6+6)
 }
 ////
 func scoped {
-    for(int a; 6+5; a = 1) {
-        if(7) {
-            while(1) {
-                int b;
-            }
-        }
-        else if(5+2) {
-            do {
-                bool c;
-            } while(5+2)
-        }
-        else {
-            decimal d;
+    if(7) {
+        for(int i; 11+6; i = 1) {
+            a = 5;
+            11+6;
+            b();
+            int a;
+            string c;
         }
     }
+    else {
+        a = 6;
+    }
+    do {
+        a = 11;
+    } while(6+6)
 }
 ////
 func void scoped {
-    for(int a; 6+5; a = 1) {
-        if(7) {
-            while(1) {
-                int b;
-            }
-        }
-        else if(5+2) {
-            do {
-                bool c;
-            } while(5+2)
-        }
-        else {
-            decimal d;
+    if(7) {
+        for(int i; 11+6; i = 1) {
+            a = 5;
+            11+6;
+            b();
+            int a;
+            string c;
         }
     }
+    else {
+        a = 6;
+    }
+    do {
+        a = 11;
+    } while(6+6)
 }
