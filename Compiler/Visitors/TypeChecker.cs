@@ -153,7 +153,7 @@ public class TypeChecker : DepthFirstAdapter
             }
         }
     }
- 
+
     public override void OutAMultExp(AMultExp node)
     {
         if (SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) ||
@@ -297,4 +297,6 @@ public class TypeChecker : DepthFirstAdapter
         // if types match stmt is ok, else notok
         SymbolTable.AddNode(node, type != exprType ? Symbol.notOk : Symbol.ok);
     }
+
+    
 }
