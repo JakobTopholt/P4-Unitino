@@ -3,21 +3,22 @@ using Moduino.node;
 
 namespace Compiler.Visitors;
 
-public class GlobalScopeCollector : DepthFirstAdapter
+public class GlobalFunctionCollector : DepthFirstAdapter
 {
-    public override void CaseANewFunc(ANewFunc node)
+    public override void InANewFunc(ANewFunc node)
     {
-        InANewFunc(node);
-        OutANewFunc(node);
+        // Mangler også at store funktions parametre her
+        // Se task 4 i TypeChecker
+        
     }
 
-    public override void InANewFunc(ANewFunc node)
+    public override void OutANewFunc(ANewFunc node)
     {
         Symbol? funcId = SymbolTable.GetSymbol(node.GetId());
         //throw new Exception("lmao, already declared");
         SymbolTable.AddId(node.GetId(), node, funcId != null ? Symbol.notOk : Symbol.func);
-        // Mangler også at store funktions parametre her
-        // Se task 4 i LocalScopeCollector
+        // throws void, however we need to understand which it can return
+        
     }
 
 
@@ -58,10 +59,12 @@ public class GlobalScopeCollector : DepthFirstAdapter
     }
 
     // Assignments
-    
-    /*public override void InAAssignStmt(AAssignStmt node)
-    {
-       
-    }*/
-    
+    public override void OutAAssignStmt(AAssignStmt node) {
+        Symbol? type = SymbolTable.GetSymbol("" + node.GetId());
+        Symbol? exprType = SymbolTable.GetSymbol(node.GetExp());    
+        
+        // if type == null (id was never declared)
+        // if type != exprType (Incompatible types)
+        SymbolTable.AddNode(node, type == null || type != exprType ? Symbol.notOk : Symbol.ok);
+    }
 }

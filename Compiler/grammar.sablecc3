@@ -118,7 +118,7 @@ Productions
 Abstract Syntax Tree
     grammar = unit* func*;
     unit = id tint subunit*;
-    subunit = id stmt; //TODO: fix to stmt
+    subunit = id stmt; //TODO: fix to exp
     func = {prog} stmt+
          | {new} id stmt+;
     stmt = {exp} exp
