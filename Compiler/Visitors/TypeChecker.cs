@@ -45,10 +45,10 @@ public class TypeChecker : DepthFirstAdapter
     // This is probably a feauture we will have to work on more, when we want to implement precedence for custom unit types.
     // To do
 
-    
+    //Nye ændringer i denne branch: Units har nu fået suffix såsom 5s.50ms
     public override void InANewFunc(ANewFunc node) {
         
-        SymbolTable.AddId(node.GetId(), node, SymbolTable.IsInCurrentScope(node.GetId())? Symbol.notOk : Symbol.func);
+        SymbolTable.AddId(node.GetId(), node, SymbolTable.IsInCurrentScope(node.GetId())? Symbol.notOk : Symbol.Func);
 
         // Funktions parametre
         // De skal stores her (tænker jeg)
@@ -208,7 +208,7 @@ public class TypeChecker : DepthFirstAdapter
                 break;
         }
     }
-    //Skal vi have implicit typecasting?
+    //Skal vi have implicit typecasting? 
     public override void OutAAssignStmt(AAssignStmt node) {
         Symbol? type = SymbolTable.GetSymbol("" + node.GetId());
         Symbol? exprType = SymbolTable.GetSymbol(node.GetExp());

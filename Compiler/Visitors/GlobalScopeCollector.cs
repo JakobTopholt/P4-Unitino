@@ -15,7 +15,7 @@ public class GlobalScopeCollector : DepthFirstAdapter
     {
         Symbol? funcId = SymbolTable.GetSymbol(node.GetId());
         //throw new Exception("lmao, already declared");
-        SymbolTable.AddId(node.GetId(), node, funcId != null ? Symbol.notOk : Symbol.func);
+        SymbolTable.AddId(node.GetId(), node, funcId != null ? Symbol.notOk : Symbol.Func);
         // Mangler også at store funktions parametre her
         // Se task 4 i LocalScopeCollector
     }
@@ -56,6 +56,7 @@ public class GlobalScopeCollector : DepthFirstAdapter
     {
         SymbolTable.ResetScope();
     }
+    
 
     // Assignments
     

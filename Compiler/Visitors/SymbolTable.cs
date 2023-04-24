@@ -55,7 +55,7 @@ public enum Symbol
     Decimal,
     Char,
     String,
-    func,
+    Func,
     ok, 
     notOk,
 }
