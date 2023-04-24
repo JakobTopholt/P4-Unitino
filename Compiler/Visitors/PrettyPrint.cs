@@ -62,7 +62,7 @@ public class PrettyPrint : DepthFirstAdapter
 
     public override void InANewFunc(ANewFunc node)
     {
-        output.Write("func " + node.GetId() + "{");
+        output.Write("Func " + node.GetId() + "{");
     }
 
     public override void OutAExpStmt(AExpStmt node)
@@ -94,16 +94,6 @@ public class PrettyPrint : DepthFirstAdapter
     public override void OutANewFunc(ANewFunc node)
     {
         output.WriteLine("}");
-    }
-
-    public override void InAFunccallStmt(AFunccallStmt node)
-    {
-        output.Write(" " + node + "()");
-    }
-
-    public override void OutAFunccallStmt(AFunccallStmt node)
-    {
-        output.Write("");
     }
 
     public override void CaseADivExp(ADivExp node)
