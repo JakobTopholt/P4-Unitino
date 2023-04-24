@@ -45,7 +45,7 @@ public class TypeChecker : DepthFirstAdapter
     // This is probably a feauture we will have to work on more, when we want to implement precedence for custom unit types.
     // To do
 
-    //Nye ændringer i denne branch: Units har nu fået suffix såsom 5s.50ms
+    // 9 Nye ændringer i denne branch: Units har nu fået suffix såsom 5s.50ms
     public override void InANewFunc(ANewFunc node) {
         
         SymbolTable.AddId(node.GetId(), node, SymbolTable.IsInCurrentScope(node.GetId())? Symbol.notOk : Symbol.Func);
@@ -113,101 +113,184 @@ public class TypeChecker : DepthFirstAdapter
     //Expressions
     public override void OutADivExp(ADivExp node)
     {
-        var l = SymbolTable.GetSymbol(node.GetL());
-        var r = SymbolTable.GetSymbol(node.GetR());
-        switch (l)
+        if (SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) ||
+            SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
         {
-            case Symbol.Int when r is Symbol.Int:
-                SymbolTable.AddNode(node, Symbol.Int);
-                break;
-            case Symbol.Decimal when r is Symbol.Decimal or Symbol.Int:
-                SymbolTable.AddNode(node, Symbol.Decimal);
-                break;
-            case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal:
-                SymbolTable.AddNode(node,Symbol.Decimal);
-                break;
-            default:
-                SymbolTable.AddNode(node, Symbol.notOk);
-                break;
+            if (!SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) &&
+                SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
+            {
+
+            }
+            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(), out AUnit leftSide) &&
+                     SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(), out AUnit rightSide))
+            {
+                SymbolTable.AddNode(node, leftSide == rightSide ? Symbol.ok : Symbol.notOk);
+
+                return;
+            }
+
+            SymbolTable.AddNode(node, Symbol.notOk);
+        }
+        else
+        {
+            var l = SymbolTable.GetSymbol(node.GetL());
+            var r = SymbolTable.GetSymbol(node.GetR());
+            switch (l)
+            {
+                case Symbol.Int when r is Symbol.Int:
+                    SymbolTable.AddNode(node, Symbol.Int);
+                    break;
+                case Symbol.Decimal when r is Symbol.Decimal or Symbol.Int:
+                    SymbolTable.AddNode(node, Symbol.Decimal);
+                    break;
+                case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal:
+                    SymbolTable.AddNode(node, Symbol.Decimal);
+                    break;
+
+                default:
+                    SymbolTable.AddNode(node, Symbol.notOk);
+                    break;
+            }
         }
     }
+
     public override void OutAMultExp(AMultExp node)
     {
-        var l = SymbolTable.GetSymbol(node.GetL());
-        var r = SymbolTable.GetSymbol(node.GetR());
-        switch (l)
+        if (SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) ||
+            SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
         {
-            case Symbol.Int when r is Symbol.Int:
-                SymbolTable.AddNode(node,Symbol.Int);
-                break;
-            case Symbol.Decimal when r is Symbol.Decimal or Symbol.Int:
-                SymbolTable.AddNode(node,Symbol.Decimal);
-                break;
-            case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal:
-                SymbolTable.AddNode(node,Symbol.Decimal);
-                break;
-            default:
-                SymbolTable.AddNode(node,Symbol.notOk);
-                break;
+            if (!SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) &&
+                SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
+            {
+
+            }
+            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(), out AUnit leftSide) &&
+                     SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(), out AUnit rightSide))
+            {
+                SymbolTable.AddNode(node, leftSide == rightSide ? Symbol.ok : Symbol.notOk);
+
+                return;
+            }
+
+            SymbolTable.AddNode(node, Symbol.notOk);
+        }
+        else
+        {
+            var l = SymbolTable.GetSymbol(node.GetL());
+            var r = SymbolTable.GetSymbol(node.GetR());
+            switch (l)
+            {
+                case Symbol.Int when r is Symbol.Int:
+                    SymbolTable.AddNode(node, Symbol.Int);
+                    break;
+                case Symbol.Decimal when r is Symbol.Decimal or Symbol.Int:
+                    SymbolTable.AddNode(node, Symbol.Decimal);
+                    break;
+                case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal:
+                    SymbolTable.AddNode(node, Symbol.Decimal);
+                    break;
+                default:
+                    SymbolTable.AddNode(node, Symbol.notOk);
+                    break;
+            }
         }
     }
 
     public override void OutAPlusExp(APlusExp node)
     {
-        var l = SymbolTable.GetSymbol(node.GetL());
-        var r = SymbolTable.GetSymbol(node.GetR());
-        
-        switch (l)
+        if (SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) || SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
         {
-            case Symbol.Int when r is Symbol.Int:
-                SymbolTable.AddNode(node,Symbol.Int);
-                break;
-            case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal or Symbol.Int:
-                SymbolTable.AddNode(node,Symbol.Decimal);
-                break;
-            case Symbol.Int or Symbol.Decimal when r is Symbol.Decimal:
-                SymbolTable.AddNode(node,Symbol.Decimal);
-                break;
-            case Symbol.String when r is Symbol.Int or Symbol.String:
-                SymbolTable.AddNode(node,Symbol.String);
-                break;
-            case Symbol.Int or Symbol.String when r is Symbol.String:
-                SymbolTable.AddNode(node,Symbol.String);
-                break;
-            case Symbol.Decimal or Symbol.String when r is Symbol.Decimal:
-                SymbolTable.AddNode(node,Symbol.String);
-                break;
-            case Symbol.String when r is Symbol.String or Symbol.Decimal:
-                SymbolTable.AddNode(node,Symbol.String);
-                break;
-            default:
-                SymbolTable.AddNode(node,Symbol.notOk);
-                break;
+            if (!SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) && SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
+            {
+                
+            }
+            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(),out AUnit leftSide) && SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(),out AUnit rightSide))
+            {
+                SymbolTable.AddNode(node, leftSide == rightSide ? Symbol.ok : Symbol.notOk);
+
+                return;
+            }
+            SymbolTable.AddNode(node,Symbol.notOk);  
         }
-        
+        else
+        {
+            var l = SymbolTable.GetSymbol(node.GetL());
+            var r = SymbolTable.GetSymbol(node.GetR());
+            switch (l)
+            {
+                case Symbol.Int when r is Symbol.Int:
+                    SymbolTable.AddNode(node, Symbol.Int);
+                    break;
+                case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal or Symbol.Int:
+                    SymbolTable.AddNode(node, Symbol.Decimal);
+                    break;
+                case Symbol.Int or Symbol.Decimal when r is Symbol.Decimal:
+                    SymbolTable.AddNode(node, Symbol.Decimal);
+                    break;
+                case Symbol.String when r is Symbol.Int or Symbol.String:
+                    SymbolTable.AddNode(node, Symbol.String);
+                    break;
+                case Symbol.Int or Symbol.String when r is Symbol.String:
+                    SymbolTable.AddNode(node, Symbol.String);
+                    break;
+                case Symbol.Decimal or Symbol.String when r is Symbol.Decimal:
+                    SymbolTable.AddNode(node, Symbol.String);
+                    break;
+                case Symbol.String when r is Symbol.String or Symbol.Decimal:
+                    SymbolTable.AddNode(node, Symbol.String);
+                    break;
+                default:
+                    SymbolTable.AddNode(node, Symbol.notOk);
+                    break;
+            }
+        }
     }
 
     public override void OutAMinusExp(AMinusExp node)
     {
-        var l = SymbolTable.GetSymbol(node.GetL());
-        var r = SymbolTable.GetSymbol(node.GetR());
-
-        switch (l)
+        
+        if (SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) || SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
         {
-            case Symbol.Int when r is Symbol.Int:
-                SymbolTable.AddNode(node, Symbol.Int);
-                break;
-            case Symbol.Decimal when r is Symbol.Decimal or Symbol.Int:
-                SymbolTable.AddNode(node, Symbol.Decimal);
-                break;
-            case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal:
-                SymbolTable.AddNode(node,Symbol.Decimal);
-                break;
-            default:
-                SymbolTable.AddNode(node, Symbol.notOk);
-                break;
+            if (!SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) && SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
+            {
+                
+            }
+            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(),out AUnit leftSide) && SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(),out AUnit rightSide))
+            {
+                SymbolTable.AddNode(node, leftSide == rightSide ? Symbol.ok : Symbol.notOk);
+
+                return;
+            }
+            SymbolTable.AddNode(node,Symbol.notOk);  
+        }
+        else
+        {
+            var l = SymbolTable.GetSymbol(node.GetL());
+            var r = SymbolTable.GetSymbol(node.GetR());
+            switch (l)
+            {
+                case Symbol.Int when r is Symbol.Int:
+                    SymbolTable.AddNode(node, Symbol.Int);
+                    break;
+                case Symbol.Decimal when r is Symbol.Decimal or Symbol.Int:
+                    SymbolTable.AddNode(node, Symbol.Decimal);
+                    break;
+                case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal:
+                    SymbolTable.AddNode(node, Symbol.Decimal);
+                    break;
+                default:
+                    SymbolTable.AddNode(node, Symbol.notOk);
+                    break;
+            }
         }
     }
+    
+
+    public override void OutAFunccallExp(AFunccallExp node)
+    {
+        //Symbol? funcId = SymbolTable.GetSymbol(node.GetId());
+    }
+
     //Skal vi have implicit typecasting? 
     public override void OutAAssignStmt(AAssignStmt node) {
         Symbol? type = SymbolTable.GetSymbol("" + node.GetId());
@@ -217,19 +300,5 @@ public class TypeChecker : DepthFirstAdapter
         SymbolTable.AddNode(node, type != exprType ? Symbol.notOk : Symbol.ok);
     }
 
-    public override void OutASubunit(ASubunit node)
-    {
-        if (SymbolTable.IsInCurrentScope(node.GetId()))
-        {
-            SymbolTable.AddId(node.GetId(),node,Symbol.notOk);
-        }
-        else
-        {
-            //ved ikke om dette er rigtigt. 
-            AExpStmt stmt = (AExpStmt)node.GetStmt();
-            Symbol? exprType = SymbolTable.GetSymbol(stmt.GetExp());
-            Symbol? type = SymbolTable.GetSymbol(node.GetId().Parent());
-            SymbolTable.AddId(node.GetId(),node, type != exprType? Symbol.notOk : Symbol.ok);
-        }
-    }
+    
 }
