@@ -60,31 +60,53 @@ public class TypeChecker : DepthFirstAdapter
     // Collecting local variables
     public override void InABoolDecl(ABoolDecl node)
     {
-        SymbolTable.AddId(node.GetId(), node, SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Bool);
+        if (node.Parent() != null)
+        {
+            SymbolTable.AddId(node.GetId(), node,
+                SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Bool);
+        }
     }
+
     public override void InAStringDecl(AStringDecl node)
     {
-        SymbolTable.AddId(node.GetId(), node, SymbolTable.IsInCurrentScope(node.GetId())? Symbol.notOk : Symbol.String);
+        if (node.Parent() != null)
+        {
+            SymbolTable.AddId(node.GetId(), node,
+                SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.String);
+        }
     }
 
     public override void InACharDecl(ACharDecl node)
     {
-        SymbolTable.AddId(node.GetId(), node, SymbolTable.IsInCurrentScope(node.GetId())? Symbol.notOk : Symbol.Char);
+        if (node.Parent() != null)
+        {
+            SymbolTable.AddId(node.GetId(), node,
+                SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Char);
+        }
     }
 
     public override void InAIntDecl(AIntDecl node)
     {
-        SymbolTable.AddId(node.GetId(), node, SymbolTable.IsInCurrentScope(node.GetId())? Symbol.notOk : Symbol.Int);
+        if (node.Parent() != null)
+        {
+            SymbolTable.AddId(node.GetId(), node,
+                SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Int);
+        }
     }
 
     public override void InADecimalDecl(ADecimalDecl node)
     {
-        SymbolTable.AddId(node.GetId(), node, SymbolTable.IsInCurrentScope(node.GetId())? Symbol.notOk : Symbol.Decimal);
+        if (node.Parent() != null)
+        {
+            SymbolTable.AddId(node.GetId(), node,
+                SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Decimal);
+        }
     }
+
     //Expressions
     public override void OutADivExp(ADivExp node)
     {
-        var l =SymbolTable.GetSymbol(node.GetL());
+        var l = SymbolTable.GetSymbol(node.GetL());
         var r = SymbolTable.GetSymbol(node.GetR());
         switch (l)
         {
@@ -104,8 +126,7 @@ public class TypeChecker : DepthFirstAdapter
     }
     public override void OutAMultExp(AMultExp node)
     {
-        
-        var l =SymbolTable.GetSymbol(node.GetL());
+        var l = SymbolTable.GetSymbol(node.GetL());
         var r = SymbolTable.GetSymbol(node.GetR());
         switch (l)
         {
@@ -126,7 +147,7 @@ public class TypeChecker : DepthFirstAdapter
 
     public override void OutAPlusExp(APlusExp node)
     {
-        var l =SymbolTable.GetSymbol(node.GetL());
+        var l = SymbolTable.GetSymbol(node.GetL());
         var r = SymbolTable.GetSymbol(node.GetR());
         
         switch (l)
@@ -180,11 +201,6 @@ public class TypeChecker : DepthFirstAdapter
                 break;
         }
     }
-    public override void OutAFunccallStmt(AFunccallStmt node)
-    {
-     
-    }
-
     //Skal vi have implicit typecasting?
     public override void OutAAssignStmt(AAssignStmt node) {
         Symbol? type = SymbolTable.GetSymbol("" + node.GetId());
@@ -196,7 +212,6 @@ public class TypeChecker : DepthFirstAdapter
 
     public override void OutASubunit(ASubunit node)
     {
-        
         if (SymbolTable.IsInCurrentScope(node.GetId()))
         {
             SymbolTable.AddId(node.GetId(),node,Symbol.notOk);
@@ -204,9 +219,10 @@ public class TypeChecker : DepthFirstAdapter
         else
         {
             //ved ikke om dette er rigtigt. 
-            Symbol? stmtType = SymbolTable.GetSymbol(node.GetStmt());
+            AExpStmt stmt = (AExpStmt)node.GetStmt();
+            Symbol? exprType = SymbolTable.GetSymbol(stmt.GetExp());
             Symbol? type = SymbolTable.GetSymbol(node.GetId().Parent());
-            SymbolTable.AddId(node.GetId(),node, type != stmtType? Symbol.notOk : Symbol.ok);
+            SymbolTable.AddId(node.GetId(),node, type != exprType? Symbol.notOk : Symbol.ok);
         }
     }
 }
