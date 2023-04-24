@@ -146,4 +146,4 @@ Abstract Syntax Tree
          | {decimal} id
          | {bool} id
          | {char} id
-         | {string} id;
+         | {string} id; // TODO: Arrays
