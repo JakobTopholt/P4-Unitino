@@ -30,11 +30,12 @@ public class TypeChecker : DepthFirstAdapter
     // To do
     
     // 6
-    // Check for forward referencing when checking assignment. If not declared before (also in global) it is an illegal assignment DONE
-    // Mangler et tjek, men Getsymbol metoderne returner null values som kan bruges til at typecheck assignment
+    // Check for forward referencing when checking assignment. If not declared before (also in global) it is an illegal assignment
+    // GlobalFunctionCollector og TypeChecker
+    // DONE
     
     // 7
-    // Implement two global scope passes. One to catch free floating variables and next to store gloabl functions which type return need to be evauluated.
+    // Implement two global scope passes. One to catch free floating variables and the next to store global functions which type return need to be evauluated.
     // This requires local variables to be stored temporarly while evaluating the global.
     // Global varaibles --> Function types --> ok/notok
     // To do
@@ -46,6 +47,15 @@ public class TypeChecker : DepthFirstAdapter
     // To do
 
     // 9 Nye ændringer i denne branch: Units har nu fået suffix såsom 5s.50ms
+    // 9 
+    // Custom units typechecking. 
+    // Expunits skal bestå af de samme singleunits
+    // 
+    
+    // 10 
+    // Implement Return keyword i grammar.
+    
+    
     public override void InANewFunc(ANewFunc node) {
         
         SymbolTable.AddId(node.GetId(), node, SymbolTable.IsInCurrentScope(node.GetId())? Symbol.notOk : Symbol.Func);
@@ -295,7 +305,7 @@ public class TypeChecker : DepthFirstAdapter
         Symbol? exprType = SymbolTable.GetSymbol(node.GetExp());
 
         // if types match stmt is ok, else notok
-        SymbolTable.AddNode(node, type != exprType ? Symbol.notOk : Symbol.ok);
+        SymbolTable.AddNode(node, type == null || type != exprType ? Symbol.notOk : Symbol.ok);
     }
 
     

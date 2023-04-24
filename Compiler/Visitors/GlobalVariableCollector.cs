@@ -3,7 +3,7 @@ using Moduino.node;
 
 namespace Compiler.Visitors;
 
-public class GlobalScopeCollector : DepthFirstAdapter
+public class GlobalVariableCollector : DepthFirstAdapter
 {
     
     public override void CaseANewFunc(ANewFunc node)
@@ -12,6 +12,7 @@ public class GlobalScopeCollector : DepthFirstAdapter
         OutANewFunc(node);
     }
 
+    // This override should be implemented in GlobalFunctionCollector
     public override void InANewFunc(ANewFunc node)
     {
         Symbol? funcId = SymbolTable.GetSymbol(node.GetId());
