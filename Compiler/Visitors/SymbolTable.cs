@@ -7,8 +7,11 @@ public class SymbolTable
     private readonly Dictionary<string, Node> idToNode = new();
     private readonly Dictionary<Node, Symbol> nodeToSymbol = new();
     private readonly SymbolTable? parent;
+    public Dictionary<string, AUnit> SubunitToUnit = new();
+    public Dictionary<Node, AUnit> nodeToUnit = new();
 
-    private static SymbolTable _currentSymbolTable = new (null);
+
+    public static SymbolTable _currentSymbolTable = new (null);
     private static readonly List<SymbolTable> AllTables = new() { _currentSymbolTable };
     public static void EnterScope() => _currentSymbolTable = new SymbolTable(_currentSymbolTable);
     public static void ExitScope()
@@ -35,12 +38,7 @@ public class SymbolTable
         this.parent = parent;
         AllTables.Add(this);
     }
-
-    /*public bool IsDeclared (Symbol node)
-    {
-        
-    }*/
-
+    
     public static Symbol? GetSymbol(Node node) => _currentSymbolTable.GetCurrentSymbol(node);
     public static Symbol? GetSymbol(string identifier) => _currentSymbolTable.GetCurrentSymbol(identifier);
     private Symbol? GetCurrentSymbol(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentSymbol(identifier);
@@ -55,7 +53,7 @@ public enum Symbol
     Decimal,
     Char,
     String,
-    func,
+    Func,
     ok, 
     notOk,
 }
