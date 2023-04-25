@@ -30,6 +30,61 @@ public class GlobalVariableCollector : DepthFirstAdapter
         SymbolTable.AddId(node.GetId(), node, boolId != null ? Symbol.notOk : Symbol.Bool);
     }
 
+    private PUnittype currentUnit;
+    public override void CaseADeclStmt(ADeclStmt node)
+    {
+        base.CaseADeclStmt(node);
+        PUnittype unit = node.GetUnittype();
+        //Symbol? unitId = SymbolTable.GetSymbol(node.GetId());
+        currentUnit = unit;
+        
+        
+        //SymbolTable.AddId(node.GetId(), node, boolId != null ? Symbol.notOk : Symbol.Bool);
+    }
+
+    public override void InASubunit(ASubunit node)
+    {
+        
+        switch ()
+        {
+            case AIntUnittype a:
+                Symbol? intId = SymbolTable.GetSymbol(a);
+                SymbolTable.AddId(node.GetId(), node, intId != null ? Symbol.notOk : Symbol.Bool);
+                break;
+            case ADecimalUnittype b:
+                Symbol? decimalId = SymbolTable.GetSymbol(b);
+                SymbolTable.AddId(node.GetId(), node, decimalId != null ? Symbol.notOk : Symbol.Bool);
+                break;
+            case ABoolUnittype c:
+                Symbol? boolId = SymbolTable.GetSymbol(c);
+                SymbolTable.AddId(node.GetId(), node, boolId != null ? Symbol.notOk : Symbol.Bool);
+                break;
+            case ACharUnittype d:
+                Symbol? charId = SymbolTable.GetSymbol(d);
+                SymbolTable.AddId(node.GetId(), node, charId != null ? Symbol.notOk : Symbol.Bool);
+                break;
+            case AStringUnittype e:
+                Symbol? stringId = SymbolTable.GetSymbol(e);
+                SymbolTable.AddId(node.GetId(), node, stringId != null ? Symbol.notOk : Symbol.Bool);
+                break;
+            case ACustomtypeUnittype f:
+                PId unitName = f.GetId();
+                Symbol? unitId = SymbolTable.GetSymbol(f);
+                PUnittype unitType = f;
+                
+                
+                SymbolTable._currentSymbolTable.idToUnit.Add(unitName.ToString(),f);
+                
+                SymbolTable.AddId(node.GetId(), node, unitId != null ? Symbol.notOk : Symbol.ok);
+                break;
+        }
+    }
+
+    public override void InADeclStmt(ADeclStmt node)
+    {
+        base.InADeclStmt(node);
+    }
+
     public override void InAStringDecl(AStringDecl node)
     {
         Symbol? stringId = SymbolTable.GetSymbol(node.GetId());

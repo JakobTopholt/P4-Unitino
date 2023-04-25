@@ -47,14 +47,21 @@ public class TypeChecker : DepthFirstAdapter
     // To do
 
     // 9 Nye ændringer i denne branch: Units har nu fået suffix såsom 5s.50ms
-    // 9 
     // Custom units typechecking. 
     // Expunits skal bestå af de samme singleunits
-    // 
+    // To do
     
     // 10 
-    // Implement Return keyword i grammar.
+    // Fix Delcarecases to new grammar
+    // WIP
     
+    // 11
+    // Implementer et tredje pass for at tjekke og save return type.
+    // To do
+    
+    // 12
+    // Implement Custom unit typechecking
+    // WIP
     
     public override void InANewFunc(ANewFunc node) {
         

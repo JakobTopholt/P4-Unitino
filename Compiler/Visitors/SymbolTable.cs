@@ -10,6 +10,10 @@ public class SymbolTable
     public Dictionary<string, AUnit> SubunitToUnit = new();
     public Dictionary<Node, AUnit> nodeToUnit = new();
 
+    public Dictionary<string, AUnit> idToUnit = new();
+    public Dictionary<AUnit, PUnittype> unitToType = new();
+
+
 
     public static SymbolTable _currentSymbolTable = new (null);
     private static readonly List<SymbolTable> AllTables = new() { _currentSymbolTable };
