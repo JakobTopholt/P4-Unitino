@@ -145,8 +145,7 @@ Productions
                   | {number} number {-> New exp.number(number.number)}
                   | {negnumber} minus number {-> New exp.negnumber(number.number)}
                   | {unarypostfix} unary id {-> New exp.unarypostfix(unary.unary, id.id)}
-                  | {unarysuffix} id unary {-> New exp.unarysuffix(id.id, unary.unary)}
-                  | {cast} l_par unittype r_par exp {-> New exp.cast(unittype.unittype, exp.exp)};
+                  | {unarysuffix} id unary {-> New exp.unarysuffix(id.id, unary.unary)};
     unary {-> unary} = {plusplus} tplusplus {-> New unary.plusplus()}
                      | {minusminus} tminusminus {-> New unary.minusminus()};
                      
@@ -211,10 +210,9 @@ Abstract Syntax Tree
         | {negvalue}
         | {negnumber} number
         | {unarypostfix} unary id
-        | {unarysuffix} id unary //TODO: fix precedence
+        | {unarysuffix} id unary
         | {id} id
-        | {negid} id
-        | {cast} unittype exp; // TODO: function with params
+        | {negid} id; // TODO: function with return value
     number = tnumber;
     singleunit = number id;
     unary = {plusplus}
