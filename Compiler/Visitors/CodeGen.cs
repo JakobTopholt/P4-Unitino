@@ -34,7 +34,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         L.Apply(this);
         writer.Write(ope);
         R.Apply(this);
-        writer.Write(L.Parent().Parent().Parent() is ASubunit ? ")" : "");
+        writer.Write(L.Parent().Parent().Parent() is ASubunit ? ");\n" : "");
     }
     private int _indent = 0;
     private void Indent(string s)
@@ -50,7 +50,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         {
             child.Apply(this);
             if (child is not AScopedStmt)
-                writer.Write(";");
+                writer.WriteLine(";");
         }
         OutAProgFunc(node);
     }
@@ -69,7 +69,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         {
             child.Apply(this);
             if (child is not AScopedStmt)
-                writer.Write(";");
+                writer.WriteLine(";");
         }
         OutANewFunc(node);
     }
@@ -77,7 +77,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void OutANewFunc(ANewFunc node)
     {
         _indent--;
-        Indent("}");
+        Indent("}\n");
     }
 
     /*-------------------------------------Control Structures---------------------------------------------------------*/

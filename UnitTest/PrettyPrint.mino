@@ -1,53 +1,75 @@
+
+////
+unit tid : int {
+    mango => 6+5;
+    banan => 5*2;
+}
+unit fart : int {
+    hej => 3-2;
+    nej => 4+2;
+}
+func hejmeddig {
+    75;
+    a = 5;
+    int a;
+    b();
+}
+Prog {
+    5+7*5-3+5*7;
+    2+5*3;
+}
 func scoped {
-    if(7) {
-        for(int i; 11+6; i = 1) {
-            a = 5;
-            11+6;
-            b();
-            int a;
-            string c;
+    for(int a; 6+5; a = 1) {
+        if(7) {
+            while(1) {
+                int b;
+            }
+        }
+        else if(5+2) {
+            do {
+                bool c;
+            } while(5+2)
+        }
+        else {
+            decimal d;
         }
     }
-    else {
-        a = 6;
-    }
-    do {
-        a = 11;
-    } while(6+6)
 }
 ////
-func scoped {
-    if(7) {
-        for(int i; 11+6; i = 1) {
-            a = 5;
-            11+6;
-            b();
-            int a;
-            string c;
-        }
-    }
-    else {
-        a = 6;
-    }
-    do {
-        a = 11;
-    } while(6+6)
+unit tid : int {
+    mango => (6+5);
+    banan => (5*2);
 }
-////
-func void scoped {
-    if(7) {
-        for(int i; 11+6; i = 1) {
-            a = 5;
-            11+6;
-            b();
-            int a;
-            string c;
+unit fart : int {
+    hej => 3-2;
+    nej => 4+2;
+}
+func hejmeddig{
+    75;
+    a = 5;
+    int a;
+    b();
+}
+
+Prog {
+    5+7*5-3+(5*7);
+    2+5*3;
+}
+
+func scoped {
+    for(int a; 6+5; a = 1) {
+        if(7) {
+            while(1) {
+                int b;
+            }
+        }
+        else if(5+2) {
+            do {
+                bool c;
+            } while(5+2)
+        }
+        else {
+            decimal d;
         }
     }
-    else {
-        a = 6;
-    }
-    do {
-        a = 11;
-    } while(6+6)
 }

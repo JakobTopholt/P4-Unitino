@@ -16,10 +16,6 @@ public class PrettyPrint : DepthFirstAdapter
     {
         this.output = output ?? Console.Out;
     }
-    private void Print(string s)
-    {
-        output.Write(s);
-    }
 
     private void PrintPrecedence(Node L, Node R, string ope)
     {
@@ -28,82 +24,249 @@ public class PrettyPrint : DepthFirstAdapter
         R.Apply(this);
     }
 
-    public override void InAProgFunc(AProgFunc node)
+    private int _indent = 0;
+    private void Indent(string s)
     {
-        output.Write("Prog {");
+        output.Write(new string(' ', _indent * 4) + s);
+    }
+
+    public override void CaseAProgFunc(AProgFunc node)
+    {
+        output.WriteLine("Prog {");
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                output.WriteLine(";");
+        }
+        OutAProgFunc(node);
     }
     
-    public override void InAUnit(AUnit node)
+    public override void OutAProgFunc(AProgFunc node)
+    {
+        _indent--;
+        output.WriteLine("}");
+    }
+    
+    public override void CaseANewFunc(ANewFunc node)
+    {
+        output.WriteLine("func " + node.GetId() + "{");
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                output.WriteLine(";");
+        }
+        OutANewFunc(node);
+    }
+    
+    public override void OutANewFunc(ANewFunc node)
+    {
+        _indent--;
+        output.WriteLine("}");
+    }
+
+    public override void CaseAUnit(AUnit node)
     {
         string? name = node.GetId().ToString();
         string? type = node.GetTint().ToString();
-        output.Write($"unit {name}: {type} {{\n");
+        Indent($"unit {name}: {type}{{\n");
+        _indent++;
+        foreach (Node child in node.GetSubunit())
+        {
+            child.Apply(this);
+            output.WriteLine(";");
+        }
+        _indent--;
+        OutAUnit(node);
     }
     public override void OutAUnit(AUnit node)
     {
         output.Write("}\n");
     }
 
-    public override void InASubunit(ASubunit node)
+    public override void CaseASubunit(ASubunit node)
     {
         string? name = node.GetId().ToString();
-        output.Write($"  {name}=>");
+        Indent($"{name}=> ");
+        _indent--;
+        node.GetStmt().Apply(this);
+        _indent++;
+        OutASubunit(node);
     }
 
-    public override void OutASubunit(ASubunit node)
+    public override void CaseAForScoped(AForScoped node)
     {
-        output.Write(";\n");
+        int _indentholder = _indent;
+        Indent("for(");
+        _indent = 0;
+        node.GetInit().Apply(this);
+        output.Write(("; "));
+        node.GetCond().Apply(this);
+        output.Write(("; "));
+        node.GetIncre().Apply(this);
+        output.WriteLine(") {");
+        _indent = _indentholder;
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                output.WriteLine(";");
+        }
+        OutAForScoped(node);
     }
 
-    public override void OutAProgFunc(AProgFunc node)
+    public override void OutAForScoped(AForScoped node)
     {
-        output.WriteLine("}");
+        _indent--;
+        Indent("}\n");
     }
 
-    public override void InANewFunc(ANewFunc node)
+    public override void CaseAIfScoped(AIfScoped node)
     {
-        output.Write("func " + node.GetId() + "{");
+        Indent("if(");
+        node.GetExp().Apply(this);
+        output.WriteLine(") {");
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                output.WriteLine(";");
+        }
+        OutAIfScoped(node);
     }
 
-    public override void OutAExpStmt(AExpStmt node)
+    public override void OutAIfScoped(AIfScoped node)
     {
-        if (node.Parent() is ANewFunc)
-            output.Write(";");
+        _indent--;
+        Indent("}\n");
+    }
+    
+    public override void CaseAWhileScoped(AWhileScoped node)
+    {
+        Indent("while(");
+        node.GetExp().Apply(this);
+        output.WriteLine(") {");
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                output.WriteLine(";");
+        }
+        OutAWhileScoped(node);
     }
 
-    public override void InADeclStmt(ADeclStmt node)
+    public override void OutAWhileScoped(AWhileScoped node)
     {
-        output.Write(" int " + node.GetDecl());
+        _indent--;
+        Indent("}\n");
+    }
+    
+    public override void CaseAElseifScoped(AElseifScoped node)
+    {
+        Indent("else if(");
+        node.GetExp().Apply(this);
+        output.WriteLine(") {");
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                output.WriteLine(";");
+        }
+        OutAElseifScoped(node);
     }
 
-    public override void OutADeclStmt(ADeclStmt node)
+    public override void OutAElseifScoped(AElseifScoped node)
     {
-        output.Write(";");
+        _indent--;
+        Indent("}\n");
+    }
+    
+    public override void CaseAElseScoped(AElseScoped node)
+    {
+        Indent("else {\n");
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                output.WriteLine(";");
+        }
+        OutAElseScoped(node);
+    }
+
+    public override void OutAElseScoped(AElseScoped node)
+    {
+        _indent--;
+        Indent("}\n");
+    }
+    public override void CaseADowhileScoped(ADowhileScoped node)
+    {
+        Indent("do {\n");
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                output.WriteLine(";");
+        }
+
+        _indent--;
+        Indent("} while(");
+        node.GetExp().Apply(this);
+        output.Write(")\n");
+    }
+
+    public override void OutADowhileScoped(ADowhileScoped node)
+    {
+        Indent(")\n");
+    }
+
+    public override void InAIntDecl(AIntDecl node)
+    {
+        Indent(("int " + node.GetId().ToString().Trim()));
+    }
+
+    public override void InABoolDecl(ABoolDecl node)
+    {
+        Indent("bool " + node.GetId().ToString().Trim());
+    }
+
+    public override void InADecimalDecl(ADecimalDecl node)
+    {
+        Indent("decimal " + node.GetId().ToString().Trim());
+    }
+
+    public override void InACharDecl(ACharDecl node)
+    {
+        Indent("char " + node.GetId().ToString().Trim());
+    }
+    
+    public override void InAStringDecl(AStringDecl node)
+    {
+        Indent("string " + node.GetId().ToString().Trim());
     }
 
     public override void InAAssignStmt(AAssignStmt node)
     {
-        output.Write(" " + node.GetId() + "= ");
-    }
-
-    public override void OutAAssignStmt(AAssignStmt node)
-    {
-        output.Write(";");
-    }
-
-    public override void OutANewFunc(ANewFunc node)
-    {
-        output.WriteLine("}");
+        Indent(node.GetId().ToString().Trim() + " = ");
     }
 
     public override void InAFunccallStmt(AFunccallStmt node)
     {
-        output.Write(" " + node + "()");
+        Indent(node.ToString().Trim() + "()");
     }
 
-    public override void OutAFunccallStmt(AFunccallStmt node)
+    public override void CaseAExpStmt(AExpStmt node)
     {
-        output.Write("");
+        Indent("");
+        node.GetExp().Apply(this);
     }
 
     public override void CaseADivExp(ADivExp node)
