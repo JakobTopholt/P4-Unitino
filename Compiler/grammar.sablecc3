@@ -102,7 +102,7 @@ Productions
                          | {single} unit {-> [unit.unit]};
     subunit_list {-> subunit*} = {list} subunit subunit_list {-> [subunit.subunit, subunit_list.subunit]}
                                | {single} subunit {-> [subunit.subunit]};
-    singleunit_list {-> singleunit*} = {list} singleunit dot groupunit_list {-> [singleunit.singleunit, groupunit_list.singleunit]} //For usage in expr
+    singleunit_list {-> singleunit*} = {list} singleunit dot singleunit_list {-> [singleunit.singleunit, singleunit_list.singleunit]} //For usage in expr
                                     | {single} singleunit {-> [singleunit.singleunit]};
                                     
     ////Listelements                     
