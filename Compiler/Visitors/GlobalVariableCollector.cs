@@ -37,15 +37,7 @@ public class GlobalVariableCollector : DepthFirstAdapter
         PUnittype unit = node.GetUnittype();
         //Symbol? unitId = SymbolTable.GetSymbol(node.GetId());
         currentUnit = unit;
-        
-        
-        //SymbolTable.AddId(node.GetId(), node, boolId != null ? Symbol.notOk : Symbol.Bool);
-    }
-
-    public override void InASubunit(ASubunit node)
-    {
-        
-        switch ()
+        switch (unit)
         {
             case AIntUnittype a:
                 Symbol? intId = SymbolTable.GetSymbol(a);
@@ -70,14 +62,13 @@ public class GlobalVariableCollector : DepthFirstAdapter
             case ACustomtypeUnittype f:
                 PId unitName = f.GetId();
                 Symbol? unitId = SymbolTable.GetSymbol(f);
-                PUnittype unitType = f;
-                
-                
                 SymbolTable._currentSymbolTable.idToUnit.Add(unitName.ToString(),f);
                 
                 SymbolTable.AddId(node.GetId(), node, unitId != null ? Symbol.notOk : Symbol.ok);
                 break;
         }
+        
+        //SymbolTable.AddId(node.GetId(), node, boolId != null ? Symbol.notOk : Symbol.Bool);
     }
 
     public override void InADeclStmt(ADeclStmt node)

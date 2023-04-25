@@ -10,8 +10,8 @@ public class SymbolTable
     public Dictionary<string, AUnit> SubunitToUnit = new();
     public Dictionary<Node, AUnit> nodeToUnit = new();
 
-    public Dictionary<string, AUnit> idToUnit = new();
-    public Dictionary<AUnit, PUnittype> unitToType = new();
+    public Dictionary<string, PUnittype> idToUnit = new();
+    //public Dictionary<AUnit, PUnittype> unitToType = new();
 
 
 
