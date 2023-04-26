@@ -61,10 +61,16 @@ public class TypeChecker : DepthFirstAdapter
     
     // 12
     // Implement Custom unit typechecking
-    // WIP
+    // To do
     
     // 13
     // Implement declareAssignment casen ELLER få ændret grammer så det sker implicit
+    // To do
+    
+    // Grammar to-do:
+    // Funktions parametre
+    // Return 
+    // Type precedence
     
     public override void InANewFunc(ANewFunc node) {
         
@@ -128,7 +134,7 @@ public class TypeChecker : DepthFirstAdapter
                         SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.String);
                 }
                 break;
-            case ACustomtypeUnittype f:
+            /*case ACustomtypeUnittype f:
                 // Er ikke implementeret ordentligt overhovedet
                 // Er en Task beasicly
 
@@ -139,6 +145,7 @@ public class TypeChecker : DepthFirstAdapter
                 
                 SymbolTable.AddId(node.GetId(), node, unitId != null ? Symbol.notOk : Symbol.ok);
                 break;
+                */
         }
     }
 

@@ -49,7 +49,7 @@ public class GlobalFunctionCollector : DepthFirstAdapter
                 Symbol? stringId = SymbolTable.GetSymbol(e);
                 SymbolTable.AddId(node.GetId(), node, stringId != null ? Symbol.notOk : Symbol.String);
                 break;
-            case ACustomtypeUnittype f:
+            /*case ACustomtypeUnittype f:
                 // Er ikke implementeret ordentligt overhovedet
                 // Er en Task beasicly
                 
@@ -59,6 +59,7 @@ public class GlobalFunctionCollector : DepthFirstAdapter
                 
                 SymbolTable.AddId(node.GetId(), node, unitId != null ? Symbol.notOk : Symbol.ok);
                 break;
+                */
         }
     }
 
