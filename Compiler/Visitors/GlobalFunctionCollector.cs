@@ -20,37 +20,46 @@ public class GlobalFunctionCollector : DepthFirstAdapter
         // throws void, however we need to understand which it can return
         
     }
-
-
-
-    public override void InABoolDecl(ABoolDecl node)
-    {
-        Symbol? boolId = SymbolTable.GetSymbol(node.GetId());
-        SymbolTable.AddId(node.GetId(), node, boolId != null ? Symbol.notOk : Symbol.Bool);
-    }
-
-    public override void InAStringDecl(AStringDecl node)
-    {
-        Symbol? stringId = SymbolTable.GetSymbol(node.GetId());
-        SymbolTable.AddId(node.GetId(), node, stringId != null ? Symbol.notOk : Symbol.String);
-    }
     
-    public override void InACharDecl(ACharDecl node)
+    // Overvej om den burde være i et In/Out 
+    public override void CaseADeclStmt(ADeclStmt node)
     {
-        Symbol? charId = SymbolTable.GetSymbol(node.GetId());
-        SymbolTable.AddId(node.GetId(), node, charId != null ? Symbol.notOk : Symbol.Char);
-    }
-
-    public override void InAIntDecl(AIntDecl node)
-    {
-        Symbol? intId = SymbolTable.GetSymbol(node.GetId());
-        SymbolTable.AddId(node.GetId(), node, intId != null ? Symbol.notOk : Symbol.Int);
-    }
-
-    public override void InADecimalDecl(ADecimalDecl node)
-    {
-        Symbol? decimalId = SymbolTable.GetSymbol(node.GetId());
-        SymbolTable.AddId(node.GetId(), node, decimalId != null ? Symbol.notOk :Symbol.Decimal);
+        base.CaseADeclStmt(node);
+        PUnittype unit = node.GetUnittype();
+        //Symbol? unitId = SymbolTable.GetSymbol(node.GetId());
+        switch (unit)
+        {
+            case AIntUnittype a:
+                Symbol? intId = SymbolTable.GetSymbol(a);
+                SymbolTable.AddId(node.GetId(), node, intId != null ? Symbol.notOk : Symbol.Int);
+                break;
+            case ADecimalUnittype b:
+                Symbol? decimalId = SymbolTable.GetSymbol(b);
+                SymbolTable.AddId(node.GetId(), node, decimalId != null ? Symbol.notOk : Symbol.Decimal);
+                break;
+            case ABoolUnittype c:
+                Symbol? boolId = SymbolTable.GetSymbol(c);
+                SymbolTable.AddId(node.GetId(), node, boolId != null ? Symbol.notOk : Symbol.Bool);
+                break;
+            case ACharUnittype d:
+                Symbol? charId = SymbolTable.GetSymbol(d);
+                SymbolTable.AddId(node.GetId(), node, charId != null ? Symbol.notOk : Symbol.Char);
+                break;
+            case AStringUnittype e:
+                Symbol? stringId = SymbolTable.GetSymbol(e);
+                SymbolTable.AddId(node.GetId(), node, stringId != null ? Symbol.notOk : Symbol.String);
+                break;
+            case ACustomtypeUnittype f:
+                // Er ikke implementeret ordentligt overhovedet
+                // Er en Task beasicly
+                
+                PId unitName = f.GetId();
+                Symbol? unitId = SymbolTable.GetSymbol(f);
+                SymbolTable._currentSymbolTable.idToUnit.Add(unitName.ToString(),f);
+                
+                SymbolTable.AddId(node.GetId(), node, unitId != null ? Symbol.notOk : Symbol.ok);
+                break;
+        }
     }
 
     public override void OutStart(Start node)

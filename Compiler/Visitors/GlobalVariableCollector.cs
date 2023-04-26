@@ -21,31 +21,22 @@ public class GlobalVariableCollector : DepthFirstAdapter
         // Mangler også at store funktions parametre her
         // Se task 4 i LocalScopeCollector
     }
-
-
-
-    public override void InABoolDecl(ABoolDecl node)
-    {
-        Symbol? boolId = SymbolTable.GetSymbol(node.GetId());
-        SymbolTable.AddId(node.GetId(), node, boolId != null ? Symbol.notOk : Symbol.Bool);
-    }
-
-    private PUnittype currentUnit;
+    
+    // Overvej om den burde være i et In/Out 
     public override void CaseADeclStmt(ADeclStmt node)
     {
         base.CaseADeclStmt(node);
         PUnittype unit = node.GetUnittype();
         //Symbol? unitId = SymbolTable.GetSymbol(node.GetId());
-        currentUnit = unit;
         switch (unit)
         {
             case AIntUnittype a:
                 Symbol? intId = SymbolTable.GetSymbol(a);
-                SymbolTable.AddId(node.GetId(), node, intId != null ? Symbol.notOk : Symbol.Bool);
+                SymbolTable.AddId(node.GetId(), node, intId != null ? Symbol.notOk : Symbol.Int);
                 break;
             case ADecimalUnittype b:
                 Symbol? decimalId = SymbolTable.GetSymbol(b);
-                SymbolTable.AddId(node.GetId(), node, decimalId != null ? Symbol.notOk : Symbol.Bool);
+                SymbolTable.AddId(node.GetId(), node, decimalId != null ? Symbol.notOk : Symbol.Decimal);
                 break;
             case ABoolUnittype c:
                 Symbol? boolId = SymbolTable.GetSymbol(c);
@@ -53,13 +44,16 @@ public class GlobalVariableCollector : DepthFirstAdapter
                 break;
             case ACharUnittype d:
                 Symbol? charId = SymbolTable.GetSymbol(d);
-                SymbolTable.AddId(node.GetId(), node, charId != null ? Symbol.notOk : Symbol.Bool);
+                SymbolTable.AddId(node.GetId(), node, charId != null ? Symbol.notOk : Symbol.Char);
                 break;
             case AStringUnittype e:
                 Symbol? stringId = SymbolTable.GetSymbol(e);
-                SymbolTable.AddId(node.GetId(), node, stringId != null ? Symbol.notOk : Symbol.Bool);
+                SymbolTable.AddId(node.GetId(), node, stringId != null ? Symbol.notOk : Symbol.String);
                 break;
             case ACustomtypeUnittype f:
+                // Er ikke implementeret ordentligt overhovedet
+                // Er en Task beasicly
+                
                 PId unitName = f.GetId();
                 Symbol? unitId = SymbolTable.GetSymbol(f);
                 SymbolTable._currentSymbolTable.idToUnit.Add(unitName.ToString(),f);
@@ -67,37 +61,6 @@ public class GlobalVariableCollector : DepthFirstAdapter
                 SymbolTable.AddId(node.GetId(), node, unitId != null ? Symbol.notOk : Symbol.ok);
                 break;
         }
-        
-        //SymbolTable.AddId(node.GetId(), node, boolId != null ? Symbol.notOk : Symbol.Bool);
-    }
-
-    public override void InADeclStmt(ADeclStmt node)
-    {
-        base.InADeclStmt(node);
-    }
-
-    public override void InAStringDecl(AStringDecl node)
-    {
-        Symbol? stringId = SymbolTable.GetSymbol(node.GetId());
-        SymbolTable.AddId(node.GetId(), node, stringId != null ? Symbol.notOk : Symbol.String);
-    }
-    
-    public override void InACharDecl(ACharDecl node)
-    {
-        Symbol? charId = SymbolTable.GetSymbol(node.GetId());
-        SymbolTable.AddId(node.GetId(), node, charId != null ? Symbol.notOk : Symbol.Char);
-    }
-
-    public override void InAIntDecl(AIntDecl node)
-    {
-        Symbol? intId = SymbolTable.GetSymbol(node.GetId());
-        SymbolTable.AddId(node.GetId(), node, intId != null ? Symbol.notOk : Symbol.Int);
-    }
-
-    public override void InADecimalDecl(ADecimalDecl node)
-    {
-        Symbol? decimalId = SymbolTable.GetSymbol(node.GetId());
-        SymbolTable.AddId(node.GetId(), node, decimalId != null ? Symbol.notOk :Symbol.Decimal);
     }
 
     public override void OutStart(Start node)
@@ -114,8 +77,8 @@ public class GlobalVariableCollector : DepthFirstAdapter
         else
         {
             //ved ikke om dette er rigtigt. 
-            AExpStmt stmt = (AExpStmt)node.GetStmt();
-            Symbol? exprType = SymbolTable.GetSymbol(stmt.GetExp());
+            //AExpStmt stmt = (AExpStmt)node.GetStmt();
+            Symbol? exprType = SymbolTable.GetSymbol(node.GetExp());
             Symbol? type = SymbolTable.GetSymbol(node.GetId().Parent());
             SymbolTable.AddId(node.GetId(),node, type != exprType? Symbol.notOk : Symbol.ok);
             //tilføj tjek om der evalueres til ok eller ej?

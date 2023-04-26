@@ -52,7 +52,7 @@ public class TypeChecker : DepthFirstAdapter
     // To do
     
     // 10 
-    // Fix Delcarecases to new grammar
+    // Fix Delcarecases to new grammar (custom units missing)
     // WIP
     
     // 11
@@ -80,50 +80,62 @@ public class TypeChecker : DepthFirstAdapter
         //parametre kode?
         SymbolTable.ExitScope();
     }
-
+    
     // Collecting local variables
-    public override void InABoolDecl(ABoolDecl node)
+    // Overvej om den burde være i et In/Out 
+    public override void CaseADeclStmt(ADeclStmt node)
     {
-        if (node.Parent() != null)
+        base.CaseADeclStmt(node);
+        PUnittype unit = node.GetUnittype();
+        //Symbol? unitId = SymbolTable.GetSymbol(node.GetId());
+        switch (unit)
         {
-            SymbolTable.AddId(node.GetId(), node,
-                SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Bool);
-        }
-    }
+            case AIntUnittype a:
+                if (a.Parent() != null)
+                {
+                    SymbolTable.AddId(node.GetId(), node,
+                        SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Int);
+                }
+                break;
+            case ADecimalUnittype b:
+                if (b.Parent() != null)
+                {
+                    SymbolTable.AddId(node.GetId(), node,
+                        SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Decimal);
+                }
+                break;
+            case ABoolUnittype c:
+                if (c.Parent() != null)
+                {
+                    SymbolTable.AddId(node.GetId(), node,
+                        SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Bool);
+                }
+                break;
+            case ACharUnittype d:
+                if (d.Parent() != null)
+                {
+                    SymbolTable.AddId(node.GetId(), node,
+                        SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Char);
+                }
+                break;
+            case AStringUnittype e:
+                if (e.Parent() != null)
+                {
+                    SymbolTable.AddId(node.GetId(), node,
+                        SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.String);
+                }
+                break;
+            case ACustomtypeUnittype f:
+                // Er ikke implementeret ordentligt overhovedet
+                // Er en Task beasicly
 
-    public override void InAStringDecl(AStringDecl node)
-    {
-        if (node.Parent() != null)
-        {
-            SymbolTable.AddId(node.GetId(), node,
-                SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.String);
-        }
-    }
 
-    public override void InACharDecl(ACharDecl node)
-    {
-        if (node.Parent() != null)
-        {
-            SymbolTable.AddId(node.GetId(), node,
-                SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Char);
-        }
-    }
-
-    public override void InAIntDecl(AIntDecl node)
-    {
-        if (node.Parent() != null)
-        {
-            SymbolTable.AddId(node.GetId(), node,
-                SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Int);
-        }
-    }
-
-    public override void InADecimalDecl(ADecimalDecl node)
-    {
-        if (node.Parent() != null)
-        {
-            SymbolTable.AddId(node.GetId(), node,
-                SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Decimal);
+                PId unitName = f.GetId();
+                Symbol? unitId = SymbolTable.GetSymbol(f);
+                SymbolTable._currentSymbolTable.idToUnit.Add(unitName.ToString(),f);
+                
+                SymbolTable.AddId(node.GetId(), node, unitId != null ? Symbol.notOk : Symbol.ok);
+                break;
         }
     }
 
