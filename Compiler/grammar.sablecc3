@@ -29,7 +29,7 @@ Helpers
 
 Tokens
 
-    prog = 'Prog';
+    tprog = 'prog';
     tfunc = 'func';
     if = 'if';
     else = 'else';
@@ -90,41 +90,32 @@ Ignored Tokens
     comment;
 
 Productions
+    grammar = funcunit_list {-> New grammar([funcunit_list.funcunit])};
     ////Lists
-    grammar = funcunit {-> New grammar([funcunit.funcunit])};
     funcunit_list {-> funcunit*} = {list} funcunit funcunit_list {-> [funcunit.funcunit, funcunit_list.funcunit]}
                                  | {single} funcunit {-> [funcunit.funcunit]};
-    func_list {-> func*} = {list} func func_list {-> [func.func, func_list.func]} 
-                         | {single} func {-> [func.func]};
     stmt_list {-> stmt*} = {list} stmt stmt_list {-> [stmt.stmt, stmt_list.stmt]} 
                          | {single} stmt {-> [stmt.stmt]};
-    unit_list {-> unit*} = {list} unit unit_list {-> [unit.unit, unit_list.unit]}
-                         | {single} unit {-> [unit.unit]};
     subunit_list {-> subunit*} = {list} subunit subunit_list {-> [subunit.subunit, subunit_list.subunit]}
                                | {single} subunit {-> [subunit.subunit]};
-    singleunit_list {-> singleunit*} = {list} singleunit dot singleunit_list {-> [singleunit.singleunit, singleunit_list.singleunit]} //For usage in expr
-                                    | {single} singleunit {-> [singleunit.singleunit]};
-                                    
+    
     ////Listelements                     
-    funcunit {-> funcunit} = {unit} unit_list {-> New funcunit.unit([unit_list.unit])}
-                           | {func} func_list {-> New funcunit.func([func_list.func])};
-    func {-> func} = {prog} prog l_brace stmt_list r_brace {-> New func.prog([stmt_list.stmt])}
-                   | {new} tfunc id l_brace stmt_list r_brace {-> New func.new(id.id, [stmt_list.stmt])};
+    funcunit {-> funcunit} = {unitdecl} unitdecl {-> New funcunit.unitdecl(unitdecl.unitdecl)}
+                           | {func} func {-> New funcunit.func(func.func)};
+    func {-> func} = {prog} tprog l_brace stmt_list r_brace {-> New func.prog([stmt_list.stmt])}
+                   | {func} tfunc id l_brace stmt_list r_brace {-> New func.func(id.id, [stmt_list.stmt])}
+                   | {typed} unittype id l_brace stmt_list r_brace {-> New func.typed(unittype.unittype, id.id, [stmt_list.stmt])};
     stmt {-> stmt} = {assign} assign semicolon {-> assign.stmt}
                    | {decl} unittype id semicolon {-> New stmt.decl(unittype.unittype, id.id)}
                    | {declass} unittype id equal exp semicolon {-> New stmt.declass(unittype.unittype, id.id, exp.exp)}
                    | {funccall} id l_par r_par semicolon {-> New stmt.funccall(id.id)}
                    | {return} treturn exp semicolon {-> New stmt.return(exp.exp)}
                    | {scoped} scoped {-> New stmt.scoped(scoped.scoped)};
-    
-    unit {-> unit} = tunit id colon unittype l_brace subunit_list r_brace {-> New unit(id.id, unittype.unittype, [subunit_list.subunit])};
-    subunit {-> subunit} = {unit} id arrow exp semicolon {-> New subunit.unit(id.id, exp.exp)}
-                         | {as} tas unittype arrow exp semicolon {-> New subunit.as(unittype.unittype, exp.exp)}
-                         | {scopedunit} id arrow l_brace stmt_list r_brace {-> New subunit.scopedunit(id.id, [stmt_list.stmt])}
-                         | {scopedas} tas unittype arrow l_brace stmt_list r_brace {-> New subunit.scopedas(unittype.unittype, [stmt_list.stmt])};
-    singleunit {-> singleunit} = number id {-> New singleunit(number.number, id.id)}; //For usage in expr
+    unitdecl {-> unitdecl} = tunit id l_brace subunit_list r_brace {-> New unitdecl(id.id, [subunit_list.subunit])};
+    subunit {-> subunit} = id arrow exp semicolon {-> New subunit(id.id, exp.exp)};
     
     ////Expression
+    singleunit {-> singleunit} = number id {-> New singleunit(number.number, id.id)}; //For usage in expr
     exp {-> exp} = {plus} exp plus factor {-> New exp.plus (exp.exp, factor.exp)}
                  | {minus} exp minus factor {-> New exp.minus (exp.exp, factor.exp)}
                  | {factor} factor {-> factor.exp};
@@ -138,7 +129,7 @@ Productions
                   | {id} id {-> New exp.id(id.id)}
                   | {funccall} id l_par r_par {-> New exp.funccall(id.id)}
                   | {decimal} [l]:number dot [r]:number {-> New exp.decimal(l.number, r.number)}
-                  | {units} singleunit_list {-> New exp.units([singleunit_list.singleunit])}
+                  | {unit} singleunit {-> New exp.unit(singleunit.singleunit)}
                   | {negid} minus id {-> New exp.negid(id.id)}
                   | {value} tvalue {-> New exp.value()}
                   | {negvalue} minus tvalue {-> New exp.negvalue()}
@@ -150,71 +141,80 @@ Productions
                      | {minusminus} tminusminus {-> New unary.minusminus()};
                      
     ////Misc    
-    unittype {-> unittype} = {int} tint {-> New unittype.int()}
-                           | {deciaml} tdecimal {-> New unittype.decimal()}
-                           | {bool} tbool {-> New unittype.bool()}
-                           | {char} tchar {-> New unittype.char()}
-                           | {string} tstring {-> New unittype.string()}
-                           | {customtype} id {-> New unittype.customtype(id.id)};
+    type {-> type} = {int} tint {-> New type.int()}
+                   | {decimal} tdecimal {-> New type.decimal()}
+                   | {bool} tbool {-> New type.bool()}
+                   | {char} tchar {-> New type.char()}
+                   | {string} tstring {-> New type.string()};
     scoped {-> scoped} = {if} if l_par exp r_par l_brace stmt_list r_brace {-> New scoped.if(exp.exp, [stmt_list.stmt])}
-                           | {else} else l_brace stmt_list r_brace {-> New scoped.else([stmt_list.stmt])}
-                           | {elseif} else if l_par exp r_par l_brace stmt_list r_brace {-> New scoped.elseif(exp.exp, [stmt_list.stmt])}
-                           | {for} for l_par [init]:stmt [fst]:semicolon [cond]:exp [snd]:semicolon [incre]:assign r_par l_brace stmt_list r_brace {-> New scoped.for(init.stmt, cond.exp, incre.stmt, [stmt_list.stmt])}
-                           | {while} while l_par exp r_par l_brace stmt_list r_brace {-> New scoped.while(exp.exp, [stmt_list.stmt])}
-                           | {dowhile} do l_brace stmt_list r_brace while l_par exp r_par {-> New scoped.dowhile([stmt_list.stmt], exp.exp)};
+                       | {else} else l_brace stmt_list r_brace {-> New scoped.else([stmt_list.stmt])}
+                       | {elseif} else if l_par exp r_par l_brace stmt_list r_brace {-> New scoped.elseif(exp.exp, [stmt_list.stmt])}
+                       | {for} for l_par [init]:stmt [fst]:semicolon [cond]:exp [snd]:semicolon [incre]:assign r_par l_brace stmt_list r_brace {-> New scoped.for(init.stmt, cond.exp, incre.stmt, [stmt_list.stmt])}
+                       | {while} while l_par exp r_par l_brace stmt_list r_brace {-> New scoped.while(exp.exp, [stmt_list.stmt])}
+                       | {dowhile} do l_brace stmt_list r_brace while l_par exp r_par {-> New scoped.dowhile([stmt_list.stmt], exp.exp)};
     number {-> number} = tnumber {-> New number(tnumber)};
     id {-> id} = tid {-> New id(tid)};
 
 
 Abstract Syntax Tree
     grammar = funcunit*;
-    funcunit = {unit} unit*
-             | {func} func*;
-    unit = id unittype subunit*;
-    subunit = {unit} id exp
-            | {as} unittype exp
-            | {scopedunit} id stmt+
-            | {scopedas} unittype stmt+;
-    unittype = {int} //unit or type
-             | {decimal}
-             | {bool}
-             | {char}
-             | {string}
-             | {customtype} id;
+    funcunit = {unitdecl} unitdecl
+             | {func} func;
+    unitdecl = id subunit*;
+    subunit = id exp;
     func = {prog} stmt+
          | {new} id stmt+
-         | {newtype} unittype id stmt+;
+         | {typed} unittype id stmt+;
     stmt = {exp} exp
          | {assign} id exp
          | {plusassign} id exp
-         | {decl} unittype id
+         | {decl} decl
          | {declass} unittype id exp
          | {funccall} id
-         | {return} exp // TODO: ensure that exp doesn't contain funccall to new. only allow newtype
+         | {return} exp
          | {scoped} scoped;
+    decl = {normal} type id
+         | {unit} unituse* id;
+         
+    unittype = {type} type
+             | {unit} unituse;
+    type = {int} 
+         | {decimal}
+         | {bool}
+         | {char}
+         | {string};
+    unituse = {num} id // numerator
+            | {den} id; // denumerator
+            
     scoped = {if} exp stmt+
            | {else} stmt+
            | {elseif} exp stmt+
-           | {for} [init]:stmt [cond]:exp [incre]:stmt stmt+
+           | {for} [init]:stmt [cond]:exp [incre]:stmt stmt+ // incre is always an assignstmt
            | {while} exp stmt+
-           | {dowhile} stmt+ exp; //TODO: Switch
+           | {dowhile} stmt+ exp;
     exp = {plus}    [l]:exp  [r]:exp 
         | {minus}   [l]:exp  [r]:exp 
         | {div}     [l]:exp  [r]:exp 
         | {mult}    [l]:exp  [r]:exp 
-        | {number}  number
-        | {value} // TODO: function with paremeters value
+        | {number}  tnumber
+        | {value}
         | {funccall} id
-        | {decimal} [l]:number [r]:number
-        | {units} singleunit+
+        | {decimal} decimal
+        | {unit} singleunit
         | {negvalue}
         | {negnumber} number
         | {unarypostfix} unary id
         | {unarysuffix} id unary
         | {id} id
-        | {negid} id; // TODO: function with return value
-    number = tnumber;
-    singleunit = number id;
+        | {negid} id;
+    decimal = [l]:tnumber [r]:tnumber;
+    singleunit = {decimal} decimal id
+               | {number} tnumber id;
     unary = {plusplus}
           | {minusminus};
-    id = tid; // TODO: Arrays
+    id = tid; 
+    
+// TODO: Arrays
+// TODO: function with paremeters value
+// TODO: Switch
+// TODO: ensure that exp doesn't contain funccall to new. only allow newtype
