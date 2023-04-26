@@ -63,6 +63,9 @@ public class TypeChecker : DepthFirstAdapter
     // Implement Custom unit typechecking
     // WIP
     
+    // 13
+    // Implement declareAssignment casen ELLER få ændret grammer så det sker implicit
+    
     public override void InANewFunc(ANewFunc node) {
         
         SymbolTable.AddId(node.GetId(), node, SymbolTable.IsInCurrentScope(node.GetId())? Symbol.notOk : Symbol.Func);
