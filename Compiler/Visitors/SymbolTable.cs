@@ -7,8 +7,8 @@ public class SymbolTable
     private readonly Dictionary<string, Node> idToNode = new();
     private readonly Dictionary<Node, Symbol> nodeToSymbol = new();
     private readonly SymbolTable? parent;
-    public Dictionary<string, AUnit> SubunitToUnit = new();
-    public Dictionary<Node, AUnit> nodeToUnit = new();
+    public Dictionary<string, AUnitdecl> SubunitToUnit = new();
+    public Dictionary<Node, AUnitdecl> nodeToUnit = new();
 
     public Dictionary<string, PUnittype> idToUnit = new();
     //public Dictionary<AUnit, PUnittype> unitToType = new();
@@ -26,7 +26,7 @@ public class SymbolTable
 
     public static void ResetScope() => _currentSymbolTable = AllTables[0];
 
-    public static void AddId(PId identifier, Node node, Symbol symbol)
+    public static void AddId(TId identifier, Node node, Symbol symbol)
     {
         _currentSymbolTable.idToNode.Add("" + identifier, node);
         AddNode(node, symbol);
@@ -47,7 +47,7 @@ public class SymbolTable
     public static Symbol? GetSymbol(string identifier) => _currentSymbolTable.GetCurrentSymbol(identifier);
     private Symbol? GetCurrentSymbol(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentSymbol(identifier);
     private Symbol? GetCurrentSymbol(Node node) => nodeToSymbol.TryGetValue(node, out Symbol symbol) ? symbol : parent?.GetCurrentSymbol(node);
-    public static bool IsInCurrentScope(PId id) => _currentSymbolTable.idToNode.ContainsKey(id.ToString());
+    public static bool IsInCurrentScope(TId id) => _currentSymbolTable.idToNode.ContainsKey(id.ToString());
 }
 
 public enum Symbol

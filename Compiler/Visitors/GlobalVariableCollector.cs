@@ -6,14 +6,14 @@ namespace Compiler.Visitors;
 public class GlobalVariableCollector : DepthFirstAdapter
 {
     
-    public override void CaseANewFunc(ANewFunc node)
+    public override void CaseAUntypedFunc(AUntypedFunc node)
     {
-        InANewFunc(node);
-        OutANewFunc(node);
+        InAUntypedFunc(node);
+        OutAUntypedFunc(node);
     }
 
     // This override should be implemented in GlobalFunctionCollector
-    public override void InANewFunc(ANewFunc node)
+    public override void InAUntypedFunc(AUntypedFunc node)
     {
         Symbol? funcId = SymbolTable.GetSymbol(node.GetId());
         //throw new Exception("lmao, already declared");
@@ -85,22 +85,33 @@ public class GlobalVariableCollector : DepthFirstAdapter
             //tilføj tjek om der evalueres til ok eller ej?
             //tilføjer subunit til dens parent i Dictionary
             SymbolTable._currentSymbolTable.SubunitToUnit.Add(node.GetId().ToString().Replace(" ", ""),
-                    type == exprType? (AUnit)node.Parent() : null);
+                    Symbol.Decimal == exprType? (AUnitdecl)node.Parent() : null);
         }
     }
-
-    public override void OutASingleunit(ASingleunit node)
+    //nye
+    public override void OutADecimalSingleunit(ADecimalSingleunit node)
     {
         //tilføjer simpleunit f.eks: 5ms til typen f.eks Time
         var singleUnit = SymbolTable._currentSymbolTable.SubunitToUnit[node.GetId().ToString().Replace(" ", "")];
         SymbolTable._currentSymbolTable.nodeToUnit.Add(node,singleUnit); 
     }
-    
-    public override void OutAUnitsExp(AUnitsExp node)
+    //gamle
+    /*public override void OutASingleunit(PSingleunit node)
     {
+        //tilføjer simpleunit f.eks: 5ms til typen f.eks Time
+        var singleUnit = SymbolTable._currentSymbolTable.SubunitToUnit[node.GetId().ToString().Replace(" ", "")];
+        SymbolTable._currentSymbolTable.nodeToUnit.Add(node,singleUnit); 
+    }
+    */
+    
+    /* -----------VIRKER IKKE------------- */
+    public override void OutAUnitExp(AUnitExp node)
+    {   
         //tager den første unit såsom 5ms og sammenligner med de andre efterfølgende.
-        var aUnit = SymbolTable._currentSymbolTable.nodeToUnit[(ASingleunit)node.GetSingleunit()[0]];
-        foreach (ASingleunit singleunit in node.GetSingleunit())
+       /* var aUnit = SymbolTable._currentSymbolTable.nodeToUnit[(node.GetSingleunit())];
+        SymbolTable.AddId(node.GetSingleunit(),node, ? Symbol.notOk : Symbol.ok);
+        
+        foreach (PSingleunit singleunit in node.GetSingleunit())
         {
             if (SymbolTable._currentSymbolTable.nodeToUnit[singleunit] != aUnit)
             {
@@ -109,15 +120,10 @@ public class GlobalVariableCollector : DepthFirstAdapter
                 return;
             }
         }
-        SymbolTable._currentSymbolTable.nodeToUnit.Add(node,aUnit);
+        SymbolTable._currentSymbolTable.nodeToUnit.Add(node,aUnit);*/
         
     }
 
     // Assignments
-    
-    /*public override void InAAssignStmt(AAssignStmt node)
-    {
-       
-    }*/
-    
+
 }
