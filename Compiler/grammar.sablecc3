@@ -130,18 +130,20 @@ Productions
     // prog {}, loop {}, func a {} or int a {}
     func {-> func} = {prog}     tprog l_brace stmt_list r_brace         {-> New func.prog([stmt_list.stmt])}
                    | {loop}     tloop l_brace stmt_list r_brace         {-> New func.loop([stmt_list.stmt])}
-                   | {func}     tfunc id l_brace stmt_list r_brace      {-> New func.func(id, [stmt_list.stmt])}
-                   | {typed}    unittype id l_brace stmt_list r_brace   {-> New func.typed(unittype.unittype, id, [stmt_list.stmt])};
+                   | {untyped}  tfunc l_par params? r_par id l_brace stmt_list r_brace      {-> New func.untyped(id, [params.exp], [stmt_list.stmt])}
+                   | {typed}    unittype id l_par params? r_par l_brace stmt_list r_brace   {-> New func.typed(unittype.unittype, id, [params.exp], [stmt_list.stmt])};
     
+    params {-> exp*} = {list}   exp comma params?   {-> [params.exp, exp.exp]}
+                     | {single} exp                 {-> [exp.exp]};
     // Statements
     stmt_list {-> stmt*} = stmt stmt_list?                      {-> [stmt.stmt, stmt_list.stmt]};
     
-    stmt {-> stmt} = {assign}   assign semicolon                {-> assign.stmt}
-                   | {decl}     unittype id semicolon           {-> New stmt.decl(unittype.unittype, id)}
-                   | {declass}  unittype id equal exp semicolon {-> New stmt.declass(unittype.unittype, id, exp.exp)}
-                   | {funccall} id l_par r_par semicolon        {-> New stmt.funccall(id)}
-                   | {return}   treturn exp semicolon           {-> New stmt.return(exp.exp)}
-                   | {scoped}   scoped                          {-> New stmt.scoped(scoped.scoped)};
+    stmt {-> stmt} = {assign}   assign semicolon                    {-> assign.stmt}
+                   | {decl}     unittype id semicolon               {-> New stmt.decl(unittype.unittype, id)}
+                   | {declass}  unittype id equal exp semicolon     {-> New stmt.declass(unittype.unittype, id, exp.exp)}
+                   | {funccall} id l_par params? r_par semicolon    {-> New stmt.funccall(id, [params.exp])}
+                   | {return}   treturn exp semicolon               {-> New stmt.return(exp.exp)}
+                   | {scoped}   scoped                              {-> New stmt.scoped(scoped.scoped)};
     
     // Needed for for loop for (int i; i < 5;i += 1)
     assign {-> stmt} = {normal}     id equal exp        {-> New stmt.assign(id, exp.exp)}
@@ -152,7 +154,7 @@ Productions
     scoped {-> scoped} = {if}       if l_par exp r_par l_brace stmt_list r_brace                                                                    {-> New scoped.if(exp.exp, [stmt_list.stmt])}
                        | {else}     else l_brace stmt_list r_brace                                                                                  {-> New scoped.else([stmt_list.stmt])}
                        | {elseif}   else if l_par exp r_par l_brace stmt_list r_brace                                                               {-> New scoped.elseif(exp.exp, [stmt_list.stmt])}
-                       | {for}      for l_par [init]:stmt [fst]:semicolon [cond]:exp [snd]:semicolon [incre]:assign r_par l_brace stmt_list r_brace {-> New scoped.for(init.stmt, cond.exp, incre.stmt, [stmt_list.stmt])}
+                       | {for}      for l_par [init]:stmt [cond]:exp semicolon [incre]:assign r_par l_brace stmt_list r_brace {-> New scoped.for(init.stmt, cond.exp, incre.stmt, [stmt_list.stmt])}
                        | {while}    while l_par exp r_par l_brace stmt_list r_brace                                                                 {-> New scoped.while(exp.exp, [stmt_list.stmt])}
                        | {dowhile}  do l_brace stmt_list r_brace while l_par exp r_par                                                              {-> New scoped.dowhile([stmt_list.stmt], exp.exp)};
                            
@@ -167,7 +169,7 @@ Productions
 
     term {-> exp} = {exp}           l_par exp r_par {-> exp.exp}
                   | {id}            id              {-> New exp.id(id)}
-                  | {funccall}      id l_par r_par  {-> New exp.funccall(id)}
+                  | {funccall}      id l_par params? r_par  {-> New exp.funccall(id, [params.exp])}
                   | {decimal}       decimal         {-> New exp.decimal(decimal)}
                   | {unit}          singleunit      {-> New exp.unit(singleunit.singleunit)}
                   | {negid}         minus id        {-> New exp.negid(id)}
@@ -202,8 +204,8 @@ Abstract Syntax Tree
     
     func = {prog} stmt+
          | {loop} stmt+
-         | {untyped} id stmt+
-         | {typed} unittype id stmt+;
+         | {untyped} id [params]:exp* stmt+
+         | {typed} unittype id [params]:exp* stmt+;
          
     stmt = {exp} exp
          | {assign} id exp
@@ -212,7 +214,7 @@ Abstract Syntax Tree
          | {unarysuffixassign} id unary
          | {decl} unittype id
          | {declass} unittype id exp
-         | {funccall} id
+         | {funccall} id [params]:exp*
          | {return} exp
          | {scoped} scoped;
          
@@ -245,11 +247,12 @@ Abstract Syntax Tree
         | {negnumber} number
         | {unarypostfix} unary id
         | {unarysuffix} id unary
-        | {funccall} id
+        | {funccall} id [params]:exp*
         | {value}
         | {negvalue}
         | {id} id
         | {negid} id;
+        
         
     decimal = [l]:number [r]:number;
     
