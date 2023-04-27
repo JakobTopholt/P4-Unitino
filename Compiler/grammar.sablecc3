@@ -123,8 +123,8 @@ Productions
                          | {den}    slash id    {-> New unituse.den(id)};
     
     // For usage in expressions ex: 50 ms, 5 s, 50 meters TODO: Allow to define complex units such as 50 m/s (meter/per second) or /s (per second)
-    singleunit {-> singleunit} = {decimal}  decimal id  {-> New singleunit.decimal(decimal.decimal, id)}
-                               | {number}   number id   {-> New singleunit.number(number, id)};
+    singleunit {-> singleunit} = {decimal}  decimal id  {-> New singleunit.decimal(decimal.decimal, id)};
+                               //| {number}   number id   {-> New singleunit.number(number, id)};
                            
     //// Functions and statements
     // prog {}, loop {}, func a {} or int a {}
@@ -253,8 +253,8 @@ Abstract Syntax Tree
         
     decimal = [l]:number [r]:number;
     
-    singleunit = {decimal} decimal id
-               | {number} number id;
+    singleunit = {decimal} decimal id;
+               //| {number} number id;
                
     unary = {plusplus}
           | {minusminus};
