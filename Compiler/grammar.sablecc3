@@ -253,8 +253,8 @@ Abstract Syntax Tree
         
     decimal = [l]:number [r]:number;
     
-    singleunit = {decimal} decimal id
-               | {number} number id;
+    singleunit = {decimal} decimal id;
+               //| {number} number id;
                
     unary = {plusplus}
           | {minusminus};
