@@ -202,7 +202,7 @@ Abstract Syntax Tree
     
     func = {prog} stmt+
          | {loop} stmt+
-         | {func} id stmt+
+         | {untyped} id stmt+
          | {typed} unittype id stmt+;
          
     stmt = {exp} exp
