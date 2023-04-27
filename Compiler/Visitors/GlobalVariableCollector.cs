@@ -1,3 +1,4 @@
+using System.Collections;
 using Moduino.analysis;
 using Moduino.node;
 
@@ -6,14 +7,14 @@ namespace Compiler.Visitors;
 public class GlobalVariableCollector : DepthFirstAdapter
 {
     
-    public override void CaseANewFunc(ANewFunc node)
+    public override void CaseAUntypedFunc(AUntypedFunc node)
     {
-        InANewFunc(node);
-        OutANewFunc(node);
+        InAUntypedFunc(node);
+        OutAUntypedFunc(node);
     }
-
+    
     // This override should be implemented in GlobalFunctionCollector
-    public override void InANewFunc(ANewFunc node)
+    public override void InAUntypedFunc(AUntypedFunc node)
     {
         Symbol? funcId = SymbolTable.GetSymbol(node.GetId());
         //throw new Exception("lmao, already declared");
@@ -27,40 +28,41 @@ public class GlobalVariableCollector : DepthFirstAdapter
     {
         base.CaseADeclStmt(node);
         PUnittype unit = node.GetUnittype();
-        //Symbol? unitId = SymbolTable.GetSymbol(node.GetId());
-        switch (unit)
+        var standardType = unit as ATypeUnittype;
+        if (standardType != null)
         {
-            case AIntUnittype a:
-                Symbol? intId = SymbolTable.GetSymbol(a);
-                SymbolTable.AddId(node.GetId(), node, intId != null ? Symbol.notOk : Symbol.Int);
-                break;
-            case ADecimalUnittype b:
-                Symbol? decimalId = SymbolTable.GetSymbol(b);
-                SymbolTable.AddId(node.GetId(), node, decimalId != null ? Symbol.notOk : Symbol.Decimal);
-                break;
-            case ABoolUnittype c:
-                Symbol? boolId = SymbolTable.GetSymbol(c);
-                SymbolTable.AddId(node.GetId(), node, boolId != null ? Symbol.notOk : Symbol.Bool);
-                break;
-            case ACharUnittype d:
-                Symbol? charId = SymbolTable.GetSymbol(d);
-                SymbolTable.AddId(node.GetId(), node, charId != null ? Symbol.notOk : Symbol.Char);
-                break;
-            case AStringUnittype e:
-                Symbol? stringId = SymbolTable.GetSymbol(e);
-                SymbolTable.AddId(node.GetId(), node, stringId != null ? Symbol.notOk : Symbol.String);
-                break;
-           /* case ACustomtypeUnittype f:
-                // Er ikke implementeret ordentligt overhovedet
-                // Er en Task beasicly
-                
-                PId unitName = f.GetId();
-                Symbol? unitId = SymbolTable.GetSymbol(f);
-                SymbolTable._currentSymbolTable.idToUnit.Add(unitName.ToString(),f);
-                
-                SymbolTable.AddId(node.GetId(), node, unitId != null ? Symbol.notOk : Symbol.ok);
-                break;
-                */
+            switch (standardType.GetType())
+            {
+                case AIntType a:
+                    Symbol? intId = SymbolTable.GetSymbol(a);
+                    SymbolTable.AddId(node.GetId(), node, intId != null ? Symbol.notOk : Symbol.Int);
+                    break;
+                case ADecimalType b:
+                    Symbol? decimalId = SymbolTable.GetSymbol(b);
+                    SymbolTable.AddId(node.GetId(), node, decimalId != null ? Symbol.notOk : Symbol.Decimal);
+                    break;
+                case ABoolType c:
+                    Symbol? boolId = SymbolTable.GetSymbol(c);
+                    SymbolTable.AddId(node.GetId(), node, boolId != null ? Symbol.notOk : Symbol.Bool);
+                    break;
+                case ACharType d:
+                    Symbol? charId = SymbolTable.GetSymbol(d);
+                    SymbolTable.AddId(node.GetId(), node, charId != null ? Symbol.notOk : Symbol.Char);
+                    break;
+                case AStringType e:
+                    Symbol? stringId = SymbolTable.GetSymbol(e);
+                    SymbolTable.AddId(node.GetId(), node, stringId != null ? Symbol.notOk : Symbol.String);
+                    break;
+            }
+        }
+        var customType = unit as AUnitUnittype;
+        if (customType != null)
+        {
+            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
+            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
+            
+            // Her skal logikken implementeres 
+            
         }
     }
 

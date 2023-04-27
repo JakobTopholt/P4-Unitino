@@ -67,6 +67,14 @@ public class TypeChecker : DepthFirstAdapter
     // Implement declareAssignment casen ELLER få ændret grammer så det sker implicit
     // To do
     
+    // 14 
+    // Create Utils class with general methods
+    
+    // 15
+    // Implement logic for the new typed func aswell. 
+    // This is basicly the same logic but needs to be handled.
+    // These return types can be easly saved
+    
     // Grammar to-do:
     // Funktions parametre
     // Return 
