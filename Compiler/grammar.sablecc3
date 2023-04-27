@@ -29,7 +29,8 @@ Helpers
 
 Tokens
 
-    prog = 'Prog';
+    tprog = 'prog';
+    tloop = 'loop';
     tfunc = 'func';
     if = 'if';
     else = 'else';
@@ -45,6 +46,7 @@ Tokens
     tstring = 'string';
     tunit = 'unit';
     tvalue = 'value';
+    tas = 'as';
 
     l_bkt = '[';
     r_bkt = ']';
@@ -72,10 +74,10 @@ Tokens
     colon = ':';
     dot = '.';
 
-    tid = id_part ('_' id_part)*;
+    id = id_part ('_' id_part)*;
 
     char = ''' not_cr_lf ''';
-    tnumber = digit+;
+    number = digit+;
     hex = '0' ('x' | 'X') hex_digit+;
 
     string = ''' [not_cr_lf - ''']+ ''';
@@ -89,121 +91,175 @@ Ignored Tokens
     comment;
 
 Productions
-    grammar = funcunit {-> New grammar([funcunit.funcunit])};
-    funcunit_list {-> funcunit*} = {list} funcunit funcunit_list {-> [funcunit.funcunit, funcunit_list.funcunit]}
-                                 | {single} funcunit {-> [funcunit.funcunit]};
-    func_list {-> func*} = {list} func func_list {-> [func.func, func_list.func]} 
-                         | {single} func {-> [func.func]};
-    stmt_list {-> stmt*} = {list} stmt stmt_list {-> [stmt.stmt, stmt_list.stmt]} 
-                         | {single} stmt {-> [stmt.stmt]};
-    unit_list {-> unit*} = {list} unit unit_list {-> [unit.unit, unit_list.unit]}
-                         | {single} unit {-> [unit.unit]};
-    subunit_list {-> subunit*} = {list} subunit subunit_list {-> [subunit.subunit, subunit_list.subunit]}
-                               | {single} subunit {-> [subunit.subunit]};
-    groupunit_list {-> singleunit*} = {list} singleunit dot groupunit_list {-> [singleunit.singleunit, groupunit_list.singleunit]} //For usage in expr
-                                    | {single} singleunit {-> [singleunit.singleunit]};
-                             
-    funcunit {-> funcunit} = {unit} unit_list {-> New funcunit.unit([unit_list.unit])}
-                           | {func} func_list {-> New funcunit.func([func_list.func])};
-    func {-> func} = {prog} prog l_brace stmt_list r_brace {-> New func.prog([stmt_list.stmt])}
-                   | {new} tfunc id l_brace stmt_list r_brace {-> New func.new(id.id, [stmt_list.stmt])};
-    stmt {-> stmt} = {assign} assign semicolon {-> assign.stmt}
-                   | {decl} unittype id semicolon {-> New stmt.decl(unittype.unittype, id.id)}
-                   | {declass} unittype id equal exp semicolon {-> New stmt.declass(unittype.unittype, id.id, exp.exp)}
-                   | {funccall} id l_par r_par semicolon {-> New stmt.funccall(id.id)}
-                   | {return} treturn exp semicolon {-> New stmt.return(exp.exp)}
-                   | {scoped} scoped {-> New stmt.scoped(scoped.scoped)};
+    grammar = funcunit_list? {-> New grammar([funcunit_list.funcunit])};
+    
+    //Any ordered list of functions such as: unit, func, unit, unit, func,
+    funcunit_list {-> funcunit*} = funcunit funcunit_list? {-> [funcunit.funcunit, funcunit_list.funcunit]};
+    
+    funcunit {-> funcunit} = {unitdecl} unitdecl {-> New funcunit.unitdecl(unitdecl.unitdecl)}
+                           | {func} func {-> New funcunit.func(func.func)};
+    
+    //// Units
+    
+    // A unit declaration consist of one unit and it's subunits
+    unitdecl {-> unitdecl} = tunit id l_brace subunit_list r_brace {-> New unitdecl(id, [subunit_list.subunit])};
+    
+    subunit_list {-> subunit*} = subunit subunit_list? {-> [subunit.subunit, subunit_list.subunit]};
+    
+    subunit {-> subunit} = id arrow exp semicolon {-> New subunit(id, exp.exp)};
+    
+    // Distance/Time speed = 50 meters / 10 seconds 
+    // Unituse is when the unit is used as the type such as distance/time (speed) or distance/time/time (acceleration), /time*distance and /time/time*distance is also allowed
+    unittype {-> unittype} = {unituse} firstunituse unituse_list?   {-> New unittype.unit([firstunituse.unituse, unituse_list.unituse])}
+                           | {type} type                            {-> New unittype.type(type.type)};
+    
+    // first unituse is rather special because here the star shouldn't be used
+    firstunituse {-> unituse} = {num}   id      {-> New unituse.num(id)}
+                              | {usual} unituse {-> unituse.unituse};
+                              
+    unituse_list {-> unituse*} = unituse unituse_list? {-> [unituse.unituse, unituse_list.unituse]};
+    
+    unituse {-> unituse} = {num}    star id     {-> New unituse.num(id)}
+                         | {den}    slash id    {-> New unituse.den(id)};
+    
+    // For usage in expressions ex: 50 ms, 5 s, 50 meters TODO: Allow to define complex units such as 50 m/s (meter/per second) or /s (per second)
+    singleunit {-> singleunit} = {decimal}  decimal id  {-> New singleunit.decimal(decimal.decimal, id)}
+                               | {number}   number id   {-> New singleunit.number(number, id)};
+                           
+    //// Functions and statements
+    // prog {}, loop {}, func a {} or int a {}
+    func {-> func} = {prog}     tprog l_brace stmt_list r_brace         {-> New func.prog([stmt_list.stmt])}
+                   | {loop}     tloop l_brace stmt_list r_brace         {-> New func.loop([stmt_list.stmt])}
+                   | {func}     tfunc id l_brace stmt_list r_brace      {-> New func.func(id, [stmt_list.stmt])}
+                   | {typed}    unittype id l_brace stmt_list r_brace   {-> New func.typed(unittype.unittype, id, [stmt_list.stmt])};
+    
+    // Statements
+    stmt_list {-> stmt*} = stmt stmt_list?                      {-> [stmt.stmt, stmt_list.stmt]};
+    
+    stmt {-> stmt} = {assign}   assign semicolon                {-> assign.stmt}
+                   | {decl}     unittype id semicolon           {-> New stmt.decl(unittype.unittype, id)}
+                   | {declass}  unittype id equal exp semicolon {-> New stmt.declass(unittype.unittype, id, exp.exp)}
+                   | {funccall} id l_par r_par semicolon        {-> New stmt.funccall(id)}
+                   | {return}   treturn exp semicolon           {-> New stmt.return(exp.exp)}
+                   | {scoped}   scoped                          {-> New stmt.scoped(scoped.scoped)};
+    
+    // Needed for for loop for (int i; i < 5;i += 1)
+    assign {-> stmt} = {normal}     id equal exp        {-> New stmt.assign(id, exp.exp)}
+                     | {plusassign} id tplusassign exp  {-> New stmt.plusassign(id, exp.exp)}
+                     | {unarypostassign} unary id       {-> New stmt.unarypostassign(unary, id)}
+                     | {unarysuffixassign} id unary     {-> New stmt.unarysuffixassign(id, unary)};
+    // scoped/block statements
+    scoped {-> scoped} = {if}       if l_par exp r_par l_brace stmt_list r_brace                                                                    {-> New scoped.if(exp.exp, [stmt_list.stmt])}
+                       | {else}     else l_brace stmt_list r_brace                                                                                  {-> New scoped.else([stmt_list.stmt])}
+                       | {elseif}   else if l_par exp r_par l_brace stmt_list r_brace                                                               {-> New scoped.elseif(exp.exp, [stmt_list.stmt])}
+                       | {for}      for l_par [init]:stmt [fst]:semicolon [cond]:exp [snd]:semicolon [incre]:assign r_par l_brace stmt_list r_brace {-> New scoped.for(init.stmt, cond.exp, incre.stmt, [stmt_list.stmt])}
+                       | {while}    while l_par exp r_par l_brace stmt_list r_brace                                                                 {-> New scoped.while(exp.exp, [stmt_list.stmt])}
+                       | {dowhile}  do l_brace stmt_list r_brace while l_par exp r_par                                                              {-> New scoped.dowhile([stmt_list.stmt], exp.exp)};
+                           
+    //// Expressions
+    exp {-> exp} = {plus}   exp plus factor     {-> New exp.plus (exp.exp, factor.exp)}
+                 | {minus}  exp minus factor    {-> New exp.minus (exp.exp, factor.exp)}
+                 | {factor} factor              {-> factor.exp};
+                 
+    factor {-> exp} = {mult}    factor star term    {-> New exp.mult (factor.exp, term.exp)} //TODO: Modulo %
+                    | {div}     factor slash term   {-> New exp.div (factor.exp, term.exp)}
+                    | {term}    term                {-> term.exp};
 
-    scoped {-> scoped} = {if} if l_par exp r_par l_brace stmt_list r_brace {-> New scoped.if(exp.exp, [stmt_list.stmt])}
-                       | {else} else l_brace stmt_list r_brace {-> New scoped.else([stmt_list.stmt])}
-                       | {elseif} else if l_par exp r_par l_brace stmt_list r_brace {-> New scoped.elseif(exp.exp, [stmt_list.stmt])}
-                       | {for} for l_par [init]:stmt [fst]:semicolon [cond]:exp [snd]:semicolon [incre]:assign r_par l_brace stmt_list r_brace {-> New scoped.for(init.stmt, cond.exp, incre.stmt, [stmt_list.stmt])}
-                       | {while} while l_par exp r_par l_brace stmt_list r_brace {-> New scoped.while(exp.exp, [stmt_list.stmt])}
-                       | {dowhile} do l_brace stmt_list r_brace while l_par exp r_par {-> New scoped.dowhile([stmt_list.stmt], exp.exp)};
-     
-    unit {-> unit} = tunit id colon unittype l_brace subunit_list r_brace {-> New unit(id.id, unittype.unittype, [subunit_list.subunit])};
-    subunit {-> subunit} = id arrow exp semicolon {-> New subunit(id.id, exp.exp)}; //TODO allow value token and stmt block
-    singleunit {-> singleunit} = number id {-> New singleunit(number.number, id.id)}; //For usage in expr
-    unittype {-> unittype} = {int} tint {-> New unittype.int()}
-                           | {deciaml} tdecimal {-> New unittype.decimal()}
-                           | {bool} tbool {-> New unittype.bool()}
-                           | {char} tchar {-> New unittype.char()}
-                           | {string} tstring {-> New unittype.string()}
-                           | {customtype} id {-> New unittype.customtype(id.id)};
-
-    exp {-> exp} = {plus} exp plus factor {-> New exp.plus (exp.exp, factor.exp) }
-                 | {minus} exp minus factor {-> New exp.minus (exp.exp, factor.exp) }
-                 | {factor} factor {-> factor.exp };
-    assign {-> stmt} = id equal exp {-> New stmt.assign(id.id, exp.exp)};
-
-    factor {-> exp} = {mult} factor star term {-> New exp.mult (factor.exp, term.exp) } //TODO: Modulo %
-                    | {div} factor slash term {-> New exp.div (factor.exp, term.exp) }
-                    | {term} term {-> term.exp };
-
-    term {-> exp} = {exp} l_par exp r_par {-> exp.exp}
-                  | {id} id {-> New exp.id(id.id)}
-                  | {funccall} id l_par r_par {-> New exp.funccall(id.id)}
-                  | {decimal} [l]:number dot [r]:number {-> New exp.decimal(l.number, r.number)}
-                  | {units} groupunit_list {-> New exp.units([groupunit_list.singleunit])}
-                  | {negid} minus id {-> New exp.negid(id.id)}
-                  | {value} tvalue {-> New exp.value()}
-                  | {negvalue} minus tvalue {-> New exp.negvalue()}
-                  | {number} number {-> New exp.number(number.number)}
-                  | {negnumber} minus number {-> New exp.negnumber(number.number)}
-                  | {unarypostfix} unary id {-> New exp.unarypostfix(unary.unary, id.id)}
-                  | {unarysuffix} id unary {-> New exp.unarysuffix(id.id, unary.unary)};
-    unary {-> unary} = {plusplus} tplusplus {-> New unary.plusplus()}
+    term {-> exp} = {exp}           l_par exp r_par {-> exp.exp}
+                  | {id}            id              {-> New exp.id(id)}
+                  | {funccall}      id l_par r_par  {-> New exp.funccall(id)}
+                  | {decimal}       decimal         {-> New exp.decimal(decimal)}
+                  | {unit}          singleunit      {-> New exp.unit(singleunit.singleunit)}
+                  | {negid}         minus id        {-> New exp.negid(id)}
+                  | {value}         tvalue          {-> New exp.value()}
+                  | {negvalue}      minus tvalue    {-> New exp.negvalue()}
+                  | {number}        number          {-> New exp.number(number)}
+                  | {negnumber}     minus number    {-> New exp.negnumber(number)}
+                  | {unarypostfix}  unary id        {-> New exp.unarypostfix(unary.unary, id)}
+                  | {unarysuffix}   id unary        {-> New exp.unarysuffix(id, unary.unary)};
+                  
+    unary {-> unary} = {plusplus}   tplusplus   {-> New unary.plusplus()}
                      | {minusminus} tminusminus {-> New unary.minusminus()};
-    number {-> number} = tnumber {-> New number(tnumber)};
-    id {-> id} = tid {-> New id(tid)};
-
+                     
+    //// Miscellaneous    
+    type {-> type} = {int}      tint        {-> New type.int()}
+                   | {decimal}  tdecimal    {-> New type.decimal()}
+                   | {bool}     tbool       {-> New type.bool()}
+                   | {char}     tchar       {-> New type.char()}
+                   | {string}   tstring     {-> New type.string()};
+                   
+    decimal {-> decimal} = [l]:number dot [r]:number {-> New decimal(l, r)};
 
 Abstract Syntax Tree
-    grammar = funcunit*;
-    funcunit = {unit} unit*
-             | {func} func*;
-    unit = id unittype subunit*;
+    grammar = funcunit+;
+    
+    funcunit = {unitdecl} unitdecl
+             | {func} func;
+             
+    unitdecl = id subunit+;
+    
     subunit = id exp;
-    unittype = {int} //unit or type
-             | {decimal}
-             | {bool}
-             | {char}
-             | {string}
-             | {customtype} id;
+    
     func = {prog} stmt+
-         | {new} id stmt+
-         | {newtype} unittype id stmt+;
+         | {loop} stmt+
+         | {func} id stmt+
+         | {typed} unittype id stmt+;
+         
     stmt = {exp} exp
          | {assign} id exp
          | {plusassign} id exp
+         | {unarypostassign} unary id
+         | {unarysuffixassign} id unary
          | {decl} unittype id
          | {declass} unittype id exp
          | {funccall} id
-         | {return} exp // TODO: ensure that exp doesn't contain funccall to new. only allow newtype
+         | {return} exp
          | {scoped} scoped;
+         
+    unittype = {type} type
+             | {unit} unituse+;
+             
+    type = {int} 
+         | {decimal}
+         | {bool}
+         | {char}
+         | {string};
+         
+    unituse = {num} id // numerator
+            | {den} id; // denumerator
+            
     scoped = {if} exp stmt+
-           | {else} stmt+
            | {elseif} exp stmt+
-           | {for} [init]:stmt [cond]:exp [incre]:stmt stmt+
+           | {else} stmt+
+           | {for} [init]:stmt [cond]:exp [incre]:stmt stmt+ // incre is always an assignstmt
            | {while} exp stmt+
-           | {dowhile} stmt+ exp; //TODO: Switch
+           | {dowhile} stmt+ exp;
+           
     exp = {plus}    [l]:exp  [r]:exp 
         | {minus}   [l]:exp  [r]:exp 
         | {div}     [l]:exp  [r]:exp 
         | {mult}    [l]:exp  [r]:exp 
         | {number}  number
-        | {value} // TODO: function with paremeters value
-        | {funccall} id
-        | {decimal} [l]:number [r]:number
-        | {units} singleunit+
-        | {negvalue}
+        | {decimal} decimal
+        | {unit} singleunit
         | {negnumber} number
         | {unarypostfix} unary id
         | {unarysuffix} id unary
+        | {funccall} id
+        | {value}
+        | {negvalue}
         | {id} id
-        | {negid} id; // TODO: function with return value
-    number = tnumber;
-    singleunit = number id;
+        | {negid} id;
+        
+    decimal = [l]:number [r]:number;
+    
+    singleunit = {decimal} decimal id
+               | {number} number id;
+               
     unary = {plusplus}
           | {minusminus};
-    id = tid; // TODO: Arrays
+    
+// TODO: Arrays
+// TODO: function with paremeters value
+// TODO: Switch
+// TODO: Precedence table
