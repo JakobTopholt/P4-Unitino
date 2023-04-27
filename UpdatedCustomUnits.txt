@@ -1,0 +1,39 @@
+UNITS UPDATED CHEATSHEET
+
+// Declaration base units  (Units er assumed float/doubles)
+Unit Distance {
+   mm => value;
+   cm => mm*10;
+   m => cm*100;
+   km => m*1000;
+}
+
+Unit Time {
+   ms => value;
+   s => ms*1000;
+   min => s*60;
+   h => m*60;
+}
+
+// Declaration af en sammensat unit
+Distance/Time speed; 
+
+// Assignment
+speed = 10km.25min;
+
+
+// Accessing
+int s = 50
+Distance/Time speed = 50m/5s
+Distance length = speed * s
+Distance/Time speed2 = speed * 50 (250m/5s)
+float length2 = length / 1m
+Distance newlength = length / s
+/Time pertime = /5s
+Distance/Time speed3 = pertime * 5m
+
+
+// TypeChecking
+
+
+
