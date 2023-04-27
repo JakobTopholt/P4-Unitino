@@ -1,4 +1,4 @@
-using Moduino.analysis;
+ using Moduino.analysis;
 using Moduino.node;
 
 namespace Compiler.Visitors;
@@ -80,7 +80,9 @@ public class TypeChecker : DepthFirstAdapter
     // Return 
     // Type precedence
     
-    public override void InANewFunc(ANewFunc node) {
+  
+    
+    public override void InAUntypedFunc(AUntypedFunc node) {
         
         SymbolTable.AddId(node.GetId(), node, SymbolTable.IsInCurrentScope(node.GetId())? Symbol.notOk : Symbol.Func);
 
@@ -92,7 +94,7 @@ public class TypeChecker : DepthFirstAdapter
         
         SymbolTable.EnterScope();
     }
-    public override void OutANewFunc(ANewFunc node) 
+    public override void OutAUntypedFunc(AUntypedFunc node) 
     {
         //parametre kode?
         SymbolTable.ExitScope();
@@ -168,8 +170,8 @@ public class TypeChecker : DepthFirstAdapter
             {
 
             }
-            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(), out AUnit leftSide) &&
-                     SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(), out AUnit rightSide))
+            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(), out AUnitdecl leftSide) &&
+                     SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(), out AUnitdecl rightSide))
             {
                 SymbolTable.AddNode(node, leftSide == rightSide ? Symbol.ok : Symbol.notOk);
 
@@ -211,8 +213,8 @@ public class TypeChecker : DepthFirstAdapter
             {
 
             }
-            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(), out AUnit leftSide) &&
-                     SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(), out AUnit rightSide))
+            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(), out AUnitdecl leftSide) &&
+                     SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(), out AUnitdecl rightSide))
             {
                 SymbolTable.AddNode(node, leftSide == rightSide ? Symbol.ok : Symbol.notOk);
 
@@ -251,7 +253,7 @@ public class TypeChecker : DepthFirstAdapter
             {
                 
             }
-            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(),out AUnit leftSide) && SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(),out AUnit rightSide))
+            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(),out AUnitdecl leftSide) && SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(),out AUnit rightSide))
             {
                 SymbolTable.AddNode(node, leftSide == rightSide ? Symbol.ok : Symbol.notOk);
 
@@ -302,7 +304,7 @@ public class TypeChecker : DepthFirstAdapter
             {
                 
             }
-            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(),out AUnit leftSide) && SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(),out AUnit rightSide))
+            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(),out AUnitdecl leftSide) && SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(),out AUnit rightSide))
             {
                 SymbolTable.AddNode(node, leftSide == rightSide ? Symbol.ok : Symbol.notOk);
 

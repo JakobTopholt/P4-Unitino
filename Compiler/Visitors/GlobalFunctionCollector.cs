@@ -5,14 +5,14 @@ namespace Compiler.Visitors;
 
 public class GlobalFunctionCollector : DepthFirstAdapter
 {
-    public override void InANewFunc(ANewFunc node)
+    public override void InAUntypedFunc(AUntypedFunc node)
     {
         // Mangler også at store funktions parametre her
         // Se task 4 i TypeChecker
         
     }
 
-    public override void OutANewFunc(ANewFunc node)
+    public override void OutAUntypedFunc(AUntypedFunc node)
     {
         Symbol? funcId = SymbolTable.GetSymbol(node.GetId());
         //throw new Exception("lmao, already declared");

@@ -7,8 +7,8 @@ public class SymbolTable
     private readonly Dictionary<string, Node> idToNode = new();
     private readonly Dictionary<Node, Symbol> nodeToSymbol = new();
     private readonly SymbolTable? parent;
-    public Dictionary<string, AUnit> SubunitToUnit = new();
-    public Dictionary<Node, AUnit> nodeToUnit = new();
+    public Dictionary<string, AUnitdecl> SubunitToUnit = new();
+    public Dictionary<Node, AUnitdecl> nodeToUnit = new();
 
     //public Dictionary<string, PUnittype> idToUnit = new();
     //public Dictionary<AUnit, PUnittype> unitToType = new();
