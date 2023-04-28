@@ -106,56 +106,55 @@ public class TypeChecker : DepthFirstAdapter
     {
         base.CaseADeclStmt(node);
         PUnittype unit = node.GetUnittype();
-        //Symbol? unitId = SymbolTable.GetSymbol(node.GetId());
-        switch (unit)
+        var standardType = unit as ATypeUnittype;
+        if (standardType != null)
         {
-            case AIntUnittype a:
-                if (a.Parent() != null)
-                {
-                    SymbolTable.AddId(node.GetId(), node,
-                        SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Int);
-                }
-                break;
-            case ADecimalUnittype b:
-                if (b.Parent() != null)
-                {
-                    SymbolTable.AddId(node.GetId(), node,
-                        SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Decimal);
-                }
-                break;
-            case ABoolUnittype c:
-                if (c.Parent() != null)
-                {
-                    SymbolTable.AddId(node.GetId(), node,
-                        SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Bool);
-                }
-                break;
-            case ACharUnittype d:
-                if (d.Parent() != null)
-                {
-                    SymbolTable.AddId(node.GetId(), node,
-                        SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Char);
-                }
-                break;
-            case AStringUnittype e:
-                if (e.Parent() != null)
-                {
-                    SymbolTable.AddId(node.GetId(), node,
-                        SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.String);
-                }
-                break;
-            /*case ACustomtypeUnittype f:
-                // Er ikke implementeret ordentligt overhovedet
-                // Er en Task beasicly
-
-
-                PId unitName = f.GetId();
-                Symbol? unitId = SymbolTable.GetSymbol(f);
-                SymbolTable._currentSymbolTable.idToUnit.Add(unitName.ToString(),f);
-                
-                SymbolTable.AddId(node.GetId(), node, unitId != null ? Symbol.notOk : Symbol.ok);
-                break;
-                */
+            switch (standardType.GetType())
+            {
+                case AIntType a:
+                    if (a.Parent() != null)
+                    {
+                        SymbolTable.AddId(node.GetId(), node, SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Int);
+                    }
+                    break;
+                case ADecimalType b:
+                    if (b.Parent() != null)
+                    {
+                        SymbolTable.AddId(node.GetId(), node,
+                            SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Decimal);
+                    }
+                    break;
+                case ABoolType c:
+                    if (c.Parent() != null)
+                    {
+                        SymbolTable.AddId(node.GetId(), node,
+                            SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Bool);
+                    }
+                    break;
+                case ACharType d:
+                    if (d.Parent() != null)
+                    {
+                        SymbolTable.AddId(node.GetId(), node,
+                            SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Char);
+                    }
+                    break;
+                case AStringType e:
+                    if (e.Parent() != null)
+                    {
+                        SymbolTable.AddId(node.GetId(), node,
+                            SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.String);
+                    }
+                    break;
+            }
+        }
+        var customType = unit as AUnitUnittype;
+        if (customType != null)
+        {
+            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
+            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
+            
+            // Her skal logikken implementeres 
+            
         }
     }
 
