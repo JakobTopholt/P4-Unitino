@@ -58,6 +58,8 @@ Tokens
     tplusplus = '++';
     tminusminus = '--';
     tplusassign = '+=';
+    tslashslash = '//';
+    tstarstar = '**';
 
     plus = '+';
     minus = '-';
@@ -123,18 +125,32 @@ Productions
                          | {den}    slash id    {-> New unituse.den(id)};
     
     // For usage in expressions ex: 50 ms, 5 s, 50 meters TODO: Allow to define complex units such as 50 m/s (meter/per second) or /s (per second)
-    singleunit {-> singleunit} = {decimal}  decimal id  {-> New singleunit.decimal(decimal.decimal, id)};
-                               //| {number}   number id   {-> New singleunit.number(number, id)};
+    unitnumber {-> unitnumber} = decimal firstsingleunit singleunit_list? {-> New unitnumber(decimal.decimal, [firstsingleunit.singleunit, singleunit_list.singleunit])};
+    
+    firstsingleunit {-> singleunit} = {num} id {-> New singleunit.num(id)}
+                                    | {den} tslashslash id {-> New singleunit.den(id)};
+                                    
+    singleunit_list {-> singleunit*} = {list} singleunit singleunit_list? {-> [singleunit.singleunit, singleunit_list.singleunit]};
+    
+    singleunit {-> singleunit} = {num} tstarstar id {-> New singleunit.num(id)}
+                               | {den} tslashslash id {-> New singleunit.den(id)};
                            
     //// Functions and statements
     // prog {}, loop {}, func a {} or int a {}
     func {-> func} = {prog}     tprog l_brace stmt_list r_brace         {-> New func.prog([stmt_list.stmt])}
                    | {loop}     tloop l_brace stmt_list r_brace         {-> New func.loop([stmt_list.stmt])}
-                   | {untyped}  tfunc l_par params? r_par id l_brace stmt_list r_brace      {-> New func.untyped(id, [params.exp], [stmt_list.stmt])}
-                   | {typed}    unittype id l_par params? r_par l_brace stmt_list r_brace   {-> New func.typed(unittype.unittype, id, [params.exp], [stmt_list.stmt])};
+                   | {untyped}  tfunc l_par args? r_par id l_brace stmt_list r_brace      {-> New func.untyped(id, [args.arg], [stmt_list.stmt])}
+                   | {typed}    unittype id l_par args? r_par l_brace stmt_list r_brace   {-> New func.typed(unittype.unittype, id, [args.arg], [stmt_list.stmt])};
     
-    params {-> exp*} = {list}   exp comma params?   {-> [params.exp, exp.exp]}
+    //arguments used to declare a function and params when using a function
+    params {-> exp*} = {list}   exp comma params   {-> [params.exp, exp.exp]}
                      | {single} exp                 {-> [exp.exp]};
+                     
+    args {-> arg*} = {list} arg comma args {-> [arg.arg, args.arg]}
+                   | {single} arg {-> [arg.arg]};
+                   
+    arg {-> arg} = unittype id {-> New arg(unittype.unittype, id)};
+    
     // Statements
     stmt_list {-> stmt*} = stmt stmt_list?                      {-> [stmt.stmt, stmt_list.stmt]};
     
@@ -171,7 +187,7 @@ Productions
                   | {id}            id              {-> New exp.id(id)}
                   | {funccall}      id l_par params? r_par  {-> New exp.funccall(id, [params.exp])}
                   | {decimal}       decimal         {-> New exp.decimal(decimal)}
-                  | {unit}          singleunit      {-> New exp.unit(singleunit.singleunit)}
+                  | {unit}          unitnumber      {-> New exp.unit(unitnumber.unitnumber)}
                   | {negid}         minus id        {-> New exp.negid(id)}
                   | {value}         tvalue          {-> New exp.value()}
                   | {negvalue}      minus tvalue    {-> New exp.negvalue()}
@@ -204,8 +220,10 @@ Abstract Syntax Tree
     
     func = {prog} stmt+
          | {loop} stmt+
-         | {untyped} id [params]:exp* stmt+
-         | {typed} unittype id [params]:exp* stmt+;
+         | {untyped} id arg* stmt+
+         | {typed} unittype id arg* stmt+;
+         
+    arg = unittype id;
          
     stmt = {exp} exp
          | {assign} id exp
@@ -220,7 +238,7 @@ Abstract Syntax Tree
          
     unittype = {type} type
              | {unit} unituse+;
-             
+                      
     type = {int} 
          | {decimal}
          | {bool}
@@ -243,7 +261,7 @@ Abstract Syntax Tree
         | {mult}    [l]:exp  [r]:exp 
         | {number}  number
         | {decimal} decimal
-        | {unit} singleunit
+        | {unit} unitnumber
         | {negnumber} number
         | {unarypostfix} unary id
         | {unarysuffix} id unary
@@ -255,9 +273,9 @@ Abstract Syntax Tree
         
         
     decimal = [l]:number [r]:number;
-    
-    singleunit = {decimal} decimal id;
-               //| {number} number id;
+    unitnumber = decimal singleunit*;
+    singleunit = {num} id
+               | {den} id;
                
     unary = {plusplus}
           | {minusminus};
