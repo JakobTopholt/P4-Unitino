@@ -16,13 +16,16 @@ Helpers
     not_cr_lf = [all - [cr + lf]];
     not_star = [all - '*'];
     not_star_slash = [not_star - '/'];
+    
+    escaped_chars = '\n'; //TODO: more escaped chars
+    valid_char = [not_cr_lf - [''' + '"']];
+    string_char = [valid_char + '''] | escaped_chars | '\"';
+    char_char = [valid_char + '"'] | escaped_chars | '\' + ''';
 
     blank = (' ' | tab | eol)+;
 
     short_comment = '//' not_cr_lf* eol;
-    long_comment =
-        '/*' not_star* '*'+ (not_star_slash not_star* '*'+)* '/';
-    comment = short_comment | long_comment;
+    long_comment = '/*' not_star* '*'+ (not_star_slash not_star* '*'+)* '/';
 
     letter = lowercase | uppercase | '_' | '$';
     id_part = lowercase (lowercase | digit)*;
@@ -46,7 +49,9 @@ Tokens
     tstring = 'string';
     tunit = 'unit';
     tvalue = 'value';
-    tas = 'as';
+    
+    ttrue = 'true';
+    tfalse = 'false';
 
     l_bkt = '[';
     r_bkt = ']';
@@ -58,17 +63,29 @@ Tokens
     tplusplus = '++';
     tminusminus = '--';
     tplusassign = '+=';
+    tminusassign = '-=';
     tslashslash = '//';
     tstarstar = '**';
+    tbarbar = '||';
+    tand = '&&';
+    tequalequal = '==';
+    tnotequal = '!=';
+    tlessequal = '<=';
+    tgreaterequal = '>=';
+    tless = '<';
+    tgreater = '>';
 
     plus = '+';
     minus = '-';
     slash = '/';
     star = '*';
+    modulo = '%'; 
 
     equal = '=';
     q_mark = '?';
     bar = '|';
+    tamparsand = '&';
+    not = '!';
     arrow = '=>';
 
     comma = ',';
@@ -78,14 +95,15 @@ Tokens
 
     id = id_part ('_' id_part)*;
 
-    char = ''' not_cr_lf ''';
+    decimal = digit+ '.' digit+;
     number = digit+;
     hex = '0' ('x' | 'X') hex_digit+;
 
-    string = ''' [not_cr_lf - ''']+ ''';
+    string = '"' string_char+ '"';
+    char = ''' char_char+ '''; //TODO: test if string and char works correctly
 
     blank = blank;
-    comment = comment;
+    comment = short_comment | long_comment;
 
 
 Ignored Tokens
@@ -125,7 +143,7 @@ Productions
                          | {den}    slash id    {-> New unituse.den(id)};
     
     // For usage in expressions ex: 50 ms, 5 s, 50 meters TODO: Allow to define complex units such as 50 m/s (meter/per second) or /s (per second)
-    unitnumber {-> unitnumber} = decimal firstsingleunit singleunit_list? {-> New unitnumber(decimal.decimal, [firstsingleunit.singleunit, singleunit_list.singleunit])};
+    unitnumber {-> unitnumber} = decimal firstsingleunit singleunit_list? {-> New unitnumber(decimal, [firstsingleunit.singleunit, singleunit_list.singleunit])};
     
     firstsingleunit {-> singleunit} = {num} id {-> New singleunit.num(id)}
                                     | {den} tslashslash id {-> New singleunit.den(id)};
@@ -162,10 +180,13 @@ Productions
                    | {scoped}   scoped                              {-> New stmt.scoped(scoped.scoped)};
     
     // Needed for for loop for (int i; i < 5;i += 1)
-    assign {-> stmt} = {normal}     id equal exp        {-> New stmt.assign(id, exp.exp)}
-                     | {plusassign} id tplusassign exp  {-> New stmt.plusassign(id, exp.exp)}
-                     | {unarypostassign} unary id       {-> New stmt.unarypostassign(unary, id)}
-                     | {unarysuffixassign} id unary     {-> New stmt.unarysuffixassign(id, unary)};
+    assign {-> stmt} = {normal}         id equal exp        {-> New stmt.assign(id, exp.exp)}
+                     | {plusassign}     id tplusassign exp  {-> New stmt.plusassign(id, exp.exp)}
+                     | {minusassign}    id tminusassign exp {-> New stmt.minusassign(id, exp.exp)}
+                     | {prefixplus}     tplusplus id        {-> New stmt.prefixplus(id)}
+                     | {prefixminus}    tminusminus id      {-> New stmt.prefixminus(id)}
+                     | {suffixplus}     id tplusplus        {-> New stmt.suffixplus(id)}
+                     | {suffixminus}    id tminusminus      {-> New stmt.suffixminus(id)};
     // scoped/block statements
     scoped {-> scoped} = {if}       if l_par exp r_par l_brace stmt_list r_brace                                                                    {-> New scoped.if(exp.exp, [stmt_list.stmt])}
                        | {else}     else l_brace stmt_list r_brace                                                                                  {-> New scoped.else([stmt_list.stmt])}
@@ -174,31 +195,48 @@ Productions
                        | {while}    while l_par exp r_par l_brace stmt_list r_brace                                                                 {-> New scoped.while(exp.exp, [stmt_list.stmt])}
                        | {dowhile}  do l_brace stmt_list r_brace while l_par exp r_par                                                              {-> New scoped.dowhile([stmt_list.stmt], exp.exp)};
                            
-    //// Expressions
-    exp {-> exp} = {plus}   exp plus factor     {-> New exp.plus (exp.exp, factor.exp)}
-                 | {minus}  exp minus factor    {-> New exp.minus (exp.exp, factor.exp)}
-                 | {factor} factor              {-> factor.exp};
-                 
-    factor {-> exp} = {mult}    factor star term    {-> New exp.mult (factor.exp, term.exp)} //TODO: Modulo %
-                    | {div}     factor slash term   {-> New exp.div (factor.exp, term.exp)}
-                    | {term}    term                {-> term.exp};
-
-    term {-> exp} = {exp}           l_par exp r_par {-> exp.exp}
-                  | {id}            id              {-> New exp.id(id)}
-                  | {funccall}      id l_par params? r_par  {-> New exp.funccall(id, [params.exp])}
-                  | {decimal}       decimal         {-> New exp.decimal(decimal)}
-                  | {unit}          unitnumber      {-> New exp.unit(unitnumber.unitnumber)}
-                  | {negid}         minus id        {-> New exp.negid(id)}
-                  | {value}         tvalue          {-> New exp.value()}
-                  | {negvalue}      minus tvalue    {-> New exp.negvalue()}
-                  | {number}        number          {-> New exp.number(number)}
-                  | {negnumber}     minus number    {-> New exp.negnumber(number)}
-                  | {unarypostfix}  unary id        {-> New exp.unarypostfix(unary.unary, id)}
-                  | {unarysuffix}   id unary        {-> New exp.unarysuffix(id, unary.unary)};
-                  
-    unary {-> unary} = {plusplus}   tplusplus   {-> New unary.plusplus()}
-                     | {minusminus} tminusminus {-> New unary.minusminus()};
-                     
+    //// Expressions - check precedence table from report
+    exp {-> exp}= {ternary}         p8 q_mark [true]:exp colon [false]:exp  {-> New exp.ternary(p8.exp, true.exp, false.exp)}
+                | p8 {-> p8.exp}; //TODO: right to left override case
+    p8 {-> exp} = {or}              p8 tbarbar p7                           {-> New exp.or(p8.exp, p7.exp)}
+                | p7 {-> p7.exp};
+    p7 {-> exp} = {and}             p7 tand p6                              {-> New exp.and(p7.exp, p6.exp)}
+                | p6 {-> p6.exp};
+    p6 {-> exp} = {equal}           p6 tequalequal p5                       {-> New exp.equal(p6.exp, p5.exp)}
+                | {notequal}        p6 tnotequal p5                         {-> New exp.notequal(p6.exp, p5.exp)}
+                | p5 {-> p5.exp};
+    p5 {-> exp} = {greater}         p5 tgreater p4                          {-> New exp.greater(p5.exp, p4.exp)}
+                | {greaterequal}    p5 tgreaterequal p4                     {-> New exp.greaterequal(p5.exp, p4.exp)}
+                | {less}            p5 tless p4                             {-> New exp.less(p5.exp, p4.exp)}
+                | {lessequal}       p5 tlessequal p4                        {-> New exp.lessequal(p5.exp, p4.exp)}
+                | p4 {-> p4.exp};
+    p4 {-> exp} = {plus}            p4 plus p3                              {-> New exp.plus(p4.exp, p3.exp)}
+                | {minus}           p4 minus p3                             {-> New exp.minus(p4.exp, p3.exp)}
+                | p3 {-> p3.exp};
+    p3 {-> exp} = {divide}          p3 slash p2                             {-> New exp.divide(p3.exp, p2.exp)}
+                | {multiply}        p3 star p2                              {-> New exp.multiply(p3.exp, p2.exp)}
+                | {remainder}       p3 modulo p2                            {-> New exp.remainder(p3.exp, p2.exp)}
+                | p2 {-> p2.exp};
+    p2 {-> exp} = {suffixplusplus}  p1 tplusplus                            {-> New exp.suffixplusplus(p1.exp)}
+                | {suffixminusminus}p1 tminusminus                          {-> New exp.suffixminusminus(p1.exp)}
+                | {unaryminus}      minus p1                                {-> New exp.unaryminus(p1.exp)}
+                | {logicalnot}      not p1                                  {-> New exp.logicalnot(p1.exp)}
+                | {cast}            l_par type r_par p1                     {-> New exp.cast(type.type, p1.exp)}
+                | p1 {-> p1.exp}; //TODO: right to left override case
+    p1 {-> exp} = {prefixplusplus}  tplusplus p0                            {-> New exp.prefixplusplus(p0.exp)}
+                | {prefixminusminus}tminusminus p0                          {-> New exp.prefixminusminus(p0.exp)}
+                | {funccall}        id l_par params? r_par                  {-> New exp.funccall(id, [params.exp])} // <- array and structaccess goes here
+                | p0 {-> p0.exp};
+    p0 {-> exp} = {id}              id {-> New exp.id(id)}
+                | {decimal}         decimal                                 {-> New exp.decimal(decimal)}
+                | {unit}            unitnumber                              {-> New exp.unit(unitnumber.unitnumber)}
+                | {value}           tvalue                                  {-> New exp.value()}
+                | {number}          number                                  {-> New exp.number(number)}
+                | {boolean}         boolean                                 {-> New exp.boolean(boolean.boolean)}
+                | {string}          string                                  {-> New exp.string(string)}
+                | {char}            char                                    {-> New exp.char(char)}
+                | {exp}             l_par exp r_par                         {-> exp.exp}; //TODO: more values such as true/false, string, etc.
+                         
     //// Miscellaneous    
     type {-> type} = {int}      tint        {-> New type.int()}
                    | {decimal}  tdecimal    {-> New type.decimal()}
@@ -206,7 +244,8 @@ Productions
                    | {char}     tchar       {-> New type.char()}
                    | {string}   tstring     {-> New type.string()};
                    
-    decimal {-> decimal} = [l]:number dot [r]:number {-> New decimal(l, r)};
+    boolean {-> boolean} = {true} ttrue {-> New boolean.true()}
+                         | {false} tfalse {-> New boolean.false()};
 
 Abstract Syntax Tree
     grammar = funcunit+;
@@ -226,10 +265,13 @@ Abstract Syntax Tree
     arg = unittype id;
          
     stmt = {exp} exp
-         | {assign} id exp
-         | {plusassign} id exp
-         | {unarypostassign} unary id
-         | {unarysuffixassign} id unary
+         | {assign}      id exp       
+         | {plusassign}  id exp   
+         | {minusassign} id exp  
+         | {prefixplus}  id             
+         | {prefixminus} id            
+         | {suffixplus}  id             
+         | {suffixminus} id                          
          | {decl} unittype id
          | {declass} unittype id exp
          | {funccall} id [params]:exp*
@@ -254,25 +296,42 @@ Abstract Syntax Tree
            | {for} [init]:stmt [cond]:exp [incre]:stmt stmt+ // incre is always an assignstmt
            | {while} exp stmt+
            | {dowhile} stmt+ exp;
-           
-    exp = {plus}    [l]:exp  [r]:exp 
-        | {minus}   [l]:exp  [r]:exp 
-        | {div}     [l]:exp  [r]:exp 
-        | {mult}    [l]:exp  [r]:exp 
-        | {number}  number
-        | {decimal} decimal
-        | {unit} unitnumber
-        | {negnumber} number
-        | {unarypostfix} unary id
-        | {unarysuffix} id unary
-        | {funccall} id [params]:exp*
-        | {value}
-        | {negvalue}
-        | {id} id
-        | {negid} id;
+    
+    
+    //Expressions
+    exp = {ternary}         [cond]:exp [true]:exp [false]:exp
+        | {or}              [l]:exp [r]:exp
+        | {and}             [l]:exp [r]:exp
+        | {equal}           [l]:exp [r]:exp
+        | {notequal}        [l]:exp [r]:exp
+        | {greater}         [l]:exp [r]:exp
+        | {greaterequal}    [l]:exp [r]:exp
+        | {less}            [l]:exp [r]:exp
+        | {lessequal}       [l]:exp [r]:exp
+        | {plus}            [l]:exp [r]:exp
+        | {minus}           [l]:exp [r]:exp
+        | {divide}          [l]:exp [r]:exp
+        | {multiply}        [l]:exp [r]:exp
+        | {remainder}       [l]:exp [r]:exp
+        | {suffixplusplus}  exp
+        | {suffixminusminus}exp
+        | {unaryminus}      exp
+        | {logicalnot}      exp
+        | {cast}            type exp
+        | {prefixplusplus}  exp
+        | {prefixminusminus}exp
+        | {funccall}        id exp*
+        | {id}              id
+        | {decimal}         decimal
+        | {unit}            unitnumber
+        | {value}           
+        | {number}          number
+        | {boolean}         boolean
+        | {string}          string
+        | {char}            char
+        | {exp}             exp;  
         
-        
-    decimal = [l]:number [r]:number;
+    boolean = {true} | {false};
     unitnumber = decimal singleunit*;
     singleunit = {num} id
                | {den} id;
@@ -281,6 +340,4 @@ Abstract Syntax Tree
           | {minusminus};
     
 // TODO: Arrays
-// TODO: function with paremeters value
 // TODO: Switch
-// TODO: Precedence table
