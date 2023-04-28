@@ -114,7 +114,8 @@ public class TypeChecker : DepthFirstAdapter
                 case AIntType a:
                     if (a.Parent() != null)
                     {
-                        SymbolTable.AddId(node.GetId(), node, SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Int);
+                        SymbolTable.AddId(node.GetId(), node, 
+                            SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Int);
                     }
                     break;
                 case ADecimalType b:
@@ -252,7 +253,7 @@ public class TypeChecker : DepthFirstAdapter
             {
                 
             }
-            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(),out AUnitdecl leftSide) && SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(),out AUnit rightSide))
+            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(),out AUnitdecl leftSide) && SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(),out AUnitdecl rightSide))
             {
                 SymbolTable.AddNode(node, leftSide == rightSide ? Symbol.ok : Symbol.notOk);
 
@@ -303,7 +304,7 @@ public class TypeChecker : DepthFirstAdapter
             {
                 
             }
-            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(),out AUnitdecl leftSide) && SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(),out AUnit rightSide))
+            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(),out AUnitdecl leftSide) && SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(),out AUnitdecl rightSide))
             {
                 SymbolTable.AddNode(node, leftSide == rightSide ? Symbol.ok : Symbol.notOk);
 
