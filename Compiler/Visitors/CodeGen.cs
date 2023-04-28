@@ -30,11 +30,9 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     void Precedence(Node L, Node R, string ope)
     {
-        writer.Write(L.Parent().Parent().Parent() is ASubunit ? "(" : "");
         L.Apply(this);
         writer.Write(ope);
         R.Apply(this);
-        writer.Write(L.Parent().Parent().Parent() is ASubunit ? ");\n" : "");
     }
     private int _indent = 0;
     private void Indent(string s)
@@ -60,8 +58,27 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         _indent--;
         Indent("}\n");
     }
-    
-    public override void CaseANewFunc(ANewFunc node)
+
+    public override void CaseALoopFunc(ALoopFunc node)
+    {
+        Indent("void loop() {\n");
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                writer.WriteLine(";");
+        }
+        OutALoopFunc(node);
+    }
+
+    public override void OutALoopFunc(ALoopFunc node)
+    {
+        _indent--;
+        Indent("}\n");
+    }
+
+    public override void CaseAFuncFunc(AFuncFunc node)
     {
         Indent("func void " + node.GetId() + "{\r\n");
         _indent++;
@@ -71,13 +88,13 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             if (child is not AScopedStmt)
                 writer.WriteLine(";");
         }
-        OutANewFunc(node);
+        OutAFuncFunc(node);
     }
 
-    public override void OutANewFunc(ANewFunc node)
+    public override void OutAFuncFunc(AFuncFunc node)
     {
         _indent--;
-        Indent("}\n");
+        Indent("}\n");    
     }
 
     /*-------------------------------------Control Structures---------------------------------------------------------*/
@@ -213,32 +230,42 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     }
 
     /*-------------------------------------Decl-----------------------------------------------------------------------*/
-    
-    public override void InAIntDecl(AIntDecl node)
+
+    public override void InADeclStmt(ADeclStmt node)
     {
-        Indent(("int " + node.GetId().ToString().Trim()));
+        base.InADeclStmt(node);
+        PUnittype unit = node.GetUnittype();
+        var standardType = unit as ATypeUnittype;
+        if (standardType != null)
+        {
+            switch (standardType.GetType())
+            {
+                case AIntType a:
+                    Indent(("int " + node.GetId().ToString().Trim()));
+                    break;
+                case ADecimalType b:
+                    Indent(("decimal " + node.GetId().ToString().Trim()));
+                    break;
+                case ABoolType c:
+                    Indent(("bool " + node.GetId().ToString().Trim()));
+                    break;
+                case ACharType d:
+                    Indent(("char " + node.GetId().ToString().Trim()));
+                    break;
+                case AStringType e:
+                    Indent(("string " + node.GetId().ToString().Trim()));
+                    break;
+            }
+        }
+        var customType = unit as AUnitUnittype;
+        if (customType != null)
+        {
+            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
+            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
+            // Her skal logikken implementeres 
+        }
     }
 
-    public override void InABoolDecl(ABoolDecl node)
-    {
-        Indent("bool " + node.GetId().ToString().Trim());
-    }
-
-    public override void InADecimalDecl(ADecimalDecl node)
-    {
-        Indent("decimal " + node.GetId().ToString().Trim());
-    }
-
-    public override void InACharDecl(ACharDecl node)
-    {
-        Indent("char " + node.GetId().ToString().Trim());
-    }
-    
-    public override void InAStringDecl(AStringDecl node)
-    {
-        Indent("string " + node.GetId().ToString().Trim());
-    }
-    
     int i = 0;
     public override void InAExpStmt(AExpStmt node)
     {
@@ -253,6 +280,63 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void InAAssignStmt(AAssignStmt node)
     {
         Indent(node.GetId() + "= ");
+    }
+
+    public override void InAPlusassignStmt(APlusassignStmt node)
+    {
+        Indent($"{node.GetId()}+= ");
+    }
+
+    public override void InAUnarypostassignStmt(AUnarypostassignStmt node)
+    {
+        Indent(node.GetId().ToString().Trim() + (node.GetUnary() is APlusplusUnary ? "++" : "--"));
+    }
+
+    public override void InAUnarysuffixassignStmt(AUnarysuffixassignStmt node)
+    {
+        Indent(node.GetId().ToString().Trim() + (node.GetUnary() is APlusplusUnary ? "++" : "--"));
+    }
+
+    public override void InADeclassStmt(ADeclassStmt node)
+    {
+        base.InADeclassStmt(node);
+        PUnittype unit = node.GetUnittype();
+        var standardType = unit as ATypeUnittype;
+        if (standardType != null)
+        {
+            switch (standardType.GetType())
+            {
+                case AIntType a:
+                    Indent(("int " + node.GetId().ToString().Trim()) + " = ");
+                    break;
+                case ADecimalType b:
+                    Indent(("decimal " + node.GetId().ToString().Trim()) + " = ");
+                    break;
+                case ABoolType c:
+                    Indent(("bool " + node.GetId().ToString().Trim()) + " = ");
+                    break;
+                case ACharType d:
+                    Indent(("char " + node.GetId().ToString().Trim()) + " = ");
+                    break;
+                case AStringType e:
+                    Indent(("string " + node.GetId().ToString().Trim()) + " = ");
+                    break;
+            }
+        }
+        var customType = unit as AUnitUnittype;
+        if (customType != null)
+        {
+            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
+            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
+            
+            // Her skal logikken implementeres 
+            
+        }
+    }
+
+    public override void InAIdExp(AIdExp node)
+    {
+        writer.Write(node.GetId());
     }
 
     public override void InAFunccallStmt(AFunccallStmt node)
@@ -283,19 +367,32 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseANumberExp(ANumberExp node)
     {
-        if(node.Parent() is not ANewFunc)
+        if(node.Parent() is not AFuncFunc)
             writer.Write(int.Parse(node.ToString()));
     }
-    public override void InASubunit(ASubunit node)
+
+    public override void CaseANegnumberExp(ANegnumberExp node)
     {
-        string? unitId = whiteSpace.Replace(((AUnit)node.Parent()).GetId().ToString(),"");
-        string? subUnitId = whiteSpace.Replace(node.GetId().ToString(),"");
-        string? type = whiteSpace.Replace(((AUnit)node.Parent()).GetTint().ToString(), "");
-        Indent($"{type} {unitId}{subUnitId}({type} value){{\n");
-        _indent++;
-        Indent("return");
-        _indent--;
+        node.GetNumber();
+        if (node.Parent() is not AFuncFunc)
+            writer.Write("-" + node.GetNumber().ToString().Trim());
     }
+
+    public override void CaseASubunit(ASubunit node)
+    {
+        string? unitId = whiteSpace.Replace(((AUnitdecl)node.Parent()).GetId().ToString(),"");
+        string? subUnitId = whiteSpace.Replace(node.GetId().ToString(),"");
+        Indent($"float {unitId}{subUnitId}(float value){{\n    return ");
+        node.GetExp().Apply(this);
+        writer.WriteLine(";");
+        OutASubunit(node);
+    }
+
+    public override void CaseAValueExp(AValueExp node)
+    {
+        writer.Write("value");
+    }
+
     public override void OutASubunit(ASubunit node)
     {
         Indent("}\n");

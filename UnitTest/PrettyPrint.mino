@@ -1,66 +1,30 @@
-
-////
-unit tid : int {
-    mango => 6+5;
-    banan => 5*2;
-}
-unit fart : int {
-    hej => 3-2;
-    nej => 4+2;
-}
 func hejmeddig {
-    75;
     a = 5;
-    int a;
+    int z;
     b();
 }
-Prog {
-    5+7*5-3+5*7;
-    2+5*3;
+
+prog {
+    f();
 }
-func scoped {
-    for(int a; 6+5; a = 1) {
-        if(7) {
-            while(1) {
-                int b;
-            }
-        }
-        else if(5+2) {
-            do {
-                bool c;
-            } while(5+2)
-        }
-        else {
-            decimal d;
-        }
-    }
+
+loop {
+    int f;
 }
-////
-unit tid : int {
-    mango => (6+5);
+
+unit tid {
+    mango => value * 5;
     banan => (5*2);
 }
-unit fart : int {
-    hej => 3-2;
-    nej => 4+2;
-}
-func hejmeddig{
-    75;
-    a = 5;
-    int a;
-    b();
-}
-
-Prog {
-    5+7*5-3+(5*7);
-    2+5*3;
-}
 
 func scoped {
-    for(int a; 6+5; a = 1) {
+    for(int g;; 6+5; a++) {
         if(7) {
+            a--;
+            int a = 7;
+            int b = a +7;
             while(1) {
-                int b;
+                a = -1;
             }
         }
         else if(5+2) {
@@ -73,3 +37,44 @@ func scoped {
         }
     }
 }
+////
+gb
+////
+func void hejmeddig {
+    a = 5;
+    int z;
+    b();
+}
+void setup() {
+    f();
+}
+void loop() {
+    int f;
+}
+float tidmango(float value){
+    return value*5;
+}
+float tidbanan(float value){
+    return 5*2;
+}
+func void scoped {
+    for(int g; 6+5; a++) {
+        if(7) {
+            a--;
+            int a = 7;
+            int b = a +7;
+            while(1) {
+                a = -1;
+            }
+        }
+        else if(5+2) {
+            do {
+                bool c;
+            } while(5+2)
+        }
+        else {
+            decimal d;
+        }
+    }
+}
+//////

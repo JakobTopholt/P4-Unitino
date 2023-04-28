@@ -48,8 +48,8 @@ public class PrettyPrint : DepthFirstAdapter
         _indent--;
         output.WriteLine("}");
     }
-    
-    public override void CaseANewFunc(ANewFunc node)
+
+    public override void CaseAFuncFunc(AFuncFunc node)
     {
         output.WriteLine("func " + node.GetId() + "{");
         _indent++;
@@ -59,19 +59,19 @@ public class PrettyPrint : DepthFirstAdapter
             if (child is not AScopedStmt)
                 output.WriteLine(";");
         }
-        OutANewFunc(node);
+        OutAFuncFunc(node);
     }
-    
-    public override void OutANewFunc(ANewFunc node)
+
+    public override void OutAFuncFunc(AFuncFunc node)
     {
         _indent--;
         output.WriteLine("}");
     }
 
-    public override void CaseAUnit(AUnit node)
+    public override void CaseAUnitdecl(AUnitdecl node)
     {
         string? name = node.GetId().ToString();
-        string? type = node.GetTint().ToString();
+        string? type = node.GetSubunit().ToString();
         Indent($"unit {name}: {type}{{\n");
         _indent++;
         foreach (Node child in node.GetSubunit())
@@ -80,9 +80,10 @@ public class PrettyPrint : DepthFirstAdapter
             output.WriteLine(";");
         }
         _indent--;
-        OutAUnit(node);
+        OutAUnitdecl(node);
     }
-    public override void OutAUnit(AUnit node)
+
+    public override void OutAUnitdecl(AUnitdecl node)
     {
         output.Write("}\n");
     }
@@ -92,7 +93,7 @@ public class PrettyPrint : DepthFirstAdapter
         string? name = node.GetId().ToString();
         Indent($"{name}=> ");
         _indent--;
-        node.GetStmt().Apply(this);
+        node.GetExp().Apply(this);
         _indent++;
         OutASubunit(node);
     }
@@ -228,29 +229,9 @@ public class PrettyPrint : DepthFirstAdapter
         Indent(")\n");
     }
 
-    public override void InAIntDecl(AIntDecl node)
+    public override void CaseADeclStmt(ADeclStmt node)
     {
-        Indent(("int " + node.GetId().ToString().Trim()));
-    }
-
-    public override void InABoolDecl(ABoolDecl node)
-    {
-        Indent("bool " + node.GetId().ToString().Trim());
-    }
-
-    public override void InADecimalDecl(ADecimalDecl node)
-    {
-        Indent("decimal " + node.GetId().ToString().Trim());
-    }
-
-    public override void InACharDecl(ACharDecl node)
-    {
-        Indent("char " + node.GetId().ToString().Trim());
-    }
-    
-    public override void InAStringDecl(AStringDecl node)
-    {
-        Indent("string " + node.GetId().ToString().Trim());
+        Indent((node.GetUnittype() + " " + node.GetId().ToString().Trim()));
     }
 
     public override void InAAssignStmt(AAssignStmt node)
