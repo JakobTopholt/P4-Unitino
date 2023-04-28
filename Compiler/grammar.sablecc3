@@ -142,7 +142,7 @@ Productions
     unituse {-> unituse} = {num}    star id     {-> New unituse.num(id)}
                          | {den}    slash id    {-> New unituse.den(id)};
     
-    // For usage in expressions ex: 50 ms, 5 s, 50 meters TODO: Allow to define complex units such as 50 m/s (meter/per second) or /s (per second)
+    // For usage in expressions ex: 50 ms, 5 s, 50 meters
     unitnumber {-> unitnumber} = decimal firstsingleunit singleunit_list? {-> New unitnumber(decimal, [firstsingleunit.singleunit, singleunit_list.singleunit])};
     
     firstsingleunit {-> singleunit} = {num} id {-> New singleunit.num(id)}
@@ -235,7 +235,7 @@ Productions
                 | {boolean}         boolean                                 {-> New exp.boolean(boolean.boolean)}
                 | {string}          string                                  {-> New exp.string(string)}
                 | {char}            char                                    {-> New exp.char(char)}
-                | {exp}             l_par exp r_par                         {-> exp.exp}; //TODO: more values such as true/false, string, etc.
+                | {exp}             l_par exp r_par                         {-> exp.exp};
                          
     //// Miscellaneous    
     type {-> type} = {int}      tint        {-> New type.int()}
