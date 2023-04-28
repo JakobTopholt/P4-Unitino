@@ -4,29 +4,49 @@ using Moduino.node;
 
 namespace Compiler.Visitors;
 
+// This the first pass of the typechecker
+// Saves global varibles in the symbolTable
+// Saves Customunits.
+// It also saves that a global function exists (but knows doesnt know anything if it is untyped at this point)
+
 public class GlobalVariableCollector : DepthFirstAdapter
 {
-    
+    public override void OutStart(Start node)
+    {
+        SymbolTable.ResetScope();
+    }
+    // Skip the inside of Functions in the first pass
     public override void CaseAUntypedFunc(AUntypedFunc node)
     {
         InAUntypedFunc(node);
         OutAUntypedFunc(node);
     }
-    
-    // This override should be implemented in GlobalFunctionCollector
     public override void InAUntypedFunc(AUntypedFunc node)
     {
-        Symbol? funcId = SymbolTable.GetSymbol(node.GetId());
-        //throw new Exception("lmao, already declared");
-        SymbolTable.AddId(node.GetId(), node, funcId != null ? Symbol.notOk : Symbol.Func);
-        // Mangler også at store funktions parametre her
-        // Se task 4 i LocalScopeCollector
+        SymbolTable.AddId(node.GetId(), node, 
+            SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Func);
+        // Save parameters
+
     }
     
-    // Overvej om den burde være i et In/Out 
-    public override void CaseADeclStmt(ADeclStmt node)
+    public override void CaseATypedFunc(ATypedFunc node)
     {
-        base.CaseADeclStmt(node);
+        InATypedFunc(node);
+        OutATypedFunc(node);
+    }
+    
+    public override void InATypedFunc(ATypedFunc node)
+    {
+        SymbolTable.AddId(node.GetId(), node, 
+            SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Func);
+        
+        // Save parameters
+        // Save returntype asswell
+        
+    }
+
+    public override void OutADeclStmt(ADeclStmt node)
+    {
         PUnittype unit = node.GetUnittype();
         var standardType = unit as ATypeUnittype;
         if (standardType != null)
@@ -65,12 +85,67 @@ public class GlobalVariableCollector : DepthFirstAdapter
             
         }
     }
+    public override void OutAAssignStmt(AAssignStmt node) {
+        Symbol? type = SymbolTable.GetSymbol("" + node.GetId());
+        Symbol? exprType = SymbolTable.GetSymbol(node.GetExp());    
+        
+        // if type == null (id was never declared) (The reason we dont use .isInCurrentScope here is we want to iclude foward refrences
+        // if type != exprType (Incompatible types)
+        SymbolTable.AddNode(node, type == null || type != exprType ? Symbol.notOk : Symbol.ok);
+    }
 
-    public override void OutStart(Start node)
-    {
-        SymbolTable.ResetScope();
+    public override void OutADeclassStmt(ADeclassStmt node)
+    { 
+        // Assignment have to be typechecked before Decl should add to symboltable
+        bool declared = SymbolTable.IsInCurrentScope(node.GetId());
+        if (!declared)
+        {
+            Symbol? exprType = SymbolTable.GetSymbol(node.GetExp());
+            PUnittype unit = node.GetUnittype();
+            var standardType = unit as ATypeUnittype;
+            if (standardType != null)
+            {
+                switch (standardType.GetType())
+                {
+                    case AIntType a:
+                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.Int ? Symbol.notOk : Symbol.Int);
+                        break;
+                    case ADecimalType b:
+                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.Decimal ? Symbol.notOk : Symbol.Decimal);
+                        break;
+                    case ABoolType c:
+                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.Bool ? Symbol.notOk : Symbol.Bool);
+                        break;
+                    case ACharType d:
+                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.Char ? Symbol.notOk : Symbol.Char);
+                        break;
+                    case AStringType e:
+                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.String ? Symbol.notOk : Symbol.String);
+                        break;
+                }
+            }
+            var customType = unit as AUnitUnittype;
+            if (customType != null)
+            {
+                IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
+                IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
+
+                // Her skal logikken implementeres 
+
+            }
+        }
+        else
+        {
+            SymbolTable.AddId(node.GetId(), node, Symbol.notOk);
+        }
     }
     
+    public override void OutAUnitdecl(AUnitdecl node)
+    {
+        // A Custom Unit declaration
+    }
+
+    // ----------------------Se på Logikken på alt under her---------------------------
     public override void OutASubunit(ASubunit node)
     {
         if (SymbolTable.IsInCurrentScope(node.GetId()))
@@ -90,22 +165,14 @@ public class GlobalVariableCollector : DepthFirstAdapter
                     Symbol.Decimal == exprType? (AUnitdecl)node.Parent() : null);
         }
     }
-    //nye
+    
     public override void OutADecimalSingleunit(ADecimalSingleunit node)
     {
         //tilføjer simpleunit f.eks: 5ms til typen f.eks Time
         var singleUnit = SymbolTable._currentSymbolTable.SubunitToUnit[node.GetId().ToString().Replace(" ", "")];
         SymbolTable._currentSymbolTable.nodeToUnit.Add(node,singleUnit); 
     }
-    //gamle
-    /*public override void OutASingleunit(PSingleunit node)
-    {
-        //tilføjer simpleunit f.eks: 5ms til typen f.eks Time
-        var singleUnit = SymbolTable._currentSymbolTable.SubunitToUnit[node.GetId().ToString().Replace(" ", "")];
-        SymbolTable._currentSymbolTable.nodeToUnit.Add(node,singleUnit); 
-    }
-    */
-    
+
     /* -----------VIRKER IKKE------------- */
     public override void OutAUnitExp(AUnitExp node)
     {   
@@ -125,7 +192,4 @@ public class GlobalVariableCollector : DepthFirstAdapter
         SymbolTable._currentSymbolTable.nodeToUnit.Add(node,aUnit);*/
         
     }
-
-    // Assignments
-
 }

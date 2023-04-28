@@ -3,6 +3,12 @@ using Moduino.node;
 
 namespace Compiler.Visitors;
 
+// Dette er typecheckeren der indeholder logikken for at typechecke hele filen
+// Den bruger symbolTablen vi har populated til at tjekke alt
+// Teknisk set tror jeg(?) at denne visitor måske er unødvendig senere hen, baseret på hvordan de 3 andre bliver implementeret
+// (Variabel, Function, Return collectors)
+// Dette er fordi de også typechecker inden de kan tilføje til symbolTable
+
 public class TypeChecker : DepthFirstAdapter
 {
     // TASKS
@@ -41,7 +47,7 @@ public class TypeChecker : DepthFirstAdapter
     // To do
     
     // 8
-    // Typecast precedence
+    // Typecast hierachry
     // We need to implement an understanding of the types precedence. int --> float,  float --> string eg. basicly the implicit typecasting
     // This is probably a feauture we will have to work on more, when we want to implement precedence for custom unit types.
     // To do
@@ -52,7 +58,7 @@ public class TypeChecker : DepthFirstAdapter
     // To do
     
     // 10 
-    // Fix Delcarecases to new grammar (custom units missing)
+    // Implement custom Units into DelcareStmnt
     // WIP
     
     // 11
@@ -64,30 +70,27 @@ public class TypeChecker : DepthFirstAdapter
     // To do
     
     // 13
-    // Implement declareAssignment casen ELLER få ændret grammer så det sker implicit
-    // To do
-    
-    // 14 
-    // Create Utils class with general methods
-    
-    // 15
+    // Implement declareAssignment casen
+    // WIP
+
+    // 14
     // Implement logic for the new typed func aswell. 
     // This is basicly the same logic but needs to be handled.
     // These return types can be easly saved
     
-    // Grammar to-do:
-    // Funktions parametre
-    // Return 
-    // Type precedence
+    // 15 
+    // Typechecking for functioncall (Functioncalls needs to get returntype based on functioncallID)
+    // Then compare in exp or whatever
     
   
-    
+    // Den skal kun gemme info om functionerne så længe de ikke er global (Ligesom vi gør i DeclStmt)
     public override void InAUntypedFunc(AUntypedFunc node) {
         
-        SymbolTable.AddId(node.GetId(), node, SymbolTable.IsInCurrentScope(node.GetId())? Symbol.notOk : Symbol.Func);
+        // Tjek for global scope
+        
+        //SymbolTable.AddId(node.GetId(), node, SymbolTable.IsInCurrentScope(node.GetId())? Symbol.notOk : Symbol.Func);
 
         // Funktions parametre
-        // De skal stores her (tænker jeg)
         // Foreach paremeter in node.getparemeters
         //   SymbolTable.AddId(parameter.id, parameter,
         //      intparameter => symbol.int, boolparameter => symbol.bool)
@@ -99,12 +102,24 @@ public class TypeChecker : DepthFirstAdapter
         //parametre kode?
         SymbolTable.ExitScope();
     }
-    
-    // Collecting local variables
-    // Overvej om den burde være i et In/Out 
-    public override void CaseADeclStmt(ADeclStmt node)
+
+    public override void InATypedFunc(ATypedFunc node)
     {
-        base.CaseADeclStmt(node);
+        // Tjek for global scope
+        // Save function parameters
+        
+        // Save return type
+        
+        SymbolTable.EnterScope();
+    }
+
+    public override void OutATypedFunc(ATypedFunc node)
+    {
+        base.OutATypedFunc(node);
+    }
+
+    public override void OutADeclStmt(ADeclStmt node)
+    {
         PUnittype unit = node.GetUnittype();
         var standardType = unit as ATypeUnittype;
         if (standardType != null)
@@ -337,8 +352,7 @@ public class TypeChecker : DepthFirstAdapter
     {
         //Symbol? funcId = SymbolTable.GetSymbol(node.GetId());
     }
-
-    //Skal vi have implicit typecasting? 
+    
     public override void OutAAssignStmt(AAssignStmt node) {
         Symbol? type = SymbolTable.GetSymbol("" + node.GetId());
         Symbol? exprType = SymbolTable.GetSymbol(node.GetExp());
@@ -346,6 +360,49 @@ public class TypeChecker : DepthFirstAdapter
         // if types match stmt is ok, else notok
         SymbolTable.AddNode(node, type == null || type != exprType ? Symbol.notOk : Symbol.ok);
     }
+    public override void OutADeclassStmt(ADeclassStmt node)
+    { 
+        // Assignment have to be typechecked before Decl should add to symboltable
+        bool declared = SymbolTable.IsInCurrentScope(node.GetId());
+        if (!declared)
+        {
+            Symbol? exprType = SymbolTable.GetSymbol(node.GetExp());
+            PUnittype unit = node.GetUnittype();
+            var standardType = unit as ATypeUnittype;
+            if (standardType != null)
+            {
+                switch (standardType.GetType())
+                {
+                    case AIntType a:
+                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.Int ? Symbol.notOk : Symbol.Int);
+                        break;
+                    case ADecimalType b:
+                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.Decimal ? Symbol.notOk : Symbol.Decimal);
+                        break;
+                    case ABoolType c:
+                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.Bool ? Symbol.notOk : Symbol.Bool);
+                        break;
+                    case ACharType d:
+                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.Char ? Symbol.notOk : Symbol.Char);
+                        break;
+                    case AStringType e:
+                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.String ? Symbol.notOk : Symbol.String);
+                        break;
+                }
+            }
+            var customType = unit as AUnitUnittype;
+            if (customType != null)
+            {
+                IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
+                IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
 
-    
+                // Her skal logikken implementeres 
+
+            }
+        }
+        else
+        {
+            SymbolTable.AddId(node.GetId(), node, Symbol.notOk);
+        }
+    }
 }

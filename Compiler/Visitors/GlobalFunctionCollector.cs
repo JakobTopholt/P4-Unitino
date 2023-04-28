@@ -3,28 +3,47 @@ using Moduino.node;
 
 namespace Compiler.Visitors;
 
+// This is the second pass of the typechecker
+// It needs to figure out whats going on inside Global functions
+// Typecheck if their inside is correct and what return type it evaluates to
+
+// Globale funktioner må gerne refere til hindanden i deres krop.
+// Men de må ikke refere til hindanen som deres returtyper
+// However så skal den referede funktion have en defineret returværdi som ikke er void.
+// Så kan vi typecheck og throw notOks som vi plejer
+
 public class GlobalFunctionCollector : DepthFirstAdapter
 {
+    public override void OutStart(Start node)
+    {
+        SymbolTable.ResetScope();
+    }
     public override void InAUntypedFunc(AUntypedFunc node)
     {
-        // Mangler også at store funktions parametre her
-        // Se task 4 i TypeChecker
-        
+        SymbolTable.EnterScope();
+        // Save funktions parametre her
+  
     }
 
     public override void OutAUntypedFunc(AUntypedFunc node)
     {
-        Symbol? funcId = SymbolTable.GetSymbol(node.GetId());
-        //throw new Exception("lmao, already declared");
-        SymbolTable.AddId(node.GetId(), node, funcId != null ? Symbol.notOk : Symbol.Func);
-        // throws void, however we need to understand which it can return
+        // Save returnType
         
+        SymbolTable.ExitScope();
+    }
+
+    public override void InATypedFunc(ATypedFunc node)
+    {
+        SymbolTable.EnterScope(); 
+    }
+
+    public override void OutATypedFunc(ATypedFunc node)
+    {
+        SymbolTable.ExitScope();
     }
     
-    // Overvej om den burde være i et In/Out 
-    public override void CaseADeclStmt(ADeclStmt node)
+    public override void OutADeclStmt(ADeclStmt node)
     {
-        base.CaseADeclStmt(node);
         PUnittype unit = node.GetUnittype();
         var standardType = unit as ATypeUnittype;
         if (standardType != null)
@@ -63,12 +82,7 @@ public class GlobalFunctionCollector : DepthFirstAdapter
             
         }
     }
-
-    public override void OutStart(Start node)
-    {
-        SymbolTable.ResetScope();
-    }
-
+    
     // Assignments
     public override void OutAAssignStmt(AAssignStmt node) {
         Symbol? type = SymbolTable.GetSymbol("" + node.GetId());
@@ -77,5 +91,50 @@ public class GlobalFunctionCollector : DepthFirstAdapter
         // if type == null (id was never declared)
         // if type != exprType (Incompatible types)
         SymbolTable.AddNode(node, type == null || type != exprType ? Symbol.notOk : Symbol.ok);
+    }
+    public override void OutADeclassStmt(ADeclassStmt node)
+    { 
+        // Assignment have to be typechecked before Decl should add to symboltable
+        bool declared = SymbolTable.IsInCurrentScope(node.GetId());
+        if (!declared)
+        {
+            Symbol? exprType = SymbolTable.GetSymbol(node.GetExp());
+            PUnittype unit = node.GetUnittype();
+            var standardType = unit as ATypeUnittype;
+            if (standardType != null)
+            {
+                switch (standardType.GetType())
+                {
+                    case AIntType a:
+                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.Int ? Symbol.notOk : Symbol.Int);
+                        break;
+                    case ADecimalType b:
+                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.Decimal ? Symbol.notOk : Symbol.Decimal);
+                        break;
+                    case ABoolType c:
+                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.Bool ? Symbol.notOk : Symbol.Bool);
+                        break;
+                    case ACharType d:
+                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.Char ? Symbol.notOk : Symbol.Char);
+                        break;
+                    case AStringType e:
+                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.String ? Symbol.notOk : Symbol.String);
+                        break;
+                }
+            }
+            var customType = unit as AUnitUnittype;
+            if (customType != null)
+            {
+                IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
+                IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
+
+                // Her skal logikken implementeres 
+
+            }
+        }
+        else
+        {
+            SymbolTable.AddId(node.GetId(), node, Symbol.notOk);
+        }
     }
 }
