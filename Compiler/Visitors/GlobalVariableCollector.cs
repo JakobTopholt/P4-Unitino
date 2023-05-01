@@ -148,7 +148,10 @@ public class GlobalVariableCollector : exprTypeChecker
             SymbolTable.AddId(node.GetId(), node, Symbol.notOk);
         }
     }
-    
+    public override void InAUnitdecl(AUnitdecl node)
+    {
+        StateUnit = true;
+    }
     public override void OutAUnitdecl(AUnitdecl node)
     {
         StateUnit = false;
@@ -160,12 +163,7 @@ public class GlobalVariableCollector : exprTypeChecker
     // Subunit skal have gemt dens relation til parentunit
     // Den skal også have typechecket dens expression og gemt den i dictionary.
     // ----------------------Se på Logikken på alt under her---------------------------
-
-    public override void InAUnitdecl(AUnitdecl node)
-    {
-        StateUnit = true;
-    }
-
+    
     public override void OutASubunit(ASubunit node)
     {
         StateUnit = false;
