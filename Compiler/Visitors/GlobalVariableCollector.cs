@@ -75,14 +75,18 @@ public class GlobalVariableCollector : DepthFirstAdapter
                     break;
             }
         }
+        // Declared a custom unit (Sammensat)
         var customType = unit as AUnitUnittype;
         if (customType != null)
         {
+            // If Numerators or denomarots contains units that does not exist
+            
+            
             IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
             IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
-            
-            // Her skal logikken implementeres 
-            
+
+            SymbolTable.AddNumerators(node.GetId(), node, numerator);
+            SymbolTable.AddDenomerators(node.GetId(), node, denomerator);
         }
     }
     public override void OutAAssignStmt(AAssignStmt node) {
@@ -129,9 +133,12 @@ public class GlobalVariableCollector : DepthFirstAdapter
             {
                 IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
                 IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
+                
+                // Mangler assignment typecheck logic
 
-                // Her skal logikken implementeres 
-
+                SymbolTable.AddNumerators(node.GetId(), node, numerator);
+                SymbolTable.AddDenomerators(node.GetId(), node, denomerator);
+                
             }
         }
         else
@@ -143,10 +150,59 @@ public class GlobalVariableCollector : DepthFirstAdapter
     public override void OutAUnitdecl(AUnitdecl node)
     {
         // A Custom Unit declaration
+        
+        SymbolTable.AddId(node.GetId(), node, Symbol.notOk);
     }
 
-    // ----------------------Se på Logikken på alt under her---------------------------
+    // Subunit skal have gemt dens relation til parentunit
+    // Den skal også have typechecket dens expression og gemt den i dictionary.
     public override void OutASubunit(ASubunit node)
+    {
+        if (!SymbolTable.IsInExtendedScope(node.GetId()))
+        {
+            PExp expr = node.GetExp();
+            if (SymbolTable.GetReturnType(expr) == Symbol.Decimal)
+            {
+                SymbolTable.AddSubunit(node.GetId(), node.Parent(), expr);
+                SymbolTable.AddId(node.GetId(), node, Symbol.ok);
+            }
+            else
+            {
+                SymbolTable.AddId(node.GetId(), node, Symbol.notOk); 
+            }
+        }
+        else
+        {
+            SymbolTable.AddId(node.GetId(), node, Symbol.notOk);
+        }
+    }
+
+    public override void OutAUnitnumber(AUnitnumber node)
+    {
+        // S
+        base.OutAUnitnumber(node);
+    }
+
+    public override void OutANumSingleunit(ANumSingleunit node)
+    {
+        // Skal gemmes til dens id
+        base.OutANumSingleunit(node);
+    }
+
+    public override void OutADenSingleunit(ADenSingleunit node)
+    {
+        // Skal gemmes til dens id
+        base.OutADenSingleunit(node);
+    }
+    
+    public override void OutAUnitExp(AUnitExp node)
+    {
+        base.OutAUnitExp(node);
+    }
+
+
+    // ----------------------Se på Logikken på alt under her---------------------------
+    /*public override void OutASubunit(ASubunit node)
     {
         if (SymbolTable.IsInCurrentScope(node.GetId()))
         {
@@ -173,7 +229,7 @@ public class GlobalVariableCollector : DepthFirstAdapter
         SymbolTable._currentSymbolTable.nodeToUnit.Add(node,singleUnit); 
     }
 
-    /* -----------VIRKER IKKE------------- */
+    /* -----------VIRKER IKKE------------- 
     public override void OutAUnitExp(AUnitExp node)
     {   
         //tager den første unit såsom 5ms og sammenligner med de andre efterfølgende.
@@ -189,7 +245,8 @@ public class GlobalVariableCollector : DepthFirstAdapter
                 return;
             }
         }
-        SymbolTable._currentSymbolTable.nodeToUnit.Add(node,aUnit);*/
+        SymbolTable._currentSymbolTable.nodeToUnit.Add(node,aUnit);
         
     }
+*/
 }

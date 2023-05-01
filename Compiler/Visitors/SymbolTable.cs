@@ -10,12 +10,12 @@ public class SymbolTable
     public Dictionary<string, AUnitdecl> SubunitToUnit = new();
     public Dictionary<Node, AUnitdecl> nodeToUnit = new();
 
-    //public Dictionary<string, PUnittype> idToUnit = new();
-    //public Dictionary<AUnit, PUnittype> unitToType = new();
+    public Dictionary<string, PExp> SubunitToExp = new();
+    public Dictionary<string, List<string>> Numerators = new();
+    public Dictionary<string, List<string>> Denomerators = new();
 
 
-
-    public static SymbolTable _currentSymbolTable = new (null);
+    private static SymbolTable _currentSymbolTable = new (null);
     private static readonly List<SymbolTable> AllTables = new() { _currentSymbolTable };
     public static void EnterScope() => _currentSymbolTable = new SymbolTable(_currentSymbolTable);
     public static void ExitScope()
@@ -26,6 +26,12 @@ public class SymbolTable
 
     public static void ResetScope() => _currentSymbolTable = AllTables[0];
 
+    public static Symbol? GetReturnType(PExp expression)
+    {
+        // Logik for at finde ud af hvilken type/symbol som en expression evalurer til
+        return Symbol.ok;
+    }
+
     public static void AddId(TId identifier, Node node, Symbol symbol)
     {
         _currentSymbolTable.idToNode.Add("" + identifier, node);
@@ -35,6 +41,35 @@ public class SymbolTable
     public static void AddNode(Node node, Symbol symbol)
     {
         _currentSymbolTable.nodeToSymbol.Add(node, symbol);
+    }
+    
+    public static void AddSubunit(TId identifier, Node node, PExp expr)
+    {
+        _currentSymbolTable.SubunitToExp.Add("" + identifier, expr);
+        _currentSymbolTable.SubunitToUnit.Add("" + identifier, (AUnitdecl) node);
+    }
+
+    public static void AddNumerators(TId identifier, Node node, IEnumerable<ANumUnituse> nums)
+    {
+        List<string> numerators = new();
+        foreach(ANumUnituse num in nums)
+        {
+            numerators.Add("" + num.GetId());
+        }
+        _currentSymbolTable.Numerators.Add("" + identifier ,numerators);
+        
+        // Addnode missing
+    }
+    public static void AddDenomerators(TId identifier, Node node ,IEnumerable<ADenUnituse> dens)
+    {
+        List<string> denomerators = new();
+        foreach(ADenUnituse den in dens)
+        {
+            denomerators.Add("" + den.GetId());
+        }
+        _currentSymbolTable.Denomerators.Add("" + identifier , denomerators);
+        
+        // Addnode missing
     }
     
     private SymbolTable(SymbolTable? parent)
@@ -48,6 +83,10 @@ public class SymbolTable
     private Symbol? GetCurrentSymbol(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentSymbol(identifier);
     private Symbol? GetCurrentSymbol(Node node) => nodeToSymbol.TryGetValue(node, out Symbol symbol) ? symbol : parent?.GetCurrentSymbol(node);
     public static bool IsInCurrentScope(TId id) => _currentSymbolTable.idToNode.ContainsKey(id.ToString());
+    public static bool IsInExtendedScope(TId id) => _currentSymbolTable._IsInCurrentScope(id);
+    private bool _IsInCurrentScope(TId id) =>
+        _currentSymbolTable.idToNode.ContainsKey(id.ToString()) || _currentSymbolTable.parent != null &&
+        _currentSymbolTable.parent._IsInCurrentScope(id);
 }
 
 public enum Symbol
