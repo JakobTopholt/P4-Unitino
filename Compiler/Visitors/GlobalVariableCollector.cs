@@ -1,4 +1,5 @@
 using System.Collections;
+using Compiler.Visitors.TypeCheckerDir;
 using Moduino.analysis;
 using Moduino.node;
 
@@ -9,8 +10,9 @@ namespace Compiler.Visitors;
 // Saves Customunits.
 // It also saves that a global function exists (but knows doesnt know anything if it is untyped at this point)
 
-public class GlobalVariableCollector : DepthFirstAdapter
+public class GlobalVariableCollector : exprTypeChecker
 {
+    public static bool StateUnit;
     public override void OutStart(Start node)
     {
         SymbolTable.ResetScope();
@@ -149,6 +151,7 @@ public class GlobalVariableCollector : DepthFirstAdapter
     
     public override void OutAUnitdecl(AUnitdecl node)
     {
+        StateUnit = false;
         // A Custom Unit declaration
         
         SymbolTable.AddId(node.GetId(), node, Symbol.notOk);
@@ -156,8 +159,16 @@ public class GlobalVariableCollector : DepthFirstAdapter
 
     // Subunit skal have gemt dens relation til parentunit
     // Den skal også have typechecket dens expression og gemt den i dictionary.
+    // ----------------------Se på Logikken på alt under her---------------------------
+
+    public override void InAUnitdecl(AUnitdecl node)
+    {
+        StateUnit = true;
+    }
+
     public override void OutASubunit(ASubunit node)
     {
+        StateUnit = false;
         if (!SymbolTable.IsInExtendedScope(node.GetId()))
         {
             PExp expr = node.GetExp();
@@ -222,21 +233,21 @@ public class GlobalVariableCollector : DepthFirstAdapter
         }
     }
     
-    public override void OutADecimalSingleunit(ADecimalSingleunit node)
+    /*public override void OutADecimalExp(ADecimalExp node)
     {
         //tilføjer simpleunit f.eks: 5ms til typen f.eks Time
-        var singleUnit = SymbolTable._currentSymbolTable.SubunitToUnit[node.GetId().ToString().Replace(" ", "")];
+        var singleUnit = SymbolTable._currentSymbolTable.SubunitToUnit[node.ToString().Replace(" ", "")];
         SymbolTable._currentSymbolTable.nodeToUnit.Add(node,singleUnit); 
-    }
+    }*/
 
     /* -----------VIRKER IKKE------------- 
     public override void OutAUnitExp(AUnitExp node)
     {   
         //tager den første unit såsom 5ms og sammenligner med de andre efterfølgende.
-       /* var aUnit = SymbolTable._currentSymbolTable.nodeToUnit[(node.GetSingleunit())];
+       var aUnit = SymbolTable._currentSymbolTable.nodeToUnit[(node.GetSingleunit()];
         SymbolTable.AddId(node.GetSingleunit(),node, ? Symbol.notOk : Symbol.ok);
         
-        foreach (PSingleunit singleunit in node.GetSingleunit())
+        foreach (PSingleunit singleunit in node.Get())
         {
             if (SymbolTable._currentSymbolTable.nodeToUnit[singleunit] != aUnit)
             {

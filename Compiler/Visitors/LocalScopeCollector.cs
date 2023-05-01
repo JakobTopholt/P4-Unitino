@@ -12,7 +12,7 @@ namespace Compiler.Visitors;
 // However så skal den referede funktion have en defineret returværdi som ikke er void.
 // Så kan vi typecheck og throw notOks som vi plejer
 
-public class GlobalFunctionCollector : DepthFirstAdapter
+public class LocalScopeCollector : DepthFirstAdapter
 {
     public override void OutStart(Start node)
     {
