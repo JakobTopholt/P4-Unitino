@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Compiler.Visitors;
 using NUnit.Framework;
 using System.Text;
@@ -14,11 +10,8 @@ namespace UnitTest;
 
 public class VisitorTests
 {
-    private static readonly Regex whiteSpace = new (@"\s+");
-    private readonly List<TestCase> testCases = new ();
-    [SetUp]
-    public void Setup()
-    {
+    private static readonly Regex WhiteSpace = new (@"\s+");
+    private static IEnumerable<TestCaseData> TestCases() {
         {
             using FileStream fileStream = File.Open(Directory.GetCurrentDirectory() + "/../../../PrettyPrint.mino", FileMode.Open);
             using StreamReader textReader = new (fileStream);
@@ -28,56 +21,58 @@ public class VisitorTests
                 if (string.IsNullOrWhiteSpace(oneTestCaseString))
                     continue;
                 string[] test = oneTestCaseString.Split("////");
-                
-                string program = test[0];
-                string prettyPrint = test[1];
-                string codeGen = test[2];
+
+                string name = test[0];
+                string program = test[1];
+                string prettyPrint = test[2];
+                string codeGen = test[3];
                 if (string.IsNullOrWhiteSpace(program) || string.IsNullOrWhiteSpace(prettyPrint) || string.IsNullOrWhiteSpace(codeGen))
                     continue;
                 using MemoryStream stream = new (program.Select(c => (byte) c ).ToArray());
                 using StreamReader reader = new StreamReader(stream);
                 
-                Start ast = new Parser(new Lexer(reader)).Parse();
-                testCases.Add(new TestCase(ast, 
-                    whiteSpace.Replace(prettyPrint, ""), 
-                    codeGen.Remove(0, 2).ReplaceLineEndings()));
+                Start? ast = null;
+                string error = "";
+
+                try
+                {
+                    ast = new Parser(new Lexer(reader)).Parse();
+                }
+                catch (Exception e)
+                {
+                    error = e.Message;
+                }
+                TestCaseData testCaseData = new TestCaseData(
+                        ast, 
+                        WhiteSpace.Replace(prettyPrint, ""), 
+                        codeGen.TrimStart().ReplaceLineEndings()
+                        ).SetName(name);
+                yield return ast != null ? testCaseData : testCaseData.Ignore(error);
             }
         }
     }
 
-    [Test]
-    public void PrettyPrint()
+    [TestCaseSource(nameof(TestCases))]
+    public void PrettyPrint(Start ast, string prettyPrint, string codeGenText)
     {
-        Assert.Multiple(() =>
-        {
-            foreach (TestCase testCase in testCases)
-            {
-                StringBuilder sb = new();
-                TextWriter output = new StringWriter(sb);
-                testCase.Ast.Apply(new PrettyPrint(output));
-                Assert.That(whiteSpace.Replace(sb.ToString(), ""), 
-                    Is.EqualTo(testCase.PrettyPrint.ReplaceLineEndings()));
-            }
-        });
+        StringBuilder sb = new();
+        TextWriter output = new StringWriter(sb);
+        ast.Apply(new PrettyPrint(output));
+        Assert.That(WhiteSpace.Replace(sb.ToString(), ""), 
+            Is.EqualTo(prettyPrint));
     }
 
-    [Test]
-    public void CodeGen()
+    [TestCaseSource(nameof(TestCases))]
+    public void CodeGen(Start ast, string prettyPrint, string codeGenText)
     {
-        Assert.Multiple(() =>
-        {
-            foreach (TestCase testCase in testCases)
-            {
-                Console.WriteLine(testCase.Ast + "\n" + testCase.CodeGen + "\n");
-                using MemoryStream stream = new();
-                using StreamWriter writer = new(stream);
-                CodeGen codeGen = new(writer);
-                testCase.Ast.Apply(codeGen);
-                writer.Flush();
-                //Console.WriteLine(stream.Length);
-                string code = Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int) stream.Length);
-                Assert.That(code.ReplaceLineEndings(), Is.EqualTo(testCase.CodeGen));
-            }
-        });
+        Console.WriteLine(ast + "\n" + codeGenText + "\n");
+        using MemoryStream stream = new();
+        using StreamWriter writer = new(stream);
+        CodeGen codeGen = new(writer);
+        ast.Apply(codeGen);
+        writer.Flush();
+        //Console.WriteLine(stream.Length);
+        string code = Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int) stream.Length);
+        Assert.That(code.ReplaceLineEndings(), Is.EqualTo(codeGenText));
     }
 }

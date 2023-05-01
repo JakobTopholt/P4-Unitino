@@ -5,20 +5,10 @@
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests.CodeGen&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests.PrettyPrint&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=c7a41c2c_002D0d7e_002D4ba4_002D8e64_002Df401274ea3da/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="CodeGen" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests.CodeGen&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests.PrettyPrint&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests.checkInput&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=e67be5d6_002Da3ba_002D4f84_002D8835_002D5db2ed17263c/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="CodeGen #3" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests.CodeGen&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests.PrettyPrint&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
+	
 	
 	</wpf:ResourceDictionary>
