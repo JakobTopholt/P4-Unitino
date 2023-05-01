@@ -113,11 +113,6 @@ public class TypeChecker : DepthFirstAdapter
         SymbolTable.EnterScope();
     }
 
-    public override void OutATypedFunc(ATypedFunc node)
-    {
-        base.OutATypedFunc(node);
-    }
-
     public override void OutADeclStmt(ADeclStmt node)
     {
         PUnittype unit = node.GetUnittype();
@@ -175,7 +170,7 @@ public class TypeChecker : DepthFirstAdapter
     }
 
     //Expressions
-    public override void OutADivExp(ADivExp node)
+    public override void OutADivideExp(ADivideExp node)
     {
         if (SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) ||
             SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
@@ -218,7 +213,7 @@ public class TypeChecker : DepthFirstAdapter
         }
     }
 
-    public override void OutAMultExp(AMultExp node)
+    public override void OutAMultiplyExp(AMultiplyExp node)
     {
         if (SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) ||
             SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
