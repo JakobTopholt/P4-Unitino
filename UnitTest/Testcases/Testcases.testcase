@@ -1,3 +1,5 @@
+Many
+////
 func hejmeddig {
     a = 5;
     int z;
@@ -77,4 +79,3 @@ func void scoped {
         }
     }
 }
-//////
