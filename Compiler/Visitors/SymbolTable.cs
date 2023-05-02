@@ -18,8 +18,8 @@ public class SymbolTable
     public Dictionary<string, List<string>> Denomerators = new();
 
 
+    private static readonly List<SymbolTable> AllTables = new() { };
     private static SymbolTable _currentSymbolTable = new (null);
-    private static readonly List<SymbolTable> AllTables = new() { _currentSymbolTable };
     public static void EnterScope() => _currentSymbolTable = new SymbolTable(_currentSymbolTable);
     public static void ExitScope()
     {
@@ -86,15 +86,15 @@ public class SymbolTable
         AllTables.Add(this);
     }
     
+    private Symbol? GetCurrentSymbol(Node node) => nodeToSymbol.TryGetValue(node, out Symbol symbol) ? symbol : parent?.GetCurrentSymbol(node);
+    private Symbol? GetCurrentSymbol(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentSymbol(identifier);
     public static Symbol? GetSymbol(Node node) => _currentSymbolTable.GetCurrentSymbol(node);
     public static Symbol? GetSymbol(string identifier) => _currentSymbolTable.GetCurrentSymbol(identifier);
-    private Symbol? GetCurrentSymbol(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentSymbol(identifier);
-    private Symbol? GetCurrentSymbol(Node node) => nodeToSymbol.TryGetValue(node, out Symbol symbol) ? symbol : parent?.GetCurrentSymbol(node);
     public static bool IsInCurrentScope(TId id) => _currentSymbolTable.idToNode.ContainsKey(id.ToString());
-    public static bool IsInExtendedScope(TId id) => _currentSymbolTable._IsInCurrentScope(id);
     private bool _IsInCurrentScope(TId id) =>
         _currentSymbolTable.idToNode.ContainsKey(id.ToString()) || _currentSymbolTable.parent != null &&
         _currentSymbolTable.parent._IsInCurrentScope(id);
+    public static bool IsInExtendedScope(TId id) => _currentSymbolTable._IsInCurrentScope(id);
 }
 
 public enum Symbol

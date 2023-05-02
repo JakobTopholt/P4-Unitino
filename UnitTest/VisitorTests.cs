@@ -41,6 +41,6 @@ public class VisitorTests
         ast.Apply(a);
         ast.Apply(b);
         ast.Apply(c);
-        Assert.That(SymbolTable.GetSymbol(ast.GetPGrammar()), Is.EqualTo(Symbol.ok));
+        Assert.That(SymbolTable.GetSymbol(ast.GetPGrammar()), Is.EqualTo(correct ? Symbol.ok : Symbol.notOk));
     }
 }

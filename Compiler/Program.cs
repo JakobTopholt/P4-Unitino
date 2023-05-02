@@ -23,13 +23,13 @@ start.Apply(new PrettyPrint());
 }
 
 // UnitVisitor
-// start.Apply(new UnitVisitor());
+start.Apply(new UnitVisitor());
 
 // FunctionVisitor
-// start.Apply(new FunctionVisitor());
+start.Apply(new FunctionVisitor());
 
 // Typechecker
-// start.Apply(new TypeChecker());
+start.Apply(new TypeChecker());
 
 
 // TODO Visitor 3: optional compiler optimization (lecture 20)
