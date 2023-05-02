@@ -14,6 +14,8 @@ public class UnitVisitor : DepthFirstAdapter
     {
         SymbolTable.ResetScope();
     }
+    
+    // custom unit(baseunit) decleration
     public override void InAUnitdecl(AUnitdecl node)
     {
         StateUnit = true;
@@ -21,9 +23,6 @@ public class UnitVisitor : DepthFirstAdapter
     public override void OutAUnitdecl(AUnitdecl node)
     {
         StateUnit = false;
-        // A Custom Unit declaration
-        
-        SymbolTable.AddId(node.GetId(), node, Symbol.notOk);
     }
 
     // Subunit skal have gemt dens relation til parentunit
@@ -39,6 +38,7 @@ public class UnitVisitor : DepthFirstAdapter
             if (SymbolTable.GetReturnType(expr) == Symbol.Decimal)
             {
                 SymbolTable.AddSubunit(node.GetId(), node.Parent(), expr);
+                //----------------------------------------------------------------------------
                 SymbolTable.AddId(node.GetId(), node, Symbol.ok);
             }
             else

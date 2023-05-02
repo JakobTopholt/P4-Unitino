@@ -20,6 +20,13 @@ public class SymbolTable
 
     private static readonly List<SymbolTable> AllTables = new() { };
     private static SymbolTable _currentSymbolTable = new (null);
+    
+    private SymbolTable(SymbolTable? parent)
+    {
+        this.parent = parent;
+        AllTables.Add(this);
+    }
+    
     public static void EnterScope() => _currentSymbolTable = new SymbolTable(_currentSymbolTable);
     public static void ExitScope()
     {
@@ -79,13 +86,12 @@ public class SymbolTable
     {
         _currentSymbolTable.functionidToParams.Add("" + identifier, param);
     }
-    
-    private SymbolTable(SymbolTable? parent)
+
+    public static IList? GetFunctionParams(TId identifier)
     {
-        this.parent = parent;
-        AllTables.Add(this);
+        return _currentSymbolTable.functionidToParams["" + identifier];
     }
-    
+
     private Symbol? GetCurrentSymbol(Node node) => nodeToSymbol.TryGetValue(node, out Symbol symbol) ? symbol : parent?.GetCurrentSymbol(node);
     private Symbol? GetCurrentSymbol(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentSymbol(identifier);
     public static Symbol? GetSymbol(Node node) => _currentSymbolTable.GetCurrentSymbol(node);
