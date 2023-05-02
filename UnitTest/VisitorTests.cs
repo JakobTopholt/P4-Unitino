@@ -35,8 +35,8 @@ public class VisitorTests
     [TestCaseSource(typeof(FilesToTestsConverter), nameof(FilesToTestsConverter.TypeVisitorData))]
     public void TypeCheck(Start ast, bool correct)
     {
-        GlobalVariableCollector b = new();
-        LocalScopeCollector a = new();
+        UnitVisitor b = new();
+        FunctionVisitor a = new();
         TypeChecker c = new();
         ast.Apply(a);
         ast.Apply(b);
