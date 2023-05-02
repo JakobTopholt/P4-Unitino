@@ -26,9 +26,6 @@ public class UnitVisitor : DepthFirstAdapter
     public override void OutAUnitdecl(AUnitdecl node)
     {
         StateUnit = false;
-        // A Custom Unit declaration
-        
-        symbolTable.AddId(node.GetId(), node, Symbol.notOk);
     }
 
     // Subunit skal have gemt dens relation til parentunit

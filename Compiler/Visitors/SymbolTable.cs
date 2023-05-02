@@ -88,6 +88,10 @@ public class SymbolTable
     {
         functionidToParams.Add("" + identifier, param);
     }
+    public IList? GetFunctionParams(TId identifier)
+    {
+        return functionidToParams["" + identifier];
+    }
 
     private Symbol? GetCurrentSymbol(Node node) => nodeToSymbol.TryGetValue(node, out Symbol symbol) ? symbol : parent?.GetCurrentSymbol(node);
     private Symbol? GetCurrentSymbol(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentSymbol(identifier);
