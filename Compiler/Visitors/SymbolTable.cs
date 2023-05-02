@@ -1,3 +1,4 @@
+using System.Collections;
 using Moduino.node;
 
 namespace Compiler.Visitors;
@@ -10,6 +11,8 @@ public class SymbolTable
     public Dictionary<string, AUnitdecl> SubunitToUnit = new();
     public Dictionary<Node, AUnitdecl> nodeToUnit = new();
 
+
+    public Dictionary<string, IList> functionidToParams = new();
     public Dictionary<string, PExp> SubunitToExp = new();
     public Dictionary<string, List<string>> Numerators = new();
     public Dictionary<string, List<string>> Denomerators = new();
@@ -70,6 +73,11 @@ public class SymbolTable
         _currentSymbolTable.Denomerators.Add("" + identifier , denomerators);
         
         // Addnode missing
+    }
+
+    public static void AddFunctionParams(TId identifier, Node node, IList param)
+    {
+        _currentSymbolTable.functionidToParams.Add("" + identifier, param);
     }
     
     private SymbolTable(SymbolTable? parent)

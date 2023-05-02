@@ -1,49 +1,97 @@
-﻿using Moduino.analysis;
+using System.Collections;
+using Compiler.Visitors.TypeCheckerDir;
+using Moduino.analysis;
 using Moduino.node;
 
 namespace Compiler.Visitors;
 
-// TODO: Create UnitVisitor
-// The idea is that we want to convert example: 50ms => UnitTimems(50). For this branch we only need to handle the
-// declaring part of this. So create a dictionary<string, stmtNode> such that in the future the value 50ms can use the
-// ms to find the function UnitTimems(). Make sure to throw compileerror if there's 2 declarations of the same string
-// Also create a dictionary for Dictionary<string, List<string>> so that Time a = 50ms; or Time b = (6+5*7/2)ms can be
-// recognized in the future
-/*
+// First pass of the typechecker
+
 public class UnitVisitor : DepthFirstAdapter
 {
-    enum Type
+    public static bool StateUnit;
+    public override void OutStart(Start node)
     {
-        Exception,
-        Int
+        SymbolTable.ResetScope();
     }
-    
-    // Dictionary used to store information on the type of each node
-    // Used then to evaluate which type an expression should yield.
-    private Dictionary<Node, Type> nodeTypes = new();
-    
-    // Vil gerne kunne switche evaluate type function based on node type
-    // Evaluate "generic" type and allow int --> but not float --> as an example.
-    public void EvaluateType(Node node)
+    public override void InAUnitdecl(AUnitdecl node)
     {
-        Type l = nodeTypes[node.GetL()];
-        Type r = nodeTypes[node.GetR()];
-        switch (l, r)
-        {
-            case { l: Type.Int, r: Type.Int }:
-            {
-                
-                break;
-            }
-        }
+        StateUnit = true;
+    }
+    public override void OutAUnitdecl(AUnitdecl node)
+    {
+        StateUnit = false;
+        // A Custom Unit declaration
+        
+        SymbolTable.AddId(node.GetId(), node, Symbol.notOk);
     }
 
-    public override void OutANumberExp(ANumberExp node)
+    // Subunit skal have gemt dens relation til parentunit
+    // Den skal også have typechecket dens expression og gemt den i dictionary.
+    // ----------------------Se på Logikken på alt under her---------------------------
+    
+    public override void OutASubunit(ASubunit node)
     {
-        if (int.TryParse(node.ToString(), out int a))
+        StateUnit = false;
+        if (!SymbolTable.IsInExtendedScope(node.GetId()))
         {
-            nodeTypes.Add(node, Type.Int);
+            PExp expr = node.GetExp();
+            if (SymbolTable.GetReturnType(expr) == Symbol.Decimal)
+            {
+                SymbolTable.AddSubunit(node.GetId(), node.Parent(), expr);
+                SymbolTable.AddId(node.GetId(), node, Symbol.ok);
+            }
+            else
+            {
+                SymbolTable.AddId(node.GetId(), node, Symbol.notOk); 
+            }
+        }
+        else
+        {
+            SymbolTable.AddId(node.GetId(), node, Symbol.notOk);
         }
     }
+/*
+    public override void OutAUnitnumber(AUnitnumber node)
+    {
+        // S
+        base.OutAUnitnumber(node);
+    }
+
+    public override void OutANumSingleunit(ANumSingleunit node)
+    {
+        // Skal gemmes til dens id
+        base.OutANumSingleunit(node);
+    }
+
+    public override void OutADenSingleunit(ADenSingleunit node)
+    {
+        // Skal gemmes til dens id
+        base.OutADenSingleunit(node);
+    }
     
-}*/
+    public override void OutAUnitExp(AUnitExp node)
+    {
+        base.OutAUnitExp(node);
+    } 
+    
+        /* -----------VIRKER IKKE------------- 
+    public override void OutAUnitExp(AUnitExp node)
+    {   
+        //tager den første unit såsom 5ms og sammenligner med de andre efterfølgende.
+       var aUnit = SymbolTable._currentSymbolTable.nodeToUnit[(node.GetSingleunit()];
+        SymbolTable.AddId(node.GetSingleunit(),node, ? Symbol.notOk : Symbol.ok);
+        
+        foreach (PSingleunit singleunit in node.Get())
+        {
+            if (SymbolTable._currentSymbolTable.nodeToUnit[singleunit] != aUnit)
+            {
+                //ikke sikker
+                SymbolTable.AddNode(node,Symbol.notOk);
+                return;
+            }
+        }
+        SymbolTable._currentSymbolTable.nodeToUnit.Add(node,aUnit);  
+    }
+*/
+}

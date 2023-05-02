@@ -1,14 +1,11 @@
- using Compiler.Visitors.TypeCheckerDir;
- using Moduino.analysis;
+using Compiler.Visitors.TypeCheckerDir;
+using Moduino.analysis;
 using Moduino.node;
 
 namespace Compiler.Visitors;
 
-// Dette er typecheckeren der indeholder logikken for at typechecke hele filen
-// Den bruger symbolTablen vi har populated til at tjekke alt
-// Teknisk set tror jeg(?) at denne visitor måske er unødvendig senere hen, baseret på hvordan de 3 andre bliver implementeret
-// (Variabel, Function, Return collectors)
-// Dette er fordi de også typechecker inden de kan tilføje til symbolTable
+// Dette er tredje og sidste pass af typecheckeren
+// Den bruger symbolTablen vi har populated til at tjekke
 
 public class TypeChecker : exprTypeChecker
 {
@@ -83,34 +80,23 @@ public class TypeChecker : exprTypeChecker
     // Typechecking for functioncall (Functioncalls needs to get returntype based on functioncallID)
     // Then compare in exp or whatever
     
-  
-    // Den skal kun gemme info om functionerne så længe de ikke er global (Ligesom vi gør i DeclStmt)
-    public override void InAUntypedFunc(AUntypedFunc node) {
-        
-        // Tjek for global scope
-        
-        //SymbolTable.AddId(node.GetId(), node, SymbolTable.IsInCurrentScope(node.GetId())? Symbol.notOk : Symbol.Func);
-
-        // Funktions parametre
-        // Foreach paremeter in node.getparemeters
-        //   SymbolTable.AddId(parameter.id, parameter,
-        //      intparameter => symbol.int, boolparameter => symbol.bool)
-        
+    
+    public override void InAUntypedFunc(AUntypedFunc node) 
+    {
         SymbolTable.EnterScope();
     }
     public override void OutAUntypedFunc(AUntypedFunc node) 
     {
-        //parametre kode?
         SymbolTable.ExitScope();
     }
 
     public override void InATypedFunc(ATypedFunc node)
     {
-        // Tjek for global scope
-        // Save function parameters
-        
-        // Save return type
-        
         SymbolTable.EnterScope();
+    }
+
+    public override void OutATypedFunc(ATypedFunc node)
+    {
+        SymbolTable.ExitScope();
     }
 }

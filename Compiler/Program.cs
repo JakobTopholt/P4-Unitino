@@ -22,19 +22,15 @@ start.Apply(new PrettyPrint());
     start.Apply(codegen);
 }
 
-// TODO Visitor 1: scope-check/symbol table
-// SymbolTable
-// GlobalScopeCollector - globale variabler gemmes i table (skal funktioner?)
-// start.Apply(new GlobalScopeCollector());
+// UnitVisitor
+// start.Apply(new UnitVisitor());
 
-// LocalScopeCollector - lokale variabler + funktioner og deres retur gemmes i table
-// start.Apply(new LocalScopeCollector());
+// FunctionVisitor
+// start.Apply(new FunctionVisitor());
 
-// TODO Visitor 2: type checking
-// Tredje scan -  type checking - ok/not ok
+// Typechecker
+// start.Apply(new TypeChecker());
 
-// TypeChecker - bruger symbolTable til at typechecke
-// start.Apply(new TypeChecker(SymbolTable));
 
 // TODO Visitor 3: optional compiler optimization (lecture 20)
 
