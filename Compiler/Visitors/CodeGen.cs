@@ -46,9 +46,8 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         _indent++;
         foreach (Node child in node.GetStmt())
         {
-            child.Apply(this);
-            if (child is not AScopedStmt)
-                writer.WriteLine(";");
+            child.Apply(this); 
+            writer.WriteLine(";");
         }
         OutAProgFunc(node);
     }
@@ -66,8 +65,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         foreach (Node child in node.GetStmt())
         {
             child.Apply(this);
-            if (child is not AScopedStmt)
-                writer.WriteLine(";");
+            writer.WriteLine(";");
         }
         OutALoopFunc(node);
     }
@@ -113,9 +111,8 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         _indent++;
         foreach (Node child in node.GetStmt())
         {
-            child.Apply(this);
-            if (child is not AScopedStmt)
-                writer.WriteLine(";");
+            child.Apply(this); 
+            writer.WriteLine(";");
         }
         OutATypedFunc(node);
     }
@@ -133,8 +130,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         foreach (Node child in node.GetStmt())
         {
             child.Apply(this);
-            if (child is not AScopedStmt)
-                writer.WriteLine(";");
+            writer.WriteLine(";");
         }
         OutAUntypedFunc(node);
     }
@@ -146,7 +142,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     }
 
     /*-------------------------------------Control Structures---------------------------------------------------------*/
-    public override void CaseAIfScoped(AIfScoped node)
+    public override void CaseAIfStmt(AIfStmt node)
     {
         Indent("if(");
         node.GetExp().Apply(this);
@@ -154,20 +150,19 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         _indent++;
         foreach (Node child in node.GetStmt())
         {
-            child.Apply(this);
-            if (child is not AScopedStmt)
-                writer.WriteLine(";");
+            child.Apply(this); 
+            writer.WriteLine(";");
         }
         _indent--;
-        OutAIfScoped(node);
+        OutAIfStmt(node);
     }
 
-    public override void OutAIfScoped(AIfScoped node)
+    public override void OutAIfStmt(AIfStmt node)
     {
         Indent("}\n");
     }
 
-    public override void CaseAForScoped(AForScoped node)
+    public override void CaseAForStmt(AForStmt node)
     {
         int _indentholder = _indent;
         Indent("for(");
@@ -183,19 +178,18 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         foreach (Node child in node.GetStmt())
         {
             child.Apply(this);
-            if (child is not AScopedStmt)
-                writer.WriteLine(";");
+            writer.WriteLine(";");
         }
         _indent--;
-        OutAForScoped(node);
+        OutAForStmt(node);
     }
     
-    public override void OutAForScoped(AForScoped node)
+    public override void OutAForStmt(AForStmt node)
     {
         Indent("}\n");
     }
 
-    public override void CaseAWhileScoped(AWhileScoped node)
+    public override void CaseAWhileStmt(AWhileStmt node)
     {
         Indent("while(");
         node.GetExp().Apply(this);
@@ -203,20 +197,19 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         _indent++;
         foreach (Node child in node.GetStmt())
         {
-            child.Apply(this);
-            if (child is not AScopedStmt)
-                writer.WriteLine(";");
+            child.Apply(this); 
+            writer.WriteLine(";");
         }
         _indent--;
-        OutAWhileScoped(node);
+        OutAWhileStmt(node);
     }
 
-    public override void OutAWhileScoped(AWhileScoped node)
+    public override void OutAWhileStmt(AWhileStmt node)
     {
         Indent("}\n");
     }
 
-    public override void CaseAElseifScoped(AElseifScoped node)
+    public override void CaseAElseifStmt(AElseifStmt node)
     {
         Indent("else if(");
         node.GetExp().Apply(this);
@@ -224,47 +217,44 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         _indent++;
         foreach (Node child in node.GetStmt())
         {
-            child.Apply(this);
-            if (child is not AScopedStmt)
-                writer.WriteLine(";");
+            child.Apply(this); 
+            writer.WriteLine(";");
         }
         _indent--;
-        OutAElseifScoped(node);
+        OutAElseifStmt(node);
     }
 
-    public override void OutAElseifScoped(AElseifScoped node)
+    public override void OutAElseifStmt(AElseifStmt node)
     {
         Indent("}\n");
     }
 
-    public override void CaseAElseScoped(AElseScoped node)
+    public override void CaseAElseStmt(AElseStmt node)
     {
         Indent("else {\n");
         _indent++;
         foreach (Node child in node.GetStmt())
         {
-            child.Apply(this);
-            if (child is not AScopedStmt)
-                writer.WriteLine(";");
+            child.Apply(this); 
+            writer.WriteLine(";");
         }
         _indent--;
-        OutAElseScoped(node);
+        OutAElseStmt(node);
     }
 
-    public override void OutAElseScoped(AElseScoped node)
+    public override void OutAElseStmt(AElseStmt node)
     {
         Indent("}\n");
     }
 
-    public override void CaseADowhileScoped(ADowhileScoped node)
+    public override void CaseADowhileStmt(ADowhileStmt node)
     {
         Indent("do {\n");
         _indent++;
         foreach (Node child in node.GetStmt())
         {
             child.Apply(this);
-            if (child is not AScopedStmt)
-                writer.WriteLine(";");
+            writer.WriteLine(";");
         }
         _indent--;
         Indent("} while(");
@@ -272,7 +262,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         writer.Write(")\n");
     }
 
-    public override void OutADowhileScoped(ADowhileScoped node)
+    public override void OutADowhileStmt(ADowhileStmt node)
     {
         Indent(")\n");
     }

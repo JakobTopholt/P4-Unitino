@@ -36,9 +36,8 @@ public class PrettyPrint : DepthFirstAdapter
         _indent++;
         foreach (Node child in node.GetStmt())
         {
-            child.Apply(this);
-            if (child is not AScopedStmt)
-                output.WriteLine(";");
+            child.Apply(this); 
+            output.WriteLine(";");
         }
         OutAProgFunc(node);
     }
@@ -55,9 +54,8 @@ public class PrettyPrint : DepthFirstAdapter
         _indent++;
         foreach (Node child in node.GetStmt())
         {
-            child.Apply(this);
-            if (child is not AScopedStmt)
-                output.WriteLine(";");
+            child.Apply(this); 
+            output.WriteLine(";");
         }
         OutATypedFunc(node);    
     }
@@ -75,9 +73,8 @@ public class PrettyPrint : DepthFirstAdapter
         _indent++;
         foreach (Node child in node.GetStmt())
         {
-            child.Apply(this);
-            if (child is not AScopedStmt)
-                output.WriteLine(";");
+            child.Apply(this); 
+            output.WriteLine(";");
         }
         OutAUntypedFunc(node);    
     }
@@ -118,7 +115,7 @@ public class PrettyPrint : DepthFirstAdapter
         OutASubunit(node);
     }
 
-    public override void CaseAForScoped(AForScoped node)
+    public override void CaseAForStmt(AForStmt node)
     {
         int _indentholder = _indent;
         Indent("for(");
@@ -133,20 +130,19 @@ public class PrettyPrint : DepthFirstAdapter
         _indent++;
         foreach (Node child in node.GetStmt())
         {
-            child.Apply(this);
-            if (child is not AScopedStmt)
-                output.WriteLine(";");
+            child.Apply(this); 
+            output.WriteLine(";");
         }
-        OutAForScoped(node);
+        OutAForStmt(node);
     }
 
-    public override void OutAForScoped(AForScoped node)
+    public override void OutAForStmt(AForStmt node)
     {
         _indent--;
         Indent("}\n");
     }
 
-    public override void CaseAIfScoped(AIfScoped node)
+    public override void CaseAIfStmt(AIfStmt node)
     {
         Indent("if(");
         node.GetExp().Apply(this);
@@ -154,20 +150,19 @@ public class PrettyPrint : DepthFirstAdapter
         _indent++;
         foreach (Node child in node.GetStmt())
         {
-            child.Apply(this);
-            if (child is not AScopedStmt)
-                output.WriteLine(";");
+            child.Apply(this); 
+            output.WriteLine(";");
         }
-        OutAIfScoped(node);
+        OutAIfStmt(node);
     }
 
-    public override void OutAIfScoped(AIfScoped node)
+    public override void OutAIfStmt(AIfStmt node)
     {
         _indent--;
         Indent("}\n");
     }
     
-    public override void CaseAWhileScoped(AWhileScoped node)
+    public override void CaseAWhileStmt(AWhileStmt node)
     {
         Indent("while(");
         node.GetExp().Apply(this);
@@ -176,19 +171,18 @@ public class PrettyPrint : DepthFirstAdapter
         foreach (Node child in node.GetStmt())
         {
             child.Apply(this);
-            if (child is not AScopedStmt)
-                output.WriteLine(";");
+            output.WriteLine(";");
         }
-        OutAWhileScoped(node);
+        OutAWhileStmt(node);
     }
 
-    public override void OutAWhileScoped(AWhileScoped node)
+    public override void OutAWhileStmt(AWhileStmt node)
     {
         _indent--;
         Indent("}\n");
     }
     
-    public override void CaseAElseifScoped(AElseifScoped node)
+    public override void CaseAElseifStmt(AElseifStmt node)
     {
         Indent("else if(");
         node.GetExp().Apply(this);
@@ -197,45 +191,42 @@ public class PrettyPrint : DepthFirstAdapter
         foreach (Node child in node.GetStmt())
         {
             child.Apply(this);
-            if (child is not AScopedStmt)
-                output.WriteLine(";");
+            output.WriteLine(";");
         }
-        OutAElseifScoped(node);
+        OutAElseifStmt(node);
     }
 
-    public override void OutAElseifScoped(AElseifScoped node)
+    public override void OutAElseifStmt(AElseifStmt node)
     {
         _indent--;
         Indent("}\n");
     }
     
-    public override void CaseAElseScoped(AElseScoped node)
+    public override void CaseAElseStmt(AElseStmt node)
     {
         Indent("else {\n");
         _indent++;
         foreach (Node child in node.GetStmt())
         {
             child.Apply(this);
-            if (child is not AScopedStmt)
-                output.WriteLine(";");
+            output.WriteLine(";");
         }
-        OutAElseScoped(node);
+        OutAElseStmt(node);
     }
 
-    public override void OutAElseScoped(AElseScoped node)
+    public override void OutAElseStmt(AElseStmt node)
     {
         _indent--;
         Indent("}\n");
     }
-    public override void CaseADowhileScoped(ADowhileScoped node)
+    public override void CaseADowhileStmt(ADowhileStmt node)
     {
         Indent("do {\n");
         _indent++;
         foreach (Node child in node.GetStmt())
         {
             child.Apply(this);
-            if (child is not AScopedStmt)
-                output.WriteLine(";");
+            output.WriteLine(";");
         }
 
         _indent--;
@@ -244,7 +235,7 @@ public class PrettyPrint : DepthFirstAdapter
         output.Write(")\n");
     }
 
-    public override void OutADowhileScoped(ADowhileScoped node)
+    public override void OutADowhileStmt(ADowhileStmt node)
     {
         Indent(")\n");
     }
