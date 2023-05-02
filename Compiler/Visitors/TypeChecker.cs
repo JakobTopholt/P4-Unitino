@@ -1,9 +1,16 @@
-using Moduino.analysis;
+ using Compiler.Visitors.TypeCheckerDir;
+ using Moduino.analysis;
 using Moduino.node;
 
 namespace Compiler.Visitors;
 
-public class TypeChecker : DepthFirstAdapter
+// Dette er typecheckeren der indeholder logikken for at typechecke hele filen
+// Den bruger symbolTablen vi har populated til at tjekke alt
+// Teknisk set tror jeg(?) at denne visitor måske er unødvendig senere hen, baseret på hvordan de 3 andre bliver implementeret
+// (Variabel, Function, Return collectors)
+// Dette er fordi de også typechecker inden de kan tilføje til symbolTable
+
+public class TypeChecker : exprTypeChecker
 {
     // TASKS
     // 1.
@@ -41,272 +48,69 @@ public class TypeChecker : DepthFirstAdapter
     // To do
     
     // 8
-    // Typecast precedence
+    // Typecast hierachry
     // We need to implement an understanding of the types precedence. int --> float,  float --> string eg. basicly the implicit typecasting
     // This is probably a feauture we will have to work on more, when we want to implement precedence for custom unit types.
     // To do
 
     // 9 Nye ændringer i denne branch: Units har nu fået suffix såsom 5s.50ms
-    // 9 
     // Custom units typechecking. 
     // Expunits skal bestå af de samme singleunits
-    // 
+    // To do
     
     // 10 
-    // Implement Return keyword i grammar.
+    // Implement custom Units into DelcareStmnt
+    // WIP
     
+    // 11
+    // Implementer et tredje pass for at tjekke og save return type.
+    // To do
     
-    public override void InANewFunc(ANewFunc node) {
+    // 12
+    // Implement Custom unit typechecking
+    // To do
+    
+    // 13
+    // Implement declareAssignment casen
+    // WIP
+
+    // 14
+    // Implement logic for the new typed func aswell. 
+    // This is basicly the same logic but needs to be handled.
+    // These return types can be easly saved
+    
+    // 15 
+    // Typechecking for functioncall (Functioncalls needs to get returntype based on functioncallID)
+    // Then compare in exp or whatever
+    
+  
+    // Den skal kun gemme info om functionerne så længe de ikke er global (Ligesom vi gør i DeclStmt)
+    public override void InAUntypedFunc(AUntypedFunc node) {
         
-        SymbolTable.AddId(node.GetId(), node, SymbolTable.IsInCurrentScope(node.GetId())? Symbol.notOk : Symbol.Func);
+        // Tjek for global scope
+        
+        //SymbolTable.AddId(node.GetId(), node, SymbolTable.IsInCurrentScope(node.GetId())? Symbol.notOk : Symbol.Func);
 
         // Funktions parametre
-        // De skal stores her (tænker jeg)
         // Foreach paremeter in node.getparemeters
         //   SymbolTable.AddId(parameter.id, parameter,
         //      intparameter => symbol.int, boolparameter => symbol.bool)
         
         SymbolTable.EnterScope();
     }
-    public override void OutANewFunc(ANewFunc node) 
+    public override void OutAUntypedFunc(AUntypedFunc node) 
     {
         //parametre kode?
         SymbolTable.ExitScope();
     }
 
-    // Collecting local variables
-    public override void InABoolDecl(ABoolDecl node)
+    public override void InATypedFunc(ATypedFunc node)
     {
-        if (node.Parent() != null)
-        {
-            SymbolTable.AddId(node.GetId(), node,
-                SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Bool);
-        }
-    }
-
-    public override void InAStringDecl(AStringDecl node)
-    {
-        if (node.Parent() != null)
-        {
-            SymbolTable.AddId(node.GetId(), node,
-                SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.String);
-        }
-    }
-
-    public override void InACharDecl(ACharDecl node)
-    {
-        if (node.Parent() != null)
-        {
-            SymbolTable.AddId(node.GetId(), node,
-                SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Char);
-        }
-    }
-
-    public override void InAIntDecl(AIntDecl node)
-    {
-        if (node.Parent() != null)
-        {
-            SymbolTable.AddId(node.GetId(), node,
-                SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Int);
-        }
-    }
-
-    public override void InADecimalDecl(ADecimalDecl node)
-    {
-        if (node.Parent() != null)
-        {
-            SymbolTable.AddId(node.GetId(), node,
-                SymbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Decimal);
-        }
-    }
-
-    //Expressions
-    public override void OutADivExp(ADivExp node)
-    {
-        if (SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) ||
-            SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
-        {
-            if (!SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) &&
-                SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
-            {
-
-            }
-            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(), out AUnit leftSide) &&
-                     SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(), out AUnit rightSide))
-            {
-                SymbolTable.AddNode(node, leftSide == rightSide ? Symbol.ok : Symbol.notOk);
-
-                return;
-            }
-
-            SymbolTable.AddNode(node, Symbol.notOk);
-        }
-        else
-        {
-            var l = SymbolTable.GetSymbol(node.GetL());
-            var r = SymbolTable.GetSymbol(node.GetR());
-            switch (l)
-            {
-                case Symbol.Int when r is Symbol.Int:
-                    SymbolTable.AddNode(node, Symbol.Int);
-                    break;
-                case Symbol.Decimal when r is Symbol.Decimal or Symbol.Int:
-                    SymbolTable.AddNode(node, Symbol.Decimal);
-                    break;
-                case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal:
-                    SymbolTable.AddNode(node, Symbol.Decimal);
-                    break;
-
-                default:
-                    SymbolTable.AddNode(node, Symbol.notOk);
-                    break;
-            }
-        }
-    }
-
-    public override void OutAMultExp(AMultExp node)
-    {
-        if (SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) ||
-            SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
-        {
-            if (!SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) &&
-                SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
-            {
-
-            }
-            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(), out AUnit leftSide) &&
-                     SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(), out AUnit rightSide))
-            {
-                SymbolTable.AddNode(node, leftSide == rightSide ? Symbol.ok : Symbol.notOk);
-
-                return;
-            }
-
-            SymbolTable.AddNode(node, Symbol.notOk);
-        }
-        else
-        {
-            var l = SymbolTable.GetSymbol(node.GetL());
-            var r = SymbolTable.GetSymbol(node.GetR());
-            switch (l)
-            {
-                case Symbol.Int when r is Symbol.Int:
-                    SymbolTable.AddNode(node, Symbol.Int);
-                    break;
-                case Symbol.Decimal when r is Symbol.Decimal or Symbol.Int:
-                    SymbolTable.AddNode(node, Symbol.Decimal);
-                    break;
-                case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal:
-                    SymbolTable.AddNode(node, Symbol.Decimal);
-                    break;
-                default:
-                    SymbolTable.AddNode(node, Symbol.notOk);
-                    break;
-            }
-        }
-    }
-
-    public override void OutAPlusExp(APlusExp node)
-    {
-        if (SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) || SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
-        {
-            if (!SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) && SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
-            {
-                
-            }
-            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(),out AUnit leftSide) && SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(),out AUnit rightSide))
-            {
-                SymbolTable.AddNode(node, leftSide == rightSide ? Symbol.ok : Symbol.notOk);
-
-                return;
-            }
-            SymbolTable.AddNode(node,Symbol.notOk);  
-        }
-        else
-        {
-            var l = SymbolTable.GetSymbol(node.GetL());
-            var r = SymbolTable.GetSymbol(node.GetR());
-            switch (l)
-            {
-                case Symbol.Int when r is Symbol.Int:
-                    SymbolTable.AddNode(node, Symbol.Int);
-                    break;
-                case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal or Symbol.Int:
-                    SymbolTable.AddNode(node, Symbol.Decimal);
-                    break;
-                case Symbol.Int or Symbol.Decimal when r is Symbol.Decimal:
-                    SymbolTable.AddNode(node, Symbol.Decimal);
-                    break;
-                case Symbol.String when r is Symbol.Int or Symbol.String:
-                    SymbolTable.AddNode(node, Symbol.String);
-                    break;
-                case Symbol.Int or Symbol.String when r is Symbol.String:
-                    SymbolTable.AddNode(node, Symbol.String);
-                    break;
-                case Symbol.Decimal or Symbol.String when r is Symbol.Decimal:
-                    SymbolTable.AddNode(node, Symbol.String);
-                    break;
-                case Symbol.String when r is Symbol.String or Symbol.Decimal:
-                    SymbolTable.AddNode(node, Symbol.String);
-                    break;
-                default:
-                    SymbolTable.AddNode(node, Symbol.notOk);
-                    break;
-            }
-        }
-    }
-
-    public override void OutAMinusExp(AMinusExp node)
-    {
+        // Tjek for global scope
+        // Save function parameters
         
-        if (SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) || SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
-        {
-            if (!SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) && SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
-            {
-                
-            }
-            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(),out AUnit leftSide) && SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(),out AUnit rightSide))
-            {
-                SymbolTable.AddNode(node, leftSide == rightSide ? Symbol.ok : Symbol.notOk);
-
-                return;
-            }
-            SymbolTable.AddNode(node,Symbol.notOk);  
-        }
-        else
-        {
-            var l = SymbolTable.GetSymbol(node.GetL());
-            var r = SymbolTable.GetSymbol(node.GetR());
-            switch (l)
-            {
-                case Symbol.Int when r is Symbol.Int:
-                    SymbolTable.AddNode(node, Symbol.Int);
-                    break;
-                case Symbol.Decimal when r is Symbol.Decimal or Symbol.Int:
-                    SymbolTable.AddNode(node, Symbol.Decimal);
-                    break;
-                case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal:
-                    SymbolTable.AddNode(node, Symbol.Decimal);
-                    break;
-                default:
-                    SymbolTable.AddNode(node, Symbol.notOk);
-                    break;
-            }
-        }
+        // Save return type
+        
+        SymbolTable.EnterScope();
     }
-    public override void OutAFunccallExp(AFunccallExp node)
-    {
-        //Symbol? funcId = SymbolTable.GetSymbol(node.GetId());
-    }
-
-    //Skal vi have implicit typecasting? 
-    public override void OutAAssignStmt(AAssignStmt node) {
-        Symbol? type = SymbolTable.GetSymbol("" + node.GetId());
-        Symbol? exprType = SymbolTable.GetSymbol(node.GetExp());
-
-        // if types match stmt is ok, else notok
-        SymbolTable.AddNode(node, type == null || type != exprType ? Symbol.notOk : Symbol.ok);
-    }
-
-    
 }
