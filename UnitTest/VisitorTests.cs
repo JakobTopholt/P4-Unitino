@@ -36,7 +36,7 @@ public class VisitorTests
     public void TypeCheck(Start ast, bool correct)
     {
         GlobalVariableCollector b = new();
-        GlobalFunctionCollector a = new();
+        LocalScopeCollector a = new();
         TypeChecker c = new();
         ast.Apply(a);
         ast.Apply(b);
