@@ -5,7 +5,7 @@ func NormalFunc(int b) {
 }
 prog {
     int i = 0;
-    NormalFunc(int b);
+    NormalFunc(i);
 }
 loop {
     int i = 0;

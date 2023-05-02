@@ -24,11 +24,11 @@ Helpers
 
     blank = (' ' | tab | eol)+;
 
-    short_comment = '//' not_cr_lf* eol;
+    short_comment = '#' not_cr_lf* eol;
     long_comment = '/*' not_star* '*'+ (not_star_slash not_star* '*'+)* '/';
 
     letter = lowercase | uppercase | '_' | '$';
-    id_part = (uppercase | lowercase) (digit)*;
+    id_part = (uppercase | lowercase)+ (digit)*;
 
 Tokens
 
@@ -135,15 +135,16 @@ Productions
     
     // first unituse is rather special because here the star shouldn't be used
     firstunituse {-> unituse} = {num}   id      {-> New unituse.num(id)}
-                              | {usual} unituse {-> unituse.unituse};
+                              | {usual} tslashslash id {-> New unituse.den(id)};
                               
     unituse_list {-> unituse*} = unituse unituse_list? {-> [unituse.unituse, unituse_list.unituse]};
     
-    unituse {-> unituse} = {num}    star id     {-> New unituse.num(id)}
-                         | {den}    slash id    {-> New unituse.den(id)};
+    unituse {-> unituse} = {num}    tstarstar id     {-> New unituse.num(id)}
+                         | {den}    tslashslash id    {-> New unituse.den(id)};
     
     // For usage in expressions ex: 50 ms, 5 s, 50 meters
-    unitnumber {-> unitnumber} = decimal firstsingleunit singleunit_list? {-> New unitnumber(decimal, [firstsingleunit.singleunit, singleunit_list.singleunit])};
+    unitnumber {-> unitnumber} = {decimal} decimal firstsingleunit singleunit_list? {-> New unitnumber.decimal(decimal, [firstsingleunit.singleunit, singleunit_list.singleunit])}
+                               | {number} number firstsingleunit singleunit_list? {-> New unitnumber.number(number, [firstsingleunit.singleunit, singleunit_list.singleunit])};
     
     firstsingleunit {-> singleunit} = {num} id {-> New singleunit.num(id)}
                                     | {den} tslashslash id {-> New singleunit.den(id)};
@@ -157,8 +158,8 @@ Productions
     // prog {}, loop {}, func a {} or int a {}
     func {-> func} = {prog}     tprog l_brace stmt_list r_brace         {-> New func.prog([stmt_list.stmt])}
                    | {loop}     tloop l_brace stmt_list r_brace         {-> New func.loop([stmt_list.stmt])}
-                   | {untyped}  tfunc id l_par args? r_par l_brace stmt_list r_brace      {-> New func.untyped(id, [args.arg], [stmt_list.stmt])}
-                   | {typed}    unittype id l_par args? r_par l_brace stmt_list r_brace   {-> New func.typed(unittype.unittype, id, [args.arg], [stmt_list.stmt])};
+                   | {untyped}  tfunc id l_par args? r_par l_brace stmt_list return? r_brace      {-> New func.untyped(id, [args.arg], [stmt_list.stmt, return.stmt])}
+                   | {typed}    unittype id l_par args? r_par l_brace stmt_list return? r_brace   {-> New func.typed(unittype.unittype, id, [args.arg], [stmt_list.stmt, return.stmt])};
     
     //arguments used to declare a function and params when using a function
     params {-> exp*} = {list}   exp comma params   {-> [params.exp, exp.exp]}
@@ -176,8 +177,9 @@ Productions
                    | {decl}     unittype id semicolon               {-> New stmt.decl(unittype.unittype, id)}
                    | {declass}  unittype id equal exp semicolon     {-> New stmt.declass(unittype.unittype, id, exp.exp)}
                    | {funccall} id l_par params? r_par semicolon    {-> New stmt.funccall(id, [params.exp])}
-                   | {return}   treturn exp semicolon               {-> New stmt.return(exp.exp)}
                    | {scoped}   scoped                              {-> scoped.stmt};
+                   
+    return {-> stmt} = treturn exp semicolon               {-> New stmt.return(exp.exp)};
     
     // Needed for for loop for (int i; i < 5;i += 1)
     assign {-> stmt} = {normal}         id equal exp        {-> New stmt.assign(id, exp.exp)}
@@ -331,7 +333,8 @@ Abstract Syntax Tree
         | {exp}             exp;  
         
     boolean = {true} | {false};
-    unitnumber = decimal singleunit*;
+    unitnumber = {decimal} decimal singleunit* 
+               | {number} number singleunit*;
     singleunit = {num} id
                | {den} id;
     

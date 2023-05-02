@@ -186,10 +186,10 @@ public class GlobalVariableCollector : exprTypeChecker
         }
     }
 
-    public override void OutAUnitnumber(AUnitnumber node)
+    public override void OutADecimalUnitnumber(ADecimalUnitnumber node)
     {
         // S
-        base.OutAUnitnumber(node);
+        base.OutADecimalUnitnumber(node);
     }
 
     public override void OutANumSingleunit(ANumSingleunit node)
