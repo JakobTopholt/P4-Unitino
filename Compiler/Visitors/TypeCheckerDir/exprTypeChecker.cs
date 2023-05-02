@@ -316,7 +316,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutAValueExp(AValueExp node)
     {
-        SymbolTable.AddNode(node, GlobalVariableCollector.StateUnit ? Symbol.ok : Symbol.notOk);
+        SymbolTable.AddNode(node, UnitVisitor.StateUnit ? Symbol.ok : Symbol.notOk);
     }
 
     private void AddBinaryToSymbolTable(Node Parent, Node L, Node R)
