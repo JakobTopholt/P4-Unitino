@@ -156,10 +156,10 @@ Productions
                            
     //// Functions and statements
     // prog {}, loop {}, func a {} or int a {}
-    func {-> func} = {prog}     tprog l_brace stmt_list r_brace         {-> New func.prog([stmt_list.stmt])}
-                   | {loop}     tloop l_brace stmt_list r_brace         {-> New func.loop([stmt_list.stmt])}
-                   | {untyped}  tfunc id l_par args? r_par l_brace stmt_list return? r_brace      {-> New func.untyped(id, [args.arg], [stmt_list.stmt, return.stmt])}
-                   | {typed}    unittype id l_par args? r_par l_brace stmt_list return? r_brace   {-> New func.typed(unittype.unittype, id, [args.arg], [stmt_list.stmt, return.stmt])};
+    func {-> func} = {prog}     tprog l_brace stmt_list? r_brace         {-> New func.prog([stmt_list.stmt])}
+                   | {loop}     tloop l_brace stmt_list? r_brace         {-> New func.loop([stmt_list.stmt])}
+                   | {untyped}  tfunc id l_par args? r_par l_brace stmt_list? return? r_brace      {-> New func.untyped(id, [args.arg], [stmt_list.stmt, return.stmt])}
+                   | {typed}    unittype id l_par args? r_par l_brace stmt_list? return? r_brace   {-> New func.typed(unittype.unittype, id, [args.arg], [stmt_list.stmt, return.stmt])};
     
     //arguments used to declare a function and params when using a function
     params {-> exp*} = {list}   exp comma params   {-> [params.exp, exp.exp]}
@@ -260,10 +260,10 @@ Abstract Syntax Tree
     subunit = id exp;
     
     //func is in CodeGen
-    func = {prog} stmt+
-         | {loop} stmt+
-         | {untyped} id arg* stmt+
-         | {typed} unittype id arg* stmt+;
+    func = {prog} stmt*
+         | {loop} stmt*
+         | {untyped} id arg* stmt*
+         | {typed} unittype id arg* stmt*;
          
     arg = unittype id;
     

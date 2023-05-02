@@ -21,15 +21,17 @@ start.Apply(new PrettyPrint());
     using CodeGen codegen = new (writer);
     start.Apply(codegen);
 }
+List<SymbolTable> AllTables = new() { };
 
+SymbolTable symbolTable = new(null, AllTables);
 // UnitVisitor
-start.Apply(new UnitVisitor());
+start.Apply(new UnitVisitor(symbolTable));
 
 // FunctionVisitor
-start.Apply(new FunctionVisitor());
+start.Apply(new FunctionVisitor(symbolTable));
 
 // Typechecker
-start.Apply(new TypeChecker());
+start.Apply(new TypeChecker(symbolTable));
 
 
 // TODO Visitor 3: optional compiler optimization (lecture 20)

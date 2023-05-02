@@ -9,6 +9,7 @@ namespace Compiler.Visitors;
 
 public class TypeChecker : exprTypeChecker
 {
+    
     // TASKS
     // 1.
     // Make sure to only store local variables and not the global ones from before
@@ -79,24 +80,28 @@ public class TypeChecker : exprTypeChecker
     // 15 
     // Typechecking for functioncall (Functioncalls needs to get returntype based on functioncallID)
     // Then compare in exp or whatever
-    
-    
+
+
+    public TypeChecker(SymbolTable symbolTable) : base(symbolTable)
+    {
+    }
+
     public override void InAUntypedFunc(AUntypedFunc node) 
     {
-        SymbolTable.EnterScope();
+        symbolTable = symbolTable.EnterScope();
     }
     public override void OutAUntypedFunc(AUntypedFunc node) 
     {
-        SymbolTable.ExitScope();
+        symbolTable = symbolTable.ExitScope();
     }
 
     public override void InATypedFunc(ATypedFunc node)
     {
-        SymbolTable.EnterScope();
+        symbolTable = symbolTable.EnterScope();
     }
 
     public override void OutATypedFunc(ATypedFunc node)
     {
-        SymbolTable.ExitScope();
+        symbolTable = symbolTable.ExitScope();
     }
 }

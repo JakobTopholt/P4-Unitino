@@ -9,12 +9,17 @@ namespace Compiler.Visitors;
 
 public class FunctionVisitor : DepthFirstAdapter
 {
+    private SymbolTable symbolTable;
+    public FunctionVisitor(SymbolTable symbolTable)
+    {
+        this.symbolTable = symbolTable;
+    }
     // Overvej om jeg mangler at kalde base.InAxx(node);
     // Collect func declarations
     // Validate return stmts
     public override void OutStart(Start node)
     {
-        SymbolTable.ResetScope();
+        symbolTable = symbolTable.ResetScope();
     }
 
     // Function logic
@@ -25,20 +30,13 @@ public class FunctionVisitor : DepthFirstAdapter
     }
     public override void InAUntypedFunc(AUntypedFunc node)
     {
-        if(SymbolTable.IsInCurrentScope(node.GetId()))
-        {
-            SymbolTable.AddId(node.GetId(), node, Symbol.notOk);
-        }
-        else
-        {
-            // Save parameters
-            IList param = node.GetArg();
-            if (param.Count > 0)
-                SymbolTable.AddFunctionParams(node.GetId(), node, param);
-
-            SymbolTable.EnterScope();
-            // Tilføj parameters til local scope for funktionen
-        }
+        symbolTable.AddId(node.GetId(), node, 
+            symbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Func);
+        
+        // Save parameters
+        IList param = node.GetArg();
+        if (param.Count > 0)
+            symbolTable.AddFunctionParams(node.GetId(), node, param);
     }
 
     public override void OutAUntypedFunc(AUntypedFunc node)
@@ -48,7 +46,6 @@ public class FunctionVisitor : DepthFirstAdapter
         // But if there is it has to be a reachable return statement in the node
         // All return statements have to evaluate to same type to be correct
 
-        SymbolTable.ExitScope();
     }
 
     public override void CaseATypedFunc(ATypedFunc node)
@@ -56,35 +53,17 @@ public class FunctionVisitor : DepthFirstAdapter
         InATypedFunc(node);
         OutATypedFunc(node);
     }
-
+    
     public override void InATypedFunc(ATypedFunc node)
     {
-        if (SymbolTable.IsInCurrentScope(node.GetId()))
-        {
-            SymbolTable.AddId(node.GetId(), node, Symbol.notOk);
-        }
-        else
-        {
-            SymbolTable.EnterScope();
-            IList inputArgs = node.GetArg();
-            
-            // ------WIP-------
-            if (inputArgs.Count > 0)
-            {
-                // Add to local scope
-                foreach (AArg? argument in inputArgs)
-                {
-                    // her skal implementes decl switchen baseret på unittype
-                    switch (argument.GetUnittype())
-                    {
-                        //SymbolTable.AddId(argument.GetId() , node, Symbol.Whatever);
-                    }
-                }
-                // Save parameters in table
-                // Change functionidToParams Dictionary to <string, List<PUnittype>> 
-                SymbolTable.AddFunctionParams(node.GetId(), node, inputArgs);
-            }
-        }
+        symbolTable.AddId(node.GetId(), node, 
+            symbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Func);
+        
+        // Save parameters
+        IList param = node.GetArg();
+        if (param.Count > 0)
+            symbolTable.AddFunctionParams(node.GetId(), node, param);
+        
     }
 
     public override void OutATypedFunc(ATypedFunc node)
@@ -95,105 +74,109 @@ public class FunctionVisitor : DepthFirstAdapter
         // But if not void it has to have a reachable return statement in the node
         // All return statements have to evaluate to same type to be correct
         
-        SymbolTable.ExitScope();
         
     }
 
     // General logic (Logic that works inside functions)
     public override void OutADeclStmt(ADeclStmt node)
     {
-        if (SymbolTable.IsInCurrentScope(node.GetId()))
+        PUnittype unit = node.GetUnittype();
+        var standardType = unit as ATypeUnittype;
+        if (standardType != null)
         {
-            switch (node.GetUnittype())
+            switch (standardType.GetType())
             {
-                case ATypeUnittype type when type.GetType() is AIntType:
-                    SymbolTable.AddId(node.GetId(), node, Symbol.Int);
+                case AIntType a:
+                    Symbol? intId = symbolTable.GetSymbol(a);
+                    symbolTable.AddId(node.GetId(), node, intId != null ? Symbol.notOk : Symbol.Int);
                     break;
-                case ATypeUnittype type when type.GetType() is AIntType:
-                    SymbolTable.AddId(node.GetId(), node, Symbol.Decimal);
+                case ADecimalType b:
+                    Symbol? decimalId = symbolTable.GetSymbol(b);
+                    symbolTable.AddId(node.GetId(), node, decimalId != null ? Symbol.notOk : Symbol.Decimal);
                     break;
-                case ATypeUnittype type when type.GetType() is AIntType:
-                    SymbolTable.AddId(node.GetId(), node, Symbol.Bool);
+                case ABoolType c:
+                    Symbol? boolId = symbolTable.GetSymbol(c);
+                    symbolTable.AddId(node.GetId(), node, boolId != null ? Symbol.notOk : Symbol.Bool);
                     break;
-                case ATypeUnittype type when type.GetType() is AIntType:
-                    SymbolTable.AddId(node.GetId(), node, Symbol.Char);
+                case ACharType d:
+                    Symbol? charId = symbolTable.GetSymbol(d);
+                    symbolTable.AddId(node.GetId(), node, charId != null ? Symbol.notOk : Symbol.Char);
                     break;
-                case ATypeUnittype type when type.GetType() is AIntType:
-                    SymbolTable.AddId(node.GetId(), node, Symbol.String);
+                case AStringType e:
+                    Symbol? stringId = symbolTable.GetSymbol(e);
+                    symbolTable.AddId(node.GetId(), node, stringId != null ? Symbol.notOk : Symbol.String);
                     break;
-                case AUnitUnittype customType:
-                {
-                    // Declared a custom sammensat unit (Ikke en baseunit declaration)
-                    IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
-                    IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
-                    
-                    // Declaration validering for sammensat unit her
-                    // Check if Numerators or denomarots contains units that does not exist
-
-                    SymbolTable.AddNumerators(node.GetId(), node, numerator);
-                    SymbolTable.AddDenomerators(node.GetId(), node, denomerator);
-                    break;
-                }
             }
         }
-        else
+        // Declared a custom unit (Sammensat)
+        var customType = unit as AUnitUnittype;
+        if (customType != null)
         {
-            SymbolTable.AddId(node.GetId(), node, Symbol.notOk);
+            // If Numerators or denomarots contains units that does not exist
+            
+            
+            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
+            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
+
+            symbolTable.AddNumerators(node.GetId(), node, numerator);
+            symbolTable.AddDenomerators(node.GetId(), node, denomerator);
         }
     }
     public override void OutAAssignStmt(AAssignStmt node) {
-        Symbol? type = SymbolTable.GetSymbol("" + node.GetId());
-        Symbol? exprType = SymbolTable.GetSymbol(node.GetExp());    
+        Symbol? type = symbolTable.GetSymbol("" + node.GetId());
+        Symbol? exprType = symbolTable.GetSymbol(node.GetExp());    
         
         // if type == null (id was never declared) (The reason we dont use .isInCurrentScope here is we want to iclude foward refrences
         // if type != exprType (Incompatible types)
-        SymbolTable.AddNode(node, type == null || type != exprType ? Symbol.notOk : Symbol.ok);
+        symbolTable.AddNode(node, type == null || type != exprType ? Symbol.notOk : Symbol.ok);
     }
 
     public override void OutADeclassStmt(ADeclassStmt node)
     { 
         // Assignment have to be typechecked before Decl should add to symboltable
-        bool declared = SymbolTable.IsInCurrentScope(node.GetId());
+        bool declared = symbolTable.IsInCurrentScope(node.GetId());
         if (!declared)
         {
-            Symbol? exprType = SymbolTable.GetSymbol(node.GetExp());
+            Symbol? exprType = symbolTable.GetSymbol(node.GetExp());
             PUnittype unit = node.GetUnittype();
-            if (unit is ATypeUnittype standardType)
+            var standardType = unit as ATypeUnittype;
+            if (standardType != null)
             {
                 switch (standardType.GetType())
                 {
                     case AIntType a:
-                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.Int ? Symbol.notOk : Symbol.Int);
+                        symbolTable.AddId(node.GetId(), node, exprType == Symbol.Int ? Symbol.notOk : Symbol.Int);
                         break;
                     case ADecimalType b:
-                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.Decimal ? Symbol.notOk : Symbol.Decimal);
+                        symbolTable.AddId(node.GetId(), node, exprType == Symbol.Decimal ? Symbol.notOk : Symbol.Decimal);
                         break;
                     case ABoolType c:
-                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.Bool ? Symbol.notOk : Symbol.Bool);
+                        symbolTable.AddId(node.GetId(), node, exprType == Symbol.Bool ? Symbol.notOk : Symbol.Bool);
                         break;
                     case ACharType d:
-                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.Char ? Symbol.notOk : Symbol.Char);
+                        symbolTable.AddId(node.GetId(), node, exprType == Symbol.Char ? Symbol.notOk : Symbol.Char);
                         break;
                     case AStringType e:
-                        SymbolTable.AddId(node.GetId(), node, exprType == Symbol.String ? Symbol.notOk : Symbol.String);
+                        symbolTable.AddId(node.GetId(), node, exprType == Symbol.String ? Symbol.notOk : Symbol.String);
                         break;
                 }
             }
-            else if (unit is AUnitUnittype customType)
+            var customType = unit as AUnitUnittype;
+            if (customType != null)
             {
                 IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
                 IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
                 
                 // Mangler assignment typecheck logic
 
-                SymbolTable.AddNumerators(node.GetId(), node, numerator);
-                SymbolTable.AddDenomerators(node.GetId(), node, denomerator);
+                symbolTable.AddNumerators(node.GetId(), node, numerator);
+                symbolTable.AddDenomerators(node.GetId(), node, denomerator);
                 
             }
         }
         else
         {
-            SymbolTable.AddId(node.GetId(), node, Symbol.notOk);
+            symbolTable.AddId(node.GetId(), node, Symbol.notOk);
         }
     }
 }

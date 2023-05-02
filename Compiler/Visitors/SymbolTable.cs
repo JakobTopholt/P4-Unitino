@@ -5,6 +5,12 @@ namespace Compiler.Visitors;
 
 public class SymbolTable
 {
+    private List<SymbolTable> allTables = new();
+    public SymbolTable(SymbolTable? parent, List<SymbolTable> allTables)
+    {
+        this.parent = parent;
+        this.allTables = allTables;
+    }
     private readonly Dictionary<string, Node> idToNode = new();
     private readonly Dictionary<Node, Symbol> nodeToSymbol = new();
     private readonly SymbolTable? parent;
@@ -18,89 +24,80 @@ public class SymbolTable
     public Dictionary<string, List<string>> Denomerators = new();
 
 
-    private static readonly List<SymbolTable> AllTables = new() { };
-    private static SymbolTable _currentSymbolTable = new (null);
-    
-    private SymbolTable(SymbolTable? parent)
+    public SymbolTable EnterScope() => new(this, allTables);
+    public SymbolTable ExitScope() => parent ?? this;
+
+    public SymbolTable ResetScope()
     {
-        this.parent = parent;
-        AllTables.Add(this);
-    }
-    
-    public static void EnterScope() => _currentSymbolTable = new SymbolTable(_currentSymbolTable);
-    public static void ExitScope()
-    {
-        if (_currentSymbolTable.parent != null) 
-            _currentSymbolTable = _currentSymbolTable.parent;
+        SymbolTable table = this;
+        while (table.parent != null)
+        {
+            table = table.parent;
+        }
+
+        return table;
     }
 
-    public static void ResetScope() => _currentSymbolTable = AllTables[0];
-
-    public static Symbol? GetReturnType(PExp expression)
+    public Symbol? GetReturnType(PExp expression)
     {
         // Logik for at finde ud af hvilken type/symbol som en expression evalurer til
         return Symbol.ok;
     }
 
-    public static void AddId(TId identifier, Node node, Symbol symbol)
+    public void AddId(TId identifier, Node node, Symbol symbol)
     {
-        _currentSymbolTable.idToNode.Add("" + identifier, node);
+        idToNode.Add("" + identifier, node);
         AddNode(node, symbol);
     }
 
-    public static void AddNode(Node node, Symbol symbol)
+    public void AddNode(Node node, Symbol symbol)
     {
-        _currentSymbolTable.nodeToSymbol.Add(node, symbol);
+        nodeToSymbol.Add(node, symbol);
     }
     
-    public static void AddSubunit(TId identifier, Node node, PExp expr)
+    public void AddSubunit(TId identifier, Node node, PExp expr)
     {
-        _currentSymbolTable.SubunitToExp.Add("" + identifier, expr);
-        _currentSymbolTable.SubunitToUnit.Add("" + identifier, (AUnitdecl) node);
+        SubunitToExp.Add("" + identifier, expr);
+        SubunitToUnit.Add("" + identifier, (AUnitdecl) node);
     }
 
-    public static void AddNumerators(TId identifier, Node node, IEnumerable<ANumUnituse> nums)
+    public void AddNumerators(TId identifier, Node node, IEnumerable<ANumUnituse> nums)
     {
         List<string> numerators = new();
         foreach(ANumUnituse num in nums)
         {
             numerators.Add("" + num.GetId());
         }
-        _currentSymbolTable.Numerators.Add("" + identifier ,numerators);
+        Numerators.Add("" + identifier ,numerators);
         
         // Addnode missing
     }
-    public static void AddDenomerators(TId identifier, Node node ,IEnumerable<ADenUnituse> dens)
+    public void AddDenomerators(TId identifier, Node node ,IEnumerable<ADenUnituse> dens)
     {
         List<string> denomerators = new();
         foreach(ADenUnituse den in dens)
         {
             denomerators.Add("" + den.GetId());
         }
-        _currentSymbolTable.Denomerators.Add("" + identifier , denomerators);
+        Denomerators.Add("" + identifier , denomerators);
         
         // Addnode missing
     }
 
-    public static void AddFunctionParams(TId identifier, Node node, IList param)
+    public void AddFunctionParams(TId identifier, Node node, IList param)
     {
-        _currentSymbolTable.functionidToParams.Add("" + identifier, param);
-    }
-
-    public static IList? GetFunctionParams(TId identifier)
-    {
-        return _currentSymbolTable.functionidToParams["" + identifier];
+        functionidToParams.Add("" + identifier, param);
     }
 
     private Symbol? GetCurrentSymbol(Node node) => nodeToSymbol.TryGetValue(node, out Symbol symbol) ? symbol : parent?.GetCurrentSymbol(node);
     private Symbol? GetCurrentSymbol(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentSymbol(identifier);
-    public static Symbol? GetSymbol(Node node) => _currentSymbolTable.GetCurrentSymbol(node);
-    public static Symbol? GetSymbol(string identifier) => _currentSymbolTable.GetCurrentSymbol(identifier);
-    public static bool IsInCurrentScope(TId id) => _currentSymbolTable.idToNode.ContainsKey(id.ToString());
+    public Symbol? GetSymbol(Node node) => GetCurrentSymbol(node);
+    public Symbol? GetSymbol(string identifier) => GetCurrentSymbol(identifier);
+    public bool IsInCurrentScope(TId id) => idToNode.ContainsKey(id.ToString());
     private bool _IsInCurrentScope(TId id) =>
-        _currentSymbolTable.idToNode.ContainsKey(id.ToString()) || _currentSymbolTable.parent != null &&
-        _currentSymbolTable.parent._IsInCurrentScope(id);
-    public static bool IsInExtendedScope(TId id) => _currentSymbolTable._IsInCurrentScope(id);
+        idToNode.ContainsKey(id.ToString()) || parent != null &&
+        parent._IsInCurrentScope(id);
+    public bool IsInExtendedScope(TId id) => _IsInCurrentScope(id);
 }
 
 public enum Symbol
