@@ -78,9 +78,38 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         Indent("}\n");
     }
 
-    public override void CaseAFuncFunc(AFuncFunc node)
+    public override void CaseATypedFunc(ATypedFunc node)
     {
-        Indent("func void " + node.GetId() + "{\r\n");
+        PUnittype unit = node.GetUnittype();
+        var standardType = unit as ATypeUnittype;
+        if (standardType != null)
+        {
+            switch (standardType.GetType())
+            {
+                case AIntType a:
+                    Indent("int " + node.GetId().ToString().Trim() + "() {\r\n");
+                    break;
+                case ADecimalType b:
+                    Indent("decimal " + node.GetId().ToString().Trim() + "() {\r\n");
+                    break;
+                case ABoolType c:
+                    Indent("bool " + node.GetId().ToString().Trim() + "() {\r\n");
+                    break;
+                case ACharType d:
+                    Indent("char " + node.GetId().ToString().Trim() + "() {\r\n");
+                    break;
+                case AStringType e:
+                    Indent("string " + node.GetId().ToString().Trim() + "() {\r\n");
+                    break;
+            }
+        }
+        var customType = unit as AUnitUnittype;
+        if (customType != null)
+        {
+            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
+            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
+            // Her skal logikken implementeres 
+        }
         _indent++;
         foreach (Node child in node.GetStmt())
         {
@@ -88,13 +117,32 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             if (child is not AScopedStmt)
                 writer.WriteLine(";");
         }
-        OutAFuncFunc(node);
+        OutATypedFunc(node);
     }
 
-    public override void OutAFuncFunc(AFuncFunc node)
+    public override void OutATypedFunc(ATypedFunc node)
     {
         _indent--;
         Indent("}\n");    
+    }
+
+    public override void CaseAUntypedFunc(AUntypedFunc node)
+    {
+        Indent("func void " + node.GetId().ToString().Trim() + "() {\r\n");
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                writer.WriteLine(";");
+        }
+        OutAUntypedFunc(node);
+    }
+
+    public override void OutAUntypedFunc(AUntypedFunc node)
+    {
+        _indent--;
+        Indent("}\n");
     }
 
     /*-------------------------------------Control Structures---------------------------------------------------------*/
@@ -141,7 +189,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         _indent--;
         OutAForScoped(node);
     }
-
+    
     public override void OutAForScoped(AForScoped node)
     {
         Indent("}\n");
@@ -230,7 +278,6 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     }
 
     /*-------------------------------------Decl-----------------------------------------------------------------------*/
-
     public override void InADeclStmt(ADeclStmt node)
     {
         base.InADeclStmt(node);
@@ -287,14 +334,35 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         Indent($"{node.GetId()}+= ");
     }
 
-    public override void InAUnarypostassignStmt(AUnarypostassignStmt node)
+    public override void InAMinusassignStmt(AMinusassignStmt node)
     {
-        Indent(node.GetId().ToString().Trim() + (node.GetUnary() is APlusplusUnary ? "++" : "--"));
+        Indent($"{node.GetId()}-= ");
     }
 
-    public override void InAUnarysuffixassignStmt(AUnarysuffixassignStmt node)
+    public override void InAPrefixplusStmt(APrefixplusStmt node)
     {
-        Indent(node.GetId().ToString().Trim() + (node.GetUnary() is APlusplusUnary ? "++" : "--"));
+        Indent("++" + node.GetId().ToString().Trim());
+    }
+
+    public override void InASuffixplusStmt(ASuffixplusStmt node)
+    {
+        Indent(node.GetId().ToString().Trim() + "++");
+    }
+
+    public override void InAPrefixminusStmt(APrefixminusStmt node)
+    {
+        Indent("--" + node.GetId().ToString().Trim());
+    }
+
+    public override void InASuffixminusStmt(ASuffixminusStmt node)
+    {
+        Indent(node.GetId().ToString().Trim() + "--");
+    }
+
+    public override void CaseAReturnStmt(AReturnStmt node)
+    {
+        Indent("return ");
+        node.GetExp().Apply(this);
     }
 
     public override void InADeclassStmt(ADeclassStmt node)
@@ -345,12 +413,12 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     }
 
     /*--------------------------------- CaseExp ----------------------------------------------------------------------*/
-    public override void CaseADivExp(ADivExp node)
+    public override void CaseADivideExp(ADivideExp node)
     {
         Precedence(node.GetL(),node.GetR(),"/");
     }
 
-    public override void CaseAMultExp(AMultExp node)
+    public override void CaseAMultiplyExp(AMultiplyExp node)
     {
         Precedence(node.GetL(),node.GetR(),"*");
     }
@@ -367,15 +435,125 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseANumberExp(ANumberExp node)
     {
-        if(node.Parent() is not AFuncFunc)
+        if(node.Parent() is not AUntypedFunc or ATypedFunc)
             writer.Write(int.Parse(node.ToString()));
     }
 
-    public override void CaseANegnumberExp(ANegnumberExp node)
+    public override void CaseAUnaryminusExp(AUnaryminusExp node)
     {
-        node.GetNumber();
-        if (node.Parent() is not AFuncFunc)
-            writer.Write("-" + node.GetNumber().ToString().Trim());
+        node.GetExp();
+        if (node.Parent() is not ATypedFunc or AUntypedFunc)
+            writer.Write("-" + node.GetExp().ToString().Trim());
+    }
+
+    public override void CaseAOrExp(AOrExp node)
+    {
+        Precedence(node.GetL(),node.GetR()," || ");
+    }
+
+    public override void CaseAAndExp(AAndExp node)
+    {
+        Precedence(node.GetL(),node.GetR()," && ");
+    }
+
+    public override void CaseAEqualExp(AEqualExp node)
+    {
+        Precedence(node.GetL(),node.GetR()," == ");
+    }
+
+    public override void CaseANotequalExp(ANotequalExp node)
+    {
+        Precedence(node.GetL(),node.GetR()," != ");
+    }
+
+    public override void CaseAGreaterExp(AGreaterExp node)
+    {
+        Precedence(node.GetL(),node.GetR()," > ");
+    }
+
+    public override void CaseAGreaterequalExp(AGreaterequalExp node)
+    {
+        Precedence(node.GetL(),node.GetR()," >= ");
+    }
+
+    public override void CaseALessExp(ALessExp node)
+    {
+        Precedence(node.GetL(),node.GetR()," < ");
+    }
+
+    public override void CaseALessequalExp(ALessequalExp node)
+    {
+        Precedence(node.GetL(),node.GetR()," <= ");
+    }
+
+    public override void CaseARemainderExp(ARemainderExp node)
+    {
+        Precedence(node.GetL(),node.GetR()," % ");
+    }
+
+    public override void CaseASuffixplusplusExp(ASuffixplusplusExp node)
+    {
+        Indent("++" + node.GetExp().ToString().Trim());
+    }
+
+    public override void CaseAPrefixplusplusExp(APrefixplusplusExp node)
+    {
+        Indent(node.GetExp().ToString().Trim() + "++");
+    }
+
+    public override void CaseASuffixminusminusExp(ASuffixminusminusExp node)
+    {
+        Indent(node.GetExp().ToString().Trim() + "--");
+    }
+
+    public override void CaseAPrefixminusminusExp(APrefixminusminusExp node)
+    {
+        Indent("--" + node.GetExp().ToString().Trim());
+    }
+
+    public override void CaseALogicalnotExp(ALogicalnotExp node)
+    {
+        writer.Write($"!{node.GetExp()}");
+    }
+
+    public override void CaseACastExp(ACastExp node)
+    {
+        writer.Write($"(decimal){node.GetExp().ToString().Trim()}");
+    }
+
+    public override void CaseAIdExp(AIdExp node)
+    {
+        writer.Write(node.GetId());
+    }
+
+    public override void CaseADecimalExp(ADecimalExp node)
+    {
+        writer.Write(node.GetDecimal().ToString().Trim());
+    }
+
+    public override void CaseAUnitExp(AUnitExp node)
+    {
+        Indent(node.GetUnitnumber().ToString());
+    }
+    
+    public override void CaseAValueExp(AValueExp node)
+    {
+        writer.Write("value");
+    }
+
+    public override void CaseABooleanExp(ABooleanExp node)
+    {
+        Indent(node.GetBoolean().ToString());
+    }
+
+    public override void CaseAStringExp(AStringExp node)
+    {
+        Indent(node.GetString().ToString());
+    }
+
+    public override void CaseACharExp(ACharExp node)
+    {
+        Indent(node.GetChar().ToString());
     }
 
     public override void CaseASubunit(ASubunit node)
@@ -387,17 +565,25 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         writer.WriteLine(";");
         OutASubunit(node);
     }
-
-    public override void CaseAValueExp(AValueExp node)
-    {
-        writer.Write("value");
-    }
-
     public override void OutASubunit(ASubunit node)
     {
         Indent("}\n");
     }
-    
+
+    public override void CaseAUnitnumber(AUnitnumber node)
+    {
+        writer.Write(node.GetDecimal() + " " + node.GetSingleunit());
+    }
+
+    public override void CaseANumSingleunit(ANumSingleunit node)
+    {
+        writer.Write(node.GetId());
+    }
+
+    public override void CaseADenSingleunit(ADenSingleunit node)
+    {
+        writer.Write(node.GetId());
+    }
 
     public void Dispose()
     {

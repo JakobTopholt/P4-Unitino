@@ -257,13 +257,15 @@ Abstract Syntax Tree
     
     subunit = id exp;
     
+    //func is in CodeGen
     func = {prog} stmt+
          | {loop} stmt+
          | {untyped} id arg* stmt+
          | {typed} unittype id arg* stmt+;
          
     arg = unittype id;
-         
+    
+    //stmt in CodeGen
     stmt = {exp} exp
          | {assign}      id exp       
          | {plusassign}  id exp   
@@ -280,7 +282,7 @@ Abstract Syntax Tree
          
     unittype = {type} type
              | {unit} unituse+;
-                      
+              
     type = {int} 
          | {decimal}
          | {bool}

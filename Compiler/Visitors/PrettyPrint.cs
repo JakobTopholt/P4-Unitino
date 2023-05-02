@@ -49,7 +49,7 @@ public class PrettyPrint : DepthFirstAdapter
         output.WriteLine("}");
     }
 
-    public override void CaseAFuncFunc(AFuncFunc node)
+    public override void CaseATypedFunc(ATypedFunc node)
     {
         output.WriteLine("func " + node.GetId() + "{");
         _indent++;
@@ -59,10 +59,30 @@ public class PrettyPrint : DepthFirstAdapter
             if (child is not AScopedStmt)
                 output.WriteLine(";");
         }
-        OutAFuncFunc(node);
+        OutATypedFunc(node);    
     }
 
-    public override void OutAFuncFunc(AFuncFunc node)
+    public override void OutATypedFunc(ATypedFunc node)
+    {
+        _indent--;
+        output.WriteLine("}");
+        
+    }
+
+    public override void CaseAUntypedFunc(AUntypedFunc node)
+    {
+        output.WriteLine("func " + node.GetId() + "{");
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this);
+            if (child is not AScopedStmt)
+                output.WriteLine(";");
+        }
+        OutAUntypedFunc(node);    
+    }
+
+    public override void OutAUntypedFunc(AUntypedFunc node)
     {
         _indent--;
         output.WriteLine("}");
@@ -250,12 +270,12 @@ public class PrettyPrint : DepthFirstAdapter
         node.GetExp().Apply(this);
     }
 
-    public override void CaseADivExp(ADivExp node)
+    public override void CaseADivideExp(ADivideExp node)
     {
         PrintPrecedence(node.GetL(),node.GetR(),"/");
     }
-
-    public override void CaseAMultExp(AMultExp node)
+    
+    public override void CaseAMultiplyExp(AMultiplyExp node)
     {
         PrintPrecedence(node.GetL(),node.GetR(),"*");
     }

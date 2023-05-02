@@ -1,9 +1,5 @@
-func hejmeddig {
-    a = 5;
-    int z;
-    b();
-}
-
+Test1
+////
 prog {
     f();
 }
@@ -13,24 +9,24 @@ loop {
 }
 
 unit tid {
-    mango => value * 5;
-    banan => (5*2);
+    ms => value * 5;
+    s => value;
 }
 
-func scoped {
-    for(int g;; 6+5; a++) {
-        if(7) {
-            a--;
-            int a = 7;
-            int b = a +7;
-            while(1) {
+func ()scoped {
+    for(int g; 6>=5; a++) {
+        if(5 == 5) {
+            /tid a = 5ms/s;
+            while(!b ) {
+                decimal o = (decimal)a;
                 a = -1;
+                a = 5 % 5;
             }
         }
-        else if(5+2) {
+        else if(5<=6) {
             do {
                 bool c;
-            } while(5+2)
+            } while(5+2&&5+4)
         }
         else {
             decimal d;
@@ -40,37 +36,32 @@ func scoped {
 ////
 gb
 ////
-func void hejmeddig {
-    a = 5;
-    int z;
-    b();
-}
 void setup() {
     f();
 }
 void loop() {
     int f;
 }
-float tidmango(float value){
+float tidms(float value){
     return value*5;
 }
-float tidbanan(float value){
-    return 5*2;
+float tids(float value){
+    return value;
 }
-func void scoped {
-    for(int g; 6+5; a++) {
-        if(7) {
-            a--;
-            int a = 7;
-            int b = a +7;
-            while(1) {
+func void scoped() {
+    for(int g; 6 >= 5; a++) {
+        if(5 == 5) {
+            /tid a = 5ms/s;
+            while(!b ) {
+                decimal o = (decimal)a;
                 a = -1;
+                a = 5 % 5;
             }
         }
-        else if(5+2) {
+        else if(5 <= 6) {
             do {
                 bool c;
-            } while(5+2)
+            } while(5+2 && 5+4)
         }
         else {
             decimal d;
