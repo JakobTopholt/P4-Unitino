@@ -28,7 +28,7 @@ Helpers
     long_comment = '/*' not_star* '*'+ (not_star_slash not_star* '*'+)* '/';
 
     letter = lowercase | uppercase | '_' | '$';
-    id_part = lowercase (lowercase | digit)*;
+    id_part = (uppercase | lowercase) (digit)*;
 
 Tokens
 
@@ -157,7 +157,7 @@ Productions
     // prog {}, loop {}, func a {} or int a {}
     func {-> func} = {prog}     tprog l_brace stmt_list r_brace         {-> New func.prog([stmt_list.stmt])}
                    | {loop}     tloop l_brace stmt_list r_brace         {-> New func.loop([stmt_list.stmt])}
-                   | {untyped}  tfunc l_par args? r_par id l_brace stmt_list r_brace      {-> New func.untyped(id, [args.arg], [stmt_list.stmt])}
+                   | {untyped}  tfunc id l_par args? r_par l_brace stmt_list r_brace      {-> New func.untyped(id, [args.arg], [stmt_list.stmt])}
                    | {typed}    unittype id l_par args? r_par l_brace stmt_list r_brace   {-> New func.typed(unittype.unittype, id, [args.arg], [stmt_list.stmt])};
     
     //arguments used to declare a function and params when using a function
@@ -177,7 +177,7 @@ Productions
                    | {declass}  unittype id equal exp semicolon     {-> New stmt.declass(unittype.unittype, id, exp.exp)}
                    | {funccall} id l_par params? r_par semicolon    {-> New stmt.funccall(id, [params.exp])}
                    | {return}   treturn exp semicolon               {-> New stmt.return(exp.exp)}
-                   | {scoped}   scoped                              {-> New stmt.scoped(scoped.scoped)};
+                   | {scoped}   scoped                              {-> scoped.stmt};
     
     // Needed for for loop for (int i; i < 5;i += 1)
     assign {-> stmt} = {normal}         id equal exp        {-> New stmt.assign(id, exp.exp)}
@@ -188,12 +188,12 @@ Productions
                      | {suffixplus}     id tplusplus        {-> New stmt.suffixplus(id)}
                      | {suffixminus}    id tminusminus      {-> New stmt.suffixminus(id)};
     // scoped/block statements
-    scoped {-> scoped} = {if}       if l_par exp r_par l_brace stmt_list r_brace                                                                    {-> New scoped.if(exp.exp, [stmt_list.stmt])}
-                       | {else}     else l_brace stmt_list r_brace                                                                                  {-> New scoped.else([stmt_list.stmt])}
-                       | {elseif}   else if l_par exp r_par l_brace stmt_list r_brace                                                               {-> New scoped.elseif(exp.exp, [stmt_list.stmt])}
-                       | {for}      for l_par [init]:stmt [cond]:exp semicolon [incre]:assign r_par l_brace stmt_list r_brace {-> New scoped.for(init.stmt, cond.exp, incre.stmt, [stmt_list.stmt])}
-                       | {while}    while l_par exp r_par l_brace stmt_list r_brace                                                                 {-> New scoped.while(exp.exp, [stmt_list.stmt])}
-                       | {dowhile}  do l_brace stmt_list r_brace while l_par exp r_par                                                              {-> New scoped.dowhile([stmt_list.stmt], exp.exp)};
+    scoped {-> stmt} = {if}       if l_par exp r_par l_brace stmt_list r_brace                                              {-> New stmt.if(exp.exp, [stmt_list.stmt])}
+                     | {else}     else l_brace stmt_list r_brace                                                            {-> New stmt.else([stmt_list.stmt])}
+                     | {elseif}   else if l_par exp r_par l_brace stmt_list r_brace                                         {-> New stmt.elseif(exp.exp, [stmt_list.stmt])}
+                     | {for}      for l_par [init]:stmt [cond]:exp semicolon [incre]:assign r_par l_brace stmt_list r_brace {-> New stmt.for(init.stmt, cond.exp, incre.stmt, [stmt_list.stmt])}
+                     | {while}    while l_par exp r_par l_brace stmt_list r_brace                                           {-> New stmt.while(exp.exp, [stmt_list.stmt])}
+                     | {dowhile}  do l_brace stmt_list r_brace while l_par exp r_par                                        {-> New stmt.dowhile([stmt_list.stmt], exp.exp)};
                            
     //// Expressions - check precedence table from report
     exp {-> exp}= {ternary}         p8 q_mark [true]:exp colon [false]:exp  {-> New exp.ternary(p8.exp, true.exp, false.exp)}
@@ -278,7 +278,12 @@ Abstract Syntax Tree
          | {declass} unittype id exp
          | {funccall} id [params]:exp*
          | {return} exp
-         | {scoped} scoped;
+         | {if} exp stmt+
+         | {elseif} exp stmt+
+         | {else} stmt+
+         | {for} [init]:stmt [cond]:exp [incre]:stmt stmt+ // incre is always an assignstmt
+         | {while} exp stmt+
+         | {dowhile} stmt+ exp;
          
     unittype = {type} type
              | {unit} unituse+;
@@ -291,14 +296,6 @@ Abstract Syntax Tree
          
     unituse = {num} id // numerator
             | {den} id; // denumerator
-            
-    scoped = {if} exp stmt+
-           | {elseif} exp stmt+
-           | {else} stmt+
-           | {for} [init]:stmt [cond]:exp [incre]:stmt stmt+ // incre is always an assignstmt
-           | {while} exp stmt+
-           | {dowhile} stmt+ exp;
-    
     
     //Expressions
     exp = {ternary}         [cond]:exp [true]:exp [false]:exp
@@ -337,9 +334,6 @@ Abstract Syntax Tree
     unitnumber = decimal singleunit*;
     singleunit = {num} id
                | {den} id;
-               
-    unary = {plusplus}
-          | {minusminus};
     
 // TODO: Arrays
 // TODO: Switch

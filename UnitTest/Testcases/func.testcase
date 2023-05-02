@@ -1,0 +1,86 @@
+﻿Func tests
+////
+func NormalFunc(int b) {
+    int i = 0;
+}
+prog {
+    int i = 0;
+    NormalFunc(int b);
+}
+loop {
+    int i = 0;
+}
+int TypedFunc() {
+    int i = 0;
+    return i;
+}
+func ImplicitTypedFunc() {
+    int i = 0;
+    return i;
+}
+unit Time {
+    ms => value;
+    s => value * 1000;
+}
+Time UnitFunc() {
+    Time a = 50ms + 1000s;
+    return a;
+}
+////
+func NormalFunc(int b) {
+    int i = 0;
+}
+prog {
+    int i = 0;
+    NormalFunc(int b);
+}
+loop {
+    int i = 0;
+}
+int TypedFunc() {
+    int i = 0;
+    return i;
+}
+func ImplicitTypedFunc() {
+    int i = 0;
+    return i;
+}
+unit Time {
+    ms => value;
+    s => value * 1000;
+}
+Time UnitFunc() {
+    Time a = 50ms + 1000s;
+    return a;
+}
+////
+void NormalFunc(int b) {
+    int i = 0;
+}
+void setup() {
+    int i = 0;
+    NormalFunc(7);
+}
+void loop() {
+    int i = 0;
+}
+int TypedFunc() {
+    int i = 0;
+    return i;
+}
+int ImplicitTypedFunc() {
+    int i = 0;
+    return i;
+}
+float Timems(float value) {
+    return value;
+}
+float Times(float value) {
+    return value*1000;
+}
+float UnitFunc() {
+    float a = Timems(50) + Timems(1000);
+    return a;
+}
+////
+true
