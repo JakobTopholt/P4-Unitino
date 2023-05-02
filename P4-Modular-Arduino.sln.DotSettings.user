@@ -1,13 +1,11 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:String x:Key="/Default/CodeInspection/PencilsConfiguration/ActualSeverity/@EntryValue">INFO</s:String>
-	
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=30aa6109_002D08b7_002D424d_002D83bb_002Daa04b3a7d147/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Tests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests.CodeGen&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests.PrettyPrint&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests.checkInput&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=8120cdb2_002Dc6b6_002D4d2f_002D83b7_002Dbff958db9e80/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Solution /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	
+	
+	
 	
 	
 	

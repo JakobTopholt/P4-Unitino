@@ -560,7 +560,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         Indent("}\n");
     }
 
-    public override void CaseAUnitnumber(AUnitnumber node)
+    public override void CaseADecimalUnitnumber(ADecimalUnitnumber node)
     {
         writer.Write(node.GetDecimal() + " " + node.GetSingleunit());
     }

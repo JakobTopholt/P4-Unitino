@@ -13,10 +13,10 @@ unit tid {
     s => value;
 }
 
-func ()scoped {
+func scoped() {
     for(int g; 6>=5; a++) {
         if(5 == 5) {
-            /tid a = 5ms/s;
+            //tid a = 5ms//s;
             while(!b ) {
                 decimal o = (decimal)a;
                 a = -1;
