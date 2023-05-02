@@ -35,12 +35,14 @@ public class VisitorTests
     [TestCaseSource(typeof(FilesToTestsConverter), nameof(FilesToTestsConverter.TypeVisitorData))]
     public void TypeCheck(Start ast, bool correct)
     {
-        UnitVisitor b = new();
-        FunctionVisitor a = new();
-        TypeChecker c = new();
+        List<SymbolTable> list = new();
+        SymbolTable symbolTable = new(null, list);
+        UnitVisitor b = new(symbolTable);
+        FunctionVisitor a = new(symbolTable);
+        TypeChecker c = new(symbolTable);
         ast.Apply(a);
         ast.Apply(b);
         ast.Apply(c);
-        Assert.That(SymbolTable.GetSymbol(ast.GetPGrammar()), Is.EqualTo(correct ? Symbol.ok : Symbol.notOk));
+        Assert.That(symbolTable.GetSymbol(ast.GetPGrammar()), Is.EqualTo(correct ? Symbol.ok : Symbol.notOk));
     }
 }
