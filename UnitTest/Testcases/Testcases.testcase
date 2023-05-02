@@ -1,0 +1,72 @@
+Test1
+////
+prog {
+    f();
+}
+
+loop {
+    int f;
+}
+
+unit tid {
+    ms => value * 5;
+    s => value;
+}
+
+func ()scoped {
+    for(int g; 6>=5; a++) {
+        if(5 == 5) {
+            /tid a = 5ms/s;
+            while(!b ) {
+                decimal o = (decimal)a;
+                a = -1;
+                a = 5 % 5;
+            }
+        }
+        else if(5<=6) {
+            do {
+                bool c;
+            } while(5+2&&5+4)
+        }
+        else {
+            decimal d;
+        }
+    }
+}
+////
+gb
+////
+void setup() {
+    f();
+}
+void loop() {
+    int f;
+}
+float tidms(float value){
+    return value*5;
+}
+float tids(float value){
+    return value;
+}
+func void scoped() {
+    for(int g; 6 >= 5; a++) {
+        if(5 == 5) {
+            /tid a = 5ms/s;
+            while(!b ) {
+                decimal o = (decimal)a;
+                a = -1;
+                a = 5 % 5;
+            }
+        }
+        else if(5 <= 6) {
+            do {
+                bool c;
+            } while(5+2 && 5+4)
+        }
+        else {
+            decimal d;
+        }
+    }
+}
+////
+true

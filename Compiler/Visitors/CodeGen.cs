@@ -21,7 +21,6 @@ namespace Compiler.Visitors;
 
 public class CodeGen : DepthFirstAdapter, IDisposable
 {
-    //private StreamWriter writer;
     private StreamWriter writer;
     private static readonly Regex whiteSpace = new(@"\s+");
     public CodeGen(StreamWriter writer)
@@ -31,49 +30,277 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     void Precedence(Node L, Node R, string ope)
     {
-        if (L.Parent().Parent().Parent() is ASubunit)
-        {
-            Indent("(");
-            L.Apply(this);
-            writer.Write(ope);
-            R.Apply(this);
-            Indent(")");
-        }
-        else
-        {
-            L.Apply(this);
-            writer.Write(ope);
-            R.Apply(this);
-        }
+        L.Apply(this);
+        writer.Write(ope);
+        R.Apply(this);
     }
     private int _indent = 0;
     private void Indent(string s)
     {
         writer.Write(new string(' ', _indent * 4) + s);
     }
-    
-    public override void InAProgFunc(AProgFunc node)
+
+    public override void CaseAProgFunc(AProgFunc node)
     {
         Indent("void setup() {\r\n");
         _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this); 
+            writer.WriteLine(";");
+        }
+        OutAProgFunc(node);
     }
 
     public override void OutAProgFunc(AProgFunc node)
     {
         _indent--;
-        Indent("}\r\n");
+        Indent("}\n");
     }
 
-    public override void InANewFunc(ANewFunc node)
+    public override void CaseALoopFunc(ALoopFunc node)
     {
-        Indent("Func void " + node.GetId() + "{\r\n");
+        Indent("void loop() {\n");
         _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this);
+            writer.WriteLine(";");
+        }
+        OutALoopFunc(node);
     }
 
-    public override void OutANewFunc(ANewFunc node)
+    public override void OutALoopFunc(ALoopFunc node)
     {
         _indent--;
-        Indent("}\r\n");
+        Indent("}\n");
+    }
+
+    public override void CaseATypedFunc(ATypedFunc node)
+    {
+        PUnittype unit = node.GetUnittype();
+        var standardType = unit as ATypeUnittype;
+        if (standardType != null)
+        {
+            switch (standardType.GetType())
+            {
+                case AIntType a:
+                    Indent("int " + node.GetId().ToString().Trim() + "() {\r\n");
+                    break;
+                case ADecimalType b:
+                    Indent("decimal " + node.GetId().ToString().Trim() + "() {\r\n");
+                    break;
+                case ABoolType c:
+                    Indent("bool " + node.GetId().ToString().Trim() + "() {\r\n");
+                    break;
+                case ACharType d:
+                    Indent("char " + node.GetId().ToString().Trim() + "() {\r\n");
+                    break;
+                case AStringType e:
+                    Indent("string " + node.GetId().ToString().Trim() + "() {\r\n");
+                    break;
+            }
+        }
+        var customType = unit as AUnitUnittype;
+        if (customType != null)
+        {
+            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
+            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
+            // Her skal logikken implementeres 
+        }
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this); 
+            writer.WriteLine(";");
+        }
+        OutATypedFunc(node);
+    }
+
+    public override void OutATypedFunc(ATypedFunc node)
+    {
+        _indent--;
+        Indent("}\n");    
+    }
+
+    public override void CaseAUntypedFunc(AUntypedFunc node)
+    {
+        Indent("func void " + node.GetId().ToString().Trim() + "() {\r\n");
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this);
+            writer.WriteLine(";");
+        }
+        OutAUntypedFunc(node);
+    }
+
+    public override void OutAUntypedFunc(AUntypedFunc node)
+    {
+        _indent--;
+        Indent("}\n");
+    }
+
+    /*-------------------------------------Control Structures---------------------------------------------------------*/
+    public override void CaseAIfStmt(AIfStmt node)
+    {
+        Indent("if(");
+        node.GetExp().Apply(this);
+        writer.WriteLine(") {");
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this); 
+            writer.WriteLine(";");
+        }
+        _indent--;
+        OutAIfStmt(node);
+    }
+
+    public override void OutAIfStmt(AIfStmt node)
+    {
+        Indent("}\n");
+    }
+
+    public override void CaseAForStmt(AForStmt node)
+    {
+        int _indentholder = _indent;
+        Indent("for(");
+        _indent = 0;
+        node.GetInit().Apply(this);
+        writer.Write(("; "));
+        node.GetCond().Apply(this);
+        writer.Write(("; "));
+        node.GetIncre().Apply(this);
+        writer.WriteLine(") {");
+        _indent = _indentholder;
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this);
+            writer.WriteLine(";");
+        }
+        _indent--;
+        OutAForStmt(node);
+    }
+    
+    public override void OutAForStmt(AForStmt node)
+    {
+        Indent("}\n");
+    }
+
+    public override void CaseAWhileStmt(AWhileStmt node)
+    {
+        Indent("while(");
+        node.GetExp().Apply(this);
+        writer.WriteLine(") {");
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this); 
+            writer.WriteLine(";");
+        }
+        _indent--;
+        OutAWhileStmt(node);
+    }
+
+    public override void OutAWhileStmt(AWhileStmt node)
+    {
+        Indent("}\n");
+    }
+
+    public override void CaseAElseifStmt(AElseifStmt node)
+    {
+        Indent("else if(");
+        node.GetExp().Apply(this);
+        writer.WriteLine(") {");
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this); 
+            writer.WriteLine(";");
+        }
+        _indent--;
+        OutAElseifStmt(node);
+    }
+
+    public override void OutAElseifStmt(AElseifStmt node)
+    {
+        Indent("}\n");
+    }
+
+    public override void CaseAElseStmt(AElseStmt node)
+    {
+        Indent("else {\n");
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this); 
+            writer.WriteLine(";");
+        }
+        _indent--;
+        OutAElseStmt(node);
+    }
+
+    public override void OutAElseStmt(AElseStmt node)
+    {
+        Indent("}\n");
+    }
+
+    public override void CaseADowhileStmt(ADowhileStmt node)
+    {
+        Indent("do {\n");
+        _indent++;
+        foreach (Node child in node.GetStmt())
+        {
+            child.Apply(this);
+            writer.WriteLine(";");
+        }
+        _indent--;
+        Indent("} while(");
+        node.GetExp().Apply(this);
+        writer.Write(")\n");
+    }
+
+    public override void OutADowhileStmt(ADowhileStmt node)
+    {
+        Indent(")\n");
+    }
+
+    /*-------------------------------------Decl-----------------------------------------------------------------------*/
+    public override void InADeclStmt(ADeclStmt node)
+    {
+        base.InADeclStmt(node);
+        PUnittype unit = node.GetUnittype();
+        var standardType = unit as ATypeUnittype;
+        if (standardType != null)
+        {
+            switch (standardType.GetType())
+            {
+                case AIntType a:
+                    Indent(("int " + node.GetId().ToString().Trim()));
+                    break;
+                case ADecimalType b:
+                    Indent(("decimal " + node.GetId().ToString().Trim()));
+                    break;
+                case ABoolType c:
+                    Indent(("bool " + node.GetId().ToString().Trim()));
+                    break;
+                case ACharType d:
+                    Indent(("char " + node.GetId().ToString().Trim()));
+                    break;
+                case AStringType e:
+                    Indent(("string " + node.GetId().ToString().Trim()));
+                    break;
+            }
+        }
+        var customType = unit as AUnitUnittype;
+        if (customType != null)
+        {
+            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
+            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
+            // Her skal logikken implementeres 
+        }
     }
 
     int i = 0;
@@ -85,86 +312,103 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             Indent("");
     }
     
-    public override void OutAExpStmt(AExpStmt node)
-    {
-        writer.Write(";\r\n");
-    }
-
-    public override void InAIntDecl(AIntDecl node)
-    {
-        if (node.Parent().Parent() is ANewFunc or AProgFunc)
-        {
-            Indent(("int " + node.GetId().ToString().Trim()));
-        }
-        else
-            Indent("int " + node.GetId().ToString().Trim());
-    }
-
-    public override void InABoolDecl(ABoolDecl node)
-    {
-        if (node.Parent().Parent() is ANewFunc or AProgFunc)
-        {
-            Indent(("bool " + node.GetId().ToString().Trim()));
-        }
-        else
-            Indent("bool " + node.GetId().ToString().Trim());
-    }
-
-    public override void InADecimalDecl(ADecimalDecl node)
-    {
-        if (node.Parent().Parent() is ANewFunc or AProgFunc)
-            Indent(("decimal " + node.GetId().ToString().Trim()));
-        else
-            Indent("decimal " + node.GetId().ToString().Trim());
-    }
-
-    public override void InACharDecl(ACharDecl node)
-    {
-        if (node.Parent().Parent() is ANewFunc or AProgFunc)
-            Indent(("char " + node.GetId().ToString().Trim()));
-        else
-            Indent("char " + node.GetId().ToString().Trim());
-    }
-    
-    public override void InAStringDecl(AStringDecl node)
-    {
-        if (node.Parent().Parent() is ANewFunc or AProgFunc)
-            Indent(("string " + node.GetId().ToString().Trim()));
-        else
-            Indent("string " + node.GetId().ToString().Trim());
-    }
-
-    public override void OutADeclStmt(ADeclStmt node)
-    {
-        Indent(";\r\n");
-    }
+    /*---------------------------------------------ExpStmt------------------------------------------------------------*/
 
     public override void InAAssignStmt(AAssignStmt node)
     {
         Indent(node.GetId() + "= ");
     }
 
-    public override void OutAAssignStmt(AAssignStmt node)
+    public override void InAPlusassignStmt(APlusassignStmt node)
     {
-        Indent(";\r\n");
+        Indent($"{node.GetId()}+= ");
     }
 
-    public override void InAFunccallExp(AFunccallExp node)
+    public override void InAMinusassignStmt(AMinusassignStmt node)
+    {
+        Indent($"{node.GetId()}-= ");
+    }
+
+    public override void InAPrefixplusStmt(APrefixplusStmt node)
+    {
+        Indent("++" + node.GetId().ToString().Trim());
+    }
+
+    public override void InASuffixplusStmt(ASuffixplusStmt node)
+    {
+        Indent(node.GetId().ToString().Trim() + "++");
+    }
+
+    public override void InAPrefixminusStmt(APrefixminusStmt node)
+    {
+        Indent("--" + node.GetId().ToString().Trim());
+    }
+
+    public override void InASuffixminusStmt(ASuffixminusStmt node)
+    {
+        Indent(node.GetId().ToString().Trim() + "--");
+    }
+
+    public override void CaseAReturnStmt(AReturnStmt node)
+    {
+        Indent("return ");
+        node.GetExp().Apply(this);
+    }
+
+    public override void InADeclassStmt(ADeclassStmt node)
+    {
+        base.InADeclassStmt(node);
+        PUnittype unit = node.GetUnittype();
+        var standardType = unit as ATypeUnittype;
+        if (standardType != null)
+        {
+            switch (standardType.GetType())
+            {
+                case AIntType a:
+                    Indent(("int " + node.GetId().ToString().Trim()) + " = ");
+                    break;
+                case ADecimalType b:
+                    Indent(("decimal " + node.GetId().ToString().Trim()) + " = ");
+                    break;
+                case ABoolType c:
+                    Indent(("bool " + node.GetId().ToString().Trim()) + " = ");
+                    break;
+                case ACharType d:
+                    Indent(("char " + node.GetId().ToString().Trim()) + " = ");
+                    break;
+                case AStringType e:
+                    Indent(("string " + node.GetId().ToString().Trim()) + " = ");
+                    break;
+            }
+        }
+        var customType = unit as AUnitUnittype;
+        if (customType != null)
+        {
+            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
+            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
+            
+            // Her skal logikken implementeres 
+            
+        }
+    }
+
+    public override void InAIdExp(AIdExp node)
+    {
+        writer.Write(node.GetId());
+    }
+
+    public override void InAFunccallStmt(AFunccallStmt node)
     {
         Indent(node.GetId().ToString().Trim() + "()");
     }
 
-    public override void OutAFunccallExp(AFunccallExp node)
-    {
-        Indent(";\r\n");
-    }
-
-    public override void CaseADivExp(ADivExp node)
+    /*--------------------------------- CaseExp ----------------------------------------------------------------------*/
+    public override void CaseADivideExp(ADivideExp node)
     {
         Precedence(node.GetL(),node.GetR(),"/");
     }
 
-    public override void CaseAMultExp(AMultExp node)
+    public override void CaseAMultiplyExp(AMultiplyExp node)
     {
         Precedence(node.GetL(),node.GetR(),"*");
     }
@@ -181,24 +425,155 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseANumberExp(ANumberExp node)
     {
-        if(node.Parent() is not ANewFunc)
+        if(node.Parent() is not AUntypedFunc or ATypedFunc)
             writer.Write(int.Parse(node.ToString()));
     }
-    public override void InASubunit(ASubunit node)
+
+    public override void CaseAUnaryminusExp(AUnaryminusExp node)
     {
-        string? unitId = whiteSpace.Replace(((AUnit)node.Parent()).GetId().ToString(),"");
+        node.GetExp();
+        if (node.Parent() is not ATypedFunc or AUntypedFunc)
+            writer.Write("-" + node.GetExp().ToString().Trim());
+    }
+
+    public override void CaseAOrExp(AOrExp node)
+    {
+        Precedence(node.GetL(),node.GetR()," || ");
+    }
+
+    public override void CaseAAndExp(AAndExp node)
+    {
+        Precedence(node.GetL(),node.GetR()," && ");
+    }
+
+    public override void CaseAEqualExp(AEqualExp node)
+    {
+        Precedence(node.GetL(),node.GetR()," == ");
+    }
+
+    public override void CaseANotequalExp(ANotequalExp node)
+    {
+        Precedence(node.GetL(),node.GetR()," != ");
+    }
+
+    public override void CaseAGreaterExp(AGreaterExp node)
+    {
+        Precedence(node.GetL(),node.GetR()," > ");
+    }
+
+    public override void CaseAGreaterequalExp(AGreaterequalExp node)
+    {
+        Precedence(node.GetL(),node.GetR()," >= ");
+    }
+
+    public override void CaseALessExp(ALessExp node)
+    {
+        Precedence(node.GetL(),node.GetR()," < ");
+    }
+
+    public override void CaseALessequalExp(ALessequalExp node)
+    {
+        Precedence(node.GetL(),node.GetR()," <= ");
+    }
+
+    public override void CaseARemainderExp(ARemainderExp node)
+    {
+        Precedence(node.GetL(),node.GetR()," % ");
+    }
+
+    public override void CaseASuffixplusplusExp(ASuffixplusplusExp node)
+    {
+        Indent("++" + node.GetExp().ToString().Trim());
+    }
+
+    public override void CaseAPrefixplusplusExp(APrefixplusplusExp node)
+    {
+        Indent(node.GetExp().ToString().Trim() + "++");
+    }
+
+    public override void CaseASuffixminusminusExp(ASuffixminusminusExp node)
+    {
+        Indent(node.GetExp().ToString().Trim() + "--");
+    }
+
+    public override void CaseAPrefixminusminusExp(APrefixminusminusExp node)
+    {
+        Indent("--" + node.GetExp().ToString().Trim());
+    }
+
+    public override void CaseALogicalnotExp(ALogicalnotExp node)
+    {
+        writer.Write($"!{node.GetExp()}");
+    }
+
+    public override void CaseACastExp(ACastExp node)
+    {
+        writer.Write($"(decimal){node.GetExp().ToString().Trim()}");
+    }
+
+    public override void CaseAIdExp(AIdExp node)
+    {
+        writer.Write(node.GetId());
+    }
+
+    public override void CaseADecimalExp(ADecimalExp node)
+    {
+        writer.Write(node.GetDecimal().ToString().Trim());
+    }
+
+    public override void CaseAUnitExp(AUnitExp node)
+    {
+        Indent(node.GetUnitnumber().ToString());
+    }
+    
+    public override void CaseAValueExp(AValueExp node)
+    {
+        writer.Write("value");
+    }
+
+    public override void CaseABooleanExp(ABooleanExp node)
+    {
+        Indent(node.GetBoolean().ToString());
+    }
+
+    public override void CaseAStringExp(AStringExp node)
+    {
+        Indent(node.GetString().ToString());
+    }
+
+    public override void CaseACharExp(ACharExp node)
+    {
+        Indent(node.GetChar().ToString());
+    }
+
+    public override void CaseASubunit(ASubunit node)
+    {
+        string? unitId = whiteSpace.Replace(((AUnitdecl)node.Parent()).GetId().ToString(),"");
         string? subUnitId = whiteSpace.Replace(node.GetId().ToString(),"");
-        string? type = whiteSpace.Replace(((AUnit)node.Parent()).GetTint().ToString(), "");
-        Indent($"{type} {unitId}{subUnitId}({type} value){{\n");
-        _indent++;
-        Indent("return");
-        _indent--;
+        Indent($"float {unitId}{subUnitId}(float value){{\n    return ");
+        node.GetExp().Apply(this);
+        writer.WriteLine(";");
+        OutASubunit(node);
     }
     public override void OutASubunit(ASubunit node)
     {
         Indent("}\n");
     }
-    
+
+    public override void CaseAUnitnumber(AUnitnumber node)
+    {
+        writer.Write(node.GetDecimal() + " " + node.GetSingleunit());
+    }
+
+    public override void CaseANumSingleunit(ANumSingleunit node)
+    {
+        writer.Write(node.GetId());
+    }
+
+    public override void CaseADenSingleunit(ADenSingleunit node)
+    {
+        writer.Write(node.GetId());
+    }
 
     public void Dispose()
     {

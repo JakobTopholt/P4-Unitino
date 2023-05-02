@@ -151,38 +151,38 @@ public class stmtTypeChecker : DepthFirstAdapter
         
     }
 
-    public override void OutAIfScoped(AIfScoped node)
+    public override void OutAIfStmt(AIfStmt node)
     {
         Symbol? CondExpr = SymbolTable.GetSymbol(node.GetExp());
         SymbolTable.AddNode(node,CondExpr != Symbol.Bool|| CondExpr == null ? Symbol.notOk: Symbol.ok);
     }
 
-    public override void OutAElseifScoped(AElseifScoped node)
+    public override void OutAElseifStmt(AElseifStmt node)
     {
         Symbol? CondExpr = SymbolTable.GetSymbol(node.GetExp());
         SymbolTable.AddNode(node,CondExpr != Symbol.Bool || CondExpr == null ? Symbol.notOk: Symbol.ok);
     }
 
-    public override void OutAElseScoped(AElseScoped node)
+    public override void OutAElseStmt(AElseStmt node)
     {
         Symbol? symbol = SymbolTable.GetSymbol(node);
         SymbolTable.AddNode(node, symbol == null ? Symbol.notOk : Symbol.ok);
     }
 
-    public override void OutAForScoped(AForScoped node)
+    public override void OutAForStmt(AForStmt node)
     {
         Symbol? cond = SymbolTable.GetSymbol(node.GetCond());
         Symbol? Incr = SymbolTable.GetSymbol(node.GetIncre());
         SymbolTable.AddNode(node, cond != Symbol.Bool ? Symbol.notOk : Symbol.ok);
     }
 
-    public override void OutAWhileScoped(AWhileScoped node)
+    public override void OutAWhileStmt(AWhileStmt node)
     {
         Symbol? cond = SymbolTable.GetSymbol(node.GetExp());
         SymbolTable.AddNode(node, cond != Symbol.Bool? Symbol.notOk: Symbol.ok);
     }
 
-    public override void OutADowhileScoped(ADowhileScoped node)
+    public override void OutADowhileStmt(ADowhileStmt node)
     {
         Symbol? cond = SymbolTable.GetSymbol(node.GetExp());
         SymbolTable.AddNode(node, cond != Symbol.Bool? Symbol.notOk: Symbol.ok);  

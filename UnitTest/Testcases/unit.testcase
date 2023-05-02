@@ -1,0 +1,86 @@
+﻿Test single unit
+////
+unit unit1 {
+    ms => value;
+}
+////
+unit unit1 {
+    ms => value;
+}
+////
+float unit1ms(float value) {
+    return value;
+}
+////
+true
+//////
+Test 2 subunits
+////
+unit unit2 {
+    ms => value;
+    s => value*1000;
+}
+////
+unit unit2 {
+    ms => value;
+    s => value*1000;
+}
+////
+float unit2ms(float value) {
+    return value;
+}
+float unit2s(float value) {
+    return value * 1000;
+}
+////
+true
+//////
+Test 2 units
+////
+unit unit3 {
+    ms => value;
+}
+unit unit4 {
+    s => value*1000;
+}
+////
+unit unit3 {
+    ms => value;
+}
+unit unit4 {
+    s => value*1000;
+}
+////
+float unit3ms(float value) {
+    return value;
+}
+float unit4s(float value) {
+    return value*1000;
+}
+////
+true
+//////
+Should fail from similar named units
+////
+unit unit5 {
+    ms => value;
+}
+unit unit5 {
+    ms => value;
+}
+////
+unit unit5 {
+    ms => value;
+}
+unit unit5 {
+    ms => value;
+}
+////
+float unit5ms(float value) {
+    return value;
+}
+float unit5ms(float value) {
+    return value;
+}
+////
+false

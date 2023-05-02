@@ -1,0 +1,80 @@
+﻿Check if single unit works
+////
+unit Time {
+    ms => value;
+}
+prog {
+    Time a = 50ms;
+}
+////
+unit Time {
+    ms => value;
+}
+prog {
+    Time a = 50ms;
+}
+////
+float Timems(float value) {
+    return value;
+}
+prog {
+    float a = Timems(50);
+}
+////
+true
+//////
+Check if multiple units work
+////
+unit Time {
+    ms => value;
+}
+prog {
+    /Time a = 50ms/ms*ms/ms/ms/ms*ms;
+    /Time b = /5ms;
+}
+////
+unit Time {
+    ms => value;
+}
+prog {
+    /Time a = 50ms/ms*ms/ms/ms/ms*ms;
+    /Time b = /5ms;
+}
+////
+float Timems(float value) {
+    return value;
+}
+prog {
+    float a = 1/Timems(50);
+    float b = 1/Timems(5);
+}
+////
+true
+//////
+Some mistake somewhere...
+////
+unit Time {
+    ms => value;
+}
+prog {
+    Time a = 50ms/ms*ms/ms/ms/ms*ms;
+    Time b = /5ms;
+}
+////
+unit Time {
+    ms => value;
+}
+prog {
+    /Time a = 50ms/ms*ms/ms/ms/ms*ms;
+    /Time b = /5ms;
+}
+////
+float Timems(float value) {
+    return value;
+}
+prog {
+    float a = 1/Timems(50);
+    float b = 1/Timems(5);
+}
+////
+false

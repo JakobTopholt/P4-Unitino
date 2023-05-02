@@ -7,7 +7,7 @@ public class exprTypeChecker : stmtTypeChecker
      //Expressions
     public override void OutADivideExp(ADivideExp node)
     {
-        if (SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) ||
+        /*if (SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) ||
             SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
         {
             if (!SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) &&
@@ -25,7 +25,7 @@ public class exprTypeChecker : stmtTypeChecker
 
             SymbolTable.AddNode(node, Symbol.notOk);
         }
-        else
+        else*/
         {
             var l = SymbolTable.GetSymbol(node.GetL());
             var r = SymbolTable.GetSymbol(node.GetR());
@@ -50,6 +50,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutAMultiplyExp(AMultiplyExp node)
     {
+        /*
         if (SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) ||
             SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
         {
@@ -68,7 +69,7 @@ public class exprTypeChecker : stmtTypeChecker
 
             SymbolTable.AddNode(node, Symbol.notOk);
         }
-        else
+        else*/
         {
             var l = SymbolTable.GetSymbol(node.GetL());
             var r = SymbolTable.GetSymbol(node.GetR());
@@ -92,6 +93,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutAPlusExp(APlusExp node)
     {
+        /*
         if (SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) || SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
         {
             if (!SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) && SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
@@ -106,7 +108,7 @@ public class exprTypeChecker : stmtTypeChecker
             }
             SymbolTable.AddNode(node,Symbol.notOk);  
         }
-        else
+        else*/
         {
             var l = SymbolTable.GetSymbol(node.GetL());
             var r = SymbolTable.GetSymbol(node.GetR());
@@ -142,7 +144,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutAMinusExp(AMinusExp node)
     {
-        
+        /*
         if (SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) || SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
         {
             if (!SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) && SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
@@ -157,7 +159,7 @@ public class exprTypeChecker : stmtTypeChecker
             }
             SymbolTable.AddNode(node,Symbol.notOk);  
         }
-        else
+        else*/
         {
             var l = SymbolTable.GetSymbol(node.GetL());
             var r = SymbolTable.GetSymbol(node.GetR());

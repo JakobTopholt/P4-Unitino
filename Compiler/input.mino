@@ -6,12 +6,32 @@ unit fart : int {
     hej => 3-2;
     nej => 4+2;
 }
-Prog {
-    5+7*5-3+(5*7); 
-} //example of expr
 func hejmeddig{
-    75; 
-    a = 5ms.5s; 
-    int a; 
+    75;
+    a = 5;
+    int a;
     b();
-} //example of stmt
+}
+
+Prog {
+    5+7*5-3+(5*7);
+    2+5*3;
+}
+
+func scoped {
+    for(int a; 6+5; a = 1) {
+        if(7) {
+            while(1) {
+                int b;
+            }
+        }
+        else if(5+2) {
+            do {
+                bool c;
+            } while(5+2)
+        }
+        else {
+            decimal d;
+        }
+    }
+}
