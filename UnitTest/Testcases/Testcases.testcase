@@ -79,3 +79,5 @@ func void scoped {
         }
     }
 }
+////
+true
