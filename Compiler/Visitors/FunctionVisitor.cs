@@ -52,7 +52,10 @@ public class FunctionVisitor : DepthFirstAdapter
         // If no return statements == Symbol.Func (void)
         // But if there is it has to be a reachable return statement in the node
         // All return statements have to evaluate to same type to be correct
-
+        if (symbolTable.GetFuncSymbol(node.GetId().ToString()) == null)
+        {
+            symbolTable.AddFuncId(node.GetId(),node,Symbol.Func);
+        }
         symbolTable = symbolTable.ExitScope();
     }
 
@@ -72,7 +75,8 @@ public class FunctionVisitor : DepthFirstAdapter
         {
             symbolTable = symbolTable.EnterScope();
             IList inputArgs = node.GetArg();
-            
+            //TODO ændre symbol.int til den rigtige type funktionen får
+            symbolTable.AddFuncId(node.GetId(),node,Symbol.Int);
             // ------WIP-------
             if (inputArgs.Count > 0)
             {
@@ -95,12 +99,30 @@ public class FunctionVisitor : DepthFirstAdapter
     public override void OutATypedFunc(ATypedFunc node)
     {
         // Save returntype
-        PUnittype? returnType = node.GetUnittype();
-
         // But if not void it has to have a reachable return statement in the node
         // All return statements have to evaluate to same type to be correct
+        symbolTable = symbolTable.ExitScope();
         
-        
+    }
+
+    public override void InALoopFunc(ALoopFunc node)
+    {
+        symbolTable = symbolTable.EnterScope();
+    }
+
+    public override void OutALoopFunc(ALoopFunc node)
+    {
+        symbolTable = symbolTable.ExitScope();
+    }
+
+    public override void InAProgFunc(AProgFunc node)
+    {
+        symbolTable = symbolTable.EnterScope();
+    }
+
+    public override void OutAProgFunc(AProgFunc node)
+    {
+        symbolTable = symbolTable.ExitScope();
     }
 
     // General logic (Logic that works inside functions)
@@ -136,7 +158,7 @@ public class FunctionVisitor : DepthFirstAdapter
 
                     symbolTable.AddNumerators(node.GetId(), node, numerator);
                     symbolTable.AddDenomerators(node.GetId(), node, denomerator);
-                    break;
+                    break; 
                 }
             }
         }

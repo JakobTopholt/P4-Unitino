@@ -325,9 +325,9 @@ public class exprTypeChecker : stmtTypeChecker
         Symbol? r = symbolTable.GetSymbol(R);
         switch (l, r)
         {
-            case (Symbol.ok, Symbol.Bool):
+            /*case (Symbol.ok, Symbol.Bool):
                 symbolTable.AddNode(Parent, Symbol.Bool);
-                break;
+                break;*/
             case (Symbol.Bool, Symbol.Bool):
                 symbolTable.AddNode(Parent,Symbol.Bool);
                 break;

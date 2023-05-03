@@ -53,8 +53,6 @@ public static class FilesToTestsConverter
                     string prettyPrint = test[2];
                     string codeGen = test[3];
                     bool typedCorrect = test[4].Equals("true", StringComparison.OrdinalIgnoreCase);
-                    if (string.IsNullOrWhiteSpace(program) || string.IsNullOrWhiteSpace(prettyPrint) || string.IsNullOrWhiteSpace(codeGen)) 
-                        continue;
                     using MemoryStream stream = new(program.Select(c => (byte)c).ToArray());
                     using StreamReader reader = new(stream);
                     Start? ast = null;
