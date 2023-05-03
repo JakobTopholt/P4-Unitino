@@ -31,53 +31,47 @@ public class TypeChecker : exprTypeChecker
     // DONE
     
     // 5 
-    // Mangler at håndtere funktions parametre - De skal implementeres i CFG grammaren først (tror jeg?)
-    // To do
+    // Mangler at håndtere funktions parametre
+    // WIP
     
     // 6
     // Check for forward referencing when checking assignment. If not declared before (also in global) it is an illegal assignment
     // GlobalFunctionCollector og TypeChecker
     // DONE
-    
+
     // 7
-    // Implement two global scope passes. One to catch free floating variables and the next to store global functions which type return need to be evauluated.
-    // This requires local variables to be stored temporarly while evaluating the global.
-    // Global varaibles --> Function types --> ok/notok
-    // To do
-    
-    // 8
     // Typecast hierachry
     // We need to implement an understanding of the types precedence. int --> float,  float --> string eg. basicly the implicit typecasting
     // This is probably a feauture we will have to work on more, when we want to implement precedence for custom unit types.
     // To do
 
-    // 9 Nye ændringer i denne branch: Units har nu fået suffix såsom 5s.50ms
+    // 8 Nye ændringer i denne branch: Units har nu fået suffix såsom 5s.50ms
     // Custom units typechecking. 
     // Expunits skal bestå af de samme singleunits
     // To do
     
-    // 10 
+    // 9 
     // Implement custom Units into DelcareStmnt
     // WIP
     
-    // 11
+    // 10
     // Implementer et tredje pass for at tjekke og save return type.
     // To do
     
-    // 12
+    // 11
     // Implement Custom unit typechecking
     // To do
     
-    // 13
+    // 12
     // Implement declareAssignment casen
     // WIP
 
-    // 14
+    // 13
     // Implement logic for the new typed func aswell. 
     // This is basicly the same logic but needs to be handled.
     // These return types can be easly saved
     
-    // 15 
+    // 14 
     // Typechecking for functioncall (Functioncalls needs to get returntype based on functioncallID)
     // Then compare in exp or whatever
 
