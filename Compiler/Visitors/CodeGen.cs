@@ -21,11 +21,15 @@ namespace Compiler.Visitors;
 
 public class CodeGen : DepthFirstAdapter, IDisposable
 {
+    private SymbolTable symbolTable;
+
     private StreamWriter writer;
     private static readonly Regex whiteSpace = new(@"\s+");
-    public CodeGen(StreamWriter writer)
+    public CodeGen(StreamWriter writer, SymbolTable symbolTable )
     {
         this.writer = writer;
+        this.symbolTable = symbolTable;
+
     }
 
     void Precedence(Node L, Node R, string ope)
@@ -125,8 +129,14 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseAUntypedFunc(AUntypedFunc node)
     {
-        Indent("func void " + node.GetId().ToString().Trim() + "() {\r\n");
+        Indent("void " + node.GetId().ToString().Trim() + "(");
         _indent++;
+        foreach (PArg o in node.GetArg())
+        {
+            o.Apply(this);
+            writer.Write(", ");
+        }
+        writer.Write(") {\r\n");
         foreach (Node child in node.GetStmt())
         {
             child.Apply(this);
@@ -139,6 +149,11 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     {
         _indent--;
         Indent("}\n");
+    }
+
+    public override void CaseAArg(AArg node)
+    {
+        writer.Write($"{node.GetUnittype()} {node.GetId()},");
     }
 
     /*-------------------------------------Control Structures---------------------------------------------------------*/
@@ -271,38 +286,46 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void InADeclStmt(ADeclStmt node)
     {
         base.InADeclStmt(node);
-        PUnittype unit = node.GetUnittype();
-        var standardType = unit as ATypeUnittype;
-        if (standardType != null)
+        if (symbolTable.IsInCurrentScope(node.GetId()))
         {
-            switch (standardType.GetType())
+            switch (node.GetUnittype())
             {
-                case AIntType a:
-                    Indent(("int " + node.GetId().ToString().Trim()));
+                case ATypeUnittype type when type.GetType() is AIntType:
+                    Indent(("int " + node.GetId().ToString().Trim()));                    
                     break;
-                case ADecimalType b:
+                case ATypeUnittype type when type.GetType() is ADecimalType:
                     Indent(("decimal " + node.GetId().ToString().Trim()));
                     break;
-                case ABoolType c:
+                case ATypeUnittype type when type.GetType() is ABoolType:
                     Indent(("bool " + node.GetId().ToString().Trim()));
                     break;
-                case ACharType d:
+                case ATypeUnittype type when type.GetType() is ACharType:
                     Indent(("char " + node.GetId().ToString().Trim()));
                     break;
-                case AStringType e:
+                case ATypeUnittype type when type.GetType() is AStringType:
                     Indent(("string " + node.GetId().ToString().Trim()));
                     break;
+                case AUnitUnittype customType:
+                {
+                    // Declared a custom sammensat unit (Ikke en baseunit declaration)
+                    IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
+                    IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
+                    
+                    // Declaration validering for sammensat unit her
+                    // Check if Numerators or denomarots contains units that does not exist
+
+                    symbolTable.AddNumerators(node.GetId(), node, numerator);
+                    symbolTable.AddDenomerators(node.GetId(), node, denomerator);
+                    break;
+                }
             }
         }
-        var customType = unit as AUnitUnittype;
-        if (customType != null)
+        else
         {
-            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
-            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
-            // Her skal logikken implementeres 
+            symbolTable.AddId(node.GetId(), node, Symbol.notOk);
         }
     }
-
+    
     int i = 0;
     public override void InAExpStmt(AExpStmt node)
     {

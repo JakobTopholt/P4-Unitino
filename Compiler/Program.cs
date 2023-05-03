@@ -14,13 +14,7 @@ Start start;
 // PrettyPrint Visitor
 start.Apply(new PrettyPrint());
 
-// Codegen Visitor
-{
-    using FileStream stream = File.Create(Directory.GetCurrentDirectory() + "/../../../output.ino");
-    using StreamWriter writer = new(stream);
-    using CodeGen codegen = new (writer);
-    start.Apply(codegen);
-}
+
 List<SymbolTable> AllTables = new() { };
 
 SymbolTable symbolTable = new(null, AllTables);
@@ -32,6 +26,14 @@ start.Apply(new FunctionVisitor(symbolTable));
 
 // Typechecker
 start.Apply(new TypeChecker(symbolTable));
+
+// Codegen Visitor
+{
+    using FileStream stream = File.Create(Directory.GetCurrentDirectory() + "/../../../output.ino");
+    using StreamWriter writer = new(stream);
+    using CodeGen codegen = new (writer, symbolTable);
+    start.Apply(codegen);
+}
 
 
 // TODO Visitor 3: optional compiler optimization (lecture 20)
