@@ -19,19 +19,7 @@ public class VisitorTests
         Assert.That(WhiteSpace.Replace(sb.ToString(), ""), 
             Is.EqualTo(prettyPrint));
     }
-
-    [TestCaseSource(typeof(FilesToTestsConverter), nameof(FilesToTestsConverter.CodeGenData))]
-    public void CodeGen(Start ast, string codeGenText)
-    {
-        using MemoryStream stream = new();
-        using StreamWriter writer = new(stream);
-        CodeGen codeGen = new(writer);
-        ast.Apply(codeGen);
-        writer.Flush();
-        string code = Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int) stream.Length);
-        Assert.That(code.ReplaceLineEndings(), Is.EqualTo(codeGenText));
-    }
-
+    
     [TestCaseSource(typeof(FilesToTestsConverter), nameof(FilesToTestsConverter.TypeVisitorData))]
     public void TypeCheck(Start ast, bool correct)
     {
@@ -45,4 +33,25 @@ public class VisitorTests
         ast.Apply(c);
         Assert.That(symbolTable.GetSymbol(ast.GetPGrammar()), Is.EqualTo(correct ? Symbol.ok : Symbol.notOk));
     }
+    
+    [TestCaseSource(typeof(FilesToTestsConverter), nameof(FilesToTestsConverter.CodeGenData))]
+    public void CodeGen(Start ast, string codeGenText)
+    {
+        List<SymbolTable> list = new();
+        SymbolTable symbolTable = new(null, list);
+        UnitVisitor b = new(symbolTable);
+        FunctionVisitor a = new(symbolTable);
+        TypeChecker c = new(symbolTable);
+        ast.Apply(a);
+        ast.Apply(b);
+        ast.Apply(c);
+        using MemoryStream stream = new();
+        using StreamWriter writer = new(stream);
+        CodeGen codeGen = new(writer, symbolTable);
+        ast.Apply(codeGen);
+        writer.Flush();
+        string code = Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int) stream.Length);
+        Assert.That(code.ReplaceLineEndings(), Is.EqualTo(codeGenText));
+    }
+    
 }
