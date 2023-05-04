@@ -162,7 +162,7 @@ Productions
                    | {typed}    unittype id l_par args? r_par l_brace stmt_list? return? r_brace   {-> New func.typed(unittype.unittype, id, [args.arg], [stmt_list.stmt, return.stmt])};
     
     //arguments used to declare a function and params when using a function
-    params {-> exp*} = {list}   exp comma params   {-> [params.exp, exp.exp]}
+    params {-> exp*} = {list}   exp comma params   {-> [exp.exp, params.exp]}
                      | {single} exp                 {-> [exp.exp]};
                      
     args {-> arg*} = {list} arg comma args {-> [arg.arg, args.arg]}
