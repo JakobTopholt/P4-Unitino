@@ -75,18 +75,43 @@ public class FunctionVisitor : DepthFirstAdapter
         {
             symbolTable = symbolTable.EnterScope();
             IList inputArgs = node.GetArg();
-            //TODO ændre symbol.int til den rigtige type funktionen får
-            symbolTable.AddFuncId(node.GetId(),node,Symbol.Int);
-            // ------WIP-------
             if (inputArgs.Count > 0)
             {
                 // Add to local scope
                 foreach (AArg? argument in inputArgs)
                 {
-                    // her skal implementes decl switchen baseret på unittype
                     switch (argument.GetUnittype())
                     {
-                        //SymbolTable.AddId(argument.GetId() , node, Symbol.Whatever);
+                        case ATypeUnittype type when type.GetType() is AIntType:
+                            symbolTable.AddId(argument.GetId() , argument, Symbol.Int);
+                            break;
+                        case ATypeUnittype type when type.GetType() is ADecimalType:
+                            symbolTable.AddId(argument.GetId() , argument, Symbol.Decimal);
+                            break;
+                        case ATypeUnittype type when type.GetType() is ABoolType:
+                            symbolTable.AddId(argument.GetId() , argument, Symbol.Bool);
+                            break;
+                        case ATypeUnittype type when type.GetType() is ACharType:
+                            symbolTable.AddId(argument.GetId() , argument, Symbol.Char);
+                            break;
+                        case ATypeUnittype type when type.GetType() is AStringType:
+                            symbolTable.AddId(argument.GetId() , argument, Symbol.String);
+                            break;
+                        case AUnitUnittype customType:
+                        {
+                            // -----------WIP----------- //
+                            
+                            // Declared a custom sammensat unit (Ikke en baseunit declaration)
+                            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
+                            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
+                    
+                            // Declaration validering for sammensat unit her
+                            // Check if Numerators or denomarots contains units that does not exist
+
+                            symbolTable.AddNumerators(argument.GetId(), argument, numerator);
+                            symbolTable.AddDenomerators(argument.GetId(), argument, denomerator);
+                            break; 
+                        }
                     }
                 }
                 // Save parameters in table
@@ -98,10 +123,14 @@ public class FunctionVisitor : DepthFirstAdapter
 
     public override void OutATypedFunc(ATypedFunc node)
     {
+        symbolTable = symbolTable.ExitScope();
         // Save returntype
         // But if not void it has to have a reachable return statement in the node
         // All return statements have to evaluate to same type to be correct
-        symbolTable = symbolTable.ExitScope();
+        
+        PUnittype returnSymbol = node.GetUnittype();
+        
+        symbolTable.AddId(node.GetId(), node, Symbol.String);
         
     }
 
@@ -135,16 +164,16 @@ public class FunctionVisitor : DepthFirstAdapter
                 case ATypeUnittype type when type.GetType() is AIntType:
                     symbolTable.AddId(node.GetId(), node, Symbol.Int);
                     break;
-                case ATypeUnittype type when type.GetType() is AIntType:
+                case ATypeUnittype type when type.GetType() is ADecimalType:
                     symbolTable.AddId(node.GetId(), node, Symbol.Decimal);
                     break;
-                case ATypeUnittype type when type.GetType() is AIntType:
+                case ATypeUnittype type when type.GetType() is ABoolType:
                     symbolTable.AddId(node.GetId(), node, Symbol.Bool);
                     break;
-                case ATypeUnittype type when type.GetType() is AIntType:
+                case ATypeUnittype type when type.GetType() is ACharType:
                     symbolTable.AddId(node.GetId(), node, Symbol.Char);
                     break;
-                case ATypeUnittype type when type.GetType() is AIntType:
+                case ATypeUnittype type when type.GetType() is AStringType:
                     symbolTable.AddId(node.GetId(), node, Symbol.String);
                     break;
                 case AUnitUnittype customType:

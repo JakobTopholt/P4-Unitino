@@ -12,7 +12,7 @@ public class SymbolTable
         this.allTables = allTables;
     }
     private readonly Dictionary<string, Node> idToNode = new();
-    private readonly Dictionary<string, Node> funcToNode = new();
+    //private readonly Dictionary<string, Node> funcToNode = new();
     private readonly Dictionary<Node, Symbol> nodeToSymbol = new();
     private readonly SymbolTable? parent;
     public Dictionary<string, AUnitdecl> SubunitToUnit = new();
@@ -40,11 +40,12 @@ public class SymbolTable
         return table;
     }
 
-    public Symbol? GetReturnType(PExp expression)
+    public PUnittype? GetUnitFromExpr(PExp expression)
     {
-        
-        // Logik for at finde ud af hvilken type/symbol som en expression evalurer til
-        return Symbol.ok;
+        // Logik for at finde ud af hvilken unit som en expression evalurer til
+        // Grunden til vi skal returne en Unittype og ikke et symbol er fordi symboler ikke indeholder
+        // data omkring typespecifikationen af en custom unit.
+        return null;
     }
 
     public void AddId(TId identifier, Node node, Symbol symbol)
@@ -52,11 +53,11 @@ public class SymbolTable
         idToNode.Add("" + identifier, node);
         AddNode(node, symbol);
     }
-    public void AddFuncId(TId identifier, Node node, Symbol symbol)
+    /*public void AddFuncId(TId identifier, Node node, Symbol symbol)
     {
         funcToNode.Add("" + identifier, node);
         AddNode(node, symbol);
-    }
+    } */
 
     public void AddNode(Node node, Symbol symbol)
     {
@@ -103,10 +104,10 @@ public class SymbolTable
 
     private Symbol? GetCurrentSymbol(Node node) => nodeToSymbol.TryGetValue(node, out Symbol symbol) ? symbol : parent?.GetCurrentSymbol(node);
     private Symbol? GetCurrentSymbol(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentSymbol(identifier);
-    private Symbol? GetCurrentFuncSymbol(string identifier) => funcToNode.TryGetValue(identifier, out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentFuncSymbol(identifier);
+    //private Symbol? GetCurrentFuncSymbol(string identifier) => funcToNode.TryGetValue(identifier, out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentFuncSymbol(identifier);
     public Symbol? GetSymbol(Node node) => GetCurrentSymbol(node);
     public Symbol? GetSymbol(string identifier) => GetCurrentSymbol(identifier);
-    public Symbol? GetFuncSymbol(string identifier) => GetCurrentFuncSymbol(identifier);
+    //public Symbol? GetFuncSymbol(string identifier) => GetCurrentFuncSymbol(identifier);
     public bool IsInCurrentScope(TId id) => idToNode.ContainsKey(id.ToString());
     private bool _IsInCurrentScope(TId id) =>
         idToNode.ContainsKey(id.ToString()) || parent != null &&

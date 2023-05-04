@@ -165,35 +165,33 @@ public class stmtTypeChecker : DepthFirstAdapter
       {
           parent = parent.Parent();
       }
-      
       switch (parent)
       {
           case ALoopFunc:
+              symbolTable.AddNode(node, Symbol.notOk);
+              throw new Exception("Should not have return in Loop");
+              break;
           case AProgFunc:
-              throw new Exception("awdawd");
+              symbolTable.AddNode(node, Symbol.notOk);
+              throw new Exception("Should not have return in Prog");
               break;
           case ATypedFunc aTypedFunc:
-              //først untyped også typed efter 
-              if (symbolTable.GetFuncSymbol(aTypedFunc.GetId().ToString()) == null)
-              {
-                symbolTable.AddFuncId(aTypedFunc.GetId(),aTypedFunc,(Symbol) symbolTable.GetSymbol(node.GetExp()));
-              }
-              else if (symbolTable.GetFuncSymbol(aTypedFunc.GetId().ToString()) != (Symbol)symbolTable.GetSymbol(node.GetExp()))
-              {
-                  //ændre på nodes til notOK
-              }
+              // Does the return-expressions' type match function type
+              PUnittype returnType = aTypedFunc.GetUnittype();
+              PUnittype exprType = symbolTable.GetUnitFromExpr(node.GetExp());
+
+              // Does exprSymbol match returnType?
+              symbolTable.AddNode(node, exprType == returnType ? Symbol.ok : Symbol.notOk);
               break;
-          case AUntypedFunc atypedFunc:
+          
+          case AUntypedFunc aUntypedFunc:
+              // Does all return-expressions evaluate to the same type
+              // Gem først returnstatement type to the function node
+              // If the next iteration does not match throw errors
+              
               
               break;
       }
-      
-      //does this type give the same type?
-      //else set i
-      //is it a typed func?
-
-
-
     }
 
     public override void OutAIfStmt(AIfStmt node)
