@@ -190,12 +190,12 @@ Productions
                      | {suffixplus}     id tplusplus        {-> New stmt.suffixplus(id)}
                      | {suffixminus}    id tminusminus      {-> New stmt.suffixminus(id)};
     // scoped/block statements
-    scoped {-> stmt} = {if}       if l_par exp r_par l_brace stmt_list r_brace                                              {-> New stmt.if(exp.exp, [stmt_list.stmt])}
-                     | {else}     else l_brace stmt_list r_brace                                                            {-> New stmt.else([stmt_list.stmt])}
-                     | {elseif}   else if l_par exp r_par l_brace stmt_list r_brace                                         {-> New stmt.elseif(exp.exp, [stmt_list.stmt])}
-                     | {for}      for l_par [init]:stmt [cond]:exp semicolon [incre]:assign r_par l_brace stmt_list r_brace {-> New stmt.for(init.stmt, cond.exp, incre.stmt, [stmt_list.stmt])}
-                     | {while}    while l_par exp r_par l_brace stmt_list r_brace                                           {-> New stmt.while(exp.exp, [stmt_list.stmt])}
-                     | {dowhile}  do l_brace stmt_list r_brace while l_par exp r_par                                        {-> New stmt.dowhile([stmt_list.stmt], exp.exp)};
+    scoped {-> stmt} = {if}       if l_par exp r_par l_brace stmt_list? return? r_brace                                              {-> New stmt.if(exp.exp, [stmt_list.stmt, return.stmt])}
+                     | {else}     else l_brace stmt_list? return? r_brace                                                            {-> New stmt.else([stmt_list.stmt, return.stmt])}
+                     | {elseif}   else if l_par exp r_par l_brace stmt_list? return? r_brace                                         {-> New stmt.elseif(exp.exp, [stmt_list.stmt, return.stmt])}
+                     | {for}      for l_par [init]:stmt [cond]:exp semicolon [incre]:assign r_par l_brace stmt_list? return? r_brace {-> New stmt.for(init.stmt, cond.exp, incre.stmt, [stmt_list.stmt, return.stmt])}
+                     | {while}    while l_par exp r_par l_brace stmt_list? return? r_brace                                           {-> New stmt.while(exp.exp, [stmt_list.stmt, return.stmt])}
+                     | {dowhile}  do l_brace stmt_list? return? r_brace while l_par exp r_par                                        {-> New stmt.dowhile([stmt_list.stmt, return.stmt], exp.exp)};
                            
     //// Expressions - check precedence table from report
     exp {-> exp}= {ternary}         p8 q_mark [true]:exp colon [false]:exp  {-> New exp.ternary(p8.exp, true.exp, false.exp)}
