@@ -143,15 +143,10 @@ Productions
                          | {den}    tslashslash id    {-> New unituse.den(id)};
     
     // For usage in expressions ex: 50 ms, 5 s, 50 meters
-    unitnumber {-> unitnumber} = {decimal} decimal firstsingleunit singleunit_list? {-> New unitnumber.decimal(decimal, [firstsingleunit.singleunit, singleunit_list.singleunit])}
-                               | {number} number firstsingleunit singleunit_list? {-> New unitnumber.number(number, [firstsingleunit.singleunit, singleunit_list.singleunit])};
+    unitnumber {-> unitnumber} = {decimal} decimal singleunit {-> New unitnumber.decimal(decimal, singleunit.singleunit)}
+                               | {number} number singleunit {-> New unitnumber.number(number, singleunit.singleunit)};
     
-    firstsingleunit {-> singleunit} = {num} id {-> New singleunit.num(id)}
-                                    | {den} tslashslash id {-> New singleunit.den(id)};
-                                    
-    singleunit_list {-> singleunit*} = {list} singleunit singleunit_list? {-> [singleunit.singleunit, singleunit_list.singleunit]};
-    
-    singleunit {-> singleunit} = {num} tstarstar id {-> New singleunit.num(id)}
+    singleunit {-> singleunit} = {num} id {-> New singleunit.num(id)}
                                | {den} tslashslash id {-> New singleunit.den(id)};
                            
     //// Functions and statements
@@ -268,8 +263,7 @@ Abstract Syntax Tree
     arg = unittype id;
     
     //stmt in CodeGen
-    stmt = {exp} exp
-         | {assign}      id exp       
+    stmt = {assign}      id exp       
          | {plusassign}  id exp   
          | {minusassign} id exp  
          | {prefixplus}  id             
@@ -277,7 +271,7 @@ Abstract Syntax Tree
          | {suffixplus}  id             
          | {suffixminus} id                          
          | {decl} unittype id
-         | {declass} unittype id exp
+         | {declass} unittype  id exp
          | {funccall} id [params]:exp*
          | {return} exp
          | {if} exp stmt+
@@ -333,8 +327,8 @@ Abstract Syntax Tree
         | {exp}             exp;  
         
     boolean = {true} | {false};
-    unitnumber = {decimal} decimal singleunit* 
-               | {number} number singleunit*;
+    unitnumber = {decimal} decimal singleunit 
+               | {number} number singleunit;
     singleunit = {num} id
                | {den} id;
     
