@@ -143,12 +143,9 @@ Productions
                          | {den}    tslashslash id    {-> New unituse.den(id)};
     
     // For usage in expressions ex: 50 ms, 5 s, 50 meters
-    unitnumber {-> unitnumber} = {decimal} decimal singleunit {-> New unitnumber.decimal(decimal, singleunit.singleunit)}
-                               | {number} number singleunit {-> New unitnumber.number(number, singleunit.singleunit)};
-    
-    singleunit {-> singleunit} = {num} id {-> New singleunit.num(id)}
-                               | {den} tslashslash id {-> New singleunit.den(id)};
-                           
+    unitnumber {-> unitnumber} = {decimal} decimal id {-> New unitnumber.decimal(decimal, id)}
+                               | {number} number id {-> New unitnumber.number(number, id)};
+                               
     //// Functions and statements
     // prog {}, loop {}, func a {} or int a {}
     func {-> func} = {prog}     tprog l_brace stmt_list? r_brace         {-> New func.prog([stmt_list.stmt])}
@@ -327,10 +324,8 @@ Abstract Syntax Tree
         | {exp}             exp;  
         
     boolean = {true} | {false};
-    unitnumber = {decimal} decimal singleunit 
-               | {number} number singleunit;
-    singleunit = {num} id
-               | {den} id;
+    unitnumber = {decimal} decimal id 
+               | {number} number id;
     
 // TODO: Arrays
 // TODO: Switch
