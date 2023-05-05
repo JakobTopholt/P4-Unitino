@@ -17,6 +17,7 @@ public class SymbolTable
     private readonly SymbolTable? parent;
     public Dictionary<string, AUnitdecl> SubunitToUnit = new();
     public Dictionary<Node, AUnitdecl> nodeToUnit = new();
+    public Dictionary<TId, PUnittype> funcToReturn = new();
     
 
 
@@ -100,6 +101,16 @@ public class SymbolTable
     public IList? GetFunctionParams(TId identifier)
     {
         return functionidToParams["" + identifier];
+    }
+
+    public void AddFirstReturnToFunction(TId identifier, PUnittype unit)
+    {
+        funcToReturn.Add(identifier, unit);
+    }
+
+    public bool DoesReturnStmtMatch(TId identifier, PUnittype unit)
+    {
+        return funcToReturn[identifier] == unit;
     }
 
     private Symbol? GetCurrentSymbol(Node node) => nodeToSymbol.TryGetValue(node, out Symbol symbol) ? symbol : parent?.GetCurrentSymbol(node);
