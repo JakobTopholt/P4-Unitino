@@ -13,9 +13,10 @@ public class stmtTypeChecker : DepthFirstAdapter
     
     public override void OutAAssignStmt(AAssignStmt node) {
         Symbol? type = symbolTable.GetSymbol("" + node.GetId());
-        Symbol? exprType = symbolTable.GetSymbol(node.GetExp());
-
-        // if types match stmt is ok, else notok
+        Symbol? exprType = symbolTable.GetSymbol(node.GetExp());    
+        
+        // if type == null (id was never declared) (The reason we dont use .isInCurrentScope here is we want to iclude foward refrences
+        // if type != exprType (Incompatible types)
         symbolTable.AddNode(node, type == null || type != exprType ? Symbol.notOk : Symbol.ok);
     }
 
@@ -34,79 +35,51 @@ public class stmtTypeChecker : DepthFirstAdapter
         
         symbolTable.AddNode(node,type == null ||type != exprType? Symbol.notOk: Symbol.ok);
     }
-
-    public override void OutAPrefixplusStmt(APrefixplusStmt node)
-    {
-        UnaryoperatorToSymbolTable(node);
-    }
-    public override void OutAPrefixminusStmt(APrefixminusStmt node)
-    {
-        UnaryoperatorToSymbolTable(node);
-    }
-    public override void OutASuffixplusStmt(ASuffixplusStmt node)
-    {
-        UnaryoperatorToSymbolTable(node);
-    }
-    public override void OutASuffixminusStmt(ASuffixminusStmt node)
-    {
-        UnaryoperatorToSymbolTable(node);
-    }
+    public override void OutAPrefixplusStmt(APrefixplusStmt node) => UnaryoperatorToSymbolTable(node);
+    public override void OutAPrefixminusStmt(APrefixminusStmt node) => UnaryoperatorToSymbolTable(node);
+    public override void OutASuffixplusStmt(ASuffixplusStmt node) => UnaryoperatorToSymbolTable(node);
+    public override void OutASuffixminusStmt(ASuffixminusStmt node) => UnaryoperatorToSymbolTable(node);
     public override void OutADeclStmt(ADeclStmt node)
     {
-        PUnittype unit = node.GetUnittype();
-        var standardType = unit as ATypeUnittype;
-        if (standardType != null)
+        if (!symbolTable.IsInCurrentScope(node.GetId()))
         {
-            switch (standardType.GetType())
+            switch (node.GetUnittype())
             {
-                case AIntType a:
-                    if (a.Parent() != null)
-                    {
-                        symbolTable.AddId(node.GetId(), node, 
-                            symbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Int);
-                    }
+                case ATypeUnittype type when type.GetType() is AIntType:
+                    symbolTable.AddId(node.GetId(), node, Symbol.Int);
                     break;
-                case ADecimalType b:
-                    if (b.Parent() != null)
-                    {
-                        symbolTable.AddId(node.GetId(), node,
-                            symbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Decimal);
-                    }
+                case ATypeUnittype type when type.GetType() is ADecimalType:
+                    symbolTable.AddId(node.GetId(), node, Symbol.Decimal);
                     break;
-                case ABoolType c:
-                    if (c.Parent() != null)
-                    {
-                        symbolTable.AddId(node.GetId(), node,
-                            symbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Bool);
-                    }
+                case ATypeUnittype type when type.GetType() is ABoolType:
+                    symbolTable.AddId(node.GetId(), node, Symbol.Bool);
                     break;
-                case ACharType d:
-                    if (d.Parent() != null)
-                    {
-                        symbolTable.AddId(node.GetId(), node,
-                            symbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.Char);
-                    }
+                case ATypeUnittype type when type.GetType() is ACharType:
+                    symbolTable.AddId(node.GetId(), node, Symbol.Char);
                     break;
-                case AStringType e:
-                    if (e.Parent() != null)
-                    {
-                        symbolTable.AddId(node.GetId(), node,
-                            symbolTable.IsInCurrentScope(node.GetId()) ? Symbol.notOk : Symbol.String);
-                    }
+                case ATypeUnittype type when type.GetType() is AStringType:
+                    symbolTable.AddId(node.GetId(), node, Symbol.String);
                     break;
+                case AUnitUnittype customType:
+                {
+                    // Declared a custom sammensat unit (Ikke en baseunit declaration)
+                    IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
+                    IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
+                    
+                    // Declaration validering for sammensat unit her
+                    // Check if Numerators or denomarots contains units that does not exist
+
+                    symbolTable.AddNumerators(node.GetId(), node, numerator);
+                    symbolTable.AddDenomerators(node.GetId(), node, denomerator);
+                    break; 
+                }
             }
         }
-        var customType = unit as AUnitUnittype;
-        if (customType != null)
+        else
         {
-            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
-            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
-            
-            // Her skal logikken implementeres 
-            
+            symbolTable.AddId(node.GetId(), node, Symbol.notOk);
         }
     }
-    
     public override void OutADeclassStmt(ADeclassStmt node)
     { 
         // Assignment have to be typechecked before Decl should add to symbolTable
@@ -144,7 +117,10 @@ public class stmtTypeChecker : DepthFirstAdapter
                 IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
 
                 // Her skal logikken implementeres 
+                // Mangler assignment typecheck logic
 
+                symbolTable.AddNumerators(node.GetId(), node, numerator);
+                symbolTable.AddDenomerators(node.GetId(), node, denomerator);
             }
         }
         else
@@ -165,40 +141,51 @@ public class stmtTypeChecker : DepthFirstAdapter
       {
           parent = parent.Parent();
       }
-
-      if (symbolTable.GetSymbol(node.GetExp()) != null)
+      switch (parent)
       {
+          case ALoopFunc:
+              symbolTable.AddNode(node, Symbol.notOk);
+              throw new Exception("Should not have return in Loop");
+              break;
+          case AProgFunc:
+              symbolTable.AddNode(node, Symbol.notOk);
+              throw new Exception("Should not have return in Prog");
+              break;
+          case ATypedFunc aTypedFunc:
+              // Does the return-expressions' type match function type
+              // Implement void type? PUnittype?
+              PUnittype returnType = aTypedFunc.GetUnittype();
+              PUnittype? exprType = symbolTable.GetUnitFromExpr(node.GetExp());
+              if(exprType == null)
+                  throw new Exception("Return is null value");
+              // Does exprSymbol match returnType?
+              symbolTable.AddNode(node, exprType == returnType ? Symbol.ok : Symbol.notOk);
+              break;
+          
+          case AUntypedFunc aUntypedFunc:
+              // Does all return-expressions evaluate to the same type
+              // Gem først returnstatement type to the function node
+              // If the next iteration does not match throw errors
+              PUnittype? exprType2 = symbolTable.GetUnitFromExpr(node.GetExp());
 
-          switch (parent)
-          {
-              case ALoopFunc:
-              case AProgFunc:
-                  throw new Exception("awdawd");
-                  break;
-              case ATypedFunc aTypedFunc:
-                  //først untyped også typed efter 
-                  if (symbolTable.GetFuncSymbol(aTypedFunc.GetId().ToString()) == null)
+              if (!symbolTable.funcToReturn.ContainsKey(aUntypedFunc.GetId()))
+              {
+                  // add the return to dictionary
+                  symbolTable.funcToReturn.Add(aUntypedFunc.GetId(), exprType2);  
+                  symbolTable.AddNode(node, Symbol.ok);
+              }
+              else
+              {
+                  if (symbolTable.DoesReturnStmtMatch(aUntypedFunc.GetId(), exprType2))
+                      symbolTable.AddNode(node, Symbol.ok);
+                  else
                   {
-                      symbolTable.AddFuncId(aTypedFunc.GetId(), aTypedFunc,
-                          (Symbol)symbolTable.GetSymbol(node.GetExp()));
+                      symbolTable.AddNode(node, Symbol.notOk);
+                      throw new Exception("Return is not correct type");
                   }
-                  else if (symbolTable.GetFuncSymbol(aTypedFunc.GetId().ToString()) !=
-                           (Symbol)symbolTable.GetSymbol(node.GetExp()))
-                  {
-                      //ændre på nodes til notOK
-                  }
-
-                  break;
-              case AUntypedFunc atypedFunc:
-                  break;
-          }
+              }
+              break;
       }
-      //does this type give the same type?
-      //else set i
-      //is it a typed func?
-
-
-
     }
 
     public override void OutAIfStmt(AIfStmt node)
@@ -237,8 +224,6 @@ public class stmtTypeChecker : DepthFirstAdapter
         Symbol? cond = symbolTable.GetSymbol(node.GetExp());
         symbolTable.AddNode(node, cond != Symbol.Bool? Symbol.notOk: Symbol.ok);  
     }
-    
-
     private void UnaryoperatorToSymbolTable(Node node)
     {
         Symbol? expr = symbolTable.GetSymbol(node);
@@ -258,5 +243,4 @@ public class stmtTypeChecker : DepthFirstAdapter
                 break;
         }
     }
-    
 }
