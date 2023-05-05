@@ -19,7 +19,7 @@ public class SymbolTable
     private Dictionary<string, IList> functionidToParams = new();
     public Dictionary<TId, PUnittype> funcToReturn = new();
 
-    private Dictionary<string, AUnitdecl> SubunitToUnit = new();
+    public Dictionary<string, AUnitdecl> SubunitToUnit = new();
     private Dictionary<string, PExp> SubunitToExp = new();
     private Dictionary<string, List<string>> Numerators = new();
     private Dictionary<string, List<string>> Denomerators = new();
