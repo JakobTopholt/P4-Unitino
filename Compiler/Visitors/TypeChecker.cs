@@ -98,4 +98,24 @@ public class TypeChecker : exprTypeChecker
     {
         symbolTable = symbolTable.ExitScope();
     }
+    
+    public override void InALoopFunc(ALoopFunc node)
+    {
+        symbolTable = symbolTable.EnterScope();
+    }
+
+    public override void OutALoopFunc(ALoopFunc node)
+    {
+        symbolTable = symbolTable.ExitScope();
+    }
+
+    public override void InAProgFunc(AProgFunc node)
+    {
+        symbolTable = symbolTable.EnterScope();
+    }
+
+    public override void OutAProgFunc(AProgFunc node)
+    {
+        symbolTable = symbolTable.ExitScope();
+    }
 }

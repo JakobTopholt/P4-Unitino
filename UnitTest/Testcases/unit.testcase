@@ -30,7 +30,7 @@ float unit2ms(float value) {
     return value;
 }
 float unit2s(float value) {
-    return value * 1000;
+    return value*1000;
 }
 ////
 true

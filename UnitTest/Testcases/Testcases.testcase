@@ -3,22 +3,18 @@ Test1
 prog {
     f();
 }
-
 loop {
-    int f;
+    int f = 9;
+    decimal e = (decimal)f ;
 }
-
 unit tid {
     ms => value * 5;
     s => value;
 }
-
 func scoped() {
     for(int g; 6>=5; a++) {
         if(5 == 5) {
-            //tid a = 5ms//s;
             while(!b ) {
-                decimal o = (decimal)a;
                 a = -1;
                 a = 5 % 5;
             }
@@ -40,20 +36,19 @@ void setup() {
     f();
 }
 void loop() {
-    int f;
+    int f = 9;
+    decimal e = (decimal)f ;
 }
-float tidms(float value){
+float tidms(float value) {
     return value*5;
 }
-float tids(float value){
+float tids(float value) {
     return value;
 }
-func void scoped() {
+void scoped() {
     for(int g; 6 >= 5; a++) {
         if(5 == 5) {
-            /tid a = 5ms/s;
             while(!b ) {
-                decimal o = (decimal)a;
                 a = -1;
                 a = 5 % 5;
             }

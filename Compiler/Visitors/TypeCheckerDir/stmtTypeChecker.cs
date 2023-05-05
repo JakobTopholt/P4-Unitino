@@ -165,29 +165,34 @@ public class stmtTypeChecker : DepthFirstAdapter
       {
           parent = parent.Parent();
       }
-      
-      switch (parent)
+
+      if (symbolTable.GetSymbol(node.GetExp()) != null)
       {
-          case ALoopFunc:
-          case AProgFunc:
-              throw new Exception("awdawd");
-              break;
-          case ATypedFunc aTypedFunc:
-              //først untyped også typed efter 
-              if (symbolTable.GetFuncSymbol(aTypedFunc.GetId().ToString()) == null)
-              {
-                symbolTable.AddFuncId(aTypedFunc.GetId(),aTypedFunc,(Symbol) symbolTable.GetSymbol(node.GetExp()));
-              }
-              else if (symbolTable.GetFuncSymbol(aTypedFunc.GetId().ToString()) != (Symbol)symbolTable.GetSymbol(node.GetExp()))
-              {
-                  //ændre på nodes til notOK
-              }
-              break;
-          case AUntypedFunc atypedFunc:
-              
-              break;
+
+          switch (parent)
+          {
+              case ALoopFunc:
+              case AProgFunc:
+                  throw new Exception("awdawd");
+                  break;
+              case ATypedFunc aTypedFunc:
+                  //først untyped også typed efter 
+                  if (symbolTable.GetFuncSymbol(aTypedFunc.GetId().ToString()) == null)
+                  {
+                      symbolTable.AddFuncId(aTypedFunc.GetId(), aTypedFunc,
+                          (Symbol)symbolTable.GetSymbol(node.GetExp()));
+                  }
+                  else if (symbolTable.GetFuncSymbol(aTypedFunc.GetId().ToString()) !=
+                           (Symbol)symbolTable.GetSymbol(node.GetExp()))
+                  {
+                      //ændre på nodes til notOK
+                  }
+
+                  break;
+              case AUntypedFunc atypedFunc:
+                  break;
+          }
       }
-      
       //does this type give the same type?
       //else set i
       //is it a typed func?

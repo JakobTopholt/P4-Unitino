@@ -1,11 +1,11 @@
 ﻿Func tests
 ////
-func NormalFunc(int b) {
+func NormalFunc(int b, int a) {
     int i = 0;
 }
 prog {
     int i = 0;
-    NormalFunc(i);
+    NormalFunc(5, 7);
 }
 loop {
     int i = 0;
@@ -14,7 +14,7 @@ int TypedFunc() {
     int i = 0;
     return i;
 }
-func ImplicitTypedFunc() {
+int ImplicitTypedFunc() {
     int i = 0;
     return i;
 }
@@ -27,7 +27,7 @@ Time UnitFunc() {
     return a;
 }
 ////
-func NormalFunc(int b) {
+void NormalFunc(int b, int a) {
     int i = 0;
 }
 prog {
@@ -54,12 +54,12 @@ Time UnitFunc() {
     return a;
 }
 ////
-void NormalFunc(int b) {
+void NormalFunc(int b, int a) {
     int i = 0;
 }
 void setup() {
     int i = 0;
-    NormalFunc(7);
+    NormalFunc(5, 7);
 }
 void loop() {
     int i = 0;

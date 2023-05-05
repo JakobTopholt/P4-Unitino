@@ -254,13 +254,6 @@ public class PrettyPrint : DepthFirstAdapter
     {
         Indent(node.ToString().Trim() + "()");
     }
-
-    public override void CaseAExpStmt(AExpStmt node)
-    {
-        Indent("");
-        node.GetExp().Apply(this);
-    }
-
     public override void CaseADivideExp(ADivideExp node)
     {
         PrintPrecedence(node.GetL(),node.GetR(),"/");
