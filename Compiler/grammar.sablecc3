@@ -41,6 +41,7 @@ Tokens
     do = 'do';
     while = 'while';
     treturn = 'return';
+    tvoid = 'void';
 
     tint = 'int';
     tdecimal = 'decimal';
@@ -130,8 +131,7 @@ Productions
     
     // Distance/Time speed = 50 meters / 10 seconds 
     // Unituse is when the unit is used as the type such as distance/time (speed) or distance/time/time (acceleration), /time*distance and /time/time*distance is also allowed
-    unittype {-> unittype} = {unituse} firstunituse unituse_list?   {-> New unittype.unit([firstunituse.unituse, unituse_list.unituse])}
-                           | {type} type                            {-> New unittype.type(type.type)};
+    
     
     // first unituse is rather special because here the star shouldn't be used
     firstunituse {-> unituse} = {num}   id      {-> New unituse.num(id)}
@@ -145,13 +145,26 @@ Productions
     // For usage in expressions ex: 50 ms, 5 s, 50 meters
     unitnumber {-> unitnumber} = {decimal} decimal id {-> New unitnumber.decimal(decimal, id)}
                                | {number} number id {-> New unitnumber.number(number, id)};
+    // Type
+    functype {-> type} = {void} tvoid {-> New type.void()}
+                       | {unittype} unittype {-> unittype.type};
+                       
+    unittype {-> type} = {unituse} firstunituse unituse_list?   {-> New type.unit([firstunituse.unituse, unituse_list.unituse])}
+                       | {type} type                            {-> type.type};
+                           
+    type {-> type} = {int}      tint        {-> New type.int()}
+                   | {decimal}  tdecimal    {-> New type.decimal()}
+                   | {bool}     tbool       {-> New type.bool()}
+                   | {char}     tchar       {-> New type.char()}
+                   | {string}   tstring     {-> New type.string()};
+
                                
     //// Functions and statements
     // prog {}, loop {}, func a {} or int a {}
     func {-> func} = {prog}     tprog l_brace stmt_list? r_brace         {-> New func.prog([stmt_list.stmt])}
                    | {loop}     tloop l_brace stmt_list? r_brace         {-> New func.loop([stmt_list.stmt])}
                    | {untyped}  tfunc id l_par args? r_par l_brace stmt_list? return? r_brace      {-> New func.untyped(id, [args.arg], [stmt_list.stmt, return.stmt])}
-                   | {typed}    unittype id l_par args? r_par l_brace stmt_list? return? r_brace   {-> New func.typed(unittype.unittype, id, [args.arg], [stmt_list.stmt, return.stmt])};
+                   | {typed}    functype id l_par args? r_par l_brace stmt_list? return? r_brace   {-> New func.typed(functype.type, id, [args.arg], [stmt_list.stmt, return.stmt])};
     
     //arguments used to declare a function and params when using a function
     params {-> exp*} = {list}   exp comma params   {-> [exp.exp, params.exp]}
@@ -160,18 +173,18 @@ Productions
     args {-> arg*} = {list} arg comma args {-> [arg.arg, args.arg]}
                    | {single} arg {-> [arg.arg]};
                    
-    arg {-> arg} = unittype id {-> New arg(unittype.unittype, id)};
+    arg {-> arg} = unittype id {-> New arg(unittype.type, id)};
     
     // Statements
     stmt_list {-> stmt*} = stmt stmt_list?                      {-> [stmt.stmt, stmt_list.stmt]};
     
     stmt {-> stmt} = {assign}   assign semicolon                    {-> assign.stmt}
-                   | {decl}     unittype id semicolon               {-> New stmt.decl(unittype.unittype, id)}
-                   | {declass}  unittype id equal exp semicolon     {-> New stmt.declass(unittype.unittype, id, exp.exp)}
+                   | {decl}     unittype id semicolon               {-> New stmt.decl(unittype.type, id)}
+                   | {declass}  unittype id equal exp semicolon     {-> New stmt.declass(unittype.type, id, exp.exp)}
                    | {funccall} id l_par params? r_par semicolon    {-> New stmt.funccall(id, [params.exp])}
                    | {scoped}   scoped                              {-> scoped.stmt};
                    
-    return {-> stmt} = treturn exp semicolon               {-> New stmt.return(exp.exp)};
+    return {-> stmt} = treturn exp? semicolon               {-> New stmt.return(exp.exp)};
     
     // Needed for for loop for (int i; i < 5;i += 1)
     assign {-> stmt} = {normal}         id equal exp        {-> New stmt.assign(id, exp.exp)}
@@ -230,14 +243,8 @@ Productions
                 | {string}          string                                  {-> New exp.string(string)}
                 | {char}            char                                    {-> New exp.char(char)}
                 | {exp}             l_par exp r_par                         {-> exp.exp};
-                         
+                
     //// Miscellaneous    
-    type {-> type} = {int}      tint        {-> New type.int()}
-                   | {decimal}  tdecimal    {-> New type.decimal()}
-                   | {bool}     tbool       {-> New type.bool()}
-                   | {char}     tchar       {-> New type.char()}
-                   | {string}   tstring     {-> New type.string()};
-                   
     boolean {-> boolean} = {true} ttrue {-> New boolean.true()}
                          | {false} tfalse {-> New boolean.false()};
 
@@ -255,9 +262,9 @@ Abstract Syntax Tree
     func = {prog} stmt*
          | {loop} stmt*
          | {untyped} id arg* stmt*
-         | {typed} unittype id arg* stmt*;
+         | {typed} type id arg* stmt*;
          
-    arg = unittype id;
+    arg = type id;
     
     //stmt in CodeGen
     stmt = {assign}      id exp       
@@ -267,25 +274,24 @@ Abstract Syntax Tree
          | {prefixminus} id            
          | {suffixplus}  id             
          | {suffixminus} id                          
-         | {decl} unittype id
-         | {declass} unittype  id exp
+         | {decl} type id
+         | {declass} type  id exp
          | {funccall} id [params]:exp*
-         | {return} exp
+         | {return} exp?
          | {if} exp stmt+
          | {elseif} exp stmt+
          | {else} stmt+
          | {for} [init]:stmt [cond]:exp [incre]:stmt stmt+ // incre is always an assignstmt
          | {while} exp stmt+
          | {dowhile} stmt+ exp;
-         
-    unittype = {type} type
-             | {unit} unituse+;
               
     type = {int} 
          | {decimal}
          | {bool}
          | {char}
-         | {string};
+         | {string}
+         | {unit} unituse+
+         | {void};
          
     unituse = {num} id // numerator
             | {den} id; // denumerator
