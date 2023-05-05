@@ -49,6 +49,29 @@ public class SymbolTable
         return null;
     }
 
+    public Symbol? GetSymbolFromExpr(PExp expression)
+    {
+        PUnittype? unit = GetUnitFromExpr(expression);
+        // Implement logic for converting
+        switch (unit)
+        {
+            case ATypeUnittype type when type.GetType() is AIntType:
+                return Symbol.Int;
+            case ATypeUnittype type when type.GetType() is AIntType:
+                return Symbol.Decimal;
+            case ATypeUnittype type when type.GetType() is AIntType:
+                return Symbol.Bool;
+            case ATypeUnittype type when type.GetType() is AIntType:
+                return Symbol.Char;
+            case ATypeUnittype type when type.GetType() is AIntType:
+                return Symbol.String;
+            case AUnitUnittype:
+                return Symbol.ok;
+            default:
+                return null;
+        }
+    }
+
     public void AddId(TId identifier, Node node, Symbol symbol)
     {
         idToNode.Add("" + identifier, node);
@@ -108,7 +131,7 @@ public class SymbolTable
         funcToReturn.Add(identifier, unit);
     }
 
-    public bool DoesReturnStmtMatch(TId identifier, PUnittype unit)
+    public bool DoesReturnStmtMatch(TId identifier, PUnittype? unit)
     {
         return funcToReturn[identifier] == unit;
     }

@@ -38,18 +38,20 @@ public class UnitVisitor : DepthFirstAdapter
         if (!symbolTable.IsInExtendedScope(node.GetId()))
         {
             PExp expr = node.GetExp();
-            if (symbolTable.GetReturnType(expr) == Symbol.Decimal)
+            if (symbolTable.GetSymbolFromExpr(expr) == Symbol.Decimal)
             {
                 symbolTable.AddSubunit(node.GetId(), node.Parent(), expr);
                 symbolTable.AddId(node.GetId(), node, Symbol.ok);
             }
             else
             {
+                // Expression did not evaluate to decimal
                 symbolTable.AddId(node.GetId(), node, Symbol.notOk); 
             }
         }
         else
         {
+            // Subunit's Id already declared
             symbolTable.AddId(node.GetId(), node, Symbol.notOk);
         }
     }

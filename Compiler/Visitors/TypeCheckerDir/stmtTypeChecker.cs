@@ -177,9 +177,11 @@ public class stmtTypeChecker : DepthFirstAdapter
               break;
           case ATypedFunc aTypedFunc:
               // Does the return-expressions' type match function type
+              // Implement void type? PUnittype?
               PUnittype returnType = aTypedFunc.GetUnittype();
               PUnittype? exprType = symbolTable.GetUnitFromExpr(node.GetExp());
-
+              if(exprType == null)
+                  throw new Exception("Return is null value");
               // Does exprSymbol match returnType?
               symbolTable.AddNode(node, exprType == returnType ? Symbol.ok : Symbol.notOk);
               break;
@@ -188,17 +190,23 @@ public class stmtTypeChecker : DepthFirstAdapter
               // Does all return-expressions evaluate to the same type
               // Gem først returnstatement type to the function node
               // If the next iteration does not match throw errors
-              exprType = symbolTable.GetUnitFromExpr(node.GetExp());
+              PUnittype? exprType2 = symbolTable.GetUnitFromExpr(node.GetExp());
 
-              
               if (!symbolTable.funcToReturn.ContainsKey(aUntypedFunc.GetId()))
               {
-                  // add the return to dicionary
-                  symbolTable.funcToReturn.Add();  
+                  // add the return to dictionary
+                  symbolTable.funcToReturn.Add(aUntypedFunc.GetId(), exprType2);  
+                  symbolTable.AddNode(node, Symbol.ok);
               }
               else
               {
-                  // Check if return matches the return in dictionary
+                  if (symbolTable.DoesReturnStmtMatch(aUntypedFunc.GetId(), exprType2))
+                      symbolTable.AddNode(node, Symbol.ok);
+                  else
+                  {
+                      symbolTable.AddNode(node, Symbol.notOk);
+                      throw new Exception("Return is not correct type");
+                  }
               }
               break;
       }

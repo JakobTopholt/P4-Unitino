@@ -52,10 +52,10 @@ public class FunctionVisitor : DepthFirstAdapter
         // If no return statements == Symbol.Func (void)
         // But if there is it has to be a reachable return statement in the node
         // All return statements have to evaluate to same type to be correct
-        if (symbolTable.GetFuncSymbol(node.GetId().ToString()) == null)
+       /* if (symbolTable.GetFuncSymbol(node.GetId().ToString()) == null)
         {
             symbolTable.AddFuncId(node.GetId(),node,Symbol.Func);
-        }
+        } */
         symbolTable = symbolTable.ExitScope();
     }
 
