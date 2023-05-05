@@ -27,13 +27,10 @@ public class UnitVisitor : DepthFirstAdapter
     {
         StateUnit = false;
     }
-
-    // Subunit skal have gemt dens relation til parentunit
-    // Den skal også have typechecket dens expression og gemt den i dictionary.
-    // ----------------------Se på Logikken på alt under her---------------------------
-    
     public override void OutASubunit(ASubunit node)
     {
+        // Subunit skal have gemt dens relation til parentunit
+        // Den skal også have typechecket dens expression og gemt den i dictionary.
         StateUnit = false;
         if (!symbolTable.IsInExtendedScope(node.GetId()))
         {
@@ -55,47 +52,4 @@ public class UnitVisitor : DepthFirstAdapter
             symbolTable.AddId(node.GetId(), node, Symbol.notOk);
         }
     }
-/*
-    public override void OutAUnitnumber(AUnitnumber node)
-    {
-        // S
-        base.OutAUnitnumber(node);
-    }
-
-    public override void OutANumSingleunit(ANumSingleunit node)
-    {
-        // Skal gemmes til dens id
-        base.OutANumSingleunit(node);
-    }
-
-    public override void OutADenSingleunit(ADenSingleunit node)
-    {
-        // Skal gemmes til dens id
-        base.OutADenSingleunit(node);
-    }
-    
-    public override void OutAUnitExp(AUnitExp node)
-    {
-        base.OutAUnitExp(node);
-    } 
-    
-        /* -----------VIRKER IKKE------------- 
-    public override void OutAUnitExp(AUnitExp node)
-    {   
-        //tager den første unit såsom 5ms og sammenligner med de andre efterfølgende.
-       var aUnit = symbolTable._currentsymbolTable.nodeToUnit[(node.GetSingleunit()];
-        symbolTable.AddId(node.GetSingleunit(),node, ? Symbol.notOk : Symbol.ok);
-        
-        foreach (PSingleunit singleunit in node.Get())
-        {
-            if (symbolTable._currentsymbolTable.nodeToUnit[singleunit] != aUnit)
-            {
-                //ikke sikker
-                symbolTable.AddNode(node,Symbol.notOk);
-                return;
-            }
-        }
-        symbolTable._currentsymbolTable.nodeToUnit.Add(node,aUnit);  
-    }
-*/
 }

@@ -4,72 +4,41 @@ using Moduino.analysis;
 
 public class exprTypeChecker : stmtTypeChecker
 {
-     //Expressions
+    public override void OutAUnitExp(AUnitExp node)
+    {
+        // single unitnumber eg. 50ms
+        
+    }
+    
     public override void OutADivideExp(ADivideExp node)
     {
-        /*if (SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) ||
-            SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
+        // Standard types
+        var l = symbolTable.GetSymbol(node.GetL());
+        var r = symbolTable.GetSymbol(node.GetR());
+        switch (l)
         {
-            if (!SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) &&
-                SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
-            {
-
-            }
-            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(), out AUnitdecl leftSide) &&
-                     SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(), out AUnitdecl rightSide))
-            {
-                SymbolTable.AddNode(node, leftSide == rightSide ? Symbol.ok : Symbol.notOk);
-
-                return;
-            }
-
-            SymbolTable.AddNode(node, Symbol.notOk);
+            case Symbol.Int when r is Symbol.Int:
+                symbolTable.AddNode(node, Symbol.Int);
+                break;
+            case Symbol.Decimal when r is Symbol.Decimal or Symbol.Int:
+                symbolTable.AddNode(node, Symbol.Decimal);
+                break;
+            case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal:
+                symbolTable.AddNode(node, Symbol.Decimal);
+                break;
+            default:
+                symbolTable.AddNode(node, Symbol.notOk);
+                break;
         }
-        else*/
-        {
-            var l = symbolTable.GetSymbol(node.GetL());
-            var r = symbolTable.GetSymbol(node.GetR());
-            switch (l)
-            {
-                case Symbol.Int when r is Symbol.Int:
-                    symbolTable.AddNode(node, Symbol.Int);
-                    break;
-                case Symbol.Decimal when r is Symbol.Decimal or Symbol.Int:
-                    symbolTable.AddNode(node, Symbol.Decimal);
-                    break;
-                case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal:
-                    symbolTable.AddNode(node, Symbol.Decimal);
-                    break;
-
-                default:
-                    symbolTable.AddNode(node, Symbol.notOk);
-                    break;
-            }
-        }
+        // Custom types
+        // Implement logic which adds a AUnitUnittype entry to the symboltable dictioary
+        // Maybe not the most effecient approach for now as each subPart of the unitexpression will be saved
+        // symbolTable.AddUnit(node, AUnitUnittype);
+        
     }
 
     public override void OutAMultiplyExp(AMultiplyExp node)
     {
-        /*
-        if (SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) ||
-            SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
-        {
-            if (!SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetL()) &&
-                SymbolTable._currentSymbolTable.nodeToUnit.ContainsKey(node.GetR()))
-            {
-
-            }
-            else if (SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetL(), out AUnitdecl leftSide) &&
-                     SymbolTable._currentSymbolTable.nodeToUnit.TryGetValue(node.GetR(), out AUnitdecl rightSide))
-            {
-                SymbolTable.AddNode(node, leftSide == rightSide ? Symbol.ok : Symbol.notOk);
-
-                return;
-            }
-
-            SymbolTable.AddNode(node, Symbol.notOk);
-        }
-        else*/
         {
             var l = symbolTable.GetSymbol(node.GetL());
             var r = symbolTable.GetSymbol(node.GetR());
@@ -93,22 +62,6 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutAPlusExp(APlusExp node)
     {
-        /*
-        if (symbolTable._currentsymbolTable.nodeToUnit.ContainsKey(node.GetL()) || symbolTable._currentsymbolTable.nodeToUnit.ContainsKey(node.GetR()))
-        {
-            if (!symbolTable._currentsymbolTable.nodeToUnit.ContainsKey(node.GetL()) && symbolTable._currentsymbolTable.nodeToUnit.ContainsKey(node.GetR()))
-            {
-                
-            }
-            else if (symbolTable._currentsymbolTable.nodeToUnit.TryGetValue(node.GetL(),out AUnitdecl leftSide) && symbolTable._currentsymbolTable.nodeToUnit.TryGetValue(node.GetR(),out AUnitdecl rightSide))
-            {
-                symbolTable.AddNode(node, leftSide == rightSide ? Symbol.ok : Symbol.notOk);
-
-                return;
-            }
-            symbolTable.AddNode(node,Symbol.notOk);  
-        }
-        else*/
         {
             var l = symbolTable.GetSymbol(node.GetL());
             var r = symbolTable.GetSymbol(node.GetR());
@@ -138,28 +91,20 @@ public class exprTypeChecker : stmtTypeChecker
                 default:
                     symbolTable.AddNode(node, Symbol.notOk);
                     break;
+                // -------------- LOGIK TIL CUSTOM UNITS TYPECHECKING ------------------ //
+                // skal save fra OutAUnitnumberExp til Dictionary<Node, PUnitUnittype> nodeToUnit
+                // Unitnumber skal håndteres i divideExprcase og multExprcase for at elevate types
+                // PUnitUnittype variablen bliver created ved at håndtere unitnumbers i ovenbenævnte cases
+                
+                
+                
+                
             }
         }
     }
 
     public override void OutAMinusExp(AMinusExp node)
     {
-        /*
-        if (symbolTable._currentsymbolTable.nodeToUnit.ContainsKey(node.GetL()) || symbolTable._currentsymbolTable.nodeToUnit.ContainsKey(node.GetR()))
-        {
-            if (!symbolTable._currentsymbolTable.nodeToUnit.ContainsKey(node.GetL()) && symbolTable._currentsymbolTable.nodeToUnit.ContainsKey(node.GetR()))
-            {
-                
-            }
-            else if (symbolTable._currentsymbolTable.nodeToUnit.TryGetValue(node.GetL(),out AUnitdecl leftSide) && symbolTable._currentsymbolTable.nodeToUnit.TryGetValue(node.GetR(),out AUnitdecl rightSide))
-            {
-                symbolTable.AddNode(node, leftSide == rightSide ? Symbol.ok : Symbol.notOk);
-
-                return;
-            }
-            symbolTable.AddNode(node,Symbol.notOk);  
-        }
-        else*/
         {
             var l = symbolTable.GetSymbol(node.GetL());
             var r = symbolTable.GetSymbol(node.GetR());
@@ -231,23 +176,10 @@ public class exprTypeChecker : stmtTypeChecker
     public override void OutALessExp(ALessExp node) => AddBinaryNumberToSymbolTable(node,node.GetL(),node.GetR());
     public override void OutAGreaterequalExp(AGreaterequalExp node) => AddBinaryNumberToSymbolTable(node,node.GetL(),node.GetR());
     public override void OutALessequalExp(ALessequalExp node) => AddBinaryNumberToSymbolTable(node,node.GetL(),node.GetR());
-    public override void OutASuffixplusplusExp(ASuffixplusplusExp node)
-    {
-        AddUnaryToSymbolTable(node);
-    }
-
-    public override void OutASuffixminusminusExp(ASuffixminusminusExp node)
-    {
-        AddUnaryToSymbolTable(node);
-    }
-
-    public override void OutAUnaryminusExp(AUnaryminusExp node)
-    {
-        AddUnaryToSymbolTable(node);
-    }
-    
+    public override void OutASuffixplusplusExp(ASuffixplusplusExp node) => AddUnaryToSymbolTable(node);
+    public override void OutASuffixminusminusExp(ASuffixminusminusExp node) => AddUnaryToSymbolTable(node);
+    public override void OutAUnaryminusExp(AUnaryminusExp node) => AddUnaryToSymbolTable(node);
     public override void OutALogicalnotExp(ALogicalnotExp node) => symbolTable.AddNode(node, symbolTable.GetSymbol(node) == Symbol.Bool ? Symbol.Bool : Symbol.notOk);
-
     public override void OutACastExp(ACastExp node)
     {
         Symbol? targetExpr = symbolTable.GetSymbol(node.GetType()); // er dette rigtigt?
@@ -291,16 +223,10 @@ public class exprTypeChecker : stmtTypeChecker
                 break;
         }
     }
+    public override void OutAPrefixminusminusExp(APrefixminusminusExp node) => AddUnaryToSymbolTable(node);
 
-    public override void OutAPrefixminusminusExp(APrefixminusminusExp node)
-    {
-        AddUnaryToSymbolTable(node);
-    }
+    public override void OutAPrefixplusplusExp(APrefixplusplusExp node) => AddUnaryToSymbolTable(node);
 
-    public override void OutAPrefixplusplusExp(APrefixplusplusExp node)
-    {
-        AddUnaryToSymbolTable(node);
-    }
     public override void OutAFunccallExp(AFunccallExp node)
     {
         Symbol? funcId = symbolTable.GetSymbol(node.GetId());

@@ -11,22 +11,19 @@ public class SymbolTable
         this.parent = parent;
         this.allTables = allTables;
     }
-    private readonly Dictionary<string, Node> idToNode = new();
-    //private readonly Dictionary<string, Node> funcToNode = new();
-    private readonly Dictionary<Node, Symbol> nodeToSymbol = new();
     private readonly SymbolTable? parent;
-    public Dictionary<string, AUnitdecl> SubunitToUnit = new();
-    public Dictionary<Node, AUnitdecl> nodeToUnit = new();
+    private readonly Dictionary<string, Node> idToNode = new();
+    private readonly Dictionary<Node, Symbol> nodeToSymbol = new();
+    private Dictionary<Node, AUnitUnittype> nodeToUnit = new();
+
+    private Dictionary<string, IList> functionidToParams = new();
     public Dictionary<TId, PUnittype> funcToReturn = new();
+
+    private Dictionary<string, AUnitdecl> SubunitToUnit = new();
+    private Dictionary<string, PExp> SubunitToExp = new();
+    private Dictionary<string, List<string>> Numerators = new();
+    private Dictionary<string, List<string>> Denomerators = new();
     
-
-
-    public Dictionary<string, IList> functionidToParams = new();
-    public Dictionary<string, PExp> SubunitToExp = new();
-    public Dictionary<string, List<string>> Numerators = new();
-    public Dictionary<string, List<string>> Denomerators = new();
-
-
     public SymbolTable EnterScope() => new(this, allTables);
     public SymbolTable ExitScope() => parent ?? this;
 
@@ -37,63 +34,22 @@ public class SymbolTable
         {
             table = table.parent;
         }
-
         return table;
     }
-
-    public PUnittype? GetUnitFromExpr(PExp expression)
-    {
-        // Logik for at finde ud af hvilken unit som en expression evalurer til
-        // Grunden til vi skal returne en Unittype og ikke et symbol er fordi symboler ikke indeholder
-        // data omkring typespecifikationen af en custom unit.
-        return null;
-    }
-
-    public Symbol? GetSymbolFromExpr(PExp expression)
-    {
-        PUnittype? unit = GetUnitFromExpr(expression);
-        // Implement logic for converting
-        switch (unit)
-        {
-            case ATypeUnittype type when type.GetType() is AIntType:
-                return Symbol.Int;
-            case ATypeUnittype type when type.GetType() is AIntType:
-                return Symbol.Decimal;
-            case ATypeUnittype type when type.GetType() is AIntType:
-                return Symbol.Bool;
-            case ATypeUnittype type when type.GetType() is AIntType:
-                return Symbol.Char;
-            case ATypeUnittype type when type.GetType() is AIntType:
-                return Symbol.String;
-            case AUnitUnittype:
-                return Symbol.ok;
-            default:
-                return null;
-        }
-    }
-
+    public AUnitUnittype? GetUnitFromExpr(PExp expression) => nodeToUnit[expression];
+    public void AddUnit(Node node, AUnitUnittype unit) => nodeToUnit.Add(node, unit);
+    public Symbol? GetSymbolFromExpr(PExp expression) => nodeToSymbol[expression];
     public void AddId(TId identifier, Node node, Symbol symbol)
     {
         idToNode.Add("" + identifier, node);
         AddNode(node, symbol);
     }
-    /*public void AddFuncId(TId identifier, Node node, Symbol symbol)
-    {
-        funcToNode.Add("" + identifier, node);
-        AddNode(node, symbol);
-    } */
-
-    public void AddNode(Node node, Symbol symbol)
-    {
-        nodeToSymbol.Add(node, symbol);
-    }
-    
+    public void AddNode(Node node, Symbol symbol) => nodeToSymbol.Add(node, symbol);
     public void AddSubunit(TId identifier, Node node, PExp expr)
     {
         SubunitToExp.Add("" + identifier, expr);
         SubunitToUnit.Add("" + identifier, (AUnitdecl) node);
     }
-
     public void AddNumerators(TId identifier, Node node, IEnumerable<ANumUnituse> nums)
     {
         List<string> numerators = new();
@@ -117,36 +73,19 @@ public class SymbolTable
         // Addnode missing
     }
 
-    public void AddFunctionParams(TId identifier, Node node, IList param)
-    {
-        functionidToParams.Add("" + identifier, param);
-    }
-    public IList? GetFunctionParams(TId identifier)
-    {
-        return functionidToParams["" + identifier];
-    }
-
-    public void AddFirstReturnToFunction(TId identifier, PUnittype unit)
-    {
-        funcToReturn.Add(identifier, unit);
-    }
-
-    public bool DoesReturnStmtMatch(TId identifier, PUnittype? unit)
-    {
-        return funcToReturn[identifier] == unit;
-    }
-
+    public void AddFunctionParams(TId identifier, Node node, IList param) => functionidToParams.Add("" + identifier, param);
+    public IList? GetFunctionParams(TId identifier) => functionidToParams["" + identifier];
+    public void AddFirstReturnToFunction(TId identifier, PUnittype unit) => funcToReturn.Add(identifier, unit);
+    public bool DoesReturnStmtMatch(TId identifier, PUnittype? unit) => funcToReturn[identifier] == unit;
     private Symbol? GetCurrentSymbol(Node node) => nodeToSymbol.TryGetValue(node, out Symbol symbol) ? symbol : parent?.GetCurrentSymbol(node);
     private Symbol? GetCurrentSymbol(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentSymbol(identifier);
-    //private Symbol? GetCurrentFuncSymbol(string identifier) => funcToNode.TryGetValue(identifier, out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentFuncSymbol(identifier);
     public Symbol? GetSymbol(Node node) => GetCurrentSymbol(node);
     public Symbol? GetSymbol(string identifier) => GetCurrentSymbol(identifier);
-    //public Symbol? GetFuncSymbol(string identifier) => GetCurrentFuncSymbol(identifier);
     public bool IsInCurrentScope(TId id) => idToNode.ContainsKey(id.ToString());
+    public bool IsInExtendedScope(TId id) => _IsInCurrentScope(id);
     private bool _IsInCurrentScope(TId id) =>
         idToNode.ContainsKey(id.ToString()) || parent != null &&
         parent._IsInCurrentScope(id);
-    public bool IsInExtendedScope(TId id) => _IsInCurrentScope(id);
 }
 
 public enum Symbol
