@@ -1,4 +1,7 @@
-﻿namespace Compiler.Visitors.TypeCheckerDir;
+﻿using System.Collections;
+using Microsoft.VisualBasic;
+
+namespace Compiler.Visitors.TypeCheckerDir;
 using Moduino.node;
 using Moduino.analysis;
 
@@ -6,10 +9,37 @@ public class exprTypeChecker : stmtTypeChecker
 {
     public override void OutAUnitExp(AUnitExp node)
     {
-        // single unitnumber eg. 50ms
-        
+        // A single unitnumber eg. 50ms
+        // Typecheck
+        // Save its parent "type" in symboltable aswell
+        var unitType = GetUnittypeFromUnitnumber(node.GetUnitnumber());
+        symbolTable.AddNodeToUnit(node, unitType);
+        symbolTable.AddNode(node, Symbol.ok);
+
+        AUnitUnittype GetUnittypeFromUnitnumber(PUnitnumber unitnumber)
+        {
+            switch (unitnumber)
+            {
+                case ADecimalUnitnumber a:
+                    AUnitdecl? unit = symbolTable.GetUnitFromSubunit(a.GetId());
+                    ANumUnituse num = new ANumUnituse(unit.GetId());
+                    IList unituse = new Collection();
+                    unituse.Add(num);
+                    AUnitUnittype unittype = new AUnitUnittype(unituse);
+                    return unittype;
+                case ANumberUnitnumber b:
+                    AUnitdecl? unit2 = symbolTable.GetUnitFromSubunit(b.GetId());
+                    ANumUnituse num2 = new ANumUnituse(unit2.GetId());
+                    IList unituse2 = new Collection();
+                    unituse2.Add(num2);
+                    AUnitUnittype unittype2 = new AUnitUnittype(unituse2);
+                    return unittype2;
+                default:
+                    throw new Exception("Is not a valid unitnumber");
+            }
+        }
     }
-    
+
     public override void OutADivideExp(ADivideExp node)
     {
         // Standard types
@@ -30,7 +60,30 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(node, Symbol.notOk);
                 break;
         }
-        // Custom types
+
+        PExp leftExpr = node.GetL();
+        PExp rightExpr = node.GetR();
+        
+        AUnitUnittype? left = symbolTable.GetUnitFromExpr(leftExpr);
+        AUnitUnittype? right = symbolTable.GetUnitFromExpr(rightExpr);
+        if (left != null && right != null)
+        {
+            // Left is Num, Right is Den
+            IEnumerable<ANumUnituse> numerator = left.GetUnituse().OfType<ANumUnituse>();
+            IEnumerable<ADenUnituse> denomerator = right.GetUnituse().OfType<ADenUnituse>();
+            
+            
+            
+            
+            IList resultUnituse = new Collection();
+
+            AUnitUnittype unitType = null;
+            symbolTable.AddNodeToUnit(node, unitType);
+            symbolTable.AddNode(node, Symbol.ok);
+        }
+        
+        //SubunitToUnit and combine parents. eg. 50km/2h -> Distance/Time
+
         // Implement logic which adds a AUnitUnittype entry to the symboltable dictioary
         // Maybe not the most effecient approach for now as each subPart of the unitexpression will be saved
         // symbolTable.AddUnit(node, AUnitUnittype);
@@ -39,25 +92,28 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutAMultiplyExp(AMultiplyExp node)
     {
+        var l = symbolTable.GetSymbol(node.GetL());
+        var r = symbolTable.GetSymbol(node.GetR());
+        switch (l)
         {
-            var l = symbolTable.GetSymbol(node.GetL());
-            var r = symbolTable.GetSymbol(node.GetR());
-            switch (l)
-            {
-                case Symbol.Int when r is Symbol.Int:
-                    symbolTable.AddNode(node, Symbol.Int);
-                    break;
-                case Symbol.Decimal when r is Symbol.Decimal or Symbol.Int:
-                    symbolTable.AddNode(node, Symbol.Decimal);
-                    break;
-                case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal:
-                    symbolTable.AddNode(node, Symbol.Decimal);
-                    break;
-                default:
-                    symbolTable.AddNode(node, Symbol.notOk);
-                    break;
-            }
+            case Symbol.Int when r is Symbol.Int:
+                symbolTable.AddNode(node, Symbol.Int);
+                break;
+            case Symbol.Decimal when r is Symbol.Decimal or Symbol.Int:
+                symbolTable.AddNode(node, Symbol.Decimal);
+                break;
+            case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal:
+                symbolTable.AddNode(node, Symbol.Decimal);
+                break;
+            default:
+                symbolTable.AddNode(node, Symbol.notOk);
+                break;
         }
+        // -------------- LOGIK TIL CUSTOM UNITS TYPECHECKING ------------------ //
+        // skal save fra OutAUnitnumberExp til Dictionary<Node, PUnitUnittype> nodeToUnit
+        // Unitnumber skal håndteres i divideExprcase og multExprcase for at elevate types
+        // PUnitUnittype variablen bliver created ved at håndtere unitnumbers i ovenbenævnte case
+        
     }
 
     public override void OutAPlusExp(APlusExp node)
@@ -91,10 +147,7 @@ public class exprTypeChecker : stmtTypeChecker
                 default:
                     symbolTable.AddNode(node, Symbol.notOk);
                     break;
-                // -------------- LOGIK TIL CUSTOM UNITS TYPECHECKING ------------------ //
-                // skal save fra OutAUnitnumberExp til Dictionary<Node, PUnitUnittype> nodeToUnit
-                // Unitnumber skal håndteres i divideExprcase og multExprcase for at elevate types
-                // PUnitUnittype variablen bliver created ved at håndtere unitnumbers i ovenbenævnte cases
+                //Custom unit logik for at plus to subunits sammen fx (50ms+5s)/10km
                 
                 
                 

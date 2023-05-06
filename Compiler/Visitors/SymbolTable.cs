@@ -36,7 +36,15 @@ public class SymbolTable
         }
         return table;
     }
-    public AUnitUnittype? GetUnitFromExpr(PExp expression) => nodeToUnit[expression];
+
+    public AUnitUnittype? GetUnitFromExpr(PExp expression)
+    {
+        return nodeToUnit[expression];
+    }
+    public void AddNodeToUnit(Node node, AUnitUnittype unit)
+    {
+        nodeToUnit.Add(node, unit);
+    }
     public void AddUnit(Node node, AUnitUnittype unit) => nodeToUnit.Add(node, unit);
     public Symbol? GetSymbolFromExpr(PExp expression) => nodeToSymbol[expression];
     public void AddId(TId identifier, Node node, Symbol symbol)
@@ -49,6 +57,10 @@ public class SymbolTable
     {
         SubunitToExp.Add("" + identifier, expr);
         SubunitToUnit.Add("" + identifier, (AUnitdecl) node);
+    }
+    public AUnitdecl? GetUnitFromSubunit(TId identifier)
+    {
+        return SubunitToUnit[identifier.ToString()];
     }
     public void AddNumerators(TId identifier, Node node, IEnumerable<ANumUnituse> nums)
     {
