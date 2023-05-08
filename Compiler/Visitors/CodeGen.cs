@@ -80,32 +80,28 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         Indent("}\n");
     }
 
+    
     public override void CaseATypedFunc(ATypedFunc node)
     {
-        PUnittype unit = node.GetUnittype();
-        var standardType = unit as ATypeUnittype;
-        if (standardType != null)
+        switch (node.GetType())
         {
-            switch (standardType.GetType())
-            {
-                case AIntType a:
-                    Indent("int " + node.GetId().ToString().Trim() + "() {\r\n");
-                    break;
-                case ADecimalType b:
-                    Indent("decimal " + node.GetId().ToString().Trim() + "() {\r\n");
-                    break;
-                case ABoolType c:
-                    Indent("bool " + node.GetId().ToString().Trim() + "() {\r\n");
-                    break;
-                case ACharType d:
-                    Indent("char " + node.GetId().ToString().Trim() + "() {\r\n");
-                    break;
-                case AStringType e:
-                    Indent("string " + node.GetId().ToString().Trim() + "() {\r\n");
-                    break;
-            }
+            case AIntType a:
+                Indent("int " + node.GetId().ToString().Trim() + "() {\r\n");
+                break;
+            case ADecimalType b:
+                Indent("decimal " + node.GetId().ToString().Trim() + "() {\r\n");
+                break;
+            case ABoolType c:
+                Indent("bool " + node.GetId().ToString().Trim() + "() {\r\n");
+                break;
+            case ACharType d:
+                Indent("char " + node.GetId().ToString().Trim() + "() {\r\n");
+                break;
+            case AStringType e:
+                Indent("string " + node.GetId().ToString().Trim() + "() {\r\n");
+                break;
         }
-        var customType = unit as AUnitUnittype;
+        var customType = node.GetType() as AUnitType;
         if (customType != null)
         {
             IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
@@ -192,24 +188,24 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void CaseAArg(AArg node)
     {
         base.CaseAArg(node);
-        switch (node.GetUnittype())
+        switch (node.GetType())
         {
-            case ATypeUnittype type when type.GetType() is AIntType:
+            case AIntType:
                 writer.Write(("int " + node.GetId().ToString().Trim()));                    
                 break;
-            case ATypeUnittype type when type.GetType() is ADecimalType:
+            case ADecimalType:
                 writer.Write(("decimal " + node.GetId().ToString().Trim()));
                 break;
-            case ATypeUnittype type when type.GetType() is ABoolType:
+            case ABoolType:
                 writer.Write(("bool " + node.GetId().ToString().Trim()));
                 break;
-            case ATypeUnittype type when type.GetType() is ACharType:
+            case ACharType:
                 writer.Write(("char " + node.GetId().ToString().Trim()));
                 break;
-            case ATypeUnittype type when type.GetType() is AStringType:
+            case AStringType:
                 writer.Write(("string " + node.GetId().ToString().Trim()));
                 break;
-            case AUnitUnittype customType:
+            case AUnitType customType:
             {
                 // Declared a custom sammensat unit (Ikke en baseunit declaration)
                 IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
@@ -450,24 +446,24 @@ public override void CaseAIfStmt(AIfStmt node)
     public override void InADeclStmt(ADeclStmt node)
     {
         base.InADeclStmt(node);
-        switch (node.GetUnittype())
+        switch (node.GetType())
         {
-            case ATypeUnittype type when type.GetType() is AIntType:
+            case AIntType:
                 Indent(("int " + node.GetId().ToString().Trim()));                    
                 break;
-            case ATypeUnittype type when type.GetType() is ADecimalType:
+            case ADecimalType:
                 Indent(("decimal " + node.GetId().ToString().Trim()));
                 break;
-            case ATypeUnittype type when type.GetType() is ABoolType:
+            case ABoolType:
                 Indent(("bool " + node.GetId().ToString().Trim()));
                 break;
-            case ATypeUnittype type when type.GetType() is ACharType:
+            case ACharType:
                 Indent(("char " + node.GetId().ToString().Trim()));
                 break;
-            case ATypeUnittype type when type.GetType() is AStringType:
+            case AStringType:
                 Indent(("string " + node.GetId().ToString().Trim()));
                 break;
-            case AUnitUnittype customType:
+            case AUnitType customType:
             {
                 // Declared a custom sammensat unit (Ikke en baseunit declaration)
                 IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
@@ -527,32 +523,26 @@ public override void CaseAIfStmt(AIfStmt node)
 
     public override void InADeclassStmt(ADeclassStmt node)
     {
-        base.InADeclassStmt(node);
-        PUnittype unit = node.GetUnittype();
-        var standardType = unit as ATypeUnittype;
-        if (standardType != null)
+        switch (node.GetType())
         {
-            switch (standardType.GetType())
-            {
-                case AIntType a:
-                    Indent(("int " + node.GetId().ToString().Trim()) + " = ");
-                    break;
-                case ADecimalType b:
-                    Indent(("decimal " + node.GetId().ToString().Trim()) + " = ");
-                    break;
-                case ABoolType c:
-                    Indent(("bool " + node.GetId().ToString().Trim()) + " = ");
-                    break;
-                case ACharType d:
-                    Indent(("char " + node.GetId().ToString().Trim()) + " = ");
-                    break;
-                case AStringType e:
-                    Indent(("string " + node.GetId().ToString().Trim()) + " = ");
-                    break;
-            }
+            case AIntType a:
+                Indent(("int " + node.GetId().ToString().Trim()) + " = ");
+                break;
+            case ADecimalType b:
+                Indent(("decimal " + node.GetId().ToString().Trim()) + " = ");
+                break;
+            case ABoolType c:
+                Indent(("bool " + node.GetId().ToString().Trim()) + " = ");
+                break;
+            case ACharType d:
+                Indent(("char " + node.GetId().ToString().Trim()) + " = ");
+                break;
+            case AStringType e:
+                Indent(("string " + node.GetId().ToString().Trim()) + " = ");
+                break;
         }
-        var customType = unit as AUnitUnittype;
-        if (customType != null)
+
+        if (node.GetType() is AUnitType customType)
         {
             IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
             IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
@@ -686,28 +676,23 @@ public override void CaseAIfStmt(AIfStmt node)
 
     public override void CaseACastExp(ACastExp node)
     {
-        base.InACastExp(node);
-        PType unit = node.GetType();
-        if (unit != null)
+        switch (node.GetType())
         {
-            switch (unit)
-            {
-                case AIntType a:
-                    writer.Write("(int)");
-                    break;
-                case ADecimalType b:
-                    writer.Write("(decimal)");
-                    break;
-                case ABoolType c:
-                    writer.Write("(bool)");
-                    break;
-                case ACharType d:
-                    writer.Write("(char)");
-                    break;
-                case AStringType e:
-                    writer.Write("(string)");
-                    break;
-            }
+            case AIntType a:
+                writer.Write("(int)");
+                break;
+            case ADecimalType b:
+                writer.Write("(decimal)");
+                break;
+            case ABoolType c:
+                writer.Write("(bool)");
+                break;
+            case ACharType d:
+                writer.Write("(char)");
+                break;
+            case AStringType e:
+                writer.Write("(string)"); 
+                break;
         }
         node.GetExp().Apply(this);
     }

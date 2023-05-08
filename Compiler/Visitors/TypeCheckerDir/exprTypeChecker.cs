@@ -7,6 +7,47 @@ using Moduino.analysis;
 
 public class exprTypeChecker : stmtTypeChecker
 {
+    public override void OutADecimalExp(ADecimalExp node)
+    {
+        symbolTable.AddNode(node, Symbol.Decimal);
+    }
+
+    public override void OutANumberExp(ANumberExp node)
+    {
+        symbolTable.AddNode(node, Symbol.Int);
+    }
+
+    public override void OutABooleanExp(ABooleanExp node)
+    {
+        symbolTable.AddNode(node, Symbol.Bool);
+    }
+
+    public override void OutAStringExp(AStringExp node)
+    {
+        symbolTable.AddNode(node, Symbol.String);
+    }
+
+    public override void OutACharExp(ACharExp node)
+    {
+        symbolTable.AddNode(node, Symbol.Char);
+    }
+    public override void OutAFunccallExp(AFunccallExp node)
+    {
+        Symbol? funcId = symbolTable.GetSymbol(node.GetId());
+        //Symbol? funcExpr = symbolTable.GetSymbol(node.GetExp());
+    }
+
+    public override void OutAIdExp(AIdExp node)
+    {
+        //ik helt hundred
+        Symbol? symbol = symbolTable.GetSymbol(node.GetId());
+        symbolTable.AddNode(node, symbol == null ? Symbol.notOk : Symbol.ok);
+    }
+
+    public override void OutAValueExp(AValueExp node)
+    {
+        symbolTable.AddNode(node, UnitVisitor.StateUnit ? Symbol.ok : Symbol.notOk);
+    }
     public override void OutAUnitExp(AUnitExp node)
     {
         // A single unitnumber eg. 50ms
@@ -16,7 +57,7 @@ public class exprTypeChecker : stmtTypeChecker
         symbolTable.AddNodeToUnit(node, unitType);
         symbolTable.AddNode(node, Symbol.ok);
 
-        AUnitUnittype GetUnittypeFromUnitnumber(PUnitnumber unitnumber)
+        AUnitType GetUnittypeFromUnitnumber(PUnitnumber unitnumber)
         {
             switch (unitnumber)
             {
@@ -25,14 +66,14 @@ public class exprTypeChecker : stmtTypeChecker
                     ANumUnituse num = new ANumUnituse(unit.GetId());
                     IList unituse = new Collection();
                     unituse.Add(num);
-                    AUnitUnittype unittype = new AUnitUnittype(unituse);
+                    AUnitType unittype = new AUnitType(unituse);
                     return unittype;
                 case ANumberUnitnumber b:
                     AUnitdecl? unit2 = symbolTable.GetUnitFromSubunit(b.GetId());
                     ANumUnituse num2 = new ANumUnituse(unit2.GetId());
                     IList unituse2 = new Collection();
                     unituse2.Add(num2);
-                    AUnitUnittype unittype2 = new AUnitUnittype(unituse2);
+                    AUnitType unittype2 = new AUnitType(unituse2);
                     return unittype2;
                 default:
                     throw new Exception("Is not a valid unitnumber");
@@ -64,8 +105,8 @@ public class exprTypeChecker : stmtTypeChecker
         PExp leftExpr = node.GetL();
         PExp rightExpr = node.GetR();
         
-        AUnitUnittype? left = symbolTable.GetUnitFromExpr(leftExpr);
-        AUnitUnittype? right = symbolTable.GetUnitFromExpr(rightExpr);
+        AUnitType? left = symbolTable.GetUnitFromExpr(leftExpr);
+        AUnitType? right = symbolTable.GetUnitFromExpr(rightExpr);
         if (left != null && right != null)
         {
             // Left is Num, Right is Den
@@ -77,7 +118,7 @@ public class exprTypeChecker : stmtTypeChecker
             
             IList resultUnituse = new Collection();
 
-            AUnitUnittype unitType = null;
+            AUnitType unitType = null;
             symbolTable.AddNodeToUnit(node, unitType);
             symbolTable.AddNode(node, Symbol.ok);
         }
@@ -279,25 +320,7 @@ public class exprTypeChecker : stmtTypeChecker
     public override void OutAPrefixminusminusExp(APrefixminusminusExp node) => AddUnaryToSymbolTable(node);
 
     public override void OutAPrefixplusplusExp(APrefixplusplusExp node) => AddUnaryToSymbolTable(node);
-
-    public override void OutAFunccallExp(AFunccallExp node)
-    {
-        Symbol? funcId = symbolTable.GetSymbol(node.GetId());
-        //Symbol? funcExpr = symbolTable.GetSymbol(node.GetExp());
-    }
-
-    public override void OutAIdExp(AIdExp node)
-    {
-        //ik helt hundred
-        Symbol? symbol = symbolTable.GetSymbol(node.GetId());
-        symbolTable.AddNode(node, symbol == null ? Symbol.notOk : Symbol.ok);
-    }
-
-    public override void OutAValueExp(AValueExp node)
-    {
-        symbolTable.AddNode(node, UnitVisitor.StateUnit ? Symbol.ok : Symbol.notOk);
-    }
-
+    
     private void AddBinaryToSymbolTable(Node Parent, Node L, Node R)
     {
         Symbol? l = symbolTable.GetSymbol(L);

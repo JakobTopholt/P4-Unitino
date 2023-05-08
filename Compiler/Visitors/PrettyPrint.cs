@@ -242,7 +242,7 @@ public class PrettyPrint : DepthFirstAdapter
 
     public override void CaseADeclStmt(ADeclStmt node)
     {
-        Indent((node.GetUnittype() + " " + node.GetId().ToString().Trim()));
+        Indent((node.GetType() + " " + node.GetId().ToString().Trim()));
     }
 
     public override void InAAssignStmt(AAssignStmt node)

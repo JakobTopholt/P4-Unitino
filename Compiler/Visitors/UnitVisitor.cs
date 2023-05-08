@@ -35,7 +35,8 @@ public class UnitVisitor : DepthFirstAdapter
         if (!symbolTable.IsInExtendedScope(node.GetId()))
         {
             PExp expr = node.GetExp();
-            if (symbolTable.GetSymbolFromExpr(expr) == Symbol.Decimal)
+            var symbol = symbolTable.GetSymbolFromExpr(expr);
+            if (symbol == Symbol.Decimal)
             {
                 symbolTable.AddSubunit(node.GetId(), node.Parent(), expr);
                 symbolTable.AddId(node.GetId(), node, Symbol.ok);

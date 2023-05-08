@@ -72,24 +72,24 @@ public class FunctionVisitor : DepthFirstAdapter
                 // Add to local scope
                 foreach (AArg? argument in inputArgs)
                 {
-                    switch (argument.GetUnittype())
+                    switch (argument.GetType())
                     {
-                        case ATypeUnittype type when type.GetType() is AIntType:
+                        case AIntType:
                             symbolTable.AddId(argument.GetId() , argument, Symbol.Int);
                             break;
-                        case ATypeUnittype type when type.GetType() is ADecimalType:
+                        case ADecimalType:
                             symbolTable.AddId(argument.GetId() , argument, Symbol.Decimal);
                             break;
-                        case ATypeUnittype type when type.GetType() is ABoolType:
+                        case ABoolType:
                             symbolTable.AddId(argument.GetId() , argument, Symbol.Bool);
                             break;
-                        case ATypeUnittype type when type.GetType() is ACharType:
+                        case ACharType:
                             symbolTable.AddId(argument.GetId() , argument, Symbol.Char);
                             break;
-                        case ATypeUnittype type when type.GetType() is AStringType:
+                        case AStringType:
                             symbolTable.AddId(argument.GetId() , argument, Symbol.String);
                             break;
-                        case AUnitUnittype customType:
+                        case AUnitType customType:
                         {
                             // -----------WIP----------- //
                             
@@ -119,7 +119,7 @@ public class FunctionVisitor : DepthFirstAdapter
         // But if not void it has to have a reachable return statement in the node
         // All return statements have to evaluate to same type to be correct
         
-        PUnittype returnSymbol = node.GetUnittype();
+        PType returnSymbol = node.GetType();
         
         symbolTable.AddId(node.GetId(), node, Symbol.String);
         

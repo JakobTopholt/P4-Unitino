@@ -14,10 +14,10 @@ public class SymbolTable
     private readonly SymbolTable? parent;
     private readonly Dictionary<string, Node> idToNode = new();
     private readonly Dictionary<Node, Symbol> nodeToSymbol = new();
-    private Dictionary<Node, AUnitUnittype> nodeToUnit = new();
+    private Dictionary<Node, AUnitType> nodeToUnit = new();
 
     private Dictionary<string, IList> functionidToParams = new();
-    public Dictionary<TId, PUnittype> funcToReturn = new();
+    public Dictionary<TId, PType> funcToReturn = new();
 
     public Dictionary<string, AUnitdecl> SubunitToUnit = new();
     private Dictionary<string, PExp> SubunitToExp = new();
@@ -37,15 +37,15 @@ public class SymbolTable
         return table;
     }
 
-    public AUnitUnittype? GetUnitFromExpr(PExp expression)
+    public AUnitType? GetUnitFromExpr(PExp expression)
     {
         return nodeToUnit[expression];
     }
-    public void AddNodeToUnit(Node node, AUnitUnittype unit)
+    public void AddNodeToUnit(Node node, AUnitType unit)
     {
         nodeToUnit.Add(node, unit);
     }
-    public void AddUnit(Node node, AUnitUnittype unit) => nodeToUnit.Add(node, unit);
+    public void AddUnit(Node node, AUnitType unit) => nodeToUnit.Add(node, unit);
     public Symbol? GetSymbolFromExpr(PExp expression) => nodeToSymbol[expression];
     public void AddId(TId identifier, Node node, Symbol symbol)
     {
@@ -87,8 +87,8 @@ public class SymbolTable
 
     public void AddFunctionParams(TId identifier, Node node, IList param) => functionidToParams.Add("" + identifier, param);
     public IList? GetFunctionParams(TId identifier) => functionidToParams["" + identifier];
-    public void AddFirstReturnToFunction(TId identifier, PUnittype unit) => funcToReturn.Add(identifier, unit);
-    public bool DoesReturnStmtMatch(TId identifier, PUnittype? unit) => funcToReturn[identifier] == unit;
+    public void AddFirstReturnToFunction(TId identifier, PType unit) => funcToReturn.Add(identifier, unit);
+    public bool DoesReturnStmtMatch(TId identifier, PType? unit) => funcToReturn[identifier] == unit;
     private Symbol? GetCurrentSymbol(Node node) => nodeToSymbol.TryGetValue(node, out Symbol symbol) ? symbol : parent?.GetCurrentSymbol(node);
     private Symbol? GetCurrentSymbol(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentSymbol(identifier);
     public Symbol? GetSymbol(Node node) => GetCurrentSymbol(node);

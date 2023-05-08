@@ -43,24 +43,24 @@ public class stmtTypeChecker : DepthFirstAdapter
     {
         if (!symbolTable.IsInCurrentScope(node.GetId()))
         {
-            switch (node.GetUnittype())
+            switch (node.GetType())
             {
-                case ATypeUnittype type when type.GetType() is AIntType:
+                case AIntType:
                     symbolTable.AddId(node.GetId(), node, Symbol.Int);
                     break;
-                case ATypeUnittype type when type.GetType() is ADecimalType:
+                case ADecimalType:
                     symbolTable.AddId(node.GetId(), node, Symbol.Decimal);
                     break;
-                case ATypeUnittype type when type.GetType() is ABoolType:
+                case ABoolType:
                     symbolTable.AddId(node.GetId(), node, Symbol.Bool);
                     break;
-                case ATypeUnittype type when type.GetType() is ACharType:
+                case ACharType:
                     symbolTable.AddId(node.GetId(), node, Symbol.Char);
                     break;
-                case ATypeUnittype type when type.GetType() is AStringType:
+                case AStringType:
                     symbolTable.AddId(node.GetId(), node, Symbol.String);
                     break;
-                case AUnitUnittype customType:
+                case AUnitType customType:
                 {
                     // Declared a custom sammensat unit (Ikke en baseunit declaration)
                     IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
@@ -87,11 +87,10 @@ public class stmtTypeChecker : DepthFirstAdapter
         if (!declared)
         {
             Symbol? exprType = symbolTable.GetSymbol(node.GetExp());
-            PUnittype unit = node.GetUnittype();
-            var standardType = unit as ATypeUnittype;
-            if (standardType != null)
+            PType unit = node.GetType();
+            if (unit != null)
             {
-                switch (standardType.GetType())
+                switch (unit)
                 {
                     case AIntType a:
                         symbolTable.AddId(node.GetId(), node, exprType == Symbol.Int ? Symbol.notOk : Symbol.Int);
@@ -110,7 +109,7 @@ public class stmtTypeChecker : DepthFirstAdapter
                         break;
                 }
             }
-            var customType = unit as AUnitUnittype;
+            var customType = unit as AUnitType;
             if (customType != null)
             {
                 IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
@@ -154,8 +153,8 @@ public class stmtTypeChecker : DepthFirstAdapter
           case ATypedFunc aTypedFunc:
               // Does the return-expressions' type match function type
               // Implement void type? PUnittype?
-              PUnittype returnType = aTypedFunc.GetUnittype();
-              PUnittype? exprType = symbolTable.GetUnitFromExpr(node.GetExp());
+              PType returnType = aTypedFunc.GetType();
+              PType? exprType = symbolTable.GetUnitFromExpr(node.GetExp());
               if(exprType == null)
                   throw new Exception("Return is null value");
               // Does exprSymbol match returnType?
@@ -166,7 +165,7 @@ public class stmtTypeChecker : DepthFirstAdapter
               // Does all return-expressions evaluate to the same type
               // Gem først returnstatement type to the function node
               // If the next iteration does not match throw errors
-              PUnittype? exprType2 = symbolTable.GetUnitFromExpr(node.GetExp());
+              PType? exprType2 = symbolTable.GetUnitFromExpr(node.GetExp());
 
               if (!symbolTable.funcToReturn.ContainsKey(aUntypedFunc.GetId()))
               {
