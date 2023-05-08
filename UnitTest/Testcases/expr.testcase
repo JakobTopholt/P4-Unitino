@@ -19,7 +19,22 @@ func funexpr(int a){
 
 ////
 true
+//////
+expr plus test false
+////
+func funexpr(int a){
+    bool b = true;
+    b = b + a;
+    decimal d = 3.5;
+    char c = "a";
+    d = d + a;
+}
+////
 
+////
+
+////
+false
 //////
 expr minus testt
 ////
@@ -38,6 +53,24 @@ func untyped(int a){
 
 ////
 true
+
+//////
+expr minus test false
+////
+func untyped(int a){
+    int a = 5;
+    string b = "lmao";
+    decimal c = 3.5;
+    char d = "L";
+    b = b-a;
+    c = c-d;
+}
+////
+
+////
+
+////
+false
 
 //////
 expr div mult mod
@@ -67,7 +100,35 @@ int a = 3;
 
 ////
 true
+//////
+expr div mult mod false
+////
+func untypedlmao(){
+    int a = 3;
+    string b = "xD";
+    decimal cd = 3.5;
+    char g = "L";
+    b = b * a;
+    decimal d = 6.5;
+    cd = cd* g;
+    cd = cd / b;
+    a = g % b; 
+}
+////
+int a = 3;
+    int b = 5;
+    b = b * a;
+    decimal c = 3.5;
+    decimal d = 6.5;
+    a = a / b;
+    c = c / b;
+    d = d * c;
+    return;  
+////
 
+
+////
+false
 //////
 tern expr
 ////
@@ -85,6 +146,23 @@ func untypedlmao(int a){
 ////
 true
 //////
+tern expr false
+////
+func untypedlmao(int a){
+    bool b = true;
+    int c = 5;
+    int d = 4;
+    d = c ? b : d;
+    
+}
+////
+
+////
+
+////
+false
+
+//////
 logical AND OR expr
 ////
 func untypedlmao(int a){
@@ -100,6 +178,22 @@ func untypedlmao(int a){
 
 ////
 true
+/////
+logical AND OR expr false
+////
+func untypedlmao(int a){
+    int b = 5;
+    decimal a = false;
+    string c = "true";
+    bool d = a || b && a || c;
+    
+}
+////
+
+////
+
+////
+false
 //////
 logical compare expr
 ////
@@ -118,7 +212,24 @@ func untypedlmao(int a){
 ////
 true
 //////
-suff-postfix expr
+logical compare expr false
+////
+func untypedlmao(int a){
+    int a = 5;
+    char b = "2";
+    decimal c = 7.5;
+    bool d = a == b || b < 7 ;
+    bool e = a != b && c > 5;
+    d = a >= 2 || b >= 3;
+}
+////
+
+////
+
+////
+false
+//////
+suff-postfix expr 
 ////
 func untypedlmao(int a){
     int a = 5;
@@ -146,6 +257,34 @@ func untypedlomo(int a){
 
 ////
 true
+//////
+suff-postfix expr false
+////
+func untypedlmao(int a){
+    string a = "5";
+    bool b = true;
+    decimal c;
+    c = ++b + a;
+    b = a++ + a;
+    a = -a + b;
+    
+    int rigtige = 5;
+    bool falsk = !rigtige;  
+}
+func untypedlomo(int a){
+    int a = 5;
+    int b = 2;
+    decimal d = 3.5;
+    int c;
+    c = --b + a;
+    b = b-- + a;
+}
+////
+
+////
+
+////
+false
 
 
 

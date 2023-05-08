@@ -63,7 +63,7 @@ true
 Should fail from similar named units
 ////
 unit unit5 {
-    ms => value;
+    ms => valu;
 }
 unit unit5 {
     ms => value;

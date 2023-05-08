@@ -1,15 +1,13 @@
 ﻿lmao xD
 ////
-func untyped(){
-    int a = 5;
-    int b = 6;
-    if(a == b) {
-        decimal d = 7.5;
-    } elseif(a != b){
-       int a = 1+2;
-    }
-    else {
-        string s = "lmao";
+func untypedtwo(){
+    int b = 3;
+    int a = 4;
+    for(int i= 0; b > a; i++){
+        b++;
+        for(int j = 0; b < a; j++){
+                    b++;
+        }
     }
 }
 ////

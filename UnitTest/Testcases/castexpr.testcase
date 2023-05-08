@@ -6,19 +6,19 @@ func untypedlmao(int a){
     decimal c = 3.5;
     string d = "lmao";
     char e = 'xD';
+    /* self casts */
     bool ab =(bool) a;
     int ba = (int) b;
     decimal cd = (decimal)c;
     string de = (string)d;
     char ef = (char)e;
+    
     /*rigtige typecasts */
     c = (decimal)b;
     d = (string)ef;
     d = (string)b;
     de =(string) c;
     ef =(char)b;
-    
-    
     
 }
 ////
@@ -27,3 +27,23 @@ func untypedlmao(int a){
 
 ////
 true
+casting expr false
+////
+func untypedlmao(int a){
+    bool a = true;
+    int b = 5;
+    decimal c = 3.5;
+    string d = "lmao";
+    char e = 'xD';
+  
+    
+    decimal cd = (decimal)e;
+    string de = (string)a;
+    char ef = (char)e;
+}
+////
+
+////
+
+////
+false
