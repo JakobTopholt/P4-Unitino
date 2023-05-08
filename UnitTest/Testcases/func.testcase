@@ -28,6 +28,10 @@ char function3(char a, char b, char c){
 }
 decimal function4(int a){
     decimal d = 3.5 + a;
+    char a = "a";
+    char b = "b";
+    char c = "c";
+        function3(a,b,c);
     return d;
 }
 

@@ -38,6 +38,41 @@ func untypedthree(int a, decimal b, string c, char d, bool e){
 ////
 true
 //////
+Assign tests false
+////
+func untypedtwo(){
+    int ab = 5;
+    string a = "lmaoi";
+    char c = "c";
+    ab +=a;
+    decimal ba = 3.5;
+    ba += a;
+    string ca = "c";
+    ca += c;
+    char da = "d";
+    bool ea = true;
+    ea += c; 
+}
+func untypedthree(int a, decimal b, string c, char d, bool e){
+    int ab = 5;
+        string a = "lmaoi";
+        char c = "c";
+        ab -=a;
+        decimal ba = 3.5;
+        ba -= a;
+        string ca = "c";
+        ca -= c;
+        char da = "d";
+        bool ea = true;
+        ea -= c; 
+}
+////
+
+////
+
+////
+false
+//////
 suffpostfix test
 ////
 func untyped(int a, decimal b, string c, char d, bool e){
@@ -68,6 +103,31 @@ func untyped(int a, decimal b, string c, char d, bool e){
 ////
 true
 //////
+suffpostfix test false
+////
+func untyped(int a, decimal b, string c, char d, bool e){
+    string ab = "lmao";
+    bool ba = true;
+    ab++;
+    ba++;
+    
+    ++ab;
+    ++ba;    
+   
+    ab--;
+    ba--;
+   
+     --ab;
+     --ba; 
+}
+
+////
+
+////
+
+////
+false
+//////
 outadecl stmt test
 ////
 func untyped(int a, decimal b, string c, char d, bool e){
@@ -94,14 +154,39 @@ func untypedtwo(int a, decimal b, string c, char d, bool e){
 ////
 true
 //////
+outadecl stmt test false
+////
+func untyped(int a, decimal b, string c, char d, bool e){
+    int int;
+    decimal decimal;
+    string char;
+    char string;
+    bool if;    
+}
+func untypedtwo(int a, decimal b, string c, char d, bool e){
+    int a = "lmao";
+    decimal b = 1;
+    string c = true;
+    char d = 1;
+    bool e = "true";
+   
+}
+////
+
+////
+
+
+////
+false
+//////
 control statemetns test
 ////
 func untyped(){
     bool e;    
     if(5 == 5){
         decimal d = 7+5;
-    }elseif(5 != 5) {
-        int a =1+2;
+    }else if(5 != 5) {
+        int a = 1 +2;
     }
     else {
         string s = "lmao";
@@ -112,12 +197,12 @@ func untypedtwo(){
     int a = 4;
     for(int i = 0; b < a;i++){
         b++;
-    
+    }
 }
 func untypedthree(){
       int b = 3;
       int a = 4;
-      bool a = true;
+      bool c = true;
       while (a!= 10){
         a++;
       } 
@@ -125,7 +210,7 @@ func untypedthree(){
 func untypedthree(){
       int b = 3;
       int a = 4;
-      bool a = true;
+      bool c = true;
       do{
         a++;
       }while (a!= 10)
@@ -137,3 +222,54 @@ func untypedthree(){
 
 ////
 true
+//////
+control statements test false
+////
+func untyped(){
+    int e = 5;
+    string d = "5";    
+    if(e){
+        e++;
+    }else if(e != d) {
+        e--;
+    }
+    else {
+    }
+}
+func untypedtwo(){
+    int b = 3;
+    int a = 4;
+    for(int i = 0; b = a; i++){
+        b++;
+        for(int j = 0; b < a; 3 > 5){
+                    b++;
+        }
+    }
+}
+func untypedthree(){
+      int b = 3;
+      int a = 4;
+      bool c = true;
+      while (a!= "10"){
+        a++;
+      }
+      while (a!= 10){
+            }  
+}
+func untypedthree(){
+      int b = 3;
+      int a = 4;
+      bool c = true;
+      do{
+        a++;
+      }while (a!= "10")
+        do{
+            }while (a!= 10)
+}
+////
+
+////
+
+
+////
+false

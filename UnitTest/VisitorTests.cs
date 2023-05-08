@@ -25,8 +25,8 @@ public class VisitorTests
     {
         List<SymbolTable> list = new();
         SymbolTable symbolTable = new(null, list);
-        UnitVisitor b = new(symbolTable);
-        FunctionVisitor a = new(symbolTable);
+        UnitVisitor a = new(symbolTable);
+        FunctionVisitor b = new(symbolTable);
         TypeChecker c = new(symbolTable);
         ast.Apply(a);
         ast.Apply(b);
@@ -39,8 +39,8 @@ public class VisitorTests
     {
         List<SymbolTable> list = new();
         SymbolTable symbolTable = new(null, list);
-        UnitVisitor b = new(symbolTable);
-        FunctionVisitor a = new(symbolTable);
+        UnitVisitor a = new(symbolTable);
+        FunctionVisitor b = new(symbolTable);
         TypeChecker c = new(symbolTable);
         ast.Apply(a);
         ast.Apply(b);
