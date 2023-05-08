@@ -1,0 +1,152 @@
+﻿expr plus test
+////
+func funexpr(int a){
+    int b = 5;
+    b = b + a;
+    decimal d = 3.5;
+    decimal e = 6.5+d;
+    d = d + a;
+    
+    string s = "lmao";
+    string t = "xD";
+    s = s+a;
+    t = t+s; 
+    t = t+d;
+}
+////
+
+////
+
+////
+true
+
+//////
+expr minus testt
+////
+func untyped(int a){
+    int b = 5;
+    b = b-a;
+    decimal c = 3.5;
+    decimal d = 6.5;
+    d = d-c;
+    c = c-b;
+    
+}
+////
+
+////
+
+////
+true
+
+//////
+expr div mult mod
+////
+func untypedlmao(){
+    int a = 3;
+    int b = 5;
+    decimal cd = 3.5;
+    b = b * a;
+    decimal d = 6.5;
+    d = d * c;
+    cd = cd / b;
+    a = d % b; 
+}
+////
+int a = 3;
+    int b = 5;
+    b = b * a;
+    decimal c = 3.5;
+    decimal d = 6.5;
+    a = a / b;
+    c = c / b;
+    d = d * c;
+    return;  
+////
+
+
+////
+true
+
+//////
+tern expr
+////
+func untypedlmao(int a){
+    bool b = true;
+    int c = 5;
+    int d = 4;
+    d = b ? c : d;
+    
+}
+////
+
+////
+
+////
+true
+//////
+logical AND OR expr
+////
+func untypedlmao(int a){
+    bool b = true;
+    bool a = false;
+    bool c = true;
+    bool d = a || b && a || c;
+    
+}
+////
+
+////
+
+////
+true
+//////
+logical compare expr
+////
+func untypedlmao(int a){
+    int a = 5;
+    int b = 2;
+    int c = 7;
+    bool d = a == b || b < 7 ;
+    bool e = a != b && c > 5;
+    d = a >= 2 || b >= 3;
+}
+////
+
+////
+
+////
+true
+//////
+suff-postfix expr
+////
+func untypedlmao(int a){
+    int a = 5;
+    int b = 2;
+    decimal d = 3.5;
+    int c;
+    c = ++b + a;
+    b = b++ + a;
+    a = -a + b;
+    
+    bool rigtige = true;
+    bool falsk = !rigtige;  
+}
+func untypedlomo(int a){
+    int a = 5;
+    int b = 2;
+    decimal d = 3.5;
+    int c;
+    c = --b + a;
+    b = b-- + a;
+}
+////
+
+////
+
+////
+true
+
+
+
+

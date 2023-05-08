@@ -1,0 +1,139 @@
+﻿Assign tests
+////
+func untyped(int a, decimal b, string c, char d, bool e){
+    int ab = a;
+    decimal ba = b;
+    string ca = c;
+    char da = d;
+    bool ea = e; 
+}
+func untypedtwo(int a, decimal b, string c, char d, bool e){
+    int ab = 5;
+    ab +=a;
+    decimal ba = 3.5;
+    ba += b;
+    string ca = "c";
+    ca += c;
+    char da = "d";
+    da += d;
+    bool ea = true;
+    ea += e; 
+}
+func untypedthree(int a, decimal b, string c, char d, bool e){
+    int ab = 5;
+        ab -=a;
+        decimal ba = 3.5;
+        ba -= b;
+        string ca = "c";
+        ca -= c;
+        char da = "d";
+        da -= d;
+        bool ea = true;
+        ea -= e; 
+}
+////
+
+////
+
+////
+true
+//////
+suffpostfix test
+////
+func untyped(int a, decimal b, string c, char d, bool e){
+    int ab = a;
+    decimal ba = b;
+    char da = d;
+    ab++;
+    ba++;
+    da++;
+    
+    ++ab;
+    ++ba;
+    ++da;
+    
+    ab--;
+    ba--;
+    da--;
+     --ab;
+     --ba;
+     --da;  
+}
+
+////
+
+////
+
+
+////
+true
+//////
+outadecl stmt test
+////
+func untyped(int a, decimal b, string c, char d, bool e){
+    int a;
+    decimal b;
+    string c;
+    char d;
+    bool e;    
+}
+func untypedtwo(int a, decimal b, string c, char d, bool e){
+    int a = 1;
+    decimal b = 1.5;
+    string c = "lmao";
+    char d = "a";
+    bool e = true;
+   
+}
+
+////
+
+////
+
+
+////
+true
+//////
+control statemetns test
+////
+func untyped(){
+    bool e;    
+    if(5 == 5){
+        decimal d = 7+5;
+    }elseif(5 != 5) {
+        int a =1+2;
+    }
+    else {
+        string s = "lmao";
+    }
+}
+func untypedtwo(){
+    int b = 3;
+    int a = 4;
+    for(int i = 0; b < a;i++){
+        b++;
+    
+}
+func untypedthree(){
+      int b = 3;
+      int a = 4;
+      bool a = true;
+      while (a!= 10){
+        a++;
+      } 
+}
+func untypedthree(){
+      int b = 3;
+      int a = 4;
+      bool a = true;
+      do{
+        a++;
+      }while (a!= 10)
+}
+////
+
+////
+
+
+////
+true

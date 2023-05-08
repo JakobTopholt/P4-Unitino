@@ -2,6 +2,11 @@
 ////
 unit Time {
     ms => value;
+    s => value * 1000;
+}
+Time UnitFunc() {
+    Time a = 50ms + 1000s;
+    return a;
 }
 prog {
     Time a = 50ms;
@@ -10,13 +15,15 @@ prog {
 unit Time {
     ms => value;
 }
+Time UnitFunc() {
+    Time a = 50ms + 1000s;
+    return a;
+}
 prog {
     Time a = 50ms;
 }
 ////
-float Timems(float value) {
-    return value;
-}
+
 prog {
     float a = Timems(50);
 }

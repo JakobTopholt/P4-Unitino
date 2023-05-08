@@ -1,4 +1,4 @@
-﻿Func tests
+﻿Func decl and returntype test 
 ////
 func NormalFunc(int b, int a) {
     int i = 0;
@@ -14,18 +14,23 @@ int TypedFunc() {
     int i = 0;
     return i;
 }
-int ImplicitTypedFunc() {
-    int i = 0;
+func ImplicitTypedFunc() {
+    string i = "0";
     return i;
 }
-unit Time {
-    ms => value;
-    s => value * 1000;
+string ImplicitTypedFunc() {
+    string i = "0";
+    return i;
 }
-Time UnitFunc() {
-    Time a = 50ms + 1000s;
-    return a;
+char function3(char a, char b, char c){
+    char d = a+b+c;
+    return d;
 }
+decimal function4(int a){
+    decimal d = 3.5 + a;
+    return d;
+}
+
 ////
 void NormalFunc(int b, int a) {
     int i = 0;
@@ -42,16 +47,21 @@ int TypedFunc() {
     return i;
 }
 func ImplicitTypedFunc() {
-    int i = 0;
+    string i = 0;
     return i;
 }
-unit Time {
-    ms => value;
-    s => value * 1000;
+string ImplicitTypedFunc() {
+    string i = "0";
+    return i;
 }
-Time UnitFunc() {
-    Time a = 50ms + 1000s;
-    return a;
+char function3(char a, char b, char c){
+    char d = a+b+c
+    return d;
+}
+decimal function4(int a){
+    decimal d = 3.5 + a;
+    return d;
+}
 }
 ////
 void NormalFunc(int b, int a) {
@@ -72,15 +82,17 @@ int ImplicitTypedFunc() {
     int i = 0;
     return i;
 }
-float Timems(float value) {
-    return value;
+string ImplicitTypedFunc() {
+    string i = "0";
+    return i;
 }
-float Times(float value) {
-    return value*1000;
+char function3(char a, char b, char c){
+    char d = a+b+c
+    return d;
 }
-float UnitFunc() {
-    float a = Timems(50) + Timems(1000);
-    return a;
+float function4(int a){
+    float d = 3.5 + a;
+    return d;
 }
 ////
 true

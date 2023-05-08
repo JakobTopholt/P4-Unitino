@@ -1,0 +1,21 @@
+﻿lmao xD
+////
+func untyped(){
+    int a = 5;
+    int b = 6;
+    if(a == b) {
+        decimal d = 7.5;
+    } elseif(a != b){
+       int a = 1+2;
+    }
+    else {
+        string s = "lmao";
+    }
+}
+////
+
+////
+
+
+////
+true
