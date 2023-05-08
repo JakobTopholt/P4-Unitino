@@ -26,7 +26,6 @@ public class SymbolTable
     
     public SymbolTable EnterScope() => new(this, allTables);
     public SymbolTable ExitScope() => parent ?? this;
-
     public SymbolTable ResetScope()
     {
         SymbolTable table = this;
@@ -36,17 +35,26 @@ public class SymbolTable
         }
         return table;
     }
-
     public AUnitType? GetUnitFromExpr(PExp expression)
     {
-        return nodeToUnit[expression];
+        AUnitType? temp;
+        bool found = nodeToUnit.TryGetValue(expression, out temp);
+        
+        return found ? temp : null;
     }
     public void AddNodeToUnit(Node node, AUnitType unit)
     {
         nodeToUnit.Add(node, unit);
     }
     public void AddUnit(Node node, AUnitType unit) => nodeToUnit.Add(node, unit);
-    public Symbol? GetSymbolFromExpr(PExp expression) => nodeToSymbol[expression];
+    public Symbol? GetSymbolFromExpr(PExp expression)
+    {
+        Symbol temp;
+        bool found = nodeToSymbol.TryGetValue(expression, out temp);
+        
+        return found ? temp : null;
+    }
+
     public void AddId(TId identifier, Node node, Symbol symbol)
     {
         idToNode.Add("" + identifier, node);
@@ -55,12 +63,12 @@ public class SymbolTable
     public void AddNode(Node node, Symbol symbol) => nodeToSymbol.Add(node, symbol);
     public void AddSubunit(TId identifier, Node node, PExp expr)
     {
-        SubunitToExp.Add("" + identifier, expr);
-        SubunitToUnit.Add("" + identifier, (AUnitdecl) node);
+        SubunitToExp.Add(identifier.ToString().Trim(), expr);
+        SubunitToUnit.Add(identifier.ToString().Trim(), (AUnitdecl) node);
     }
     public AUnitdecl? GetUnitFromSubunit(TId identifier)
     {
-        return SubunitToUnit[identifier.ToString()];
+        return SubunitToUnit[identifier.ToString().Trim()];
     }
     public void AddNumerators(TId identifier, Node node, IEnumerable<ANumUnituse> nums)
     {

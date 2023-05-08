@@ -132,6 +132,23 @@ public class stmtTypeChecker : DepthFirstAdapter
         
     }
 
+    public Symbol PTypeToSymbol(PType type)
+    {
+        switch (type)
+        {
+            case AIntType:
+                return Symbol.Bool;
+            default:
+                return Symbol.notOk;
+        }
+    }
+
+    public bool CompareCustomUnits(AUnitType unit1, AUnitType unit2)
+    {
+        // Implement logic for comaparing the content of two custom units
+        return false;
+    }
+
     public override void InAReturnStmt(AReturnStmt node)
     {
       //already set before
@@ -153,12 +170,27 @@ public class stmtTypeChecker : DepthFirstAdapter
           case ATypedFunc aTypedFunc:
               // Does the return-expressions' type match function type
               // Implement void type? PUnittype?
-              PType returnType = aTypedFunc.GetType();
-              PType? exprType = symbolTable.GetUnitFromExpr(node.GetExp());
-              if(exprType == null)
-                  throw new Exception("Return is null value");
-              // Does exprSymbol match returnType?
-              symbolTable.AddNode(node, exprType == returnType ? Symbol.ok : Symbol.notOk);
+              PType typedType = aTypedFunc.GetType();
+              PExp? returnExp = node.GetExp();
+              if (returnExp is AIdExp ID)
+              { 
+                  symbolTable.AddNode(node, PTypeToSymbol(typedType) == symbolTable.GetSymbol(ID.GetId()) ? Symbol.ok : Symbol.notOk);
+              } 
+              else if (returnExp is AUnitExp unit)
+              {
+                  // Implement function which compares two custom unit types
+                  
+                  symbolTable.AddNode(node, symbolTable.GetUnitFromExpr(unit) == typedType ? Symbol.ok : Symbol.notOk);
+              } 
+              else if (returnExp is null)
+              {
+                  symbolTable.AddNode(node, typedType is AVoidType ? Symbol.ok : Symbol.notOk);
+              }
+              else
+              {
+                  symbolTable.AddNode(node, PTypeToSymbol(typedType) == symbolTable.GetSymbol(returnExp) ? Symbol.ok : Symbol.notOk);
+              }
+
               break;
           
           case AUntypedFunc aUntypedFunc:

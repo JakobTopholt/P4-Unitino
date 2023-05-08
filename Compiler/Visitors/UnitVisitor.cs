@@ -36,6 +36,8 @@ public class UnitVisitor : DepthFirstAdapter
         {
             PExp expr = node.GetExp();
             var symbol = symbolTable.GetSymbolFromExpr(expr);
+            // Find ud hvorfor "ms" ik bliver tilføjet til dictionary
+            
             if (symbol == Symbol.Decimal)
             {
                 symbolTable.AddSubunit(node.GetId(), node.Parent(), expr);
