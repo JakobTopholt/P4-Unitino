@@ -75,34 +75,34 @@ public class FunctionVisitor : DepthFirstAdapter
                     switch (argument.GetType())
                     {
                         case AIntType:
-                            symbolTable.AddId(argument.GetId() , argument, Symbol.Int);
+                            symbolTable.AddId(argument.GetId(), argument, Symbol.Int);
                             break;
                         case ADecimalType:
-                            symbolTable.AddId(argument.GetId() , argument, Symbol.Decimal);
+                            symbolTable.AddId(argument.GetId(), argument, Symbol.Decimal);
                             break;
                         case ABoolType:
-                            symbolTable.AddId(argument.GetId() , argument, Symbol.Bool);
+                            symbolTable.AddId(argument.GetId(), argument, Symbol.Bool);
                             break;
                         case ACharType:
-                            symbolTable.AddId(argument.GetId() , argument, Symbol.Char);
+                            symbolTable.AddId(argument.GetId(), argument, Symbol.Char);
                             break;
                         case AStringType:
-                            symbolTable.AddId(argument.GetId() , argument, Symbol.String);
+                            symbolTable.AddId(argument.GetId(), argument, Symbol.String);
                             break;
                         case AUnitType customType:
                         {
                             // -----------WIP----------- //
-                            
+
                             // Declared a custom sammensat unit (Ikke en baseunit declaration)
                             IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
                             IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
-                    
+
                             // Declaration validering for sammensat unit her
                             // Check if Numerators or denomarots contains units that does not exist
 
                             symbolTable.AddNumerators(argument.GetId(), argument, numerator);
                             symbolTable.AddDenomerators(argument.GetId(), argument, denomerator);
-                            break; 
+                            break;
                         }
                     }
                 }
@@ -114,15 +114,35 @@ public class FunctionVisitor : DepthFirstAdapter
     }
     public override void OutATypedFunc(ATypedFunc node)
     {
-        symbolTable = symbolTable.ExitScope();
         // Save returntype
         // But if not void it has to have a reachable return statement in the node
         // All return statements have to evaluate to same type to be correct
-        
-        PType returnSymbol = node.GetType();
-        
-        symbolTable.AddId(node.GetId(), node, Symbol.String);
-        
+        symbolTable = symbolTable.ExitScope();
+        switch (node.GetType())
+        {
+            case AIntType:
+                symbolTable.AddId(node.GetId(), node, Symbol.Int);
+                break;
+            case ADecimalType:
+                symbolTable.AddId(node.GetId(), node, Symbol.Decimal);
+                break;
+            case ABoolType:
+                symbolTable.AddId(node.GetId(), node, Symbol.Bool);
+                break;
+            case ACharType:
+                symbolTable.AddId(node.GetId(), node, Symbol.Char);
+                break;
+            case AStringType:
+                symbolTable.AddId(node.GetId(), node, Symbol.String);
+                break;
+            case AVoidType:
+                symbolTable.AddId(node.GetId(), node, Symbol.Func);
+                break;
+            case AUnitType customType:
+                // ----- Logic ----
+                break;
+        }
+
     }
     public override void InALoopFunc(ALoopFunc node) => symbolTable = symbolTable.EnterScope();
     public override void OutALoopFunc(ALoopFunc node) => symbolTable = symbolTable.ExitScope();

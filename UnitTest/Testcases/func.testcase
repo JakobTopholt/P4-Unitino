@@ -14,7 +14,7 @@ int TypedFunc() {
     int i = 0;
     return i;
 }
-int ImplicitTypedFunc() {
+func ImplicitTypedFunc() {
     int i = 0;
     return i;
 }

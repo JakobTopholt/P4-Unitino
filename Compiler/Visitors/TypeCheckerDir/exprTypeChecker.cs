@@ -57,6 +57,7 @@ public class exprTypeChecker : stmtTypeChecker
         symbolTable.AddNodeToUnit(node, unitType);
         symbolTable.AddNode(node, Symbol.ok);
 
+        // This a function xD
         AUnitType GetUnittypeFromUnitnumber(PUnitnumber unitnumber)
         {
             switch (unitnumber)
