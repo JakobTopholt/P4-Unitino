@@ -14,11 +14,12 @@ public class SymbolTable
     private readonly SymbolTable? parent;
     private readonly Dictionary<string, Node> idToNode = new();
     private readonly Dictionary<Node, Symbol> nodeToSymbol = new();
-    private Dictionary<Node, AUnitType> nodeToUnit = new();
+    private Dictionary<Node, Tuple<List<AUnitdecl>, List<AUnitdecl>>> nodeToUnit = new();
 
     private Dictionary<string, IList> functionidToParams = new();
     public Dictionary<TId, PType> funcToReturn = new();
 
+    private Dictionary<string, AUnitdecl> idToUnit = new();
     public Dictionary<string, AUnitdecl> SubunitToUnit = new();
     private Dictionary<string, PExp> SubunitToExp = new();
     private Dictionary<string, List<string>> Numerators = new();
@@ -35,18 +36,28 @@ public class SymbolTable
         }
         return table;
     }
-    public AUnitType? GetUnitFromExpr(PExp expression)
+
+    public void AddIdToUnit(string identifier, AUnitdecl node)
     {
-        AUnitType? temp;
+        idToUnit.Add(identifier, node);
+    }
+    
+    public AUnitdecl? GetUnitFromId(string identifier)
+    {
+        return idToUnit[identifier];
+    }
+    
+    public Tuple<List<AUnitdecl>, List<AUnitdecl>>? GetUnit(Node expression)
+    {
+        Tuple<List<AUnitdecl>, List<AUnitdecl>>? temp;
         bool found = nodeToUnit.TryGetValue(expression, out temp);
         
         return found ? temp : null;
     }
-    public void AddNodeToUnit(Node node, AUnitType unit)
+    public void AddNodeToUnit(Node node, Tuple<List<AUnitdecl>, List<AUnitdecl>> unit)
     {
         nodeToUnit.Add(node, unit);
     }
-    public void AddUnit(Node node, AUnitType unit) => nodeToUnit.Add(node, unit);
     public Symbol? GetSymbolFromExpr(PExp expression)
     {
         Symbol temp;

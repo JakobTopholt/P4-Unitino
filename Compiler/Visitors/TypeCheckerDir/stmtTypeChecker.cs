@@ -143,10 +143,14 @@ public class stmtTypeChecker : DepthFirstAdapter
         }
     }
 
-    public bool CompareCustomUnits(AUnitType unit1, AUnitType unit2)
+    public bool CompareCustomUnits(Node unit1, Node unit2)
     {
-        // Implement logic for comaparing the content of two custom units
-        return false;
+        var a = symbolTable.GetUnit(unit1);
+        var b = symbolTable.GetUnit(unit2);
+        
+        // Compare logic here
+        
+        return true;
     }
 
     public override void InAReturnStmt(AReturnStmt node)
@@ -157,6 +161,7 @@ public class stmtTypeChecker : DepthFirstAdapter
       {
           parent = parent.Parent();
       }
+      PExp? returnExp = node.GetExp();
       switch (parent)
       {
           case ALoopFunc:
@@ -171,16 +176,15 @@ public class stmtTypeChecker : DepthFirstAdapter
               // Does the return-expressions' type match function type
               // Implement void type? PUnittype?
               PType typedType = aTypedFunc.GetType();
-              PExp? returnExp = node.GetExp();
-              if (returnExp is AIdExp ID)
+              if (returnExp is AIdExp Id)
               { 
-                  symbolTable.AddNode(node, PTypeToSymbol(typedType) == symbolTable.GetSymbol(ID.GetId()) ? Symbol.ok : Symbol.notOk);
+                  symbolTable.AddNode(node, PTypeToSymbol(typedType) == symbolTable.GetSymbol(Id.GetId()) ? Symbol.ok : Symbol.notOk);
               } 
               else if (returnExp is AUnitExp unit)
               {
                   // Implement function which compares two custom unit types
                   
-                  symbolTable.AddNode(node, symbolTable.GetUnitFromExpr(unit) == typedType ? Symbol.ok : Symbol.notOk);
+                  symbolTable.AddNode(node, CompareCustomUnits(unit, typedType) ? Symbol.ok : Symbol.notOk);
               } 
               else if (returnExp is null)
               {
@@ -197,12 +201,12 @@ public class stmtTypeChecker : DepthFirstAdapter
               // Does all return-expressions evaluate to the same type
               // Gem først returnstatement type to the function node
               // If the next iteration does not match throw errors
-              PType? exprType2 = symbolTable.GetUnitFromExpr(node.GetExp());
-
+              PType type = symbolTable.GetTypeFromExp();
+              // WIP
               if (!symbolTable.funcToReturn.ContainsKey(aUntypedFunc.GetId()))
               {
                   // add the return to dictionary
-                  symbolTable.funcToReturn.Add(aUntypedFunc.GetId(), exprType2);  
+                  symbolTable.funcToReturn.Add(aUntypedFunc.GetId(), );  
                   symbolTable.AddNode(node, Symbol.ok);
               }
               else

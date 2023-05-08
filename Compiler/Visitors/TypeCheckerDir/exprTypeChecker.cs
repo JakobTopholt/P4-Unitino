@@ -53,32 +53,35 @@ public class exprTypeChecker : stmtTypeChecker
         // A single unitnumber eg. 50ms
         // Typecheck
         // Save its parent "type" in symboltable aswell
-        var unitType = GetUnittypeFromUnitnumber(node.GetUnitnumber());
-        symbolTable.AddNodeToUnit(node, unitType);
-        symbolTable.AddNode(node, Symbol.ok);
+        var unitType = GetUnitFromUnitnumber(node.GetUnitnumber());
+        if (unitType != null)
+        {
+            //symbolTable.AddNodeToUnit(node, unitType);
+            symbolTable.AddNode(node, Symbol.ok); 
+        }
+        else
+        {
+            symbolTable.AddNode(node, Symbol.notOk);
+        }
 
         // This a function xD
-        AUnitType GetUnittypeFromUnitnumber(PUnitnumber unitnumber)
+        Tuple<List<AUnitdecl>, List<AUnitdecl>> unituse;
+ 
+    }
+
+    private AUnitdecl? GetUnitFromUnitnumber(PUnitnumber unitnumber)
+    {
+        AUnitdecl? unit;
+        switch (unitnumber)
         {
-            switch (unitnumber)
-            {
-                case ADecimalUnitnumber a:
-                    AUnitdecl? unit = symbolTable.GetUnitFromSubunit(a.GetId());
-                    ANumUnituse num = new ANumUnituse(unit.GetId());
-                    IList unituse = new Collection();
-                    unituse.Add(num);
-                    AUnitType unittype = new AUnitType(unituse);
-                    return unittype;
-                case ANumberUnitnumber b:
-                    AUnitdecl? unit2 = symbolTable.GetUnitFromSubunit(b.GetId());
-                    ANumUnituse num2 = new ANumUnituse(unit2.GetId());
-                    IList unituse2 = new Collection();
-                    unituse2.Add(num2);
-                    AUnitType unittype2 = new AUnitType(unituse2);
-                    return unittype2;
-                default:
-                    throw new Exception("Is not a valid unitnumber");
-            }
+            case ADecimalUnitnumber a:
+                unit = symbolTable.GetUnitFromSubunit(a.GetId());
+                return unit;
+            case ANumberUnitnumber b:
+                unit = symbolTable.GetUnitFromSubunit(b.GetId());
+                return unit;
+            default:
+                return null;
         }
     }
 
@@ -106,21 +109,28 @@ public class exprTypeChecker : stmtTypeChecker
         PExp leftExpr = node.GetL();
         PExp rightExpr = node.GetR();
         
-        AUnitType? left = symbolTable.GetUnitFromExpr(leftExpr);
-        AUnitType? right = symbolTable.GetUnitFromExpr(rightExpr);
-        if (left != null && right != null)
+        // Hvis begge sider contains units do something
+        // hvis en side er en unit og den anden er et 
+        
+        if (true)
         {
-            // Left is Num, Right is Den
-            IEnumerable<ANumUnituse> numerator = left.GetUnituse().OfType<ANumUnituse>();
-            IEnumerable<ADenUnituse> denomerator = right.GetUnituse().OfType<ADenUnituse>();
-            
-            
-            
-            
-            IList resultUnituse = new Collection();
+            // Div
+            Tuple<List<AUnitdecl>, List<AUnitdecl>> left = symbolTable.GetUnit(leftExpr); // unit 1
+            Tuple<List<AUnitdecl>, List<AUnitdecl>> right = symbolTable.GetUnit(rightExpr); // unit 2
 
-            AUnitType unitType = null;
-            symbolTable.AddNodeToUnit(node, unitType);
+            List<AUnitdecl> a = left.Item1;
+            List<AUnitdecl> b = left.Item2;
+            List<AUnitdecl> c = right.Item1;
+            List<AUnitdecl> d = right.Item2;
+
+            List<AUnitdecl> ac = a.Intersect(c).ToList();
+            List<AUnitdecl> bd = b.Intersect(d).ToList();
+            
+            List<AUnitdecl> numerators = a.Except(ac).Union(d.Except(bd)).ToList();
+            List<AUnitdecl> denomerators = c.Except(ac).Union(b.Except(bd)).ToList();
+            
+            Tuple<List<AUnitdecl>, List<AUnitdecl>> unituse = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(numerators, denomerators);
+            symbolTable.AddNodeToUnit(node, unituse);
             symbolTable.AddNode(node, Symbol.ok);
         }
         
@@ -131,6 +141,7 @@ public class exprTypeChecker : stmtTypeChecker
         // symbolTable.AddUnit(node, AUnitUnittype);
         
     }
+    
 
     public override void OutAMultiplyExp(AMultiplyExp node)
     {
@@ -151,10 +162,23 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(node, Symbol.notOk);
                 break;
         }
-        // -------------- LOGIK TIL CUSTOM UNITS TYPECHECKING ------------------ //
-        // skal save fra OutAUnitnumberExp til Dictionary<Node, PUnitUnittype> nodeToUnit
-        // Unitnumber skal håndteres i divideExprcase og multExprcase for at elevate types
-        // PUnitUnittype variablen bliver created ved at håndtere unitnumbers i ovenbenævnte case
+        PExp leftExpr = node.GetL();
+        PExp rightExpr = node.GetR();
+        // mult
+        Tuple<List<AUnitdecl>, List<AUnitdecl>> left = symbolTable.GetUnit(leftExpr); // unit 1
+        Tuple<List<AUnitdecl>, List<AUnitdecl>> right = symbolTable.GetUnit(rightExpr); // unit 2
+            
+        List<AUnitdecl> a = left.Item1;
+        List<AUnitdecl> b = left.Item2;
+        List<AUnitdecl> c = right.Item1;
+        List<AUnitdecl> d = right.Item2;
+            
+        List<AUnitdecl> ad = a.Intersect(d).ToList();
+        List<AUnitdecl> bc = b.Intersect(c).ToList();
+            
+        List<AUnitdecl> numerators = a.Except(ad).Union(d.Except(bc)).ToList();
+        List<AUnitdecl> denomerators = c.Except(ad).Union(b.Except(bc)).ToList();
+
         
     }
 
