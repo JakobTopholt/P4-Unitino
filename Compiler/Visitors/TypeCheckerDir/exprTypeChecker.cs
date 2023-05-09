@@ -51,22 +51,24 @@ public class exprTypeChecker : stmtTypeChecker
     public override void OutAUnitExp(AUnitExp node)
     {
         // A single unitnumber eg. 50ms
-        // Typecheck
-        // Save its parent "type" in symboltable aswell
         var unitType = GetUnitFromUnitnumber(node.GetUnitnumber());
         if (unitType != null)
         {
-            //symbolTable.AddNodeToUnit(node, unitType);
+            // Create a new unit tuple and add the unitnumber as a lone numerator
+            List<AUnitdecl> nums = new List<AUnitdecl>();
+            nums.Add(unitType);
+            List<AUnitdecl> dens = new List<AUnitdecl>();
+            var unit = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(nums, dens);
+            
+            // Map node to the unit
+            symbolTable.AddNodeToUnit(node, unit);
             symbolTable.AddNode(node, Symbol.ok); 
         }
         else
         {
+            // Id is not a valid subunit
             symbolTable.AddNode(node, Symbol.notOk);
         }
-
-        // This a function xD
-        Tuple<List<AUnitdecl>, List<AUnitdecl>> unituse;
- 
     }
 
     private AUnitdecl? GetUnitFromUnitnumber(PUnitnumber unitnumber)
@@ -84,62 +86,51 @@ public class exprTypeChecker : stmtTypeChecker
                 return null;
         }
     }
-
     public override void OutADivideExp(ADivideExp node)
     {
-        // Standard types
-        var l = symbolTable.GetSymbol(node.GetL());
-        var r = symbolTable.GetSymbol(node.GetR());
-        switch (l)
+        PExp leftExpr = node.GetL();
+        PExp rightExpr = node.GetR();
+        Symbol? leftSymbol = symbolTable.GetSymbol(leftExpr);
+        Symbol? rightSymbol = symbolTable.GetSymbol(rightExpr);
+        switch (leftSymbol)
         {
-            case Symbol.Int when r is Symbol.Int:
+            case Symbol.Int when rightSymbol is Symbol.Int:
                 symbolTable.AddNode(node, Symbol.Int);
                 break;
-            case Symbol.Decimal when r is Symbol.Decimal or Symbol.Int:
+            case Symbol.Decimal when rightSymbol is Symbol.Decimal or Symbol.Int:
                 symbolTable.AddNode(node, Symbol.Decimal);
                 break;
-            case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal:
+            case Symbol.Decimal or Symbol.Int when rightSymbol is Symbol.Decimal:
                 symbolTable.AddNode(node, Symbol.Decimal);
                 break;
             default:
-                symbolTable.AddNode(node, Symbol.notOk);
+                if (symbolTable.nodeToUnit.ContainsKey(leftExpr) && symbolTable.nodeToUnit.ContainsKey(rightExpr))
+                {
+                    Tuple<List<AUnitdecl>, List<AUnitdecl>> left = symbolTable.GetUnit(leftExpr); // unit 1
+                    Tuple<List<AUnitdecl>, List<AUnitdecl>> right = symbolTable.GetUnit(rightExpr); // unit 2
+
+                    List<AUnitdecl> a = left.Item1;
+                    List<AUnitdecl> b = left.Item2;
+                    List<AUnitdecl> c = right.Item1;
+                    List<AUnitdecl> d = right.Item2;
+
+                    List<AUnitdecl> ac = a.Intersect(c).ToList();
+                    List<AUnitdecl> bd = b.Intersect(d).ToList();
+            
+                    List<AUnitdecl> numerators = a.Except(ac).Union(d.Except(bd)).ToList();
+                    List<AUnitdecl> denomerators = c.Except(ac).Union(b.Except(bd)).ToList();
+            
+                    Tuple<List<AUnitdecl>, List<AUnitdecl>> unituse = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(numerators, denomerators);
+                    symbolTable.AddNodeToUnit(node, unituse);
+                    symbolTable.AddNode(node, Symbol.ok);
+                } 
+                else
+                { 
+                    // not valid input expressions to a divide expression
+                    symbolTable.AddNode(node, Symbol.notOk);
+                }
                 break;
         }
-
-        PExp leftExpr = node.GetL();
-        PExp rightExpr = node.GetR();
-        
-        // Hvis begge sider contains units do something
-        // hvis en side er en unit og den anden er et 
-        
-        if (true)
-        {
-            // Div
-            Tuple<List<AUnitdecl>, List<AUnitdecl>> left = symbolTable.GetUnit(leftExpr); // unit 1
-            Tuple<List<AUnitdecl>, List<AUnitdecl>> right = symbolTable.GetUnit(rightExpr); // unit 2
-
-            List<AUnitdecl> a = left.Item1;
-            List<AUnitdecl> b = left.Item2;
-            List<AUnitdecl> c = right.Item1;
-            List<AUnitdecl> d = right.Item2;
-
-            List<AUnitdecl> ac = a.Intersect(c).ToList();
-            List<AUnitdecl> bd = b.Intersect(d).ToList();
-            
-            List<AUnitdecl> numerators = a.Except(ac).Union(d.Except(bd)).ToList();
-            List<AUnitdecl> denomerators = c.Except(ac).Union(b.Except(bd)).ToList();
-            
-            Tuple<List<AUnitdecl>, List<AUnitdecl>> unituse = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(numerators, denomerators);
-            symbolTable.AddNodeToUnit(node, unituse);
-            symbolTable.AddNode(node, Symbol.ok);
-        }
-        
-        //SubunitToUnit and combine parents. eg. 50km/2h -> Distance/Time
-
-        // Implement logic which adds a AUnitUnittype entry to the symboltable dictioary
-        // Maybe not the most effecient approach for now as each subPart of the unitexpression will be saved
-        // symbolTable.AddUnit(node, AUnitUnittype);
-        
     }
     
 

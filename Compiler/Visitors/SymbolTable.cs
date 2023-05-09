@@ -14,7 +14,7 @@ public class SymbolTable
     private readonly SymbolTable? parent;
     private readonly Dictionary<string, Node> idToNode = new();
     private readonly Dictionary<Node, Symbol> nodeToSymbol = new();
-    private Dictionary<Node, Tuple<List<AUnitdecl>, List<AUnitdecl>>> nodeToUnit = new();
+    public Dictionary<Node, Tuple<List<AUnitdecl>, List<AUnitdecl>>> nodeToUnit = new();
 
     private Dictionary<string, IList> functionidToParams = new();
     public Dictionary<TId, PType> funcToReturn = new();

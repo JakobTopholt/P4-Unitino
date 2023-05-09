@@ -173,50 +173,42 @@ public class stmtTypeChecker : DepthFirstAdapter
               throw new Exception("Should not have return in Prog");
               break;
           case ATypedFunc aTypedFunc:
-              // Does the return-expressions' type match function type
-              // Implement void type? PUnittype?
               PType typedType = aTypedFunc.GetType();
-              if (returnExp is AIdExp Id)
-              { 
-                  symbolTable.AddNode(node, PTypeToSymbol(typedType) == symbolTable.GetSymbol(Id.GetId()) ? Symbol.ok : Symbol.notOk);
-              } 
-              else if (returnExp is AUnitExp unit)
+              switch (returnExp)
               {
-                  // Implement function which compares two custom unit types
-                  
-                  symbolTable.AddNode(node, CompareCustomUnits(unit, typedType) ? Symbol.ok : Symbol.notOk);
-              } 
-              else if (returnExp is null)
-              {
-                  symbolTable.AddNode(node, typedType is AVoidType ? Symbol.ok : Symbol.notOk);
+                  case AIdExp Id:
+                      symbolTable.AddNode(node, PTypeToSymbol(typedType) == symbolTable.GetSymbol(Id.GetId()) ? Symbol.ok : Symbol.notOk);
+                      break;
+                  case AUnitExp unit:
+                      symbolTable.AddNode(node, CompareCustomUnits(unit, typedType) ? Symbol.ok : Symbol.notOk);
+                      break;
+                  case null:
+                      symbolTable.AddNode(node, typedType is AVoidType ? Symbol.ok : Symbol.notOk);
+                      break;
+                  default:
+                      symbolTable.AddNode(node, PTypeToSymbol(typedType) == symbolTable.GetSymbol(returnExp) ? Symbol.ok : Symbol.notOk);
+                      break;
               }
-              else
-              {
-                  symbolTable.AddNode(node, PTypeToSymbol(typedType) == symbolTable.GetSymbol(returnExp) ? Symbol.ok : Symbol.notOk);
-              }
-
               break;
-          
           case AUntypedFunc aUntypedFunc:
-              // Does all return-expressions evaluate to the same type
-              // Gem først returnstatement type to the function node
-              // If the next iteration does not match throw errors
-              PType type = symbolTable.GetTypeFromExp();
-              // WIP
               if (!symbolTable.funcToReturn.ContainsKey(aUntypedFunc.GetId()))
               {
-                  // add the return to dictionary
-                  symbolTable.funcToReturn.Add(aUntypedFunc.GetId(), );  
+                  // Add the first returnExp in an untyped func as the "Correct"
+                  var unit = symbolTable.GetUnit(node.GetExp());
+                  symbolTable.AddNodeToUnit(node, unit);
                   symbolTable.AddNode(node, Symbol.ok);
               }
               else
               {
-                  if (symbolTable.DoesReturnStmtMatch(aUntypedFunc.GetId(), exprType2))
+                  if (CompareCustomUnits(node, node.GetExp()))
+                  {
+                      //Return statement match earlier decleration
                       symbolTable.AddNode(node, Symbol.ok);
+                  }
                   else
                   {
+                      // Return staement differs from previous declared
                       symbolTable.AddNode(node, Symbol.notOk);
-                      throw new Exception("Return is not correct type");
                   }
               }
               break;
