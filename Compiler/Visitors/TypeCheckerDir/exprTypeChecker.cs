@@ -178,64 +178,143 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutAPlusExp(APlusExp node)
     {
+        PExp leftExpr = node.GetL();
+        PExp rightExpr = node.GetR();
+        Symbol? leftSymbol = symbolTable.GetSymbol(leftExpr);
+        Symbol? rightSymbol = symbolTable.GetSymbol(rightExpr); 
+        switch (leftSymbol)
         {
-            var l = symbolTable.GetSymbol(node.GetL());
-            var r = symbolTable.GetSymbol(node.GetR());
-            switch (l)
-            {
-                case Symbol.Int when r is Symbol.Int:
-                    symbolTable.AddNode(node, Symbol.Int);
-                    break;
-                case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal or Symbol.Int:
-                    symbolTable.AddNode(node, Symbol.Decimal);
-                    break;
-                case Symbol.Int or Symbol.Decimal when r is Symbol.Decimal:
-                    symbolTable.AddNode(node, Symbol.Decimal);
-                    break;
-                case Symbol.String when r is Symbol.Int or Symbol.String:
-                    symbolTable.AddNode(node, Symbol.String);
-                    break;
-                case Symbol.Int or Symbol.String when r is Symbol.String:
-                    symbolTable.AddNode(node, Symbol.String);
-                    break;
-                case Symbol.Decimal or Symbol.String when r is Symbol.Decimal:
-                    symbolTable.AddNode(node, Symbol.String);
-                    break;
-                case Symbol.String when r is Symbol.String or Symbol.Decimal:
-                    symbolTable.AddNode(node, Symbol.String);
-                    break;
-                default:
+            case Symbol.Int when rightSymbol is Symbol.Int:
+                symbolTable.AddNode(node, Symbol.Int);
+                break;
+            case Symbol.Decimal or Symbol.Int when rightSymbol is Symbol.Decimal or Symbol.Int:
+                symbolTable.AddNode(node, Symbol.Decimal);
+                break;
+            case Symbol.Int or Symbol.Decimal when rightSymbol is Symbol.Decimal:
+                symbolTable.AddNode(node, Symbol.Decimal);
+                break;
+            case Symbol.String when rightSymbol is Symbol.Int or Symbol.String:
+                symbolTable.AddNode(node, Symbol.String);
+                break;
+            case Symbol.Int or Symbol.String when rightSymbol is Symbol.String:
+                symbolTable.AddNode(node, Symbol.String);
+                break;
+            case Symbol.Decimal or Symbol.String when rightSymbol is Symbol.Decimal:
+                symbolTable.AddNode(node, Symbol.String);
+                break;
+            case Symbol.String when rightSymbol is Symbol.String or Symbol.Decimal:
+                symbolTable.AddNode(node, Symbol.String);
+                break;
+            default:
+                // Implement logikken for custom units her
+                if (symbolTable.nodeToUnit.ContainsKey(leftExpr) && symbolTable.nodeToUnit.ContainsKey(rightExpr))
+                {
+                    Tuple<List<AUnitdecl>, List<AUnitdecl>> left = symbolTable.GetUnit(leftExpr); // unit 1
+                    Tuple<List<AUnitdecl>, List<AUnitdecl>> right = symbolTable.GetUnit(rightExpr); // unit 2
+            
+                    List<AUnitdecl> a = left.Item1;
+                    List<AUnitdecl> b = left.Item2;
+                    List<AUnitdecl> c = right.Item1;
+                    List<AUnitdecl> d = right.Item2;
+                    
+                    var sortedNums1 = a.OrderBy(x => x).ToList();
+                    bool isEmptyNums1 = sortedNums1.Count == 0;
+                    var sortedNums2 = c.OrderBy(x => x).ToList();
+                    bool isEmptyNums2 = sortedNums2.Count == 0;
+                    var sortedDens1 = b.OrderBy(x => x).ToList();
+                    bool isEmptyDens1 = sortedDens1.Count == 0;
+                    var sortedDens2 = d.OrderBy(x => x).ToList();
+                    bool isEmptyDens2 = sortedDens2.Count == 0;
+
+                    bool dontCompareNums = isEmptyNums1 || isEmptyNums2;
+                    bool dontCompareDens = isEmptyDens1 || isEmptyDens2;
+                    
+                    if ((dontCompareNums || sortedNums1.SequenceEqual(sortedNums2)) && (dontCompareDens || sortedDens1.SequenceEqual(sortedDens2)))
+                    {
+                        // Create a new unitTyple and add it to NodeToUnit and return symbol.ok
+                        List<AUnitdecl> numerators = isEmptyNums1 ? isEmptyNums2 ? new List<AUnitdecl>() : sortedNums2 : sortedNums1;
+                        List<AUnitdecl> denomerators = isEmptyDens1 ? isEmptyDens2 ? new List<AUnitdecl>() : sortedDens2 : sortedDens1;
+                        
+                        Tuple<List<AUnitdecl>, List<AUnitdecl>> unituse = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(numerators, denomerators);
+                        symbolTable.AddNodeToUnit(node, unituse);
+                        symbolTable.AddNode(node, Symbol.ok); 
+                    }
+                    else
+                    {
+                        symbolTable.AddNode(node, Symbol.notOk); 
+                    }
+                } 
+                else
+                { 
+                    // not valid input expressions to a multiply expression
                     symbolTable.AddNode(node, Symbol.notOk);
-                    break;
-                //Custom unit logik for at plus to subunits sammen fx (50ms+5s)/10km
-                
-                
-                
-                
-            }
+                }
+                break;
         }
     }
 
     public override void OutAMinusExp(AMinusExp node)
     {
+        PExp leftExpr = node.GetL();
+        PExp rightExpr = node.GetR();
+        Symbol? leftSymbol = symbolTable.GetSymbol(leftExpr);
+        Symbol? rightSymbol = symbolTable.GetSymbol(rightExpr); 
+        switch (leftSymbol)
         {
-            var l = symbolTable.GetSymbol(node.GetL());
-            var r = symbolTable.GetSymbol(node.GetR());
-            switch (l)
-            {
-                case Symbol.Int when r is Symbol.Int:
-                    symbolTable.AddNode(node, Symbol.Int);
-                    break;
-                case Symbol.Decimal when r is Symbol.Decimal or Symbol.Int:
-                    symbolTable.AddNode(node, Symbol.Decimal);
-                    break;
-                case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal:
-                    symbolTable.AddNode(node, Symbol.Decimal);
-                    break;
-                default:
+            case Symbol.Int when rightSymbol is Symbol.Int:
+                symbolTable.AddNode(node, Symbol.Int);
+                break;
+            case Symbol.Decimal when rightSymbol is Symbol.Decimal or Symbol.Int:
+                symbolTable.AddNode(node, Symbol.Decimal);
+                break;
+            case Symbol.Decimal or Symbol.Int when rightSymbol is Symbol.Decimal:
+                symbolTable.AddNode(node, Symbol.Decimal);
+                break;
+            default:
+                // Implement logikken for custom units her
+                if (symbolTable.nodeToUnit.ContainsKey(leftExpr) && symbolTable.nodeToUnit.ContainsKey(rightExpr))
+                {
+                    Tuple<List<AUnitdecl>, List<AUnitdecl>> left = symbolTable.GetUnit(leftExpr); // unit 1
+                    Tuple<List<AUnitdecl>, List<AUnitdecl>> right = symbolTable.GetUnit(rightExpr); // unit 2
+            
+                    List<AUnitdecl> a = left.Item1;
+                    List<AUnitdecl> b = left.Item2;
+                    List<AUnitdecl> c = right.Item1;
+                    List<AUnitdecl> d = right.Item2;
+                    
+                    var sortedNums1 = a.OrderBy(x => x).ToList();
+                    bool isEmptyNums1 = sortedNums1.Count == 0;
+                    var sortedNums2 = c.OrderBy(x => x).ToList();
+                    bool isEmptyNums2 = sortedNums2.Count == 0;
+                    var sortedDens1 = b.OrderBy(x => x).ToList();
+                    bool isEmptyDens1 = sortedDens1.Count == 0;
+                    var sortedDens2 = d.OrderBy(x => x).ToList();
+                    bool isEmptyDens2 = sortedDens2.Count == 0;
+
+                    bool dontCompareNums = isEmptyNums1 || isEmptyNums2;
+                    bool dontCompareDens = isEmptyDens1 || isEmptyDens2;
+                    
+                    if ((dontCompareNums || sortedNums1.SequenceEqual(sortedNums2)) && (dontCompareDens || sortedDens1.SequenceEqual(sortedDens2)))
+                    {
+                        // Create a new unitTyple and add it to NodeToUnit and return symbol.ok
+                        List<AUnitdecl> numerators = isEmptyNums1 ? isEmptyNums2 ? new List<AUnitdecl>() : sortedNums2 : sortedNums1;
+                        List<AUnitdecl> denomerators = isEmptyDens1 ? isEmptyDens2 ? new List<AUnitdecl>() : sortedDens2 : sortedDens1;
+                        
+                        Tuple<List<AUnitdecl>, List<AUnitdecl>> unituse = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(numerators, denomerators);
+                        symbolTable.AddNodeToUnit(node, unituse);
+                        symbolTable.AddNode(node, Symbol.ok); 
+                    }
+                    else
+                    {
+                        symbolTable.AddNode(node, Symbol.notOk); 
+                    }
+                } 
+                else
+                { 
+                    // not valid input expressions to a multiply expression
                     symbolTable.AddNode(node, Symbol.notOk);
-                    break;
-            }
+                }
+                break;
         }
     }
 
