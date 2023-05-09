@@ -28,6 +28,12 @@ public class UnitVisitor : DepthFirstAdapter
         symbolTable.AddIdToUnit(node.GetId().ToString(), node);
         StateUnit = false;
     }
+    public override void OutAValueExp(AValueExp node)
+    {
+        symbolTable.AddNode(node, Symbol.Decimal);
+
+        //symbolTable.AddNode(node, UnitVisitor.StateUnit ? Symbol.Decimal : Symbol.notOk);
+    }
     public override void OutASubunit(ASubunit node)
     {
         // Subunit skal have gemt dens relation til parentunit
@@ -36,17 +42,15 @@ public class UnitVisitor : DepthFirstAdapter
         if (!symbolTable.IsInExtendedScope(node.GetId()))
         {
             PExp expr = node.GetExp();
-            var symbol = symbolTable.GetSymbolFromExpr(expr);
-            // Find ud hvorfor "ms" ik bliver tilføjet til dictionary
-            
-            if (symbol == Symbol.Decimal)
+
+            if (symbolTable.GetSymbol(expr) == Symbol.Decimal)
             {
                 symbolTable.AddSubunit(node.GetId(), node.Parent(), expr);
-                symbolTable.AddId(node.GetId(), node, Symbol.ok);
+                symbolTable.AddNode(node, Symbol.ok);
             }
             else
             {
-                // Expression did not evaluate to decimal
+                // Expression did not evaluate to valid
                 symbolTable.AddId(node.GetId(), node, Symbol.notOk); 
             }
         }

@@ -92,6 +92,7 @@ public class TypeChecker : exprTypeChecker
     public override void InATypedFunc(ATypedFunc node)
     {
         symbolTable = symbolTable.EnterScope();
+        
     }
 
     public override void OutATypedFunc(ATypedFunc node)

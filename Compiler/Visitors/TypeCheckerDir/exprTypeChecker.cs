@@ -43,11 +43,6 @@ public class exprTypeChecker : stmtTypeChecker
         Symbol? symbol = symbolTable.GetSymbol(node.GetId());
         symbolTable.AddNode(node, symbol == null ? Symbol.notOk : Symbol.ok);
     }
-
-    public override void OutAValueExp(AValueExp node)
-    {
-        symbolTable.AddNode(node, UnitVisitor.StateUnit ? Symbol.ok : Symbol.notOk);
-    }
     public override void OutAUnitExp(AUnitExp node)
     {
         // A single unitnumber eg. 50ms
@@ -136,41 +131,49 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutAMultiplyExp(AMultiplyExp node)
     {
-        var l = symbolTable.GetSymbol(node.GetL());
-        var r = symbolTable.GetSymbol(node.GetR());
-        switch (l)
+        PExp leftExpr = node.GetL();
+        PExp rightExpr = node.GetR();
+        Symbol? leftSymbol = symbolTable.GetSymbol(leftExpr);
+        Symbol? rightSymbol = symbolTable.GetSymbol(rightExpr);
+        switch (leftSymbol)
         {
-            case Symbol.Int when r is Symbol.Int:
+            case Symbol.Int when rightSymbol is Symbol.Int:
                 symbolTable.AddNode(node, Symbol.Int);
                 break;
-            case Symbol.Decimal when r is Symbol.Decimal or Symbol.Int:
+            case Symbol.Decimal when rightSymbol is Symbol.Decimal or Symbol.Int:
                 symbolTable.AddNode(node, Symbol.Decimal);
                 break;
-            case Symbol.Decimal or Symbol.Int when r is Symbol.Decimal:
+            case Symbol.Decimal or Symbol.Int when rightSymbol is Symbol.Decimal:
                 symbolTable.AddNode(node, Symbol.Decimal);
                 break;
             default:
-                symbolTable.AddNode(node, Symbol.notOk);
+                if (symbolTable.nodeToUnit.ContainsKey(leftExpr) && symbolTable.nodeToUnit.ContainsKey(rightExpr))
+                {
+                    Tuple<List<AUnitdecl>, List<AUnitdecl>> left = symbolTable.GetUnit(leftExpr); // unit 1
+                    Tuple<List<AUnitdecl>, List<AUnitdecl>> right = symbolTable.GetUnit(rightExpr); // unit 2
+            
+                    List<AUnitdecl> a = left.Item1;
+                    List<AUnitdecl> b = left.Item2;
+                    List<AUnitdecl> c = right.Item1;
+                    List<AUnitdecl> d = right.Item2;
+            
+                    List<AUnitdecl> ad = a.Intersect(d).ToList();
+                    List<AUnitdecl> bc = b.Intersect(c).ToList();
+            
+                    List<AUnitdecl> numerators = a.Except(ad).Union(d.Except(bc)).ToList();
+                    List<AUnitdecl> denomerators = c.Except(ad).Union(b.Except(bc)).ToList();
+            
+                    Tuple<List<AUnitdecl>, List<AUnitdecl>> unituse = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(numerators, denomerators);
+                    symbolTable.AddNodeToUnit(node, unituse);
+                    symbolTable.AddNode(node, Symbol.ok);
+                } 
+                else
+                { 
+                    // not valid input expressions to a multiply expression
+                    symbolTable.AddNode(node, Symbol.notOk);
+                }
                 break;
         }
-        PExp leftExpr = node.GetL();
-        PExp rightExpr = node.GetR();
-        // mult
-        Tuple<List<AUnitdecl>, List<AUnitdecl>> left = symbolTable.GetUnit(leftExpr); // unit 1
-        Tuple<List<AUnitdecl>, List<AUnitdecl>> right = symbolTable.GetUnit(rightExpr); // unit 2
-            
-        List<AUnitdecl> a = left.Item1;
-        List<AUnitdecl> b = left.Item2;
-        List<AUnitdecl> c = right.Item1;
-        List<AUnitdecl> d = right.Item2;
-            
-        List<AUnitdecl> ad = a.Intersect(d).ToList();
-        List<AUnitdecl> bc = b.Intersect(c).ToList();
-            
-        List<AUnitdecl> numerators = a.Except(ad).Union(d.Except(bc)).ToList();
-        List<AUnitdecl> denomerators = c.Except(ad).Union(b.Except(bc)).ToList();
-
-        
     }
 
     public override void OutAPlusExp(APlusExp node)

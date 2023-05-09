@@ -79,8 +79,18 @@ public class SymbolTable
     }
     public AUnitdecl? GetUnitFromSubunit(TId identifier)
     {
-        return SubunitToUnit[identifier.ToString().Trim()];
+        return (GetCurrentUnitFromSubunit(identifier));
     }
+
+    private AUnitdecl? GetCurrentUnitFromSubunit(TId identifier)
+    {
+        return SubunitToUnit.TryGetValue(identifier.ToString().Trim(), out AUnitdecl? result)
+            ? result
+            : parent?.GetCurrentUnitFromSubunit(identifier);
+    }
+    
+    
+    
     public void AddNumerators(TId identifier, Node node, IEnumerable<ANumUnituse> nums)
     {
         List<string> numerators = new();
