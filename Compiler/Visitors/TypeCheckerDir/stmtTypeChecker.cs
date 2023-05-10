@@ -179,7 +179,10 @@ public class stmtTypeChecker : DepthFirstAdapter
                   case AIdExp Id:
                       symbolTable.AddNode(node, PTypeToSymbol(typedType) == symbolTable.GetSymbol(Id.GetId()) ? Symbol.ok : Symbol.notOk);
                       break;
-                  case AUnitExp unit:
+                  case AUnitdecimalExp unit:
+                      symbolTable.AddNode(node, CompareCustomUnits(unit, typedType) ? Symbol.ok : Symbol.notOk);
+                      break;
+                  case AUnitnumberExp unit:
                       symbolTable.AddNode(node, CompareCustomUnits(unit, typedType) ? Symbol.ok : Symbol.notOk);
                       break;
                   case null:

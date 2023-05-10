@@ -36,8 +36,8 @@ unit Time {
     ms => value;
 }
 prog {
-    //Time a = 50ms//ms**ms//ms//ms//ms**ms;
-    //Time b = 5//ms;
+    //Time a = 1/50ms;
+    //Time b = 1/5ms;
     
 }
 ////
@@ -45,8 +45,8 @@ unit Time {
     ms => value;
 }
 prog {
-    //Time a = 50ms//ms**ms//ms//ms//ms**ms;
-    //Time b = //5ms;
+    //Time a = 1/50ms;
+    //Time b = 1/5ms;
 }
 ////
 float Timems(float value) {
@@ -65,8 +65,8 @@ unit Time {
     ms => value;
 }
 prog {
-    Time a = 50ms//ms**ms//ms//ms//ms**ms;
-    Time b = 5//ms;
+    Time a = 1/50ms;
+    Time b = 1/5ms;
 }
 ////
 unit Time {

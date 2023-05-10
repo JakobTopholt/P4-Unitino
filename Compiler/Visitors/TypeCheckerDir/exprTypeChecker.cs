@@ -43,44 +43,37 @@ public class exprTypeChecker : stmtTypeChecker
         Symbol? symbol = symbolTable.GetSymbol(node.GetId());
         symbolTable.AddNode(node, symbol == null ? Symbol.notOk : Symbol.ok);
     }
-    public override void OutAUnitExp(AUnitExp node)
+
+    public override void OutAUnitdecimalExp(AUnitdecimalExp node)
+    {
+        AddSingleUnitNumber(symbolTable.GetUnitFromId(node.GetId().ToString()), node);
+    }
+
+    public override void OutAUnitnumberExp(AUnitnumberExp node)
+    {
+        AddSingleUnitNumber(symbolTable.GetUnitFromId(node.GetId().ToString()), node);
+    }
+
+    private void AddSingleUnitNumber(AUnitdecl? unitType, Node node)
     {
         // A single unitnumber eg. 50ms
-        var unitType = GetUnitFromUnitnumber(node.GetUnitnumber());
-        if (unitType != null)
-        {
-            // Create a new unit tuple and add the unitnumber as a lone numerator
-            List<AUnitdecl> nums = new List<AUnitdecl>();
-            nums.Add(unitType);
-            List<AUnitdecl> dens = new List<AUnitdecl>();
-            var unit = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(nums, dens);
-            
-            // Map node to the unit
-            symbolTable.AddNodeToUnit(node, unit);
-            symbolTable.AddNode(node, Symbol.ok); 
-        }
-        else
+        if (unitType == null)
         {
             // Id is not a valid subunit
             symbolTable.AddNode(node, Symbol.notOk);
+            return;
         }
+
+        // Create a new unit tuple and add the unitnumber as a lone numerator
+        List<AUnitdecl> nums = new() { unitType };
+        List<AUnitdecl> dens = new();
+        var unit = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(nums, dens);
+
+        // Map node to the unit
+        symbolTable.AddNodeToUnit(node, unit);
+        symbolTable.AddNode(node, Symbol.ok);
     }
 
-    private AUnitdecl? GetUnitFromUnitnumber(PUnitnumber unitnumber)
-    {
-        AUnitdecl? unit;
-        switch (unitnumber)
-        {
-            case ADecimalUnitnumber a:
-                unit = symbolTable.GetUnitFromSubunit(a.GetId());
-                return unit;
-            case ANumberUnitnumber b:
-                unit = symbolTable.GetUnitFromSubunit(b.GetId());
-                return unit;
-            default:
-                return null;
-        }
-    }
     public override void OutADivideExp(ADivideExp node)
     {
         PExp leftExpr = node.GetL();

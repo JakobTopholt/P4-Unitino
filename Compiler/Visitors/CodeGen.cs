@@ -745,13 +745,12 @@ public override void CaseAIfStmt(AIfStmt node)
         writer.WriteLine("}");
     }
 
-    public override void CaseADecimalUnitnumber(ADecimalUnitnumber node)
+    public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
     {
         AUnitdecl test = symbolTable.SubunitToUnit["" + node.GetId()];
         writer.Write(node.GetDecimal());
     }
-
-    public override void CaseANumberUnitnumber(ANumberUnitnumber node)
+    public override void CaseAUnitnumberExp(AUnitnumberExp node)
     {
         AUnitdecl test = symbolTable.SubunitToUnit["" + node.GetId()];
         writer.Write(node.GetNumber());

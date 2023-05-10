@@ -143,8 +143,8 @@ Productions
                          | {den}    tslashslash id    {-> New unituse.den(id)};
     
     // For usage in expressions ex: 50 ms, 5 s, 50 meters
-    unitnumber {-> unitnumber} = {decimal} decimal id {-> New unitnumber.decimal(decimal, id)}
-                               | {number} number id {-> New unitnumber.number(number, id)};
+    unitnumber {-> exp} = {unitdecimal} decimal id {-> New exp.unitdecimal(decimal, id)}
+                        | {unitnumber} number id {-> New exp.unitnumber(number, id)};
     // Type
     functype {-> type} = {void} tvoid {-> New type.void()}
                        | {unittype} unittype {-> unittype.type};
@@ -236,7 +236,7 @@ Productions
                 | p0 {-> p0.exp};
     p0 {-> exp} = {id}              id {-> New exp.id(id)}
                 | {decimal}         decimal                                 {-> New exp.decimal(decimal)}
-                | {unit}            unitnumber                              {-> New exp.unit(unitnumber.unitnumber)}
+                | {unit}            unitnumber                              {-> unitnumber.exp}
                 | {value}           tvalue                                  {-> New exp.value()}
                 | {number}          number                                  {-> New exp.number(number)}
                 | {boolean}         boolean                                 {-> New exp.boolean(boolean.boolean)}
@@ -320,8 +320,9 @@ Abstract Syntax Tree
         | {prefixminusminus}exp
         | {funccall}        id exp*
         | {id}              id
+        | {unitnumber}      number id
+        | {unitdecimal}     decimal id
         | {decimal}         decimal
-        | {unit}            unitnumber
         | {value}           
         | {number}          number
         | {boolean}         boolean
@@ -330,8 +331,6 @@ Abstract Syntax Tree
         | {exp}             exp;  
         
     boolean = {true} | {false};
-    unitnumber = {decimal} decimal id 
-               | {number} number id;
     
 // TODO: Arrays
 // TODO: Switch
