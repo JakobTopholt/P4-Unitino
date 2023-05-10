@@ -80,42 +80,42 @@ public class TypeChecker : exprTypeChecker
     {
     }
 
-    public override void InAUntypedFunc(AUntypedFunc node) 
+    public override void InAUntypedGlobal(AUntypedGlobal node) 
     {
         symbolTable = symbolTable.EnterScope();
     }
-    public override void OutAUntypedFunc(AUntypedFunc node) 
+    public override void OutAUntypedGlobal(AUntypedGlobal node) 
     {
         symbolTable = symbolTable.ExitScope();
     }
 
-    public override void InATypedFunc(ATypedFunc node)
+    public override void InATypedGlobal(ATypedGlobal node)
     {
         symbolTable = symbolTable.EnterScope();
         
     }
 
-    public override void OutATypedFunc(ATypedFunc node)
+    public override void OutATypedGlobal(ATypedGlobal node)
     {
         symbolTable = symbolTable.ExitScope();
     }
     
-    public override void InALoopFunc(ALoopFunc node)
+    public override void InALoopGlobal(ALoopGlobal node)
     {
         symbolTable = symbolTable.EnterScope();
     }
 
-    public override void OutALoopFunc(ALoopFunc node)
+    public override void OutALoopGlobal(ALoopGlobal node)
     {
         symbolTable = symbolTable.ExitScope();
     }
 
-    public override void InAProgFunc(AProgFunc node)
+    public override void InAProgGlobal(AProgGlobal node)
     {
         symbolTable = symbolTable.EnterScope();
     }
 
-    public override void OutAProgFunc(AProgFunc node)
+    public override void OutAProgGlobal(AProgGlobal node)
     {
         symbolTable = symbolTable.ExitScope();
     }

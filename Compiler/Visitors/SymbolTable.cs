@@ -14,13 +14,13 @@ public class SymbolTable
     private readonly SymbolTable? parent;
     private readonly Dictionary<string, Node> idToNode = new();
     private readonly Dictionary<Node, Symbol> nodeToSymbol = new();
-    public Dictionary<Node, Tuple<List<AUnitdecl>, List<AUnitdecl>>> nodeToUnit = new();
+    public Dictionary<Node, Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>> nodeToUnit = new();
 
     private Dictionary<string, IList> functionidToParams = new();
     public Dictionary<TId, PType> funcToReturn = new();
 
-    private Dictionary<string, AUnitdecl> idToUnit = new();
-    public Dictionary<string, AUnitdecl> SubunitToUnit = new();
+    private Dictionary<string, AUnitdeclGlobal> idToUnit = new();
+    public Dictionary<string, AUnitdeclGlobal> SubunitToUnit = new();
     private Dictionary<string, PExp> SubunitToExp = new();
     private Dictionary<string, List<string>> Numerators = new();
     private Dictionary<string, List<string>> Denomerators = new();
@@ -37,24 +37,24 @@ public class SymbolTable
         return table;
     }
 
-    public void AddIdToUnit(string identifier, AUnitdecl node)
+    public void AddIdToUnit(string identifier, AUnitdeclGlobal node)
     {
         idToUnit.Add(identifier, node);
     }
     
-    public AUnitdecl? GetUnitFromId(string identifier)
+    public AUnitdeclGlobal? GetUnitFromId(string identifier)
     {
         return idToUnit[identifier];
     }
     
-    public Tuple<List<AUnitdecl>, List<AUnitdecl>>? GetUnit(Node expression)
+    public Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>? GetUnit(Node expression)
     {
-        Tuple<List<AUnitdecl>, List<AUnitdecl>>? temp;
+        Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>? temp;
         bool found = nodeToUnit.TryGetValue(expression, out temp);
         
         return found ? temp : null;
     }
-    public void AddNodeToUnit(Node node, Tuple<List<AUnitdecl>, List<AUnitdecl>> unit)
+    public void AddNodeToUnit(Node node, Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unit)
     {
         nodeToUnit.Add(node, unit);
     }
@@ -75,16 +75,16 @@ public class SymbolTable
     public void AddSubunit(TId identifier, Node node, PExp expr)
     {
         SubunitToExp.Add(identifier.ToString().Trim(), expr);
-        SubunitToUnit.Add(identifier.ToString().Trim(), (AUnitdecl) node);
+        SubunitToUnit.Add(identifier.ToString().Trim(), (AUnitdeclGlobal) node);
     }
-    public AUnitdecl? GetUnitFromSubunit(TId identifier)
+    public AUnitdeclGlobal? GetUnitFromSubunit(TId identifier)
     {
         return (GetCurrentUnitFromSubunit(identifier));
     }
 
-    private AUnitdecl? GetCurrentUnitFromSubunit(TId identifier)
+    private AUnitdeclGlobal? GetCurrentUnitFromSubunit(TId identifier)
     {
-        return SubunitToUnit.TryGetValue(identifier.ToString().Trim(), out AUnitdecl? result)
+        return SubunitToUnit.TryGetValue(identifier.ToString().Trim(), out AUnitdeclGlobal? result)
             ? result
             : parent?.GetCurrentUnitFromSubunit(identifier);
     }

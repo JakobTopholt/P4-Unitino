@@ -30,7 +30,7 @@ public class PrettyPrint : DepthFirstAdapter
         output.Write(new string(' ', _indent * 4) + s);
     }
 
-    public override void CaseAProgFunc(AProgFunc node)
+    public override void CaseAProgGlobal(AProgGlobal node)
     {
         output.WriteLine("Prog {");
         _indent++;
@@ -39,16 +39,16 @@ public class PrettyPrint : DepthFirstAdapter
             child.Apply(this); 
             output.WriteLine(";");
         }
-        OutAProgFunc(node);
+        OutAProgGlobal(node);
     }
     
-    public override void OutAProgFunc(AProgFunc node)
+    public override void OutAProgGlobal(AProgGlobal node)
     {
         _indent--;
         output.WriteLine("}");
     }
 
-    public override void CaseATypedFunc(ATypedFunc node)
+    public override void CaseATypedGlobal(ATypedGlobal node)
     {
         output.WriteLine("func " + node.GetId() + "{");
         _indent++;
@@ -57,17 +57,17 @@ public class PrettyPrint : DepthFirstAdapter
             child.Apply(this); 
             output.WriteLine(";");
         }
-        OutATypedFunc(node);    
+        OutATypedGlobal(node);    
     }
 
-    public override void OutATypedFunc(ATypedFunc node)
+    public override void OutATypedGlobal(ATypedGlobal node)
     {
         _indent--;
         output.WriteLine("}");
         
     }
 
-    public override void CaseAUntypedFunc(AUntypedFunc node)
+    public override void CaseAUntypedGlobal(AUntypedGlobal node)
     {
         output.WriteLine("func " + node.GetId() + "{");
         _indent++;
@@ -76,16 +76,16 @@ public class PrettyPrint : DepthFirstAdapter
             child.Apply(this); 
             output.WriteLine(";");
         }
-        OutAUntypedFunc(node);    
+        OutAUntypedGlobal(node);    
     }
 
-    public override void OutAUntypedFunc(AUntypedFunc node)
+    public override void OutAUntypedGlobal(AUntypedGlobal node)
     {
         _indent--;
         output.WriteLine("}");
     }
 
-    public override void CaseAUnitdecl(AUnitdecl node)
+    public override void CaseAUnitdeclGlobal(AUnitdeclGlobal node)
     {
         string? name = node.GetId().ToString();
         string? type = node.GetSubunit().ToString();
@@ -97,10 +97,10 @@ public class PrettyPrint : DepthFirstAdapter
             output.WriteLine(";");
         }
         _indent--;
-        OutAUnitdecl(node);
+        OutAUnitdeclGlobal(node);
     }
 
-    public override void OutAUnitdecl(AUnitdecl node)
+    public override void OutAUnitdeclGlobal(AUnitdeclGlobal node)
     {
         output.Write("}\n");
     }

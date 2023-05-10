@@ -19,12 +19,12 @@ public class FunctionVisitor : DepthFirstAdapter
 
     public override void OutStart(Start node) => symbolTable = symbolTable.ResetScope();
     
-    public override void CaseAUntypedFunc(AUntypedFunc node)
+    public override void CaseAUntypedGlobal(AUntypedGlobal node)
     {
-        InAUntypedFunc(node);
-        OutAUntypedFunc(node);
+        InAUntypedGlobal(node);
+        OutAUntypedGlobal(node);
     }
-    public override void InAUntypedFunc(AUntypedFunc node)
+    public override void InAUntypedGlobal(AUntypedGlobal node)
     {
         if(symbolTable.IsInCurrentScope(node.GetId()))
         {
@@ -41,7 +41,7 @@ public class FunctionVisitor : DepthFirstAdapter
             // Tilføj parameters til local scope for funktionen
         }
     }
-    public override void OutAUntypedFunc(AUntypedFunc node)
+    public override void OutAUntypedGlobal(AUntypedGlobal node)
     {
         // save returntype;
         // If no return statements == Symbol.Func (void)
@@ -52,12 +52,12 @@ public class FunctionVisitor : DepthFirstAdapter
         
         symbolTable = symbolTable.ExitScope();
     }
-    public override void CaseATypedFunc(ATypedFunc node)
+    public override void CaseATypedGlobal(ATypedGlobal node)
     {
-        InATypedFunc(node);
-        OutATypedFunc(node);
+        InATypedGlobal(node);
+        OutATypedGlobal(node);
     }
-    public override void InATypedFunc(ATypedFunc node)
+    public override void InATypedGlobal(ATypedGlobal node)
     {
         if (symbolTable.IsInCurrentScope(node.GetId()))
         {
@@ -112,7 +112,7 @@ public class FunctionVisitor : DepthFirstAdapter
             }
         }
     }
-    public override void OutATypedFunc(ATypedFunc node)
+    public override void OutATypedGlobal(ATypedGlobal node)
     {
         // Save returntype
         // But if not void it has to have a reachable return statement in the node
@@ -144,9 +144,9 @@ public class FunctionVisitor : DepthFirstAdapter
         }
 
     }
-    public override void InALoopFunc(ALoopFunc node) => symbolTable = symbolTable.EnterScope();
-    public override void OutALoopFunc(ALoopFunc node) => symbolTable = symbolTable.ExitScope();
-    public override void InAProgFunc(AProgFunc node) => symbolTable = symbolTable.EnterScope();
-    public override void OutAProgFunc(AProgFunc node) => symbolTable = symbolTable.ExitScope();
+    public override void InALoopGlobal(ALoopGlobal node) => symbolTable = symbolTable.EnterScope();
+    public override void OutALoopGlobal(ALoopGlobal node) => symbolTable = symbolTable.ExitScope();
+    public override void InAProgGlobal(AProgGlobal node) => symbolTable = symbolTable.EnterScope();
+    public override void OutAProgGlobal(AProgGlobal node) => symbolTable = symbolTable.ExitScope();
     
 }
