@@ -7,30 +7,26 @@ using Moduino.analysis;
 
 public class exprTypeChecker : stmtTypeChecker
 {
-    public override void OutADecimalExp(ADecimalExp node)
+    public exprTypeChecker(SymbolTable symbolTable) : base(symbolTable)
     {
-        symbolTable.AddNode(node, Symbol.Decimal);
+        
     }
-
-    public override void OutANumberExp(ANumberExp node)
+    public override void OutAUnitType(AUnitType node)
     {
-        symbolTable.AddNode(node, Symbol.Int);
+        // Save reference from node to tuple
+        // Implement logic here
+       
+        List<AUnitdecl> newNums = new List<AUnitdecl>();
+        List<AUnitdecl> newDens = new List<AUnitdecl>();
+       
+        Tuple<List<AUnitdecl>, List<AUnitdecl>> unit = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(newNums, newDens);
+        symbolTable.AddNodeToUnit(node, unit);
     }
-
-    public override void OutABooleanExp(ABooleanExp node)
-    {
-        symbolTable.AddNode(node, Symbol.Bool);
-    }
-
-    public override void OutAStringExp(AStringExp node)
-    {
-        symbolTable.AddNode(node, Symbol.String);
-    }
-
-    public override void OutACharExp(ACharExp node)
-    {
-        symbolTable.AddNode(node, Symbol.Char);
-    }
+    public override void OutADecimalExp(ADecimalExp node) => symbolTable.AddNode(node, Symbol.Decimal);
+    public override void OutANumberExp(ANumberExp node) => symbolTable.AddNode(node, Symbol.Int);
+    public override void OutABooleanExp(ABooleanExp node) => symbolTable.AddNode(node, Symbol.Bool);
+    public override void OutAStringExp(AStringExp node) => symbolTable.AddNode(node, Symbol.String);
+    public override void OutACharExp(ACharExp node) => symbolTable.AddNode(node, Symbol.Char);
     public override void OutAFunccallExp(AFunccallExp node)
     {
         Symbol? funcId = symbolTable.GetSymbol(node.GetId());
@@ -319,7 +315,6 @@ public class exprTypeChecker : stmtTypeChecker
     }
 
     public override void OutARemainderExp(ARemainderExp node) => AddBinaryNumberToSymbolTable(node,node.GetL(),node.GetR());
-
     public override void OutATernaryExp(ATernaryExp node)
     {
         Symbol? Cond = symbolTable.GetSymbol(node.GetCond());
@@ -332,7 +327,6 @@ public class exprTypeChecker : stmtTypeChecker
             symbolTable.AddNode(node,Symbol.notOk);
         }
     }
-
     public override void OutAOrExp(AOrExp node)
     {
         Symbol? leftside = symbolTable.GetSymbol(node.GetL());
@@ -345,9 +339,7 @@ public class exprTypeChecker : stmtTypeChecker
         {
             symbolTable.AddNode(node,Symbol.notOk);
         }
-
     }
-
     public override void OutAAndExp(AAndExp node)
     {
         Symbol? leftside = symbolTable.GetSymbol(node.GetL());
@@ -361,7 +353,6 @@ public class exprTypeChecker : stmtTypeChecker
             symbolTable.AddNode(node,Symbol.notOk);
         }
     }
-
     public override void OutAEqualExp(AEqualExp node) => AddBinaryToSymbolTable(node,node.GetL(),node.GetR());
     public override void OutANotequalExp(ANotequalExp node) => AddBinaryToSymbolTable(node,node.GetL(),node.GetR());
     public override void OutAGreaterExp(AGreaterExp node) => AddBinaryNumberToSymbolTable(node,node.GetL(),node.GetR());
@@ -416,9 +407,7 @@ public class exprTypeChecker : stmtTypeChecker
         }
     }
     public override void OutAPrefixminusminusExp(APrefixminusminusExp node) => AddUnaryToSymbolTable(node);
-
     public override void OutAPrefixplusplusExp(APrefixplusplusExp node) => AddUnaryToSymbolTable(node);
-    
     private void AddBinaryToSymbolTable(Node Parent, Node L, Node R)
     {
         Symbol? l = symbolTable.GetSymbol(L);
@@ -448,7 +437,6 @@ public class exprTypeChecker : stmtTypeChecker
                 break;
         }
     }
-
     private void AddUnaryToSymbolTable(Node node)
     {
         Symbol? expr = symbolTable.GetSymbol(node);
@@ -487,11 +475,6 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(Parent,Symbol.notOk);
                 break;
         }
-    }
-
-    public exprTypeChecker(SymbolTable symbolTable) : base(symbolTable)
-    {
-        
     }
 }
 

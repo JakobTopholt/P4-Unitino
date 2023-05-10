@@ -20,7 +20,7 @@ public class SymbolTable
     public Dictionary<Node, Tuple<List<AUnitdecl>, List<AUnitdecl>>> nodeToUnit = new();
 
     private Dictionary<string, Node> functionidToNode = new();
-    private Dictionary<Node, IList> nodeToParams = new();
+    private Dictionary<Node, List<PType>> nodeToArgs = new();
     private Dictionary<Node, Symbol?> nodeToReturn = new();
     
     // General methods
@@ -82,8 +82,14 @@ public class SymbolTable
     }
     
     // Function methods
-    public void AddFunctionParams(TId identifier, Node node, IList param) => nodeToParams.Add("" + identifier, param);
-    public IList? GetFunctionParams(TId identifier) => nodeToParams["" + identifier];
+    public void AddFunctionArgs(Node node, List<PType> args)
+    {
+        nodeToArgs.Add(node, args);
+    }
+    public List<PType>? GetFunctionParams(Node node)
+    {
+        return nodeToArgs[node];
+    }
     public void AddReturnSymbol(Node node, Symbol? symbol) => nodeToReturn.Add(node, symbol);
     public Symbol? GetReturnFromNode(Node node) => nodeToReturn[node];
 }

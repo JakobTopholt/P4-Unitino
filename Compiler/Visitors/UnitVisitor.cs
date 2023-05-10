@@ -27,12 +27,6 @@ public class UnitVisitor : DepthFirstAdapter
     {
         StateUnit = false;
     }
-    public override void OutAValueExp(AValueExp node)
-    {
-        symbolTable.AddNode(node, Symbol.Decimal);
-
-        //symbolTable.AddNode(node, UnitVisitor.StateUnit ? Symbol.Decimal : Symbol.notOk);
-    }
     public override void OutASubunit(ASubunit node)
     {
         // Subunit skal have gemt dens relation til parentunit
@@ -59,16 +53,10 @@ public class UnitVisitor : DepthFirstAdapter
             symbolTable.AddNode(node, Symbol.notOk);
         }
     }
-    public override void OutAUnitType(AUnitType node)
+    public override void OutAValueExp(AValueExp node)
     {
-       // Save reference from node to tuple
-       // Implement logic here
-       
-       List<AUnitdecl> newNums = new List<AUnitdecl>();
-       List<AUnitdecl> newDens = new List<AUnitdecl>();
-       
-       Tuple<List<AUnitdecl>, List<AUnitdecl>> unit = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(newNums, newDens);
-       symbolTable.AddNodeToUnit(node, unit);
-
+        symbolTable.AddNode(node, Symbol.Decimal);
+        // ----- Logic missing here---- (tag stilling til hvad det under betød)
+        //symbolTable.AddNode(node, UnitVisitor.StateUnit ? Symbol.Decimal : Symbol.notOk);
     }
 }

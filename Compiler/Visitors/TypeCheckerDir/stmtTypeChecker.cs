@@ -10,7 +10,6 @@ public class stmtTypeChecker : DepthFirstAdapter
     {
         this.symbolTable = symbolTable;
     }
-    
     public override void OutAAssignStmt(AAssignStmt node) {
         Symbol? type = symbolTable.GetSymbol("" + node.GetId());
         Symbol? exprType = symbolTable.GetSymbol(node.GetExp());    
@@ -19,7 +18,6 @@ public class stmtTypeChecker : DepthFirstAdapter
         // if type != exprType (Incompatible types)
         symbolTable.AddNode(node, type == null || type != exprType ? Symbol.notOk : Symbol.ok);
     }
-
     public override void OutAPlusassignStmt(APlusassignStmt node)
     {
         Symbol? type = symbolTable.GetSymbol(node.GetId());
@@ -27,7 +25,6 @@ public class stmtTypeChecker : DepthFirstAdapter
         
         symbolTable.AddNode(node,type == null ||type != exprType? Symbol.notOk: Symbol.ok);
     }
-
     public override void OutAMinusassignStmt(AMinusassignStmt node)
     {
         Symbol? type = symbolTable.GetSymbol(node.GetId());
@@ -62,12 +59,8 @@ public class stmtTypeChecker : DepthFirstAdapter
                     break;
                 case AUnitType customType:
                 {
-                    // Declared a custom sammensat unit (Ikke en baseunit declaration)
+                    // ----- Logic missing here----
 
-                    // Declaration validering for sammensat unit her
-                    // Check if Numerators or denomarots contains units that does not exist
-                    
-                    
                     break; 
                 }
             }
@@ -104,16 +97,13 @@ public class stmtTypeChecker : DepthFirstAdapter
                     case AStringType e:
                         symbolTable.AddId(node.GetId(), node, exprType == Symbol.String ? Symbol.notOk : Symbol.String);
                         break;
+                    case AUnitType customType:
+                    {
+                        // ----- Logic missing here----
+
+                        break; 
+                    }
                 }
-            }
-            var customType = unit as AUnitType;
-            if (customType != null)
-            {
-
-                // Her skal logikken implementeres 
-                // Mangler assignment typecheck logic
-
-             
             }
         }
         else
@@ -123,7 +113,7 @@ public class stmtTypeChecker : DepthFirstAdapter
     }
     public override void OutAFunccallStmt(AFunccallStmt node)
     {
-        
+       // the real one? 
     }
 
     public Symbol? PTypeToSymbol(PType type)
@@ -146,7 +136,6 @@ public class stmtTypeChecker : DepthFirstAdapter
                 return null;
         }
     }
-
     public bool CompareCustomUnits(Tuple<List<AUnitdecl>, List<AUnitdecl>> unit1, Tuple<List<AUnitdecl>, List<AUnitdecl>> unit2)
     { 
         List<AUnitdecl> FuncNums = unit1.Item1;
