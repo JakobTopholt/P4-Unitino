@@ -21,12 +21,12 @@ public class FunctionVisitor : DepthFirstAdapter
         // tilføj til symboltable 
         // Skal nok også ind i tredje pass ad typechecker (det lokale)
     }
-    public override void CaseAUntypedFunc(AUntypedFunc node)
+    public override void CaseAUntypedGlobal(AUntypedGlobal node)
     {
-        InAUntypedFunc(node);
-        OutAUntypedFunc(node);
+        InAUntypedGlobal(node);
+        OutAUntypedGlobal(node);
     }
-    public override void InAUntypedFunc(AUntypedFunc node)
+    public override void InAUntypedGlobal(AUntypedGlobal node)
     {
         if(symbolTable.IsInExtendedScope(node.GetId()))
         {
@@ -44,7 +44,7 @@ public class FunctionVisitor : DepthFirstAdapter
             symbolTable.EnterScope();
         }
     }
-    public override void OutAUntypedFunc(AUntypedFunc node)
+    public override void OutAUntypedGlobal(AUntypedGlobal node)
     {
         // Map node to returnType;
         // Get return type from dictionary in symboltable
@@ -55,12 +55,12 @@ public class FunctionVisitor : DepthFirstAdapter
         
         symbolTable = symbolTable.ExitScope();
     }
-    public override void CaseATypedFunc(ATypedFunc node)
+    public override void CaseATypedGlobal(ATypedGlobal node)
     {
-        InATypedFunc(node);
-        OutATypedFunc(node);
+        InATypedGlobal(node);
+        OutATypedGlobal(node);
     }
-    public override void InATypedFunc(ATypedFunc node)
+    public override void InATypedGlobal(ATypedGlobal node)
     {
         if(symbolTable.IsInExtendedScope(node.GetId()))
         {
@@ -78,7 +78,7 @@ public class FunctionVisitor : DepthFirstAdapter
             symbolTable.EnterScope();
         }
     }
-    public override void OutATypedFunc(ATypedFunc node)
+    public override void OutATypedGlobal(ATypedGlobal node)
     {
         // Save returntype
         // But if not void it has to have a reachable return statement in the node
@@ -113,19 +113,19 @@ public class FunctionVisitor : DepthFirstAdapter
         }
 
     }
-    public override void CaseALoopFunc(ALoopFunc node)
+    public override void CaseALoopGlobal(ALoopGlobal node)
     {
-        InALoopFunc(node);
-        OutALoopFunc(node);
+        InALoopGlobal(node);
+        OutALoopGlobal(node);
     }
-    public override void InALoopFunc(ALoopFunc node) => symbolTable = symbolTable.EnterScope();
-    public override void OutALoopFunc(ALoopFunc node) => symbolTable = symbolTable.ExitScope();
-    public override void CaseAProgFunc(AProgFunc node)
+    public override void InALoopGlobal(ALoopGlobal node) => symbolTable = symbolTable.EnterScope();
+    public override void OutALoopGlobal(ALoopGlobal node) => symbolTable = symbolTable.ExitScope();
+    public override void CaseAProgGlobal(AProgGlobal node)
     {
-        InAProgFunc(node);
-        OutAProgFunc(node);
+        InAProgGlobal(node);
+        OutAProgGlobal(node);
     }
-    public override void InAProgFunc(AProgFunc node) => symbolTable = symbolTable.EnterScope();
-    public override void OutAProgFunc(AProgFunc node) => symbolTable = symbolTable.ExitScope();
+    public override void InAProgGlobal(AProgGlobal node) => symbolTable = symbolTable.EnterScope();
+    public override void OutAProgGlobal(AProgGlobal node) => symbolTable = symbolTable.ExitScope();
     
 }

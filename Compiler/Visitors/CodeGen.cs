@@ -44,7 +44,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         writer.Write(new string(' ', _indent * 4) + s);
     }
 
-    public override void CaseAProgFunc(AProgFunc node)
+    public override void CaseAProgGlobal(AProgGlobal node)
     {
         Indent("void setup() {\r\n");
         _indent++;
@@ -53,16 +53,16 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             child.Apply(this); 
             writer.WriteLine(";");
         }
-        OutAProgFunc(node);
+        OutAProgGlobal(node);
     }
 
-    public override void OutAProgFunc(AProgFunc node)
+    public override void OutAProgGlobal(AProgGlobal node)
     {
         _indent--;
         Indent("}\n");
     }
 
-    public override void CaseALoopFunc(ALoopFunc node)
+    public override void CaseALoopGlobal(ALoopGlobal node)
     {
         Indent("void loop() {\n");
         _indent++;
@@ -71,34 +71,44 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             child.Apply(this);
             writer.WriteLine(";");
         }
-        OutALoopFunc(node);
+        OutALoopGlobal(node);
     }
 
-    public override void OutALoopFunc(ALoopFunc node)
+    public override void OutALoopGlobal(ALoopGlobal node)
     {
         _indent--;
         Indent("}\n");
     }
 
     
-    public override void CaseATypedFunc(ATypedFunc node)
+    public override void CaseATypedGlobal(ATypedGlobal node)
     {
         switch (node.GetType())
         {
-            case AIntType a:
-                Indent("int " + node.GetId().ToString().Trim() + "() {\r\n");
+            case AIntType:
+                Indent("int ");
+                node.GetId().Apply(this);
+                writer.Write("(");
                 break;
-            case ADecimalType b:
-                Indent("decimal " + node.GetId().ToString().Trim() + "() {\r\n");
+            case ADecimalType:
+                Indent("decimal ");
+                node.GetId().Apply(this);
+                writer.Write("(");
                 break;
-            case ABoolType c:
-                Indent("bool " + node.GetId().ToString().Trim() + "() {\r\n");
+            case ABoolType:
+                Indent("bool ");
+                node.GetId().Apply(this);
+                writer.Write("(");
                 break;
-            case ACharType d:
-                Indent("char " + node.GetId().ToString().Trim() + "() {\r\n");
+            case ACharType:
+                Indent("char ");
+                node.GetId().Apply(this);
+                writer.Write("(");
                 break;
-            case AStringType e:
-                Indent("string " + node.GetId().ToString().Trim() + "() {\r\n");
+            case AStringType:
+                Indent("string ");
+                node.GetId().Apply(this);
+                writer.Write("(");
                 break;
         }
         var customType = node.GetType() as AUnitType;
@@ -106,8 +116,21 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         {
             IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
             IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
-            Indent($"float {node.GetId().ToString().Trim()}() {{\n");
+            Indent($"float ");
+            node.GetId().Apply(this);
+            writer.Write("(");
         }
+
+        int i = 0;
+        var arg = node.GetArg();
+        foreach (Node child in node.GetArg())
+        {
+            child.Apply(this);
+            i++;
+            if(i != arg.Count)
+                writer.Write(", ");
+        }
+        writer.Write(") {\n");
         _indent++;
         foreach (PStmt child in node.GetStmt())
         {
@@ -132,18 +155,20 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                     break;
             }
         }
-        OutATypedFunc(node);
+        OutATypedGlobal(node);
     }
 
-    public override void OutATypedFunc(ATypedFunc node)
+    public override void OutATypedGlobal(ATypedGlobal node)
     {
         _indent--;
         Indent("}\n");    
     }
 
-    public override void CaseAUntypedFunc(AUntypedFunc node)
+    public override void CaseAUntypedGlobal(AUntypedGlobal node)
     {
-        Indent("void " + node.GetId().ToString().Trim() + "(");
+        Indent("void ");
+        node.GetId().Apply(this);
+        writer.Write("(");
         _indent++;
         var arg = node.GetArg();
         for (var i = 0; i < arg.Count; i++)
@@ -176,10 +201,10 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                     break;
             }
         }
-        OutAUntypedFunc(node);
+        OutAUntypedGlobal(node);
     }
 
-    public override void OutAUntypedFunc(AUntypedFunc node)
+    public override void OutAUntypedGlobal(AUntypedGlobal node)
     {
         _indent--;
         Indent("}\n");
@@ -187,33 +212,33 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseAArg(AArg node)
     {
-        base.CaseAArg(node);
         switch (node.GetType())
         {
             case AIntType:
-                writer.Write(("int " + node.GetId().ToString().Trim()));                    
+                writer.Write("int ");
                 break;
             case ADecimalType:
-                writer.Write(("decimal " + node.GetId().ToString().Trim()));
+                writer.Write("decimal ");
                 break;
             case ABoolType:
-                writer.Write(("bool " + node.GetId().ToString().Trim()));
+                writer.Write("bool ");
                 break;
             case ACharType:
-                writer.Write(("char " + node.GetId().ToString().Trim()));
+                writer.Write("char ");
                 break;
             case AStringType:
-                writer.Write(("string " + node.GetId().ToString().Trim()));
+                writer.Write("string ");
                 break;
             case AUnitType customType:
             {
                 break;
             }
         }
+        node.GetId().Apply(this);
     }
 
     /*-------------------------------------Control Structures---------------------------------------------------------*/
-public override void CaseAIfStmt(AIfStmt node)
+    public override void CaseAIfStmt(AIfStmt node)
     {
         Indent("if(");
         node.GetExp().Apply(this);
@@ -436,23 +461,22 @@ public override void CaseAIfStmt(AIfStmt node)
     /*-------------------------------------Decl-----------------------------------------------------------------------*/
     public override void InADeclStmt(ADeclStmt node)
     {
-        base.InADeclStmt(node);
         switch (node.GetType())
         {
             case AIntType:
-                Indent(("int " + node.GetId().ToString().Trim()));                    
+                Indent("int ");
                 break;
             case ADecimalType:
-                Indent(("decimal " + node.GetId().ToString().Trim()));
+                Indent("decimal ");
                 break;
             case ABoolType:
-                Indent(("bool " + node.GetId().ToString().Trim()));
+                Indent("bool ");
                 break;
             case ACharType:
-                Indent(("char " + node.GetId().ToString().Trim()));
+                Indent("char ");
                 break;
             case AStringType:
-                Indent(("string " + node.GetId().ToString().Trim()));
+                Indent("string ");
                 break;
             case AUnitType customType:
             {
@@ -461,43 +485,58 @@ public override void CaseAIfStmt(AIfStmt node)
                 break;
             }
         }
+        node.GetId().Apply(this);
     }
     
     /*---------------------------------------------ExpStmt------------------------------------------------------------*/
 
     public override void InAAssignStmt(AAssignStmt node)
     {
-        Indent(node.GetId() + "= ");
+        Indent("");
+        node.GetId().Apply(this);
+        writer.Write("= ");
     }
 
     public override void InAPlusassignStmt(APlusassignStmt node)
     {
-        Indent($"{node.GetId()}+= ");
+        Indent("");
+        node.GetId().Apply(this);
+        writer.Write("+= ");
     }
 
     public override void InAMinusassignStmt(AMinusassignStmt node)
     {
-        Indent($"{node.GetId()}-= ");
+        Indent("");
+        node.GetId().Apply(this);
+        writer.Write("-= ");
     }
 
     public override void InAPrefixplusStmt(APrefixplusStmt node)
     {
-        Indent("++" + node.GetId().ToString().Trim());
+        Indent("");  
+        writer.Write("++");
+        node.GetId().Apply(this);
     }
 
     public override void InASuffixplusStmt(ASuffixplusStmt node)
     {
-        Indent(node.GetId().ToString().Trim() + "++");
+        Indent("");
+        node.GetId().Apply(this);
+        writer.Write("++");
     }
 
     public override void InAPrefixminusStmt(APrefixminusStmt node)
     {
-        Indent("--" + node.GetId().ToString().Trim());
+        Indent("");    
+        writer.Write("--");
+        node.GetId().Apply(this);
     }
 
     public override void InASuffixminusStmt(ASuffixminusStmt node)
     {
-        Indent(node.GetId().ToString().Trim() + "--");
+        Indent("");
+        node.GetId().Apply(this);
+        writer.Write("--");
     }
 
     public override void CaseAReturnStmt(AReturnStmt node)
@@ -505,50 +544,49 @@ public override void CaseAIfStmt(AIfStmt node)
         Indent($"return {node.GetExp().ToString().Trim()}");
     }
 
-    public override void InADeclassStmt(ADeclassStmt node)
+    public override void CaseADeclassStmt(ADeclassStmt node)
     {
         switch (node.GetType())
         {
             case AIntType a:
-                Indent(("int " + node.GetId().ToString().Trim()) + " = ");
+                Indent(($"int "));
                 break;
             case ADecimalType b:
-                Indent(("decimal " + node.GetId().ToString().Trim()) + " = ");
+                Indent(($"decimal "));
                 break;
             case ABoolType c:
-                Indent(("bool " + node.GetId().ToString().Trim()) + " = ");
+                Indent(($"bool "));
                 break;
             case ACharType d:
-                Indent(("char " + node.GetId().ToString().Trim()) + " = ");
+                Indent(($"char "));
                 break;
             case AStringType e:
-                Indent(("string " + node.GetId().ToString().Trim()) + " = ");
+                Indent(($"string "));
                 break;
         }
-
         if (node.GetType() is AUnitType customType)
         {
             IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
             IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
-            Indent(($"float {node.GetId().ToString().Trim()} = "));
-            node.GetExp().Apply(this);
+            Indent(($"float "));
         }
-    }
-
-    public override void InAIdExp(AIdExp node)
-    {
-        writer.Write(node.GetId());
+        node.GetId().Apply(this);
+        writer.Write(" = ");
+        node.GetExp().Apply(this);
     }
 
     public override void CaseAFunccallStmt(AFunccallStmt node)
     {
-        Indent(node.GetId().ToString().Trim() + "(");
+        Indent("");
+        node.GetId().Apply(this);
+        writer.Write("(");
         var list = node.GetParams();
-        for (var i = 0; i < list.Count; i++)
+        int i = 0;
+        foreach (Node child in node.GetParams())
         {
-            var child = (ANumberExp)list[i];
             child.Apply(this);
-            if(i != list.Count-1)
+            i++;
+            if(i != list.Count)
                 writer.Write(", ");
         }
         writer.Write(")");
@@ -577,14 +615,14 @@ public override void CaseAIfStmt(AIfStmt node)
 
     public override void CaseANumberExp(ANumberExp node)
     {
-        if(node.Parent() is not AUntypedFunc or ATypedFunc)
+        if(node.Parent() is not AUntypedGlobal or ATypedGlobal)
             writer.Write(int.Parse(node.ToString().Trim()));
     }
 
     public override void CaseAUnaryminusExp(AUnaryminusExp node)
     {
         node.GetExp();
-        if (node.Parent() is not ATypedFunc or AUntypedFunc)
+        if (node.Parent() is not ATypedGlobal or AUntypedGlobal)
             writer.Write("-" + node.GetExp().ToString().Trim());
     }
 
@@ -681,11 +719,15 @@ public override void CaseAIfStmt(AIfStmt node)
         node.GetExp().Apply(this);
     }
 
-    public override void CaseAIdExp(AIdExp node)
+    public override void CaseTId(TId node)
     {
-        writer.Write(node.GetId());
+        writer.Write(node.ToString().Trim());
     }
-    
+
+    public override void CaseTDecimal(TDecimal node)
+    {
+        writer.Write(node.ToString().Trim());
+    }
 
     public override void CaseAValueExp(AValueExp node)
     {
@@ -694,20 +736,20 @@ public override void CaseAIfStmt(AIfStmt node)
 
     public override void CaseABooleanExp(ABooleanExp node)
     {
-        Indent(node.GetBoolean().ToString().Trim());
+        writer.Write(node.GetBoolean().ToString().Trim());
     }
 
     public override void CaseAStringExp(AStringExp node)
     {
-        Indent(node.GetString().ToString().Trim());
+        writer.Write(node.GetString().ToString().Trim());
     }
 
     public override void CaseACharExp(ACharExp node)
     {
-        Indent(node.GetChar().ToString().Trim());
+        writer.Write(node.GetChar().ToString().Trim());
     }
 
-    public override void CaseAUnitdecl(AUnitdecl node)
+    public override void CaseAUnitdeclGlobal(AUnitdeclGlobal node)
     {
         foreach (PSubunit child in node.GetSubunit())
         {
@@ -717,9 +759,10 @@ public override void CaseAIfStmt(AIfStmt node)
 
     public override void CaseASubunit(ASubunit node)
     {
-        string? unitId = whiteSpace.Replace(((AUnitdecl)node.Parent()).GetId().ToString(),"");
-        string? subUnitId = whiteSpace.Replace(node.GetId().ToString().Trim(),"");
-        Indent($"float {unitId}{subUnitId}(float value) {{\n    return ");
+        string? unitId = whiteSpace.Replace(((AUnitdeclGlobal)node.Parent()).GetId().ToString(),"");
+        Indent($"float {unitId}");
+        node.GetId().Apply(this);
+        writer.Write(")(float value) {{\n    return ");
         node.GetExp().Apply(this);
         writer.WriteLine(";");
         OutASubunit(node);
@@ -729,15 +772,14 @@ public override void CaseAIfStmt(AIfStmt node)
         writer.WriteLine("}");
     }
 
-    public override void CaseADecimalUnitnumber(ADecimalUnitnumber node)
+    public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
     {
-        AUnitdecl test = symbolTable.SubunitToUnit["" + node.GetId()];
+        AUnitdeclGlobal test = symbolTable.SubunitToUnit["" + node.GetId()];
         writer.Write(node.GetDecimal());
     }
-
-    public override void CaseANumberUnitnumber(ANumberUnitnumber node)
+    public override void CaseAUnitnumberExp(AUnitnumberExp node)
     {
-        AUnitdecl test = symbolTable.SubunitToUnit["" + node.GetId()];
+        AUnitdeclGlobal test = symbolTable.SubunitToUnit["" + node.GetId()];
         writer.Write(node.GetNumber());
     }
     public void Dispose()

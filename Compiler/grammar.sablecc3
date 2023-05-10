@@ -112,18 +112,17 @@ Ignored Tokens
     comment;
 
 Productions
-    grammar = funcunit_list? {-> New grammar([funcunit_list.funcunit])};
+    grammar = global_list? {-> New grammar([global_list.global])};
     
     //Any ordered list of functions such as: unit, func, unit, unit, func,
-    funcunit_list {-> funcunit*} = funcunit funcunit_list? {-> [funcunit.funcunit, funcunit_list.funcunit]};
+    global_list {-> global*} = global global_list? {-> [global.global, global_list.global]};
     
-    funcunit {-> funcunit} = {unitdecl} unitdecl {-> New funcunit.unitdecl(unitdecl.unitdecl)}
-                           | {func} func {-> New funcunit.func(func.func)};
-    
+    global {-> global} = {unitdecl} unitdecl {-> unitdecl.global}
+                       | {func} func {-> func.global};
     //// Units
     
     // A unit declaration consist of one unit and it's subunits
-    unitdecl {-> unitdecl} = tunit id l_brace subunit_list r_brace {-> New unitdecl(id, [subunit_list.subunit])};
+    unitdecl {-> global} = tunit id l_brace subunit_list r_brace {-> New global.unitdecl(id, [subunit_list.subunit])};
     
     subunit_list {-> subunit*} = subunit subunit_list? {-> [subunit.subunit, subunit_list.subunit]};
     
@@ -143,8 +142,8 @@ Productions
                          | {den}    tslashslash id    {-> New unituse.den(id)};
     
     // For usage in expressions ex: 50 ms, 5 s, 50 meters
-    unitnumber {-> unitnumber} = {decimal} decimal id {-> New unitnumber.decimal(decimal, id)}
-                               | {number} number id {-> New unitnumber.number(number, id)};
+    unitnumber {-> exp} = {unitdecimal} decimal id {-> New exp.unitdecimal(decimal, id)}
+                        | {unitnumber} number id {-> New exp.unitnumber(number, id)};
     // Type
     functype {-> type} = {void} tvoid {-> New type.void()}
                        | {unittype} unittype {-> unittype.type};
@@ -161,11 +160,11 @@ Productions
                                
     //// Functions and statements
     // prog {}, loop {}, func a {} or int a {}
-    func {-> func} = {prog}     tprog l_brace stmt_list? r_brace         {-> New func.prog([stmt_list.stmt])}
-                   | {loop}     tloop l_brace stmt_list? r_brace         {-> New func.loop([stmt_list.stmt])}
-                   | {untyped}  tfunc id l_par args? r_par l_brace stmt_list? return? r_brace      {-> New func.untyped(id, [args.arg], [stmt_list.stmt, return.stmt])}
-                   | {typed}    functype id l_par args? r_par l_brace stmt_list? return? r_brace   {-> New func.typed(functype.type, id, [args.arg], [stmt_list.stmt, return.stmt])};
-    
+    func {-> global} = {prog}     tprog l_brace stmt_list? r_brace         {-> New global.prog([stmt_list.stmt])}
+                     | {loop}     tloop l_brace stmt_list? r_brace         {-> New global.loop([stmt_list.stmt])}
+                     | {untyped}  tfunc id l_par args? r_par l_brace stmt_list? return? r_brace      {-> New global.untyped(id, [args.arg], [stmt_list.stmt, return.stmt])}
+                     | {typed}    functype id l_par args? r_par l_brace stmt_list? return? r_brace   {-> New global.typed(functype.type, id, [args.arg], [stmt_list.stmt, return.stmt])};
+            
     //arguments used to declare a function and params when using a function
     params {-> exp*} = {list}   exp comma params   {-> [exp.exp, params.exp]}
                      | {single} exp                 {-> [exp.exp]};
@@ -236,7 +235,7 @@ Productions
                 | p0 {-> p0.exp};
     p0 {-> exp} = {id}              id {-> New exp.id(id)}
                 | {decimal}         decimal                                 {-> New exp.decimal(decimal)}
-                | {unit}            unitnumber                              {-> New exp.unit(unitnumber.unitnumber)}
+                | {unit}            unitnumber                              {-> unitnumber.exp}
                 | {value}           tvalue                                  {-> New exp.value()}
                 | {number}          number                                  {-> New exp.number(number)}
                 | {boolean}         boolean                                 {-> New exp.boolean(boolean.boolean)}
@@ -249,21 +248,15 @@ Productions
                          | {false} tfalse {-> New boolean.false()};
 
 Abstract Syntax Tree
-    grammar = funcunit+;
+    grammar = global+;
     
-    funcunit = {unitdecl} unitdecl
-             | {func} func;
-             
-    unitdecl = id subunit+;
+    global = {unitdecl} id subunit+
+           | {prog} stmt*
+           | {loop} stmt*
+           | {untyped} id arg* stmt*
+           | {typed} type id arg* stmt*;
     
     subunit = id exp;
-    
-    //func is in CodeGen
-    func = {prog} stmt*
-         | {loop} stmt*
-         | {untyped} id arg* stmt*
-         | {typed} type id arg* stmt*;
-         
     arg = type id;
     
     //stmt in CodeGen
@@ -275,7 +268,7 @@ Abstract Syntax Tree
          | {suffixplus}  id             
          | {suffixminus} id                          
          | {decl} type id
-         | {declass} type  id exp
+         | {declass} type id exp
          | {funccall} id [params]:exp*
          | {return} exp?
          | {if} exp stmt+
@@ -320,8 +313,9 @@ Abstract Syntax Tree
         | {prefixminusminus}exp
         | {funccall}        id exp*
         | {id}              id
+        | {unitnumber}      number id
+        | {unitdecimal}     decimal id
         | {decimal}         decimal
-        | {unit}            unitnumber
         | {value}           
         | {number}          number
         | {boolean}         boolean
@@ -330,8 +324,6 @@ Abstract Syntax Tree
         | {exp}             exp;  
         
     boolean = {true} | {false};
-    unitnumber = {decimal} decimal id 
-               | {number} number id;
     
 // TODO: Arrays
 // TODO: Switch

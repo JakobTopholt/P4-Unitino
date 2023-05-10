@@ -19,11 +19,11 @@ public class UnitVisitor : DepthFirstAdapter
     {
         symbolTable = symbolTable.ResetScope();
     }
-    public override void InAUnitdecl(AUnitdecl node)
+    public override void InAUnitdeclGlobal(AUnitdeclGlobal node)
     {
         StateUnit = true;
     }
-    public override void OutAUnitdecl(AUnitdecl node)
+    public override void OutAUnitdeclGlobal(AUnitdeclGlobal node)
     {
         StateUnit = false;
     }

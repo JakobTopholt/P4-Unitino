@@ -16,10 +16,10 @@ public class exprTypeChecker : stmtTypeChecker
         // Save reference from node to tuple
         // Implement logic here
        
-        List<AUnitdecl> newNums = new List<AUnitdecl>();
-        List<AUnitdecl> newDens = new List<AUnitdecl>();
+        List<AUnitdeclGlobal> newNums = new List<AUnitdeclGlobal>();
+        List<AUnitdeclGlobal> newDens = new List<AUnitdeclGlobal>();
        
-        Tuple<List<AUnitdecl>, List<AUnitdecl>> unit = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(newNums, newDens);
+        Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unit = new Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>(newNums, newDens);
         symbolTable.AddNodeToUnit(node, unit);
     }
     public override void OutADecimalExp(ADecimalExp node) => symbolTable.AddNode(node, Symbol.Decimal);
@@ -39,17 +39,18 @@ public class exprTypeChecker : stmtTypeChecker
         Symbol? symbol = symbolTable.GetSymbol(node.GetId());
         symbolTable.AddNode(node, symbol == null ? Symbol.notOk : Symbol.ok);
     }
-    public override void OutAUnitExp(AUnitExp node)
+
+    public override void OutAUnitdecimalExp(AUnitdecimalExp node)
     {
         // A single unitnumber eg. 50ms
-        var unitType = GetUnitFromUnitnumber(node.GetUnitnumber());
+        AUnitdeclGlobal unitType = symbolTable.GetUnitFromSubunit(node.GetId());
         if (unitType != null)
         {
             // Create a new unit tuple and add the unitnumber as a lone numerator
-            List<AUnitdecl> nums = new List<AUnitdecl>();
+            List<AUnitdeclGlobal> nums = new List<AUnitdeclGlobal>();
             nums.Add(unitType);
-            List<AUnitdecl> dens = new List<AUnitdecl>();
-            var unit = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(nums, dens);
+            List<AUnitdeclGlobal> dens = new List<AUnitdeclGlobal>();
+            var unit = new Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>(nums, dens);
             
             // Map node to the unit
             symbolTable.AddNodeToUnit(node, unit);
@@ -62,21 +63,49 @@ public class exprTypeChecker : stmtTypeChecker
         }
     }
 
-    private AUnitdecl? GetUnitFromUnitnumber(PUnitnumber unitnumber)
+    public override void OutAUnitnumberExp(AUnitnumberExp node)
     {
-        AUnitdecl? unit;
-        switch (unitnumber)
+        // A single unitnumber eg. 50ms
+        AUnitdeclGlobal unitType = symbolTable.GetUnitFromSubunit(node.GetId());
+        if (unitType != null)
         {
-            case ADecimalUnitnumber a:
-                unit = symbolTable.GetUnitFromSubunit(a.GetId());
-                return unit;
-            case ANumberUnitnumber b:
-                unit = symbolTable.GetUnitFromSubunit(b.GetId());
-                return unit;
-            default:
-                return null;
+            // Create a new unit tuple and add the unitnumber as a lone numerator
+            List<AUnitdeclGlobal> nums = new List<AUnitdeclGlobal>();
+            nums.Add(unitType);
+            List<AUnitdeclGlobal> dens = new List<AUnitdeclGlobal>();
+            var unit = new Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>(nums, dens);
+            
+            // Map node to the unit
+            symbolTable.AddNodeToUnit(node, unit);
+            symbolTable.AddNode(node, Symbol.ok); 
+        }
+        else
+        {
+            // Id is not a valid subunit
+            symbolTable.AddNode(node, Symbol.notOk);
         }
     }
+
+    private void AddSingleUnitNumber(AUnitdeclGlobal? unitType, Node node)
+    {
+        // A single unitnumber eg. 50ms
+        if (unitType == null)
+        {
+            // Id is not a valid subunit
+            symbolTable.AddNode(node, Symbol.notOk);
+            return;
+        }
+
+        // Create a new unit tuple and add the unitnumber as a lone numerator
+        List<AUnitdeclGlobal> nums = new() { unitType };
+        List<AUnitdeclGlobal> dens = new();
+        var unit = new Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>(nums, dens);
+
+        // Map node to the unit
+        symbolTable.AddNodeToUnit(node, unit);
+        symbolTable.AddNode(node, Symbol.ok);
+    }
+
     public override void OutADivideExp(ADivideExp node)
     {
         PExp leftExpr = node.GetL();
@@ -97,21 +126,21 @@ public class exprTypeChecker : stmtTypeChecker
             default:
                 if (symbolTable.nodeToUnit.ContainsKey(leftExpr) && symbolTable.nodeToUnit.ContainsKey(rightExpr))
                 {
-                    Tuple<List<AUnitdecl>, List<AUnitdecl>> left = symbolTable.GetUnit(leftExpr); // unit 1
-                    Tuple<List<AUnitdecl>, List<AUnitdecl>> right = symbolTable.GetUnit(rightExpr); // unit 2
+                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> left = symbolTable.GetUnit(leftExpr); // unit 1
+                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> right = symbolTable.GetUnit(rightExpr); // unit 2
 
-                    List<AUnitdecl> a = left.Item1;
-                    List<AUnitdecl> b = left.Item2;
-                    List<AUnitdecl> c = right.Item1;
-                    List<AUnitdecl> d = right.Item2;
+                    List<AUnitdeclGlobal> a = left.Item1;
+                    List<AUnitdeclGlobal> b = left.Item2;
+                    List<AUnitdeclGlobal> c = right.Item1;
+                    List<AUnitdeclGlobal> d = right.Item2;
 
-                    List<AUnitdecl> ac = a.Intersect(c).ToList();
-                    List<AUnitdecl> bd = b.Intersect(d).ToList();
+                    List<AUnitdeclGlobal> ac = a.Intersect(c).ToList();
+                    List<AUnitdeclGlobal> bd = b.Intersect(d).ToList();
             
-                    List<AUnitdecl> numerators = a.Except(ac).Union(d.Except(bd)).ToList();
-                    List<AUnitdecl> denomerators = c.Except(ac).Union(b.Except(bd)).ToList();
+                    List<AUnitdeclGlobal> numerators = a.Except(ac).Union(d.Except(bd)).ToList();
+                    List<AUnitdeclGlobal> denomerators = c.Except(ac).Union(b.Except(bd)).ToList();
             
-                    Tuple<List<AUnitdecl>, List<AUnitdecl>> unituse = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(numerators, denomerators);
+                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unituse = new Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>(numerators, denomerators);
                     symbolTable.AddNodeToUnit(node, unituse);
                     symbolTable.AddNode(node, Symbol.ok);
                 } 
@@ -145,21 +174,21 @@ public class exprTypeChecker : stmtTypeChecker
             default:
                 if (symbolTable.nodeToUnit.ContainsKey(leftExpr) && symbolTable.nodeToUnit.ContainsKey(rightExpr))
                 {
-                    Tuple<List<AUnitdecl>, List<AUnitdecl>> left = symbolTable.GetUnit(leftExpr); // unit 1
-                    Tuple<List<AUnitdecl>, List<AUnitdecl>> right = symbolTable.GetUnit(rightExpr); // unit 2
+                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> left = symbolTable.GetUnit(leftExpr); // unit 1
+                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> right = symbolTable.GetUnit(rightExpr); // unit 2
             
-                    List<AUnitdecl> a = left.Item1;
-                    List<AUnitdecl> b = left.Item2;
-                    List<AUnitdecl> c = right.Item1;
-                    List<AUnitdecl> d = right.Item2;
+                    List<AUnitdeclGlobal> a = left.Item1;
+                    List<AUnitdeclGlobal> b = left.Item2;
+                    List<AUnitdeclGlobal> c = right.Item1;
+                    List<AUnitdeclGlobal> d = right.Item2;
             
-                    List<AUnitdecl> ad = a.Intersect(d).ToList();
-                    List<AUnitdecl> bc = b.Intersect(c).ToList();
+                    List<AUnitdeclGlobal> ad = a.Intersect(d).ToList();
+                    List<AUnitdeclGlobal> bc = b.Intersect(c).ToList();
             
-                    List<AUnitdecl> numerators = a.Except(ad).Union(d.Except(bc)).ToList();
-                    List<AUnitdecl> denomerators = c.Except(ad).Union(b.Except(bc)).ToList();
+                    List<AUnitdeclGlobal> numerators = a.Except(ad).Union(d.Except(bc)).ToList();
+                    List<AUnitdeclGlobal> denomerators = c.Except(ad).Union(b.Except(bc)).ToList();
             
-                    Tuple<List<AUnitdecl>, List<AUnitdecl>> unituse = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(numerators, denomerators);
+                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unituse = new Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>(numerators, denomerators);
                     symbolTable.AddNodeToUnit(node, unituse);
                     symbolTable.AddNode(node, Symbol.ok);
                 } 
@@ -205,13 +234,13 @@ public class exprTypeChecker : stmtTypeChecker
                 // Implement logikken for custom units her
                 if (symbolTable.nodeToUnit.ContainsKey(leftExpr) && symbolTable.nodeToUnit.ContainsKey(rightExpr))
                 {
-                    Tuple<List<AUnitdecl>, List<AUnitdecl>> left = symbolTable.GetUnit(leftExpr); // unit 1
-                    Tuple<List<AUnitdecl>, List<AUnitdecl>> right = symbolTable.GetUnit(rightExpr); // unit 2
+                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> left = symbolTable.GetUnit(leftExpr); // unit 1
+                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> right = symbolTable.GetUnit(rightExpr); // unit 2
             
-                    List<AUnitdecl> a = left.Item1;
-                    List<AUnitdecl> b = left.Item2;
-                    List<AUnitdecl> c = right.Item1;
-                    List<AUnitdecl> d = right.Item2;
+                    List<AUnitdeclGlobal> a = left.Item1;
+                    List<AUnitdeclGlobal> b = left.Item2;
+                    List<AUnitdeclGlobal> c = right.Item1;
+                    List<AUnitdeclGlobal> d = right.Item2;
                     
                     var sortedNums1 = a.OrderBy(x => x).ToList();
                     bool isEmptyNums1 = sortedNums1.Count == 0;
@@ -228,10 +257,10 @@ public class exprTypeChecker : stmtTypeChecker
                     if ((dontCompareNums || sortedNums1.SequenceEqual(sortedNums2)) && (dontCompareDens || sortedDens1.SequenceEqual(sortedDens2)))
                     {
                         // Create a new unitTyple and add it to NodeToUnit and return symbol.ok
-                        List<AUnitdecl> numerators = isEmptyNums1 ? isEmptyNums2 ? new List<AUnitdecl>() : sortedNums2 : sortedNums1;
-                        List<AUnitdecl> denomerators = isEmptyDens1 ? isEmptyDens2 ? new List<AUnitdecl>() : sortedDens2 : sortedDens1;
+                        List<AUnitdeclGlobal> numerators = isEmptyNums1 ? isEmptyNums2 ? new List<AUnitdeclGlobal>() : sortedNums2 : sortedNums1;
+                        List<AUnitdeclGlobal> denomerators = isEmptyDens1 ? isEmptyDens2 ? new List<AUnitdeclGlobal>() : sortedDens2 : sortedDens1;
                         
-                        Tuple<List<AUnitdecl>, List<AUnitdecl>> unituse = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(numerators, denomerators);
+                        Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unituse = new Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>(numerators, denomerators);
                         symbolTable.AddNodeToUnit(node, unituse);
                         symbolTable.AddNode(node, Symbol.ok); 
                     }
@@ -270,13 +299,13 @@ public class exprTypeChecker : stmtTypeChecker
                 // Implement logikken for custom units her
                 if (symbolTable.nodeToUnit.ContainsKey(leftExpr) && symbolTable.nodeToUnit.ContainsKey(rightExpr))
                 {
-                    Tuple<List<AUnitdecl>, List<AUnitdecl>> left = symbolTable.GetUnit(leftExpr); // unit 1
-                    Tuple<List<AUnitdecl>, List<AUnitdecl>> right = symbolTable.GetUnit(rightExpr); // unit 2
+                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> left = symbolTable.GetUnit(leftExpr); // unit 1
+                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> right = symbolTable.GetUnit(rightExpr); // unit 2
             
-                    List<AUnitdecl> a = left.Item1;
-                    List<AUnitdecl> b = left.Item2;
-                    List<AUnitdecl> c = right.Item1;
-                    List<AUnitdecl> d = right.Item2;
+                    List<AUnitdeclGlobal> a = left.Item1;
+                    List<AUnitdeclGlobal> b = left.Item2;
+                    List<AUnitdeclGlobal> c = right.Item1;
+                    List<AUnitdeclGlobal> d = right.Item2;
                     
                     var sortedNums1 = a.OrderBy(x => x).ToList();
                     bool isEmptyNums1 = sortedNums1.Count == 0;
@@ -293,10 +322,10 @@ public class exprTypeChecker : stmtTypeChecker
                     if ((dontCompareNums || sortedNums1.SequenceEqual(sortedNums2)) && (dontCompareDens || sortedDens1.SequenceEqual(sortedDens2)))
                     {
                         // Create a new unitTyple and add it to NodeToUnit and return symbol.ok
-                        List<AUnitdecl> numerators = isEmptyNums1 ? isEmptyNums2 ? new List<AUnitdecl>() : sortedNums2 : sortedNums1;
-                        List<AUnitdecl> denomerators = isEmptyDens1 ? isEmptyDens2 ? new List<AUnitdecl>() : sortedDens2 : sortedDens1;
+                        List<AUnitdeclGlobal> numerators = isEmptyNums1 ? isEmptyNums2 ? new List<AUnitdeclGlobal>() : sortedNums2 : sortedNums1;
+                        List<AUnitdeclGlobal> denomerators = isEmptyDens1 ? isEmptyDens2 ? new List<AUnitdeclGlobal>() : sortedDens2 : sortedDens1;
                         
-                        Tuple<List<AUnitdecl>, List<AUnitdecl>> unituse = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(numerators, denomerators);
+                        Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unituse = new Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>(numerators, denomerators);
                         symbolTable.AddNodeToUnit(node, unituse);
                         symbolTable.AddNode(node, Symbol.ok); 
                     }

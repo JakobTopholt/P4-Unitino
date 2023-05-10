@@ -136,12 +136,12 @@ public class stmtTypeChecker : DepthFirstAdapter
                 return null;
         }
     }
-    public bool CompareCustomUnits(Tuple<List<AUnitdecl>, List<AUnitdecl>> unit1, Tuple<List<AUnitdecl>, List<AUnitdecl>> unit2)
+    public bool CompareCustomUnits(Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unit1, Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unit2)
     { 
-        List<AUnitdecl> FuncNums = unit1.Item1;
-        List<AUnitdecl> ReturnNums = unit2.Item1;
-        List<AUnitdecl> FuncDens = unit1.Item2;
-        List<AUnitdecl> ReturnDens = unit2.Item2;
+        List<AUnitdeclGlobal> FuncNums = unit1.Item1;
+        List<AUnitdeclGlobal> ReturnNums = unit2.Item1;
+        List<AUnitdeclGlobal> FuncDens = unit1.Item2;
+        List<AUnitdeclGlobal> ReturnDens = unit2.Item2;
                     
         var sortedFuncNums = FuncNums.OrderBy(x => x).ToList();
         var sortedReturnNums = ReturnNums.OrderBy(x => x).ToList();
@@ -155,22 +155,22 @@ public class stmtTypeChecker : DepthFirstAdapter
     {
       //already set before
       Node parent = node.Parent();
-      while (parent is not PFunc)
+      while (parent is not PGlobal)
       {
           parent = parent.Parent();
       }
       PExp? returnExp = node.GetExp();
       switch (parent)
       {
-          case ALoopFunc:
+          case ALoopGlobal:
               // Should not have return in Loop
               symbolTable.AddNode(node, Symbol.notOk);
               break;
-          case AProgFunc:
+          case AProgGlobal:
               // Should not have return in Prog
               symbolTable.AddNode(node, Symbol.notOk);
               break;
-          case ATypedFunc aTypedFunc:
+          case ATypedGlobal aTypedFunc:
               PType typedType = aTypedFunc.GetType();
               //Symbol? symbol = symbolTable.GetSymbol(returnExp);
               Symbol? symbol = PTypeToSymbol(typedType);
@@ -196,8 +196,8 @@ public class stmtTypeChecker : DepthFirstAdapter
                       symbolTable.AddNode(node, symbolTable.GetSymbol(returnExp) == Symbol.Func ? Symbol.ok : Symbol.notOk);
                       break;
                   default:
-                      Tuple<List<AUnitdecl>, List<AUnitdecl>> funcType = symbolTable.GetUnit(typedType);
-                      Tuple<List<AUnitdecl>, List<AUnitdecl>>? returnType = symbolTable.GetUnit(returnExp);
+                      Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> funcType = symbolTable.GetUnit(typedType);
+                      Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>? returnType = symbolTable.GetUnit(returnExp);
                       if (symbolTable.GetUnit(returnExp) != null)
                       {
                           if (CompareCustomUnits(funcType, returnType))
@@ -216,7 +216,7 @@ public class stmtTypeChecker : DepthFirstAdapter
                       break;
               }
               break;
-          case AUntypedFunc aUntypedFunc:
+          case AUntypedGlobal aUntypedFunc:
               if (symbolTable.GetUnit(aUntypedFunc) != null)
               {
                   symbolTable.AddNode(node, CompareCustomUnits(symbolTable.GetUnit(aUntypedFunc), symbolTable.GetUnit(returnExp)) ? Symbol.ok : Symbol.notOk);
@@ -234,6 +234,9 @@ public class stmtTypeChecker : DepthFirstAdapter
                       symbolTable.AddReturnSymbol(aUntypedFunc, symbolTable.GetSymbol(returnExp));
                   }
               }
+              break;
+          default:
+              symbolTable.AddNode(node, Symbol.notOk);
               break;
       }
     }

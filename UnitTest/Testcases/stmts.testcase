@@ -156,13 +156,6 @@ true
 //////
 outadecl stmt test false
 ////
-func untyped(int a, decimal b, string c, char d, bool e){
-    int int;
-    decimal decimal;
-    string char;
-    char string;
-    bool if;    
-}
 func untypedtwo(int a, decimal b, string c, char d, bool e){
     int a = "lmao";
     decimal b = 1;
@@ -234,16 +227,6 @@ func untyped(){
         e--;
     }
     else {
-    }
-}
-func untypedtwo(){
-    int b = 3;
-    int a = 4;
-    for(int i = 0; b = a; i++){
-        b++;
-        for(int j = 0; b < a; 3 > 5){
-                    b++;
-        }
     }
 }
 func untypedthree(){

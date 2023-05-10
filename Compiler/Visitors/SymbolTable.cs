@@ -15,9 +15,9 @@ public class SymbolTable
     private readonly Dictionary<string, Node> idToNode = new();
     private readonly Dictionary<Node, Symbol> nodeToSymbol = new();
     
-    public Dictionary<string, AUnitdecl> SubunitToUnit = new();
+    public Dictionary<string, AUnitdeclGlobal> SubunitToUnit = new();
     private Dictionary<string, PExp> SubunitToExp = new();
-    public Dictionary<Node, Tuple<List<AUnitdecl>, List<AUnitdecl>>> nodeToUnit = new();
+    public Dictionary<Node, Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>> nodeToUnit = new();
 
     private Dictionary<string, Node> functionidToNode = new();
     private Dictionary<Node, List<PType>> nodeToArgs = new();
@@ -60,23 +60,23 @@ public class SymbolTable
     
     // Unit methods
     public void AddIdToNode(string identifier, Node node) => idToNode.Add(identifier, node);
-    public Tuple<List<AUnitdecl>, List<AUnitdecl>>? GetUnit(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetUnit(node) : null;
-    public Tuple<List<AUnitdecl>, List<AUnitdecl>>? GetUnit(Node expression)
+    public Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>? GetUnit(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetUnit(node) : null;
+    public Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>? GetUnit(Node expression)
     {
-        Tuple<List<AUnitdecl>, List<AUnitdecl>>? temp;
+        Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>? temp;
         bool found = nodeToUnit.TryGetValue(expression, out temp);
         return found ? temp : null;
     }
-    public void AddNodeToUnit(Node node, Tuple<List<AUnitdecl>, List<AUnitdecl>> unit) => nodeToUnit.Add(node, unit);
+    public void AddNodeToUnit(Node node, Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unit) => nodeToUnit.Add(node, unit);
     public void AddSubunit(TId identifier, Node node, PExp expr)
     {
         SubunitToExp.Add(identifier.ToString().Trim(), expr);
-        SubunitToUnit.Add(identifier.ToString().Trim(), (AUnitdecl) node);
+        SubunitToUnit.Add(identifier.ToString().Trim(), (AUnitdeclGlobal) node);
     }
-    public AUnitdecl? GetUnitFromSubunit(TId identifier) => (GetCurrentUnitFromSubunit(identifier));
-    private AUnitdecl? GetCurrentUnitFromSubunit(TId identifier)
+    public AUnitdeclGlobal? GetUnitFromSubunit(TId identifier) => (GetCurrentUnitFromSubunit(identifier));
+    private AUnitdeclGlobal? GetCurrentUnitFromSubunit(TId identifier)
     {
-        return SubunitToUnit.TryGetValue(identifier.ToString().Trim(), out AUnitdecl? result)
+        return SubunitToUnit.TryGetValue(identifier.ToString().Trim(), out AUnitdeclGlobal? result)
             ? result
             : parent?.GetCurrentUnitFromSubunit(identifier);
     }
