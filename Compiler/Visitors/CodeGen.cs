@@ -231,15 +231,6 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 break;
             case AUnitType customType:
             {
-                // Declared a custom sammensat unit (Ikke en baseunit declaration)
-                IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
-                IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
-                    
-                // Declaration validering for sammensat unit her
-                // Check if Numerators or denomarots contains units that does not exist
-
-                symbolTable.AddNumerators(node.GetId(), node, numerator);
-                symbolTable.AddDenomerators(node.GetId(), node, denomerator);
                 break;
             }
         }
@@ -489,15 +480,8 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 break;
             case AUnitType customType:
             {
-                // Declared a custom sammensat unit (Ikke en baseunit declaration)
-                IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
-                IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
-                    
-                // Declaration validering for sammensat unit her
-                // Check if Numerators or denomarots contains units that does not exist
+              
 
-                symbolTable.AddNumerators(node.GetId(), node, numerator);
-                symbolTable.AddDenomerators(node.GetId(), node, denomerator);
                 break;
             }
         }

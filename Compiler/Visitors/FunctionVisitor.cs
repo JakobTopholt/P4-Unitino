@@ -14,11 +14,13 @@ public class FunctionVisitor : DepthFirstAdapter
     {
         this.symbolTable = symbolTable;
     }
-    // Overvej om jeg mangler at kalde base.InAxx(node);
-    // Collect func declarations
-
-    public override void OutStart(Start node) => symbolTable = symbolTable.ResetScope();
     
+    public override void OutStart(Start node) => symbolTable = symbolTable.ResetScope();
+    public override void OutAArg(AArg node)
+    {
+        // tilføj til symboltable 
+        // Skal nok også ind i tredje pass ad typechecker (det lokale)
+    }
     public override void CaseAUntypedGlobal(AUntypedGlobal node)
     {
         InAUntypedGlobal(node);
@@ -26,28 +28,29 @@ public class FunctionVisitor : DepthFirstAdapter
     }
     public override void InAUntypedGlobal(AUntypedGlobal node)
     {
-        if(symbolTable.IsInCurrentScope(node.GetId()))
+        if(symbolTable.IsInExtendedScope(node.GetId()))
         {
             symbolTable.AddId(node.GetId(), node, Symbol.notOk);
         }
         else
         {
-            // Save parameters
-            IList param = node.GetArg();
-            if (param.Count > 0)
-                symbolTable.AddFunctionParams(node.GetId(), node, param);
+            // Save arguments
+            List<PType> args = node.GetArg().OfType<PType>().ToList();
+            if (args.Count > 0)
+            {
+                symbolTable.AddFunctionArgs(node, args);
+            }
 
             symbolTable.EnterScope();
-            // Tilføj parameters til local scope for funktionen
         }
     }
     public override void OutAUntypedGlobal(AUntypedGlobal node)
     {
-        // save returntype;
-        // If no return statements == Symbol.Func (void)
-        // But if there is it has to be a reachable return statement in the node
-        // All return statements have to evaluate to same type to be correct
-        // WIP i returnStmt casen
+        // Map node to returnType;
+        // Get return type from dictionary in symboltable
+        // Add the symbol or unit to its dictionary
+        // If void when tryinmg to get from dictionary it must be a void function (symbol.Func)
+        // ----- Logic missing here----
         
         
         symbolTable = symbolTable.ExitScope();
@@ -59,57 +62,20 @@ public class FunctionVisitor : DepthFirstAdapter
     }
     public override void InATypedGlobal(ATypedGlobal node)
     {
-        if (symbolTable.IsInCurrentScope(node.GetId()))
+        if(symbolTable.IsInExtendedScope(node.GetId()))
         {
             symbolTable.AddId(node.GetId(), node, Symbol.notOk);
         }
         else
         {
-            symbolTable = symbolTable.EnterScope();
-            IList inputArgs = node.GetArg();
-            if (inputArgs.Count > 0)
+            // Save arguments
+            List<PType> args = node.GetArg().OfType<PType>().ToList();
+            if (args.Count > 0)
             {
-                // Add to local scope
-                foreach (AArg? argument in inputArgs)
-                {
-                    switch (argument.GetType())
-                    {
-                        case AIntType:
-                            symbolTable.AddId(argument.GetId(), argument, Symbol.Int);
-                            break;
-                        case ADecimalType:
-                            symbolTable.AddId(argument.GetId(), argument, Symbol.Decimal);
-                            break;
-                        case ABoolType:
-                            symbolTable.AddId(argument.GetId(), argument, Symbol.Bool);
-                            break;
-                        case ACharType:
-                            symbolTable.AddId(argument.GetId(), argument, Symbol.Char);
-                            break;
-                        case AStringType:
-                            symbolTable.AddId(argument.GetId(), argument, Symbol.String);
-                            break;
-                        case AUnitType customType:
-                        {
-                            // -----------WIP----------- //
-
-                            // Declared a custom sammensat unit (Ikke en baseunit declaration)
-                            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
-                            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
-
-                            // Declaration validering for sammensat unit her
-                            // Check if Numerators or denomarots contains units that does not exist
-
-                            symbolTable.AddNumerators(argument.GetId(), argument, numerator);
-                            symbolTable.AddDenomerators(argument.GetId(), argument, denomerator);
-                            break;
-                        }
-                    }
-                }
-                // Save parameters in table
-                // Change functionidToParams Dictionary to <string, List<PUnittype>> 
-                symbolTable.AddFunctionParams(node.GetId(), node, inputArgs);
+                symbolTable.AddFunctionArgs(node, args);
             }
+
+            symbolTable.EnterScope();
         }
     }
     public override void OutATypedGlobal(ATypedGlobal node)
@@ -139,13 +105,26 @@ public class FunctionVisitor : DepthFirstAdapter
                 symbolTable.AddId(node.GetId(), node, Symbol.Func);
                 break;
             case AUnitType customType:
-                // ----- Logic ----
+                // ----- Logic missing here----
+                
+                
+                
                 break;
         }
 
     }
+    public override void CaseALoopGlobal(ALoopGlobal node)
+    {
+        InALoopGlobal(node);
+        OutALoopGlobal(node);
+    }
     public override void InALoopGlobal(ALoopGlobal node) => symbolTable = symbolTable.EnterScope();
     public override void OutALoopGlobal(ALoopGlobal node) => symbolTable = symbolTable.ExitScope();
+    public override void CaseAProgGlobal(AProgGlobal node)
+    {
+        InAProgGlobal(node);
+        OutAProgGlobal(node);
+    }
     public override void InAProgGlobal(AProgGlobal node) => symbolTable = symbolTable.EnterScope();
     public override void OutAProgGlobal(AProgGlobal node) => symbolTable = symbolTable.ExitScope();
     
