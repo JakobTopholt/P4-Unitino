@@ -157,22 +157,22 @@ public class stmtTypeChecker : DepthFirstAdapter
     {
       //already set before
       Node parent = node.Parent();
-      while (parent is not PFunc)
+      while (parent is not PGlobal)
       {
           parent = parent.Parent();
       }
       PExp? returnExp = node.GetExp();
       switch (parent)
       {
-          case ALoopFunc:
+          case ALoopGlobal:
               symbolTable.AddNode(node, Symbol.notOk);
               throw new Exception("Should not have return in Loop");
               break;
-          case AProgFunc:
+          case AProgGlobal:
               symbolTable.AddNode(node, Symbol.notOk);
               throw new Exception("Should not have return in Prog");
               break;
-          case ATypedFunc aTypedFunc:
+          case ATypedGlobal aTypedFunc:
               PType typedType = aTypedFunc.GetType();
               switch (returnExp)
               {
@@ -193,7 +193,7 @@ public class stmtTypeChecker : DepthFirstAdapter
                       break;
               }
               break;
-          case AUntypedFunc aUntypedFunc:
+          case AUntypedGlobal aUntypedFunc:
               if (!symbolTable.funcToReturn.ContainsKey(aUntypedFunc.GetId()))
               {
                   // Add the first returnExp in an untyped func as the "Correct"

@@ -19,11 +19,12 @@ public class UnitVisitor : DepthFirstAdapter
     {
         symbolTable = symbolTable.ResetScope();
     }
-    public override void InAUnitdecl(AUnitdecl node)
+
+    public override void InAUnitdeclGlobal(AUnitdeclGlobal node)
     {
         StateUnit = true;
     }
-    public override void OutAUnitdecl(AUnitdecl node)
+    public override void OutAUnitdeclGlobal(AUnitdeclGlobal node)
     {
         symbolTable.AddIdToUnit(node.GetId().ToString(), node);
         StateUnit = false;
@@ -67,11 +68,11 @@ public class UnitVisitor : DepthFirstAdapter
        List<ADenUnituse> denomerator = node.GetUnituse().OfType<ADenUnituse>().ToList();
        // Implement logic here
        
-       List<AUnitdecl> newNums = numerator.Select(x => symbolTable.GetUnitFromId(x.GetId().ToString())).ToList();
-       List<AUnitdecl> newDens = numerator.Select(x => symbolTable.GetUnitFromId(x.GetId().ToString())).ToList();
+       List<AUnitdeclGlobal> newNums = numerator.Select(x => symbolTable.GetUnitFromId(x.GetId().ToString())).ToList();
+       List<AUnitdeclGlobal> newDens = numerator.Select(x => symbolTable.GetUnitFromId(x.GetId().ToString())).ToList();
        
        
-       Tuple<List<AUnitdecl>, List<AUnitdecl>> unit = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(newNums, newDens);
+       Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unit = new(newNums, newDens);
        symbolTable.AddNodeToUnit(node, unit);
 
     }

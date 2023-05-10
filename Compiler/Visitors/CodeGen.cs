@@ -44,7 +44,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         writer.Write(new string(' ', _indent * 4) + s);
     }
 
-    public override void CaseAProgFunc(AProgFunc node)
+    public override void CaseAProgGlobal(AProgGlobal node)
     {
         Indent("void setup() {\r\n");
         _indent++;
@@ -53,16 +53,16 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             child.Apply(this); 
             writer.WriteLine(";");
         }
-        OutAProgFunc(node);
+        OutAProgGlobal(node);
     }
 
-    public override void OutAProgFunc(AProgFunc node)
+    public override void OutAProgGlobal(AProgGlobal node)
     {
         _indent--;
         Indent("}\n");
     }
 
-    public override void CaseALoopFunc(ALoopFunc node)
+    public override void CaseALoopGlobal(ALoopGlobal node)
     {
         Indent("void loop() {\n");
         _indent++;
@@ -71,17 +71,17 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             child.Apply(this);
             writer.WriteLine(";");
         }
-        OutALoopFunc(node);
+        OutALoopGlobal(node);
     }
 
-    public override void OutALoopFunc(ALoopFunc node)
+    public override void OutALoopGlobal(ALoopGlobal node)
     {
         _indent--;
         Indent("}\n");
     }
 
     
-    public override void CaseATypedFunc(ATypedFunc node)
+    public override void CaseATypedGlobal(ATypedGlobal node)
     {
         switch (node.GetType())
         {
@@ -132,16 +132,16 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                     break;
             }
         }
-        OutATypedFunc(node);
+        OutATypedGlobal(node);
     }
 
-    public override void OutATypedFunc(ATypedFunc node)
+    public override void OutATypedGlobal(ATypedGlobal node)
     {
         _indent--;
         Indent("}\n");    
     }
 
-    public override void CaseAUntypedFunc(AUntypedFunc node)
+    public override void CaseAUntypedGlobal(AUntypedGlobal node)
     {
         Indent("void " + node.GetId().ToString().Trim() + "(");
         _indent++;
@@ -176,10 +176,10 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                     break;
             }
         }
-        OutAUntypedFunc(node);
+        OutAUntypedGlobal(node);
     }
 
-    public override void OutAUntypedFunc(AUntypedFunc node)
+    public override void OutAUntypedGlobal(AUntypedGlobal node)
     {
         _indent--;
         Indent("}\n");
@@ -593,14 +593,14 @@ public override void CaseAIfStmt(AIfStmt node)
 
     public override void CaseANumberExp(ANumberExp node)
     {
-        if(node.Parent() is not AUntypedFunc or ATypedFunc)
+        if(node.Parent() is not AUntypedGlobal or ATypedGlobal)
             writer.Write(int.Parse(node.ToString().Trim()));
     }
 
     public override void CaseAUnaryminusExp(AUnaryminusExp node)
     {
         node.GetExp();
-        if (node.Parent() is not ATypedFunc or AUntypedFunc)
+        if (node.Parent() is not ATypedGlobal or AUntypedGlobal)
             writer.Write("-" + node.GetExp().ToString().Trim());
     }
 
@@ -723,7 +723,7 @@ public override void CaseAIfStmt(AIfStmt node)
         Indent(node.GetChar().ToString().Trim());
     }
 
-    public override void CaseAUnitdecl(AUnitdecl node)
+    public override void CaseAUnitdeclGlobal(AUnitdeclGlobal node)
     {
         foreach (PSubunit child in node.GetSubunit())
         {
@@ -733,7 +733,7 @@ public override void CaseAIfStmt(AIfStmt node)
 
     public override void CaseASubunit(ASubunit node)
     {
-        string? unitId = whiteSpace.Replace(((AUnitdecl)node.Parent()).GetId().ToString(),"");
+        string? unitId = whiteSpace.Replace(((AUnitdeclGlobal)node.Parent()).GetId().ToString(),"");
         string? subUnitId = whiteSpace.Replace(node.GetId().ToString().Trim(),"");
         Indent($"float {unitId}{subUnitId}(float value) {{\n    return ");
         node.GetExp().Apply(this);
@@ -747,12 +747,12 @@ public override void CaseAIfStmt(AIfStmt node)
 
     public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
     {
-        AUnitdecl test = symbolTable.SubunitToUnit["" + node.GetId()];
+        AUnitdeclGlobal test = symbolTable.SubunitToUnit["" + node.GetId()];
         writer.Write(node.GetDecimal());
     }
     public override void CaseAUnitnumberExp(AUnitnumberExp node)
     {
-        AUnitdecl test = symbolTable.SubunitToUnit["" + node.GetId()];
+        AUnitdeclGlobal test = symbolTable.SubunitToUnit["" + node.GetId()];
         writer.Write(node.GetNumber());
     }
     public void Dispose()
