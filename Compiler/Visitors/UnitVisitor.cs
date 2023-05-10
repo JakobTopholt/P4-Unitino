@@ -38,7 +38,7 @@ public class UnitVisitor : DepthFirstAdapter
 
             if (symbolTable.GetSymbol(expr) == Symbol.Decimal)
             {
-                symbolTable.AddSubunit(node.GetId(), node.Parent(), expr);
+                symbolTable.AddSubunit(node.GetId(), (AUnitdeclGlobal) node.Parent());
                 symbolTable.AddNode(node, Symbol.ok);
             }
             else
