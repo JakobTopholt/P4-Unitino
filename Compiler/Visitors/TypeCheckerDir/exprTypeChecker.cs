@@ -29,8 +29,11 @@ public class exprTypeChecker : stmtTypeChecker
     public override void OutACharExp(ACharExp node) => symbolTable.AddNode(node, Symbol.Char);
     public override void OutAFunccallExp(AFunccallExp node)
     {
-        Symbol? funcId = symbolTable.GetSymbol(node.GetId());
-        //Symbol? funcExpr = symbolTable.GetSymbol(node.GetExp());
+        // Funccall som en del af et returnValue udtryk
+        // returnvalue har betydning for om det er et correct call
+        // Om Parameterene matcher Functionens Arguments skal selvf tjekkes
+        
+        
     }
 
     public override void OutAIdExp(AIdExp node)

@@ -113,7 +113,11 @@ public class stmtTypeChecker : DepthFirstAdapter
     }
     public override void OutAFunccallStmt(AFunccallStmt node)
     {
-       // the real one? 
+       // STANDALONE FUNCCAL
+       // Returtype er ubetydlig
+       // Om Parameterene matcher Functionens Arguments skal selvf tjekkes
+       
+       
     }
 
     public Symbol? PTypeToSymbol(PType type)
@@ -229,9 +233,11 @@ public class stmtTypeChecker : DepthFirstAdapter
                   if (symbolTable.GetUnit(returnExp) != null)
                   {
                       symbolTable.AddNodeToUnit(aUntypedFunc, symbolTable.GetUnit(returnExp));
+                      symbolTable.AddNodeToUnit(parent, symbolTable.GetUnit(returnExp));
                   } else if (symbolTable.GetSymbol(returnExp) != null)
                   {
                       symbolTable.AddReturnSymbol(aUntypedFunc, symbolTable.GetSymbol(returnExp));
+                      symbolTable.AddNode(parent, (Symbol)symbolTable.GetSymbol(returnExp));
                   }
               }
               break;
