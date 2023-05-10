@@ -1,19 +1,31 @@
 ﻿lmao xD
 ////
-func untypedtwo(){
-    int b = 3;
-    int a = 4;
-    for(int i= 0; b > a; i++){
-        b++;
-        for(int j = 0; b < a; j++){
-                    b++;
-        }
-    }
+char function3(char a, char b, char c) {
+    char d = a+b+c;
+    return d;
+}
+decimal function4(int a) {
+    decimal d = 3.5+a ;
+    char g = 'o';
+    char b = 'b';
+    char c = 'c';
+    function3(a, b, c);
+    return d;
 }
 ////
 
 ////
-
-
+char function3(char a, char b, char c) {
+    char d = a+b+c;
+    return d;
+}
+decimal function4(int a) {
+    decimal d = 3.5+a;
+    char g = 'o';
+    char b = 'b';
+    char c = 'c';
+    function3(a, b, c);
+    return d;
+}
 ////
 true

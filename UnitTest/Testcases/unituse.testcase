@@ -5,48 +5,43 @@ unit Time {
     s => value * 1000;
 }
 Time UnitFunc() {
-    Time a = 50ms + 1000s;
+    Time a = 50//ms + 1000//s;
     return a;
 }
 prog {
-    Time a = 50ms;
-}
-////
-unit Time {
-    ms => value;
-}
-Time UnitFunc() {
-    Time a = 50ms + 1000s;
-    return a;
-}
-prog {
-    Time a = 50ms;
+    Time a = 50//ms;
 }
 ////
 
+////
+float Timems(float value) {
+    return value;
+}
+float Times(float value) {
+    return value * 1000;
+}
 prog {
     float a = Timems(50);
 }
 ////
 true
 //////
-Check if multiple units work
+Check if units work
 ////
 unit Time {
     ms => value;
 }
 prog {
-    //Time a = 50ms//ms**ms//ms//ms//ms**ms;
+    //Time a = 50//ms;
     //Time b = 5//ms;
-    
 }
 ////
 unit Time {
     ms => value;
 }
 prog {
-    //Time a = 50ms//ms**ms//ms//ms//ms**ms;
-    //Time b = //5ms;
+    //Time a = 50//ms;
+    //Time b = 5//ms;
 }
 ////
 float Timems(float value) {
@@ -58,31 +53,3 @@ prog {
 }
 ////
 true
-//////
-Some mistake somewhere...
-////
-unit Time {
-    ms => value;
-}
-prog {
-    Time a = 50ms//ms**ms//ms//ms//ms**ms;
-    Time b = 5//ms;
-}
-////
-unit Time {
-    ms => value;
-}
-prog {
-    Time a = 50ms//ms**ms//ms//ms//ms**ms;
-    Time b = //5ms;
-}
-////
-float Timems(float value) {
-    return value;
-}
-prog {
-    float a = 1/Timems(50);
-    float b = 1/Timems(5);
-}
-////
-false

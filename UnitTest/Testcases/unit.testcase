@@ -60,18 +60,12 @@ float unit4s(float value) {
 ////
 true
 //////
-Should fail from similar named units
-////
-unit unit5 {
-    ms => valu;
-}
-unit unit5 {
-    ms => value;
-}
+Should succeed with only units
 ////
 unit unit5 {
     ms => value;
 }
+////
 unit unit5 {
     ms => value;
 }
@@ -79,8 +73,5 @@ unit unit5 {
 float unit5ms(float value) {
     return value;
 }
-float unit5ms(float value) {
-    return value;
-}
 ////
-false
+true

@@ -143,13 +143,11 @@ func untypedtwo(int a, decimal b, string c, char d, bool e){
     string c = "lmao";
     char d = "a";
     bool e = true;
-   
 }
 
 ////
 
 ////
-
 
 ////
 true
@@ -174,7 +172,6 @@ func untypedtwo(int a, decimal b, string c, char d, bool e){
 ////
 
 ////
-
 
 ////
 false
@@ -218,7 +215,6 @@ func untypedthree(){
 ////
 
 ////
-
 
 ////
 true
@@ -264,12 +260,12 @@ func untypedthree(){
         a++;
       }while (a!= "10")
         do{
-            }while (a!= 10)
+        
+        }while (a!= 10)
 }
 ////
 
 ////
-
 
 ////
 false
