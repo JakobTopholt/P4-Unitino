@@ -25,7 +25,6 @@ public class UnitVisitor : DepthFirstAdapter
     }
     public override void OutAUnitdecl(AUnitdecl node)
     {
-        symbolTable.AddIdToUnit(node.GetId().ToString(), node);
         StateUnit = false;
     }
     public override void OutAValueExp(AValueExp node)
@@ -63,13 +62,10 @@ public class UnitVisitor : DepthFirstAdapter
     public override void OutAUnitType(AUnitType node)
     {
        // Save reference from node to tuple
-       List<ANumUnituse> numerator = node.GetUnituse().OfType<ANumUnituse>().ToList();
-       List<ADenUnituse> denomerator = node.GetUnituse().OfType<ADenUnituse>().ToList();
        // Implement logic here
        
-       List<AUnitdecl> newNums = numerator.Select(x => symbolTable.GetUnitFromId(x.GetId().ToString())).ToList();
-       List<AUnitdecl> newDens = numerator.Select(x => symbolTable.GetUnitFromId(x.GetId().ToString())).ToList();
-       
+       List<AUnitdecl> newNums = new List<AUnitdecl>();
+       List<AUnitdecl> newDens = new List<AUnitdecl>();
        
        Tuple<List<AUnitdecl>, List<AUnitdecl>> unit = new Tuple<List<AUnitdecl>, List<AUnitdecl>>(newNums, newDens);
        symbolTable.AddNodeToUnit(node, unit);

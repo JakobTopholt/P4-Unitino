@@ -49,6 +49,8 @@ public class FunctionVisitor : DepthFirstAdapter
         // All return statements have to evaluate to same type to be correct
         // WIP i returnStmt casen
         
+        // If it contains no return staments save void type to it.
+        
         
         symbolTable = symbolTable.ExitScope();
     }
@@ -94,14 +96,11 @@ public class FunctionVisitor : DepthFirstAdapter
                             // -----------WIP----------- //
 
                             // Declared a custom sammensat unit (Ikke en baseunit declaration)
-                            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
-                            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
 
                             // Declaration validering for sammensat unit her
                             // Check if Numerators or denomarots contains units that does not exist
 
-                            symbolTable.AddNumerators(argument.GetId(), argument, numerator);
-                            symbolTable.AddDenomerators(argument.GetId(), argument, denomerator);
+                       
                             break;
                         }
                     }
