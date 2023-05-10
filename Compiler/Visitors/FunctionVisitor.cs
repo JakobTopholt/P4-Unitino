@@ -89,7 +89,7 @@ public class FunctionVisitor : DepthFirstAdapter
         {
             symbolTable.AddNode(node, Symbol.Func);
         }
-
+        /*
         switch (symbolTable.GetSymbol(node))
         {
             case Symbol.Int:
@@ -124,7 +124,7 @@ public class FunctionVisitor : DepthFirstAdapter
                     symbolTable.AddNode(node, Symbol.notOk);
                 }
                 break;
-        }
+        } */
     }
 
     public override void CaseATypedGlobal(ATypedGlobal node)

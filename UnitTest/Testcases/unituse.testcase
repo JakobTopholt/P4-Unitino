@@ -32,8 +32,8 @@ unit Time {
     ms => value;
 }
 prog {
-    //Time a = 1/50ms;
-    //Time b = 1/5ms;
+    #Time a = 1/50ms;
+    #Time b = 1/5ms;
     
 }
 ////

@@ -58,12 +58,15 @@ public class SymbolTable
         parent._IsInCurrentScope(id);
     
     // Unit methods
-    public void AddIdToNode(string identifier, Node node) => idToNode.Add(identifier.Trim(), node);
+    public void AddIdToNode(string identifier, AUnitdeclGlobal node) => idToNode.Add(identifier.Trim(), node);
     public AUnitdeclGlobal? GetUnitFromId(string identifier)
     {
-        return (AUnitdeclGlobal)idToNode[identifier];
+        return GetCurrentUnitFromId(identifier);
     }
-
+    private AUnitdeclGlobal? GetCurrentUnitFromId(string identifier)
+    {
+        return idToNode.TryGetValue(identifier.Trim(), out Node? result) ? (AUnitdeclGlobal)result : parent?.GetCurrentUnitFromId(identifier);
+    }
     public Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>? GetUnit(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetUnit(node) : null;
     public Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>? GetUnit(Node expression)
     {
