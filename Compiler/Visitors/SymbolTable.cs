@@ -16,7 +16,6 @@ public class SymbolTable
     private readonly Dictionary<Node, Symbol> nodeToSymbol = new();
     
     public Dictionary<string, AUnitdeclGlobal> SubunitToUnit = new();
-    private Dictionary<string, PExp> SubunitToExp = new();
     public Dictionary<Node, Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>> nodeToUnit = new();
 
     private Dictionary<string, Node> functionidToNode = new();
@@ -68,9 +67,8 @@ public class SymbolTable
         return found ? temp : null;
     }
     public void AddNodeToUnit(Node node, Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unit) => nodeToUnit.Add(node, unit);
-    public void AddSubunit(TId identifier, Node node, PExp expr)
+    public void AddSubunit(TId identifier, AUnitdeclGlobal node)
     {
-        SubunitToExp.Add(identifier.ToString().Trim(), expr);
         SubunitToUnit.Add(identifier.ToString().Trim(), (AUnitdeclGlobal) node);
     }
     public AUnitdeclGlobal? GetUnitFromSubunit(TId identifier) => (GetCurrentUnitFromSubunit(identifier));

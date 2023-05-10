@@ -774,12 +774,12 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
     {
-        AUnitdeclGlobal test = symbolTable.SubunitToUnit["" + node.GetId()];
+        AUnitdeclGlobal test = symbolTable.SubunitToUnit[node.GetId().ToString().Trim()];
         writer.Write(node.GetDecimal());
     }
     public override void CaseAUnitnumberExp(AUnitnumberExp node)
     {
-        AUnitdeclGlobal test = symbolTable.SubunitToUnit["" + node.GetId()];
+        AUnitdeclGlobal test = symbolTable.SubunitToUnit[node.GetId().ToString().Trim()];
         writer.Write(node.GetNumber());
     }
     public void Dispose()
