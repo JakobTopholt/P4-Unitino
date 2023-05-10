@@ -12,10 +12,10 @@ unit tid {
     s => value;
 }
 func scoped() {
-    for(int g; 6>=5; a++) {
+    for(int g = 0; 6>=5; ++g) {
         if(5 == 5) {
             while(!b ) {
-                a = -1;
+                a = -1+7*5;
                 a = 5 % 5;
             }
         }
@@ -37,7 +37,7 @@ void setup() {
 }
 void loop() {
     int f = 9;
-    decimal e = (decimal)f ;
+    float e = (float)f;
 }
 float tidms(float value) {
     return value*5;
@@ -46,10 +46,10 @@ float tids(float value) {
     return value;
 }
 void scoped() {
-    for(int g; 6 >= 5; a++) {
+    for(int g = 0; 6 >= 5; ++g) {
         if(5 == 5) {
             while(!b ) {
-                a = -1;
+                a = -1+7*5;
                 a = 5 % 5;
             }
         }
@@ -59,7 +59,7 @@ void scoped() {
             } while(5+2 && 5+4)
         }
         else {
-            decimal d;
+            float d;
         }
     }
 }

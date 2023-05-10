@@ -91,7 +91,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 writer.Write("(");
                 break;
             case ADecimalType:
-                Indent("decimal ");
+                Indent("float ");
                 node.GetId().Apply(this);
                 writer.Write("(");
                 break;
@@ -218,7 +218,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 writer.Write("int ");
                 break;
             case ADecimalType:
-                writer.Write("decimal ");
+                writer.Write("float ");
                 break;
             case ABoolType:
                 writer.Write("bool ");
@@ -476,7 +476,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 Indent("int ");
                 break;
             case ADecimalType:
-                Indent("decimal ");
+                Indent("float ");
                 break;
             case ABoolType:
                 Indent("bool ");
@@ -501,16 +501,16 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 break;
             }
         }
-        node.GetId().Apply(this);
     }
     
     /*---------------------------------------------ExpStmt------------------------------------------------------------*/
 
-    public override void InAAssignStmt(AAssignStmt node)
+    public override void CaseAAssignStmt(AAssignStmt node)
     {
         Indent("");
         node.GetId().Apply(this);
-        writer.Write("= ");
+        writer.Write(" = ");
+        node.GetExp().Apply(this);
     }
 
     public override void InAPlusassignStmt(APlusassignStmt node)
@@ -529,29 +529,21 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void InAPrefixplusStmt(APrefixplusStmt node)
     {
-        Indent("");  
         writer.Write("++");
-        node.GetId().Apply(this);
     }
 
-    public override void InASuffixplusStmt(ASuffixplusStmt node)
+    public override void OutASuffixplusStmt(ASuffixplusStmt node)
     {
-        Indent("");
-        node.GetId().Apply(this);
         writer.Write("++");
     }
 
     public override void InAPrefixminusStmt(APrefixminusStmt node)
     {
-        Indent("");    
         writer.Write("--");
-        node.GetId().Apply(this);
     }
 
-    public override void InASuffixminusStmt(ASuffixminusStmt node)
+    public override void OutASuffixminusStmt(ASuffixminusStmt node)
     {
-        Indent("");
-        node.GetId().Apply(this);
         writer.Write("--");
     }
 
@@ -568,7 +560,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 Indent(($"int "));
                 break;
             case ADecimalType b:
-                Indent(($"decimal "));
+                Indent(($"float "));
                 break;
             case ABoolType c:
                 Indent(($"bool "));
@@ -720,7 +712,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 writer.Write("(int)");
                 break;
             case ADecimalType b:
-                writer.Write("(decimal)");
+                writer.Write("(float)");
                 break;
             case ABoolType c:
                 writer.Write("(bool)");
@@ -778,7 +770,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         string? unitId = whiteSpace.Replace(((AUnitdeclGlobal)node.Parent()).GetId().ToString(),"");
         Indent($"float {unitId}");
         node.GetId().Apply(this);
-        writer.Write(")(float value) {{\n    return ");
+        writer.Write("(float value) {\n    return ");
         node.GetExp().Apply(this);
         writer.WriteLine(";");
         OutASubunit(node);

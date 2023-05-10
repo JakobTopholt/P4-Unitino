@@ -15,26 +15,25 @@ int TypedFunc() {
     return i;
 }
 func ImplicitTypedFunc() {
-    string i = "0";
+    int i = 0;
     return i;
 }
 string ImplicitTypedFunc() {
     string i = "0";
     return i;
 }
-char function3(char a, char b, char c){
+char function3(char a, char b, char c) {
     char d = a+b+c;
     return d;
 }
-decimal function4(int a){
-    decimal d = 3.5 + a;
+decimal function4(int a) {
+    decimal d = 3.5+a;
     char a = "a";
     char b = "b";
     char c = "c";
-        function3(a,b,c);
+    function3(a, b, c);
     return d;
 }
-
 ////
 void NormalFunc(int b, int a) {
     int i = 0;
@@ -66,7 +65,6 @@ decimal function4(int a){
     decimal d = 3.5 + a;
     return d;
 }
-}
 ////
 void NormalFunc(int b, int a) {
     int i = 0;
@@ -82,7 +80,7 @@ int TypedFunc() {
     int i = 0;
     return i;
 }
-int ImplicitTypedFunc() {
+void ImplicitTypedFunc() {
     int i = 0;
     return i;
 }
@@ -90,12 +88,16 @@ string ImplicitTypedFunc() {
     string i = "0";
     return i;
 }
-char function3(char a, char b, char c){
-    char d = a+b+c
+char function3(char a, char b, char c) {
+    char d = a+b+c;
     return d;
 }
-float function4(int a){
-    float d = 3.5 + a;
+float function4(int a) {
+    float d = 3.5+a;
+    char a = "a";
+    char b = "b";
+    char c = "c";
+    function3(a, b, c);
     return d;
 }
 ////
