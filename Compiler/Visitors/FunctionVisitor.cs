@@ -150,6 +150,17 @@ public class FunctionVisitor : DepthFirstAdapter
         symbolTable = symbolTable.ExitScope();
         if (symbolTable.GetSymbol(node) == null)
         {
+            bool typedIsOk = true;
+            foreach (AReturnStmt returnStmt in node.GetStmt().OfType<AReturnStmt>())
+            {
+                if (symbolTable.GetSymbol(returnStmt) == Symbol.notOk)
+                    typedIsOk = false;
+            }
+            if(!typedIsOk)
+                symbolTable.AddNode(node, Symbol.notOk);
+        }
+        if (symbolTable.GetSymbol(node) == null)
+        {
             switch (node.GetType())
             {
                 case AIntType:

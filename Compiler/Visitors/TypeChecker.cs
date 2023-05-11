@@ -50,6 +50,18 @@ public class TypeChecker : exprTypeChecker
         symbolTable.AddNode(node, grammarIsOk ? Symbol.ok : Symbol.notOk);
     }
 
+    public override void OutANumUnituse(ANumUnituse node)
+    {
+        // Does id to Unit exist?
+        symbolTable.AddNode(node,
+            symbolTable.GetUnitdeclFromId(node.GetId().ToString()) != null ? Symbol.ok : Symbol.notOk);
+    }
+    public override void OutADenUnituse(ADenUnituse node)
+    {
+        symbolTable.AddNode(node,
+            symbolTable.GetUnitdeclFromId(node.GetId().ToString()) != null ? Symbol.ok : Symbol.notOk);
+    }
+
     public override void OutAUnitType(AUnitType node)
     {
         List<ANumUnituse> nums = node.GetUnituse().OfType<ANumUnituse>().ToList();
@@ -57,6 +69,7 @@ public class TypeChecker : exprTypeChecker
         List<AUnitdeclGlobal> newNums = new List<AUnitdeclGlobal>();
         List<AUnitdeclGlobal> newDens = new List<AUnitdeclGlobal>();
 
+        bool aunittypeIsOk = true;
         foreach (ANumUnituse num in nums)
         {
             AUnitdeclGlobal? newNum = symbolTable.GetUnitFromId(num.GetId().ToString());
@@ -67,7 +80,7 @@ public class TypeChecker : exprTypeChecker
             else
             {
                 // Not a recognized unit
-                symbolTable.AddNode(node, Symbol.notOk);
+                aunittypeIsOk = false;
             }
         }
         foreach (ADenUnituse den in dens)
@@ -80,12 +93,21 @@ public class TypeChecker : exprTypeChecker
             else
             {
                 // Not a recognized unit
-                symbolTable.AddNode(node, Symbol.notOk);
+                aunittypeIsOk = false;
             }
         }
-        Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unituse = new Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>(newNums, newDens);
-        symbolTable.AddNodeToUnit(node, unituse);
-        symbolTable.AddNode(node, Symbol.ok);
+
+        if (aunittypeIsOk)
+        {
+            Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unituse =
+                new Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>(newNums, newDens);
+            symbolTable.AddNodeToUnit(node, unituse);
+            symbolTable.AddNode(node, Symbol.ok);
+        }
+        else
+        {
+            symbolTable.AddNode(node, Symbol.notOk);
+        }
     }
     public override void OutAIntType(AIntType node)
     {

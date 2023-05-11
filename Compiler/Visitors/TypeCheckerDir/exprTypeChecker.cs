@@ -25,6 +25,8 @@ public class exprTypeChecker : stmtTypeChecker
     public override void OutADecimalExp(ADecimalExp node) => symbolTable.AddNode(node, Symbol.Decimal);
     public override void OutANumberExp(ANumberExp node) => symbolTable.AddNode(node, Symbol.Int);
     public override void OutABooleanExp(ABooleanExp node) => symbolTable.AddNode(node, Symbol.Bool);
+    public override void OutATrueBoolean(ATrueBoolean node) => symbolTable.AddNode(node, Symbol.Bool);
+    public override void OutAFalseBoolean(AFalseBoolean node) => symbolTable.AddNode(node, Symbol.Bool);
     public override void OutAStringExp(AStringExp node) => symbolTable.AddNode(node, Symbol.String);
     public override void OutACharExp(ACharExp node) => symbolTable.AddNode(node, Symbol.Char);
     public override void OutAFunccallExp(AFunccallExp node)
@@ -92,7 +94,7 @@ public class exprTypeChecker : stmtTypeChecker
     public override void OutAUnitdecimalExp(AUnitdecimalExp node)
     {
         // A single unitnumber eg. 50ms
-        AUnitdeclGlobal unitType = symbolTable.GetUnitFromSubunit(node.GetId());
+        AUnitdeclGlobal unitType = symbolTable.GetUnitdeclFromId(node.GetId().ToString());
         if (unitType != null)
         {
             // Create a new unit tuple and add the unitnumber as a lone numerator
@@ -115,7 +117,7 @@ public class exprTypeChecker : stmtTypeChecker
     public override void OutAUnitnumberExp(AUnitnumberExp node)
     {
         // A single unitnumber eg. 50ms
-        AUnitdeclGlobal unitType = symbolTable.GetUnitFromSubunit(node.GetId());
+        AUnitdeclGlobal unitType = symbolTable.GetUnitdeclFromId(node.GetId().ToString());
         if (unitType != null)
         {
             // Create a new unit tuple and add the unitnumber as a lone numerator

@@ -15,7 +15,7 @@ public class SymbolTable
     private readonly Dictionary<string, Node> idToNode = new();
     private readonly Dictionary<Node, Symbol> nodeToSymbol = new();
     
-    public Dictionary<string, AUnitdeclGlobal> SubunitToUnit = new();
+    public Dictionary<string, AUnitdeclGlobal> itToUnitdecl = new();
     public Dictionary<Node, Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>> nodeToUnit = new();
     
     private readonly Dictionary<string, Node> funcidToNode = new();
@@ -75,16 +75,16 @@ public class SymbolTable
         return found ? temp : null;
     }
     public void AddNodeToUnit(Node node, Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unit) => nodeToUnit.Add(node, unit);
-    public void AddSubunit(TId identifier, AUnitdeclGlobal node)
+    public void AddIdToUnitdecl(string identifier, AUnitdeclGlobal node)
     {
-        SubunitToUnit.Add(identifier.ToString().Trim(), (AUnitdeclGlobal) node);
+        itToUnitdecl.Add(identifier.Trim(), (AUnitdeclGlobal) node);
     }
-    public AUnitdeclGlobal? GetUnitFromSubunit(TId identifier) => (GetCurrentUnitFromSubunit(identifier));
-    private AUnitdeclGlobal? GetCurrentUnitFromSubunit(TId identifier)
+    public AUnitdeclGlobal? GetUnitdeclFromId(string identifier) => (GetCurrentUnitdeclFromId(identifier));
+    private AUnitdeclGlobal? GetCurrentUnitdeclFromId(string identifier)
     {
-        return SubunitToUnit.TryGetValue(identifier.ToString().Trim(), out AUnitdeclGlobal? result)
+        return itToUnitdecl.TryGetValue(identifier.ToString().Trim(), out AUnitdeclGlobal? result)
             ? result
-            : parent?.GetCurrentUnitFromSubunit(identifier);
+            : parent?.GetCurrentUnitdeclFromId(identifier);
     }
     public bool CompareCustomUnits(Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unit1, Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unit2)
     { 

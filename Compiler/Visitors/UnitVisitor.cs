@@ -33,13 +33,12 @@ public class UnitVisitor : DepthFirstAdapter
                 subunitsIsOk = false;
         }
         symbolTable.AddNode(node, symbolTable.GetSymbol(node.GetId()) != Symbol.notOk && subunitsIsOk ? Symbol.ok : Symbol.notOk);
+        symbolTable.AddIdToUnitdecl(node.GetId().ToString(), node);
 
         StateUnit = false;
     }
     public override void OutASubunit(ASubunit node)
     {
-        // Subunit skal have gemt dens relation til parentunit
-        // Den skal også have typechecket dens expression og gemt den i dictionary.
         StateUnit = false;
         if (!symbolTable.IsInExtendedScope(node.GetId()))
         {
@@ -47,13 +46,14 @@ public class UnitVisitor : DepthFirstAdapter
 
             if (symbolTable.GetSymbol(expr) == Symbol.Decimal)
             {
-                symbolTable.AddSubunit(node.GetId(), (AUnitdeclGlobal) node.Parent());
-                symbolTable.AddNode(node, Symbol.ok);
+                // Subunit skal have gemt dens relation til parentunit
+                symbolTable.AddIdToUnitdecl(node.GetId().ToString(), (AUnitdeclGlobal) node.Parent());
+                symbolTable.AddNode(node, Symbol.Decimal);
             }
             else
             {
                 // Expression did not evaluate to valid
-                symbolTable.AddId(node.GetId(), node, Symbol.notOk); 
+                symbolTable.AddNode(node, Symbol.notOk); 
             }
         }
         else
