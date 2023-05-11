@@ -46,8 +46,10 @@ internal static class ArduinoCompiler
             string boardFQBN = column[7];
 
             Process compileProcess = await Compile(filePath, portName, boardFQBN);
-
             Console.WriteLine(compileProcess.ExitCode == 0 ? "Compilation succeeded!" : "Compilation failed.");
+            
+            Process monitorProcess = await Monitor(portName, boardFQBN);
+            Console.WriteLine("Exited with code: " + monitorProcess.ExitCode);
 
             break;
         }
@@ -67,6 +69,15 @@ internal static class ArduinoCompiler
         compileProcess.StartInfo.FileName = "arduino-cli";
         compileProcess.StartInfo.Arguments = $"compile --fqbn {boardFQBN} --port {portName} {filePath}";
         compileProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(filePath);
+        compileProcess.Start();
+        await compileProcess.WaitForExitAsync();
+        return compileProcess;
+    }
+    public static async Task<Process> Monitor(string portName, string boardFQBN)
+    {
+        Process compileProcess = new();
+        compileProcess.StartInfo.FileName = "arduino-cli";
+        compileProcess.StartInfo.Arguments = $"monitor --fqbn {boardFQBN} --port {portName}";
         compileProcess.Start();
         await compileProcess.WaitForExitAsync();
         return compileProcess;
