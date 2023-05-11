@@ -19,21 +19,15 @@ public class UnitVisitor : DepthFirstAdapter
     {
         symbolTable = symbolTable.ResetScope();
     }
-
     public override void InAUnitdeclGlobal(AUnitdeclGlobal node)
     {
         StateUnit = true;
     }
     public override void OutAUnitdeclGlobal(AUnitdeclGlobal node)
     {
-        symbolTable.AddIdToUnit(node.GetId().ToString(), node);
+        symbolTable.AddIdToNode(node.GetId().ToString(), node);
+        
         StateUnit = false;
-    }
-    public override void OutAValueExp(AValueExp node)
-    {
-        symbolTable.AddNode(node, Symbol.Decimal);
-
-        //symbolTable.AddNode(node, UnitVisitor.StateUnit ? Symbol.Decimal : Symbol.notOk);
     }
     public override void OutASubunit(ASubunit node)
     {
@@ -46,7 +40,7 @@ public class UnitVisitor : DepthFirstAdapter
 
             if (symbolTable.GetSymbol(expr) == Symbol.Decimal)
             {
-                symbolTable.AddSubunit(node.GetId(), node.Parent(), expr);
+                symbolTable.AddSubunit(node.GetId(), (AUnitdeclGlobal) node.Parent());
                 symbolTable.AddNode(node, Symbol.ok);
             }
             else
@@ -61,19 +55,10 @@ public class UnitVisitor : DepthFirstAdapter
             symbolTable.AddNode(node, Symbol.notOk);
         }
     }
-    public override void OutAUnitType(AUnitType node)
+    public override void OutAValueExp(AValueExp node)
     {
-       // Save reference from node to tuple
-       List<ANumUnituse> numerator = node.GetUnituse().OfType<ANumUnituse>().ToList();
-       List<ADenUnituse> denomerator = node.GetUnituse().OfType<ADenUnituse>().ToList();
-       // Implement logic here
-       
-       List<AUnitdeclGlobal> newNums = numerator.Select(x => symbolTable.GetUnitFromId(x.GetId().ToString())).ToList();
-       List<AUnitdeclGlobal> newDens = numerator.Select(x => symbolTable.GetUnitFromId(x.GetId().ToString())).ToList();
-       
-       
-       Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unit = new(newNums, newDens);
-       symbolTable.AddNodeToUnit(node, unit);
-
+        symbolTable.AddNode(node, Symbol.Decimal);
+        // ----- Logic missing here---- (tag stilling til hvad det under betød)
+        //symbolTable.AddNode(node, UnitVisitor.StateUnit ? Symbol.Decimal : Symbol.notOk);
     }
 }
