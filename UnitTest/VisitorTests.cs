@@ -51,7 +51,7 @@ public class VisitorTests
         ast.Apply(codeGen);
         writer.Flush();
         string code = Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int) stream.Length);
-        Assert.That(code.Trim().ReplaceLineEndings(), Is.EqualTo(codeGenText));
+        Assert.That(code.ReplaceLineEndings(), Is.EqualTo(codeGenText));
     }
     
 }
