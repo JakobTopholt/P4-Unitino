@@ -1,42 +1,19 @@
-﻿using Compiler.Visitors;
-using Moduino.lexer;
-using Moduino.node;
-using Moduino.parser;
+﻿namespace Compiler;
 
-Start start;
+internal static class Program
 {
-    using FileStream fileStream = File.Open(Directory.GetCurrentDirectory() + "/../../../input.mino", FileMode.Open);
-    using TextReader textReader = new StreamReader(fileStream);
-    Lexer lexer = new (textReader);
-    Parser parser = new (lexer);
-    start = parser.Parse();
+    private const string ArduinoCliPath = "./arduino-cli";
+    
+    public static async Task Main(string[] args)
+    {
+        //Usage: plug in Arduino board and run the compiler with "Moduino.exe [file]"
+        string inputFile = args.GetValue(0) as string ?? Directory.GetCurrentDirectory() + "/../../../input";
+        
+        // Download Arduino CLI while compiling Moduino to Arduino
+        Task downloadCliAsync = ArduinoCompiler.DownloadCliAsync(ArduinoCliPath);
+        
+        await ModuinoCompiler.CompileMinoToIno(inputFile);
+        await downloadCliAsync;
+        await ArduinoCompiler.InoToAVROnBoard(inputFile);
+    }
 }
-// PrettyPrint Visitor
-start.Apply(new PrettyPrint());
-
-
-List<SymbolTable> AllTables = new() { };
-
-SymbolTable symbolTable = new(null, AllTables);
-// UnitVisitor
-start.Apply(new UnitVisitor(symbolTable));
-
-// FunctionVisitor
-start.Apply(new FunctionVisitor(symbolTable));
-
-// Typechecker
-start.Apply(new TypeChecker(symbolTable));
-
-// Codegen Visitor
-{
-    using FileStream stream = File.Create(Directory.GetCurrentDirectory() + "/../../../output.ino");
-    using StreamWriter writer = new(stream);
-    using CodeGen codegen = new (writer, symbolTable);
-    start.Apply(codegen);
-}
-
-
-// TODO Visitor 3: optional compiler optimization (lecture 20)
-
-
-
