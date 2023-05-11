@@ -34,12 +34,10 @@ public class SymbolTable
         }
         return table;
     }
-    public Symbol? GetSymbolFromExpr(PExp expression)
+
+    public Node GetNodeFromId(string identifier)
     {
-        Symbol temp;
-        bool found = nodeToSymbol.TryGetValue(expression, out temp);
-        
-        return found ? temp : null;
+        return idToNode[identifier.Trim()];
     }
     public void AddId(TId identifier, Node node, Symbol symbol)
     {

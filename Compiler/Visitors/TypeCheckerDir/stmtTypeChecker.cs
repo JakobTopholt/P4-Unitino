@@ -12,30 +12,111 @@ public class stmtTypeChecker : DepthFirstAdapter
     }
     public override void OutAAssignStmt(AAssignStmt node) {
         Symbol? type = symbolTable.GetSymbol("" + node.GetId());
-        Symbol? exprType = symbolTable.GetSymbol(node.GetExp());    
-        
-        // if type == null (id was never declared) (The reason we dont use .isInCurrentScope here is we want to iclude foward refrences
-        // if type != exprType (Incompatible types)
-        symbolTable.AddNode(node, type == null || type != exprType ? Symbol.notOk : Symbol.ok);
+        PExp exp = node.GetExp();
+        switch (type)
+        {
+            case Symbol.Int:
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Int ? Symbol.ok : Symbol.notOk);
+                break;
+            case Symbol.Decimal:
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Decimal ? Symbol.ok : Symbol.notOk);
+                break;
+            case Symbol.Bool:
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Bool ? Symbol.ok : Symbol.notOk);
+                break;
+            case Symbol.Char:
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Char ? Symbol.ok : Symbol.notOk);
+                break;
+            case Symbol.String:
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.String ? Symbol.ok : Symbol.notOk);
+                break;
+            default:
+                var typeUnit =symbolTable.GetUnit(symbolTable.GetNodeFromId(node.GetId().ToString()));
+                var expUnit = symbolTable.GetUnit(exp);
+                symbolTable.AddNode(node, symbolTable.CompareCustomUnits(typeUnit, expUnit) ? Symbol.ok : Symbol.notOk);
+                break;
+        }
     }
     public override void OutAPlusassignStmt(APlusassignStmt node)
     {
-        Symbol? type = symbolTable.GetSymbol(node.GetId());
-        Symbol? exprType = symbolTable.GetSymbol(node.GetExp());
-        
-        symbolTable.AddNode(node,type == null ||type != exprType? Symbol.notOk: Symbol.ok);
+        // OVervej om man kan sige += med string, char og bool typer
+        Symbol? type = symbolTable.GetSymbol("" + node.GetId());
+        PExp exp = node.GetExp();
+        switch (type)
+        {
+            case Symbol.Int:
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Int ? Symbol.ok : Symbol.notOk);
+                break;
+            case Symbol.Decimal:
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Decimal ? Symbol.ok : Symbol.notOk);
+                break;
+            case Symbol.Bool:
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Bool ? Symbol.ok : Symbol.notOk);
+                break;
+            case Symbol.Char:
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Char ? Symbol.ok : Symbol.notOk);
+                break;
+            case Symbol.String:
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.String ? Symbol.ok : Symbol.notOk);
+                break;
+            default:
+                var typeUnit =symbolTable.GetUnit(symbolTable.GetNodeFromId(node.GetId().ToString()));
+                var expUnit = symbolTable.GetUnit(exp);
+                symbolTable.AddNode(node, symbolTable.CompareCustomUnits(typeUnit, expUnit) ? Symbol.ok : Symbol.notOk);
+                break;
+        }
     }
     public override void OutAMinusassignStmt(AMinusassignStmt node)
     {
-        Symbol? type = symbolTable.GetSymbol(node.GetId());
-        Symbol? exprType = symbolTable.GetSymbol(node.GetExp());
-        
-        symbolTable.AddNode(node,type == null ||type != exprType? Symbol.notOk: Symbol.ok);
+        Symbol? type = symbolTable.GetSymbol("" + node.GetId());
+        PExp exp = node.GetExp();
+        switch (type)
+        {
+            case Symbol.Int:
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Int ? Symbol.ok : Symbol.notOk);
+                break;
+            case Symbol.Decimal:
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Decimal ? Symbol.ok : Symbol.notOk);
+                break;
+            case Symbol.Bool:
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Bool ? Symbol.ok : Symbol.notOk);
+                break;
+            case Symbol.Char:
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Char ? Symbol.ok : Symbol.notOk);
+                break;
+            case Symbol.String:
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.String ? Symbol.ok : Symbol.notOk);
+                break;
+            default:
+                var typeUnit =symbolTable.GetUnit(symbolTable.GetNodeFromId(node.GetId().ToString()));
+                var expUnit = symbolTable.GetUnit(exp);
+                symbolTable.AddNode(node, symbolTable.CompareCustomUnits(typeUnit, expUnit) ? Symbol.ok : Symbol.notOk);
+                break;
+        }
     }
     public override void OutAPrefixplusStmt(APrefixplusStmt node) => UnaryoperatorToSymbolTable(node);
     public override void OutAPrefixminusStmt(APrefixminusStmt node) => UnaryoperatorToSymbolTable(node);
     public override void OutASuffixplusStmt(ASuffixplusStmt node) => UnaryoperatorToSymbolTable(node);
     public override void OutASuffixminusStmt(ASuffixminusStmt node) => UnaryoperatorToSymbolTable(node);
+    private void UnaryoperatorToSymbolTable(Node node)
+    {
+        Symbol? expr = symbolTable.GetSymbol(node);
+        switch (expr)
+        {
+            case Symbol.Decimal:
+                symbolTable.AddNode(node,Symbol.ok);
+                break;
+            case Symbol.Int:
+                symbolTable.AddNode(node,Symbol.ok); 
+                break;
+            case Symbol.Char:
+                symbolTable.AddNode(node,Symbol.ok);
+                break;
+            default:
+                symbolTable.AddNode(node,Symbol.notOk);
+                break;
+        }
+    }
     public override void OutADeclStmt(ADeclStmt node)
     {
         if (!symbolTable.IsInCurrentScope(node.GetId()))
@@ -297,7 +378,7 @@ public class stmtTypeChecker : DepthFirstAdapter
     public override void OutAIfStmt(AIfStmt node)
     {
         Symbol? CondExpr = symbolTable.GetSymbol(node.GetExp());
-        symbolTable.AddNode(node,CondExpr != Symbol.Bool|| CondExpr == null ? Symbol.notOk: Symbol.ok);
+        symbolTable.AddNode(node,CondExpr != Symbol.Bool || CondExpr == null ? Symbol.notOk: Symbol.ok);
     }
 
     public override void OutAElseifStmt(AElseifStmt node)
@@ -330,23 +411,5 @@ public class stmtTypeChecker : DepthFirstAdapter
         Symbol? cond = symbolTable.GetSymbol(node.GetExp());
         symbolTable.AddNode(node, cond != Symbol.Bool? Symbol.notOk: Symbol.ok);  
     }
-    private void UnaryoperatorToSymbolTable(Node node)
-    {
-        Symbol? expr = symbolTable.GetSymbol(node);
-        switch (expr)
-        {
-            case Symbol.Decimal:
-                symbolTable.AddNode(node,Symbol.ok);
-                break;
-            case Symbol.Int:
-                symbolTable.AddNode(node,Symbol.ok); 
-                break;
-            case Symbol.Char:
-                symbolTable.AddNode(node,Symbol.ok);
-                break;
-            default:
-                symbolTable.AddNode(node,Symbol.notOk);
-                break;
-        }
-    }
+
 }
