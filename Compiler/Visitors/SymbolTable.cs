@@ -58,7 +58,7 @@ public class SymbolTable
         parent._IsInCurrentScope(id);
     
     // Unit methods
-    public void AddIdToNode(string identifier, AUnitdeclGlobal node) => idToNode.Add(identifier.Trim(), node);
+    public void AddIdToNode(string identifier, Node node) => idToNode.Add(identifier.Trim(), node);
     public AUnitdeclGlobal? GetUnitFromId(string identifier)
     {
         return GetCurrentUnitFromId(identifier);
