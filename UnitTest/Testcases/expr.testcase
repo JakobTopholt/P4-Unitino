@@ -86,15 +86,7 @@ func untypedlmao(){
     a = d % b; 
 }
 ////
-int a = 3;
-    int b = 5;
-    b = b * a;
-    decimal c = 3.5;
-    decimal d = 6.5;
-    a = a / b;
-    c = c / b;
-    d = d * c;
-    return;  
+ 
 ////
 
 
@@ -115,15 +107,7 @@ func untypedlmao(){
     a = g % b; 
 }
 ////
-int a = 3;
-    int b = 5;
-    b = b * a;
-    decimal c = 3.5;
-    decimal d = 6.5;
-    a = a / b;
-    c = c / b;
-    d = d * c;
-    return;  
+
 ////
 
 

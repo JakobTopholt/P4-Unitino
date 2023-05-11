@@ -5,7 +5,7 @@ unit Time {
     s => value * 1000;
 }
 Time UnitFunc() {
-    Time a = 1/50ms + 1/1000s;
+    Time a = 1/50ms+1/1000ms;
     return a;
 }
 prog {
@@ -18,10 +18,14 @@ float Timems(float value) {
     return value;
 }
 float Times(float value) {
-    return value * 1000;
+    return value*1000;
+}
+float UnitFunc() {
+    float a = 1/Timems(50)+1/Timems(1000);
+    return a;
 }
 prog {
-    float a = Timems(50);
+    float a = 1/Timems(50);
 }
 ////
 true
@@ -32,22 +36,22 @@ unit Time {
     ms => value;
 }
 prog {
-    #Time a = 1/50ms;
-    #Time b = 1/5ms;
+    Time a = 1/50ms;
+    Time b = 1/5ms;
 }
 ////
 unit Time {
     ms => value;
 }
 prog {
-    //Time a = 1/50ms;
-    //Time b = 1/5ms;
+    float a = 1/Timems(50);
+    float b = 1/Timems(5);
 }
 ////
 float Timems(float value) {
     return value;
 }
-prog {
+void setup() {
     float a = 1/Timems(50);
     float b = 1/Timems(5);
 }
