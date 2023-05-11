@@ -62,10 +62,5 @@ public class UnitVisitor : DepthFirstAdapter
             symbolTable.AddNode(node, Symbol.notOk);
         }
     }
-    public override void OutAValueExp(AValueExp node)
-    {
-        symbolTable.AddNode(node, Symbol.Decimal);
-        // ----- Logic missing here---- (tag stilling til hvad det under betød)
-        //symbolTable.AddNode(node, UnitVisitor.StateUnit ? Symbol.Decimal : Symbol.notOk);
-    }
+   
 }

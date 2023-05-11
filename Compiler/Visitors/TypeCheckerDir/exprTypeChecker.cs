@@ -29,59 +29,106 @@ public class exprTypeChecker : stmtTypeChecker
     public override void OutAFalseBoolean(AFalseBoolean node) => symbolTable.AddNode(node, Symbol.Bool);
     public override void OutAStringExp(AStringExp node) => symbolTable.AddNode(node, Symbol.String);
     public override void OutACharExp(ACharExp node) => symbolTable.AddNode(node, Symbol.Char);
+    public override void OutAValueExp(AValueExp node)
+    {
+        //symbolTable.AddNode(node, Symbol.Decimal);
+        // ----- Logic missing here---- (tag stilling til hvad det under betød)
+        symbolTable.AddNode(node, UnitVisitor.StateUnit ? Symbol.Decimal : Symbol.notOk);
+    }
     public override void OutAFunccallExp(AFunccallExp node)
     {
         // Funccall som en del af et return udtryk
         // returnvalue har betydning for om det er et correct call
-        List<PType> args = symbolTable.GetFunctionArgs(symbolTable.GetFuncFromId(node.GetId().ToString()));
-        List<PExp>? parameters = node.GetExp() as List<PExp>;
-        if (args.Count() == parameters.Count())
-        {
-            for(int i = 0; i < args.Count(); i++)
-            {
-                switch (args[i])
-                {
-                    case AIntType:
-                        symbolTable.AddNode(node, symbolTable.GetSymbol(parameters[i]) == Symbol.Int ? Symbol.ok : Symbol.notOk);
-                        break;
-                    case ADecimalType:
-                        symbolTable.AddNode(node, symbolTable.GetSymbol(parameters[i]) == Symbol.Decimal ? Symbol.ok : Symbol.notOk);
-                        break;
-                    case ABoolType:
-                        symbolTable.AddNode(node, symbolTable.GetSymbol(parameters[i]) == Symbol.Bool ? Symbol.ok : Symbol.notOk);
-                        break;
-                    case ACharType:
-                        symbolTable.AddNode(node, symbolTable.GetSymbol(parameters[i]) == Symbol.Char ? Symbol.ok : Symbol.notOk);
-                        break;
-                    case AStringType:
-                        symbolTable.AddNode(node, symbolTable.GetSymbol(parameters[i]) == Symbol.String ? Symbol.ok : Symbol.notOk);
-                        break;
-                    case AUnitType argType:
-                    {
-                        var argUnit = symbolTable.GetUnit(argType);
-                        var paramUnit = symbolTable.GetUnit(parameters[i]);
+        
+       List<PType> args = symbolTable.GetFunctionArgs(symbolTable.GetFuncFromId(node.GetId().ToString()));
+       List<PExp>? parameters = node.GetExp() as List<PExp>;
+       if (args.Count() == parameters.Count())
+       {
+           bool matches = true;
+           for(int i = 0; i < args.Count(); i++)
+           {
+               switch (args[i])
+               {
+                   case AIntType:
+                       if (symbolTable.GetSymbol(parameters[i]) != Symbol.Int)
+                           matches = false;
+                       break;
+                   case ADecimalType:
+                       if (symbolTable.GetSymbol(parameters[i]) != Symbol.Decimal)
+                           matches = false;
+                       break;
+                   case ABoolType:
+                       if (symbolTable.GetSymbol(parameters[i]) != Symbol.Bool)
+                           matches = false;
+                       break;
+                   case ACharType:
+                       if (symbolTable.GetSymbol(parameters[i]) != Symbol.Char)
+                           matches = false;
+                       break;
+                   case AStringType:
+                       if (symbolTable.GetSymbol(parameters[i]) != Symbol.String)
+                           matches = false;
+                       break;
+                   case AUnitType argType:
+                   {
+                       var argUnit = symbolTable.GetUnit(argType);
+                       var paramUnit = symbolTable.GetUnit(parameters[i]);
                         
-                        if (symbolTable.CompareCustomUnits(argUnit, paramUnit))
-                        {
-                            symbolTable.AddNodeToUnit(node, argUnit);
-                            symbolTable.AddNode(node, Symbol.ok);
-                        }
-                        else
-                        {
-                            symbolTable.AddNode(node, Symbol.notOk);
-                        }
-                        break; 
-                    }
-                    default:
-                        symbolTable.AddNode(node, Symbol.notOk);
-                        break;
-                }
-            }
-        }
-        else
-        {
-            symbolTable.AddNode(node, Symbol.notOk);
-        }
+                       if (!symbolTable.CompareCustomUnits(argUnit, paramUnit))
+                       {
+                           matches = false;
+                           symbolTable.AddNodeToUnit(node, argUnit);
+                       }
+                       break; 
+                   }
+                   default:
+                       matches = false;
+                       break;
+               }
+           }
+           if (matches)
+           {
+               var symbol = symbolTable.GetSymbol(symbolTable.GetNodeFromId(node.GetId().ToString()));
+               switch (symbol)
+               {
+                   case Symbol.Int:
+                       symbolTable.AddNode(node, Symbol.Int);
+                       break;
+                   case Symbol.Decimal:
+                       symbolTable.AddNode(node, Symbol.Decimal);
+                       break;
+                   case Symbol.Bool:
+                       symbolTable.AddNode(node, Symbol.Bool);
+                       break;
+                   case Symbol.Char:
+                       symbolTable.AddNode(node, Symbol.Char);
+                       break;
+                   case Symbol.String:
+                       symbolTable.AddNode(node, Symbol.String);
+                       break;
+                   default:
+                       var unit = symbolTable.GetUnit(symbolTable.GetNodeFromId(node.GetId().ToString()));
+                       if (unit != null)
+                       {
+                           symbolTable.AddNodeToUnit(node, unit);
+                           symbolTable.AddNode(node, Symbol.ok);
+                       }
+                       else
+                       {
+                           symbolTable.AddNode(node, Symbol.notOk);
+                       }
+                       break;
+               }
+           }
+           else
+           {
+               symbolTable.AddNode(node, Symbol.notOk);
+           }
+       }
+       else
+       {
+           symbolTable.AddNode(node, Symbol.notOk);
+       }
     }
 
     public override void OutAIdExp(AIdExp node)

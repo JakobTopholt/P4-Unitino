@@ -212,53 +212,56 @@ public class stmtTypeChecker : DepthFirstAdapter
        
        List<PType> args = symbolTable.GetFunctionArgs(symbolTable.GetFuncFromId(node.GetId().ToString()));
        List<PExp>? parameters = node.GetParams() as List<PExp>;
-        if (args.Count() == parameters.Count())
-        {
-            for(int i = 0; i < args.Count(); i++)
-            {
-                switch (args[i])
-                {
-                    case AIntType:
-                        symbolTable.AddNode(node, symbolTable.GetSymbol(parameters[i]) == Symbol.Int ? Symbol.ok : Symbol.notOk);
-                        break;
-                    case ADecimalType:
-                        symbolTable.AddNode(node, symbolTable.GetSymbol(parameters[i]) == Symbol.Decimal ? Symbol.ok : Symbol.notOk);
-                        break;
-                    case ABoolType:
-                        symbolTable.AddNode(node, symbolTable.GetSymbol(parameters[i]) == Symbol.Bool ? Symbol.ok : Symbol.notOk);
-                        break;
-                    case ACharType:
-                        symbolTable.AddNode(node, symbolTable.GetSymbol(parameters[i]) == Symbol.Char ? Symbol.ok : Symbol.notOk);
-                        break;
-                    case AStringType:
-                        symbolTable.AddNode(node, symbolTable.GetSymbol(parameters[i]) == Symbol.String ? Symbol.ok : Symbol.notOk);
-                        break;
-                    case AUnitType argType:
-                    {
-                        var argUnit = symbolTable.GetUnit(argType);
-                        var paramUnit = symbolTable.GetUnit(parameters[i]);
+       if (args.Count() == parameters.Count())
+       {
+           bool matches = true;
+           for(int i = 0; i < args.Count(); i++)
+           {
+               switch (args[i])
+               {
+                   case AIntType:
+                       if (symbolTable.GetSymbol(parameters[i]) != Symbol.Int)
+                           matches = false;
+                       break;
+                   case ADecimalType:
+                       if (symbolTable.GetSymbol(parameters[i]) != Symbol.Decimal)
+                           matches = false;
+                       break;
+                   case ABoolType:
+                       if (symbolTable.GetSymbol(parameters[i]) != Symbol.Bool)
+                           matches = false;
+                       break;
+                   case ACharType:
+                       if (symbolTable.GetSymbol(parameters[i]) != Symbol.Char)
+                           matches = false;
+                       break;
+                   case AStringType:
+                       if (symbolTable.GetSymbol(parameters[i]) != Symbol.String)
+                           matches = false;
+                       break;
+                   case AUnitType argType:
+                   {
+                       var argUnit = symbolTable.GetUnit(argType);
+                       var paramUnit = symbolTable.GetUnit(parameters[i]);
                         
-                        if (symbolTable.CompareCustomUnits(argUnit, paramUnit))
-                        {
-                            symbolTable.AddNodeToUnit(node, argUnit);
-                            symbolTable.AddNode(node, Symbol.ok);
-                        }
-                        else
-                        {
-                            symbolTable.AddNode(node, Symbol.notOk);
-                        }
-                        break; 
-                    }
-                    default:
-                        symbolTable.AddNode(node, Symbol.notOk);
-                        break;
-                }
-            }
-        }
-        else
-        {
-            symbolTable.AddNode(node, Symbol.notOk);
-        }
+                       if (!symbolTable.CompareCustomUnits(argUnit, paramUnit))
+                       {
+                           matches = false;
+                           symbolTable.AddNodeToUnit(node, argUnit);
+                       }
+                       break; 
+                   }
+                   default:
+                       matches = false;
+                       break;
+               }
+           }
+           symbolTable.AddNode(node, matches ? Symbol.ok : Symbol.notOk);
+       }
+       else
+       {
+           symbolTable.AddNode(node, Symbol.notOk);
+       }
     }
 
     public Symbol? PTypeToSymbol(PType type)
