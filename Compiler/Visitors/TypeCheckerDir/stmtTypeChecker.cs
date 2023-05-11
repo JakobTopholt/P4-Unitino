@@ -58,16 +58,19 @@ public class stmtTypeChecker : DepthFirstAdapter
                     symbolTable.AddId(node.GetId(), node, Symbol.String);
                     break;
                 case AUnitType customType:
-                {
-                    // ----- Logic missing here----
-
+                    var unit = symbolTable.GetUnit(customType);
+                    symbolTable.AddIdToNode(node.GetId().ToString(), node);
+                    symbolTable.AddNodeToUnit(node, unit);
+                    symbolTable.AddNode(node, Symbol.ok);
                     break; 
-                }
+                default:
+                    symbolTable.AddNode(node, Symbol.notOk);
+                    break;
             }
         }
         else
         {
-            symbolTable.AddId(node.GetId(), node, Symbol.notOk);
+            symbolTable.AddNode(node, Symbol.notOk);
         }
     }
     public override void OutADeclassStmt(ADeclassStmt node)
@@ -83,32 +86,43 @@ public class stmtTypeChecker : DepthFirstAdapter
                 switch (unit)
                 {
                     case AIntType a:
-                        symbolTable.AddId(node.GetId(), node, exprType == Symbol.Int ? Symbol.notOk : Symbol.Int);
+                        symbolTable.AddId(node.GetId(), node, exprType != Symbol.Int ? Symbol.notOk : Symbol.Int);
                         break;
                     case ADecimalType b:
-                        symbolTable.AddId(node.GetId(), node, exprType == Symbol.Decimal ? Symbol.notOk : Symbol.Decimal);
+                        symbolTable.AddId(node.GetId(), node, exprType != Symbol.Decimal ? Symbol.notOk : Symbol.Decimal);
                         break;
                     case ABoolType c:
-                        symbolTable.AddId(node.GetId(), node, exprType == Symbol.Bool ? Symbol.notOk : Symbol.Bool);
+                        symbolTable.AddId(node.GetId(), node, exprType != Symbol.Bool ? Symbol.notOk : Symbol.Bool);
                         break;
                     case ACharType d:
-                        symbolTable.AddId(node.GetId(), node, exprType == Symbol.Char ? Symbol.notOk : Symbol.Char);
+                        symbolTable.AddId(node.GetId(), node, exprType != Symbol.Char ? Symbol.notOk : Symbol.Char);
                         break;
                     case AStringType e:
-                        symbolTable.AddId(node.GetId(), node, exprType == Symbol.String ? Symbol.notOk : Symbol.String);
+                        symbolTable.AddId(node.GetId(), node, exprType != Symbol.String ? Symbol.notOk : Symbol.String);
                         break;
                     case AUnitType customType:
-                    {
-                        // ----- Logic missing here----
-
+                        var unitType = symbolTable.GetUnit(customType);
+                        var expType = symbolTable.GetUnit(customType);
+                        if (symbolTable.CompareCustomUnits(unitType, expType))
+                        {
+                            symbolTable.AddIdToNode(node.GetId().ToString(), node);
+                            symbolTable.AddNodeToUnit(node, unitType);
+                            symbolTable.AddNode(node, Symbol.ok); 
+                        }
+                        else
+                        {
+                            symbolTable.AddNode(node, Symbol.notOk);
+                        }
                         break; 
-                    }
+                    default:
+                        symbolTable.AddNode(node, Symbol.notOk);
+                        break;
                 }
             }
         }
         else
         {
-            symbolTable.AddId(node.GetId(), node, Symbol.notOk);
+            symbolTable.AddNode(node, Symbol.notOk);
         }
     }
     public override void OutAFunccallStmt(AFunccallStmt node)
