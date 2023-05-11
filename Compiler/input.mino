@@ -1,37 +1,31 @@
-unit tid : int {
-    mango => (6+5);
-    banan => (5*2);
+lmao xD
+////
+char function3(char a, char b, char c) {
+    char d = a+b+c;
+    return d;
 }
-unit fart : int {
-    hej => 3-2;
-    nej => 4+2;
+decimal function4(int a) {
+    decimal d = 3.5+a ;
+    char g = 'o';
+    char b = 'b';
+    char c = 'c';
+    function3(a, b, c);
+    return d;
 }
-func hejmeddig{
-    75;
-    a = 5;
-    int a;
-    b();
-}
+////
 
-Prog {
-    5+7*5-3+(5*7);
-    2+5*3;
+////
+char function3(char a, char b, char c) {
+    char d = a+b+c;
+    return d;
 }
-
-func scoped {
-    for(int a; 6+5; a = 1) {
-        if(7) {
-            while(1) {
-                int b;
-            }
-        }
-        else if(5+2) {
-            do {
-                bool c;
-            } while(5+2)
-        }
-        else {
-            decimal d;
-        }
-    }
+decimal function4(int a) {
+    decimal d = 3.5+a;
+    char g = 'o';
+    char b = 'b';
+    char c = 'c';
+    function3(a, b, c);
+    return d;
 }
+////
+true

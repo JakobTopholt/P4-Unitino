@@ -200,7 +200,7 @@ func untypedthree(){
         a++;
       } 
 }
-func untypedthree(){
+func untypedfour(){
       int b = 3;
       int a = 4;
       bool c = true;
@@ -239,7 +239,7 @@ func untypedthree(){
       while (a!= 10){
             }  
 }
-func untypedthree(){
+func untypedfour(){
       int b = 3;
       int a = 4;
       bool c = true;

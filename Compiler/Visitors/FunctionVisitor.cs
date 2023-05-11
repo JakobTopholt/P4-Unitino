@@ -67,7 +67,7 @@ public class FunctionVisitor : DepthFirstAdapter
     {
         if(symbolTable.IsInExtendedScope(node.GetId()))
         {
-            symbolTable.AddId(node.GetId(), node, Symbol.notOk);
+            symbolTable.AddNode(node, Symbol.notOk);
         }
         else
         {
@@ -85,46 +85,45 @@ public class FunctionVisitor : DepthFirstAdapter
 
     public override void OutAUntypedGlobal(AUntypedGlobal node)
     {
+        symbolTable = symbolTable.ExitScope();
         if (node.GetStmt().OfType<AReturnStmt>().Count() == 0)
         {
             symbolTable.AddNode(node, Symbol.Func);
         }
-        /*
-        switch (symbolTable.GetSymbol(node))
+        else
         {
-            case Symbol.Int:
-                symbolTable.AddNode(node, Symbol.Int);
-                break;
-            case Symbol.Decimal:
-                symbolTable.AddNode(node, Symbol.Decimal);
-                break;
-            case Symbol.Bool:
-                symbolTable.AddNode(node, Symbol.Bool);
-                break;
-            case Symbol.Char:
-                symbolTable.AddNode(node, Symbol.Char);
-                break;
-            case Symbol.String:
-                symbolTable.AddNode(node, Symbol.String);
-                break;
-            case Symbol.Func:
-                symbolTable.AddNode(node, Symbol.Func);
-                break;
-            default:
-                // Implement logikken for custom units her
-                if (symbolTable.nodeToUnit.ContainsKey(node))
-                {
-                    var unit = symbolTable.GetUnit(node);
-                    symbolTable.AddNodeToUnit(node, unit);
-                    symbolTable.AddNode(node, Symbol.ok); 
-                }
-                else
-                {
-                    // not a valid type
-                    symbolTable.AddNode(node, Symbol.notOk);
-                }
-                break;
-        } */
+            // We have to add to symbletable here to have correct scope
+            AReturnStmt returnType = node.GetStmt().OfType<AReturnStmt>().ToList()[0];
+            switch (symbolTable.GetSymbol(returnType))
+            {
+                case Symbol.Int:
+                    symbolTable.AddNode(node, Symbol.Int);
+                    break;
+                case Symbol.Decimal:
+                    symbolTable.AddNode(node, Symbol.Decimal);
+                    break;
+                case Symbol.Bool:
+                    symbolTable.AddNode(node, Symbol.Bool);
+                    break;
+                case Symbol.Char:
+                    symbolTable.AddNode(node, Symbol.Char);
+                    break;
+                case Symbol.String:
+                    symbolTable.AddNode(node, Symbol.String);
+                    break;
+                default:
+                    if (symbolTable.GetUnit(returnType) != null)
+                    {
+                        symbolTable.AddNode(node, Symbol.ok); 
+                    }
+                    else
+                    {
+                        symbolTable.AddNode(node, Symbol.notOk); 
+                    }
+                    break;
+            }
+        }
+        //symbolTable.AddIdToFunc(node.GetId().ToString(), node);
     }
 
     public override void CaseATypedGlobal(ATypedGlobal node)
@@ -136,7 +135,7 @@ public class FunctionVisitor : DepthFirstAdapter
     {
         if(symbolTable.IsInExtendedScope(node.GetId()))
         {
-            symbolTable.AddId(node.GetId(), node, Symbol.notOk);
+            symbolTable.AddNode(node, Symbol.notOk);
         }
         else
         {
@@ -157,22 +156,22 @@ public class FunctionVisitor : DepthFirstAdapter
         switch (node.GetType())
         {
             case AIntType:
-                symbolTable.AddId(node.GetId(), node, Symbol.Int);
+                symbolTable.AddNode(node, Symbol.Int);
                 break;
             case ADecimalType:
-                symbolTable.AddId(node.GetId(), node, Symbol.Decimal);
+                symbolTable.AddNode(node, Symbol.Decimal);
                 break;
             case ABoolType:
-                symbolTable.AddId(node.GetId(), node, Symbol.Bool);
+                symbolTable.AddNode(node, Symbol.Bool);
                 break;
             case ACharType:
-                symbolTable.AddId(node.GetId(), node, Symbol.Char);
+                symbolTable.AddNode(node, Symbol.Char);
                 break;
             case AStringType:
-                symbolTable.AddId(node.GetId(), node, Symbol.String);
+                symbolTable.AddNode(node, Symbol.String);
                 break;
             case AVoidType:
-                symbolTable.AddId(node.GetId(), node, Symbol.Func);
+                symbolTable.AddNode(node, Symbol.Func);
                 break;
             case AUnitType customType:
                 var unit = symbolTable.GetUnit(customType);
@@ -183,6 +182,7 @@ public class FunctionVisitor : DepthFirstAdapter
                 symbolTable.AddNode(node, Symbol.notOk);
                 break;
         }
+        //symbolTable.AddIdToFunc(node.GetId().ToString(), node);
 
     }
     public override void CaseALoopGlobal(ALoopGlobal node)
