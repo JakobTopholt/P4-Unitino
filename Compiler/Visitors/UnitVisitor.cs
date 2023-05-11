@@ -26,7 +26,14 @@ public class UnitVisitor : DepthFirstAdapter
     public override void OutAUnitdeclGlobal(AUnitdeclGlobal node)
     {
         symbolTable.AddIdToNode(node.GetId().ToString(), node);
-        
+        bool subunitsIsOk = true;
+        foreach (ASubunit subunit in node.GetSubunit())
+        {
+            if (symbolTable.GetSymbol(subunit) == Symbol.notOk)
+                subunitsIsOk = false;
+        }
+        symbolTable.AddNode(node, symbolTable.GetSymbol(node.GetId()) != Symbol.notOk && subunitsIsOk ? Symbol.ok : Symbol.notOk);
+
         StateUnit = false;
     }
     public override void OutASubunit(ASubunit node)

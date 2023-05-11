@@ -39,6 +39,17 @@ public class TypeChecker : exprTypeChecker
     {
     }
 
+    public override void OutAGrammar(AGrammar node)
+    {
+        bool grammarIsOk = true;
+        foreach (PGlobal global in node.GetGlobal())
+        {
+            if (symbolTable.GetSymbol(global) == Symbol.notOk)
+                grammarIsOk = false;
+        }
+        symbolTable.AddNode(node, grammarIsOk ? Symbol.ok : Symbol.notOk);
+    }
+
     public override void OutAUnitType(AUnitType node)
     {
         List<ANumUnituse> nums = node.GetUnituse().OfType<ANumUnituse>().ToList();

@@ -86,44 +86,38 @@ public class FunctionVisitor : DepthFirstAdapter
     public override void OutAUntypedGlobal(AUntypedGlobal node)
     {
         symbolTable = symbolTable.ExitScope();
-        if (node.GetStmt().OfType<AReturnStmt>().Count() == 0)
+        if (symbolTable.GetSymbol(node) == null)
         {
-            symbolTable.AddNode(node, Symbol.Func);
-        }
-        else
-        {
-            // We have to add to symbletable here to have correct scope
-            AReturnStmt returnType = node.GetStmt().OfType<AReturnStmt>().ToList()[0];
-            switch (symbolTable.GetSymbol(returnType))
+            if (node.GetStmt().OfType<AReturnStmt>().Count() == 0)
             {
-                case Symbol.Int:
-                    symbolTable.AddNode(node, Symbol.Int);
-                    break;
-                case Symbol.Decimal:
-                    symbolTable.AddNode(node, Symbol.Decimal);
-                    break;
-                case Symbol.Bool:
-                    symbolTable.AddNode(node, Symbol.Bool);
-                    break;
-                case Symbol.Char:
-                    symbolTable.AddNode(node, Symbol.Char);
-                    break;
-                case Symbol.String:
-                    symbolTable.AddNode(node, Symbol.String);
-                    break;
-                default:
-                    if (symbolTable.GetUnit(returnType) != null)
-                    {
-                        symbolTable.AddNode(node, Symbol.ok); 
-                    }
-                    else
-                    {
-                        symbolTable.AddNode(node, Symbol.notOk); 
-                    }
-                    break;
+                symbolTable.AddNode(node, Symbol.Func);
+            }
+            else
+            {
+                AReturnStmt returnType = node.GetStmt().OfType<AReturnStmt>().ToList()[0];
+                switch (symbolTable.GetSymbol(returnType))
+                {
+                    case Symbol.Int:
+                        symbolTable.AddNode(node, Symbol.Int);
+                        break;
+                    case Symbol.Decimal:
+                        symbolTable.AddNode(node, Symbol.Decimal);
+                        break;
+                    case Symbol.Bool:
+                        symbolTable.AddNode(node, Symbol.Bool);
+                        break;
+                    case Symbol.Char:
+                        symbolTable.AddNode(node, Symbol.Char);
+                        break;
+                    case Symbol.String:
+                        symbolTable.AddNode(node, Symbol.String);
+                        break;
+                    default:
+                        symbolTable.AddNode(node, symbolTable.GetUnit(returnType) != null ? Symbol.ok : Symbol.notOk);
+                        break;
+                }
             }
         }
-        //symbolTable.AddIdToFunc(node.GetId().ToString(), node);
     }
 
     public override void CaseATypedGlobal(ATypedGlobal node)
@@ -150,39 +144,42 @@ public class FunctionVisitor : DepthFirstAdapter
             symbolTable.EnterScope();
         }
     }
+
     public override void OutATypedGlobal(ATypedGlobal node)
     {
         symbolTable = symbolTable.ExitScope();
-        switch (node.GetType())
+        if (symbolTable.GetSymbol(node) == null)
         {
-            case AIntType:
-                symbolTable.AddNode(node, Symbol.Int);
-                break;
-            case ADecimalType:
-                symbolTable.AddNode(node, Symbol.Decimal);
-                break;
-            case ABoolType:
-                symbolTable.AddNode(node, Symbol.Bool);
-                break;
-            case ACharType:
-                symbolTable.AddNode(node, Symbol.Char);
-                break;
-            case AStringType:
-                symbolTable.AddNode(node, Symbol.String);
-                break;
-            case AVoidType:
-                symbolTable.AddNode(node, Symbol.Func);
-                break;
-            case AUnitType customType:
-                var unit = symbolTable.GetUnit(customType);
-                symbolTable.AddNodeToUnit(node, unit);
-                symbolTable.AddNode(node, Symbol.ok);
-                break; 
-            default:
-                symbolTable.AddNode(node, Symbol.notOk);
-                break;
+            switch (node.GetType())
+            {
+                case AIntType:
+                    symbolTable.AddNode(node, Symbol.Int);
+                    break;
+                case ADecimalType:
+                    symbolTable.AddNode(node, Symbol.Decimal);
+                    break;
+                case ABoolType:
+                    symbolTable.AddNode(node, Symbol.Bool);
+                    break;
+                case ACharType:
+                    symbolTable.AddNode(node, Symbol.Char);
+                    break;
+                case AStringType:
+                    symbolTable.AddNode(node, Symbol.String);
+                    break;
+                case AVoidType:
+                    symbolTable.AddNode(node, Symbol.Func);
+                    break;
+                case AUnitType customType:
+                    var unit = symbolTable.GetUnit(customType);
+                    symbolTable.AddNodeToUnit(node, unit);
+                    symbolTable.AddNode(node, Symbol.ok);
+                    break;
+                default:
+                    symbolTable.AddNode(node, Symbol.notOk);
+                    break;
+            }
         }
-        //symbolTable.AddIdToFunc(node.GetId().ToString(), node);
 
     }
     public override void CaseALoopGlobal(ALoopGlobal node)
@@ -190,14 +187,44 @@ public class FunctionVisitor : DepthFirstAdapter
         InALoopGlobal(node);
         OutALoopGlobal(node);
     }
-    public override void InALoopGlobal(ALoopGlobal node) => symbolTable = symbolTable.EnterScope();
-    public override void OutALoopGlobal(ALoopGlobal node) => symbolTable = symbolTable.ExitScope();
+    public override void InALoopGlobal(ALoopGlobal node)
+    {
+        // overvej om der skal tjekkes for "loop" allerede er deklareret før
+        symbolTable = symbolTable.EnterScope();
+    }
+
+    public override void OutALoopGlobal(ALoopGlobal node)
+    {
+        symbolTable = symbolTable.ExitScope();
+        bool loopIsOk = true;
+        foreach (PStmt stmt in node.GetStmt())
+        {
+            if (symbolTable.GetSymbol(stmt) == Symbol.notOk)
+                loopIsOk = false;
+        }
+        symbolTable.AddNode(node, loopIsOk ? Symbol.ok : Symbol.notOk);
+    }
+
     public override void CaseAProgGlobal(AProgGlobal node)
     {
         InAProgGlobal(node);
         OutAProgGlobal(node);
     }
-    public override void InAProgGlobal(AProgGlobal node) => symbolTable = symbolTable.EnterScope();
-    public override void OutAProgGlobal(AProgGlobal node) => symbolTable = symbolTable.ExitScope();
-    
+    public override void InAProgGlobal(AProgGlobal node)
+    {
+        // overvej om der skal tjekkes for "prog" allerede er deklareret før
+        symbolTable = symbolTable.EnterScope();
+    }
+
+    public override void OutAProgGlobal(AProgGlobal node)
+    {
+        symbolTable = symbolTable.ExitScope();
+        bool progIsOk = true;
+        foreach (PStmt stmt in node.GetStmt())
+        {
+            if (symbolTable.GetSymbol(stmt) == Symbol.notOk)
+                progIsOk = false;
+        }
+        symbolTable.AddNode(node, progIsOk ? Symbol.ok : Symbol.notOk);
+    }
 }
