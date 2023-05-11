@@ -14,7 +14,7 @@ func untypedtwo(int a, decimal b, string c, char d, bool e){
     ba += b;
     string ca = "c";
     ca += c;
-    char da = "d";
+    char da = 'd';
     da += d;
     bool ea = true;
     ea += e; 
@@ -26,7 +26,7 @@ func untypedthree(int a, decimal b, string c, char d, bool e){
         ba -= b;
         string ca = "c";
         ca -= c;
-        char da = "d";
+        char da = 'd';
         da -= d;
         bool ea = true;
         ea -= e; 
