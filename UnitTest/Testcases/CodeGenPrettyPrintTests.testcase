@@ -1,0 +1,30 @@
+﻿Unit Testing
+////
+int argTest(int a, string b, char c, bool d, decimal e) {
+    int f;
+    return a;
+}
+prog {
+    int a = 5;
+    int y = argTest(a);
+}
+////
+int argTest(int a, string b, char c, bool d, decimal e) {
+    int f;
+    return a;
+}
+prog {
+    int a = 5;
+    int y = argTest(a);
+}
+////
+int argTest(int a, string b, char c, bool d, float e) {
+    int f;
+    return a;
+}
+void setup() {
+    int a = 5;
+    int y = argTest(a);
+}
+////
+true

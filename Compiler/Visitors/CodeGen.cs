@@ -59,7 +59,13 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             case ADeclStmt: 
             case AAssignStmt: 
             case AReturnStmt:
-            case AFunccallStmt: 
+            case AFunccallStmt:
+            case APlusassignStmt:
+            case AMinusassignStmt:
+            case ASuffixminusStmt:
+            case ASuffixplusStmt:
+            case APrefixminusStmt:
+            case APrefixplusStmt:    
                 writer.WriteLine(";");                    
                 break;
         }
@@ -69,10 +75,10 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     {
         Indent("void setup() {\r\n");
         _indent++;
-        foreach (Node child in node.GetStmt())
+        foreach (PStmt child in node.GetStmt())
         {
             child.Apply(this); 
-            writer.WriteLine(";");
+            ScopeHandler(child);
         }
         OutAProgGlobal(node);
     }
@@ -87,10 +93,10 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     {
         Indent("void loop() {\n");
         _indent++;
-        foreach (Node child in node.GetStmt())
+        foreach (PStmt child in node.GetStmt())
         {
             child.Apply(this);
-            writer.WriteLine(";");
+            ScopeHandler(child);
         }
         OutALoopGlobal(node);
     }
@@ -101,7 +107,6 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         Indent("}\n");
     }
 
-    
     public override void CaseATypedGlobal(ATypedGlobal node)
     {
         switch (node.GetType())
@@ -374,23 +379,30 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         node.GetExp().Apply(this);
     }
 
-    public override void InAPlusassignStmt(APlusassignStmt node)
+    public override void CaseAPlusassignStmt(APlusassignStmt node)
     {
         Indent("");
         node.GetId().Apply(this);
-        writer.Write("+= ");
+        writer.Write(" += ");
+        node.GetExp().Apply(this);
     }
 
-    public override void InAMinusassignStmt(AMinusassignStmt node)
+    public override void CaseAMinusassignStmt(AMinusassignStmt node)
     {
         Indent("");
         node.GetId().Apply(this);
-        writer.Write("-= ");
+        writer.Write(" -= ");
+        node.GetExp().Apply(this);
     }
 
     public override void InAPrefixplusStmt(APrefixplusStmt node)
     {
-        writer.Write("++");
+        Indent("++");
+    }
+
+    public override void InASuffixplusStmt(ASuffixplusStmt node)
+    {
+        Indent("");
     }
 
     public override void OutASuffixplusStmt(ASuffixplusStmt node)
@@ -400,7 +412,12 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void InAPrefixminusStmt(APrefixminusStmt node)
     {
-        writer.Write("--");
+        Indent("--");
+    }
+    
+    public override void InASuffixminusStmt(ASuffixminusStmt node)
+    {
+        Indent("");
     }
 
     public override void OutASuffixminusStmt(ASuffixminusStmt node)
@@ -605,7 +622,10 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseABooleanExp(ABooleanExp node)
     {
-        writer.Write(node.GetBoolean().ToString().Trim());
+        if (node.GetBoolean() is ATrueBoolean)
+            writer.Write("true");
+        else if (node.GetBoolean() is AFalseBoolean)
+            writer.Write("false");
     }
 
     public override void CaseAStringExp(AStringExp node)

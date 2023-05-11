@@ -50,7 +50,13 @@ public class PrettyPrint : DepthFirstAdapter
             case ADeclStmt: 
             case AAssignStmt: 
             case AReturnStmt:
-            case AFunccallStmt: 
+            case AFunccallStmt:
+            case APlusassignStmt:
+            case AMinusassignStmt:
+            case ASuffixminusStmt:
+            case ASuffixplusStmt:
+            case APrefixminusStmt:
+            case APrefixplusStmt: 
                 output.WriteLine(";");                    
                 break;
         }
@@ -60,10 +66,10 @@ public class PrettyPrint : DepthFirstAdapter
     {
         Indent("prog {\r\n");
         _indent++;
-        foreach (Node child in node.GetStmt())
+        foreach (PStmt child in node.GetStmt())
         {
-            child.Apply(this); 
-            output.WriteLine(";");
+            child.Apply(this);
+            ScopeHandler(child);
         }
         OutAProgGlobal(node);
     }
@@ -79,10 +85,10 @@ public class PrettyPrint : DepthFirstAdapter
     {
         Indent("loop {\n");
         _indent++;
-        foreach (Node child in node.GetStmt())
+        foreach (PStmt child in node.GetStmt())
         {
             child.Apply(this);
-            output.WriteLine(";");
+            ScopeHandler(child);
         }
         OutALoopGlobal(node);
     }
@@ -388,23 +394,30 @@ public class PrettyPrint : DepthFirstAdapter
         node.GetExp().Apply(this);
     }
     
-    public override void InAPlusassignStmt(APlusassignStmt node)
+    public override void CaseAPlusassignStmt(APlusassignStmt node)
     {
         Indent("");
         node.GetId().Apply(this);
         output.Write("+= ");
+        node.GetExp().Apply(this);
     }
 
-    public override void InAMinusassignStmt(AMinusassignStmt node)
+    public override void CaseAMinusassignStmt(AMinusassignStmt node)
     {
         Indent("");
         node.GetId().Apply(this);
         output.Write("-= ");
+        node.GetExp().Apply(this);
     }
 
     public override void InAPrefixplusStmt(APrefixplusStmt node)
     {
-        output.Write("++");
+        Indent("++");
+    }
+
+    public override void InASuffixplusStmt(ASuffixplusStmt node)
+    {
+        Indent("");
     }
 
     public override void OutASuffixplusStmt(ASuffixplusStmt node)
@@ -414,7 +427,12 @@ public class PrettyPrint : DepthFirstAdapter
 
     public override void InAPrefixminusStmt(APrefixminusStmt node)
     {
-        output.Write("--");
+        Indent("--");
+    }
+    
+    public override void InASuffixminusStmt(ASuffixminusStmt node)
+    {
+        Indent("");
     }
 
     public override void OutASuffixminusStmt(ASuffixminusStmt node)
@@ -619,8 +637,10 @@ public class PrettyPrint : DepthFirstAdapter
 
     public override void CaseABooleanExp(ABooleanExp node)
     {
-        output.Write(node.GetBoolean().ToString().Trim());
-    }
+        if (node.GetBoolean() is ATrueBoolean)
+            output.Write("true");
+        else if (node.GetBoolean() is AFalseBoolean)
+            output.Write("false");    }
     
     public override void CaseAStringExp(AStringExp node)
     {
