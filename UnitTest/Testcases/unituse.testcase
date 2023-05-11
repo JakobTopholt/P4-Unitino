@@ -55,7 +55,7 @@ prog {
 ////
 true
 //////
-Some mistake somewhere...
+Some mistake somewhere
 ////
 unit Time {
     ms => value;

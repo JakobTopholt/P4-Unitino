@@ -2,7 +2,6 @@
 
 internal static class Program
 {
-    private const string ArduinoCliPath = "./arduino-cli";
     
     public static async Task Main(string[] args)
     {
@@ -10,7 +9,7 @@ internal static class Program
         string inputFile = args.GetValue(0) as string ?? Directory.GetCurrentDirectory() + "/../../../input";
         
         // Download Arduino CLI while compiling Moduino to Arduino
-        Task downloadCliAsync = ArduinoCompiler.DownloadCliAsync(ArduinoCliPath);
+        Task downloadCliAsync = ArduinoCompiler.DownloadCliAsync(Directory.GetCurrentDirectory() + "/");
         
         await ModuinoCompiler.CompileMinoToIno(inputFile);
         await downloadCliAsync;

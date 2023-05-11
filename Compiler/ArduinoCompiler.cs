@@ -1,33 +1,43 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace Compiler;
 
-internal static class ArduinoCompiler
+public static class ArduinoCompiler
 {
-    public static async Task DownloadCliAsync(string arduinoCliPath)
+    public static async Task DownloadCliAsync(string scriptLoc)
     {
-        if (File.Exists(arduinoCliPath))
+        if (File.Exists(scriptLoc + "bin\\arduino-cli"))
             return;
-        Console.WriteLine("Downloading Arduino CLI");
-        
-        using HttpClient httpClient = new();
-        HttpResponseMessage response = await httpClient.GetAsync("https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh");
-        string scriptContent = await response.Content.ReadAsStringAsync();
-
+        Console.WriteLine("Downloading Arduino CLI to " + scriptLoc + "bin\\arduino-cli");
+        {
+            using HttpClient httpClient = new();
+            HttpResponseMessage response = await httpClient.GetAsync("https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh");
+            await using StreamWriter textWriter = File.CreateText(scriptLoc + "cliDownload.sh");
+            await textWriter.WriteAsync(await response.Content.ReadAsStringAsync());
+        }
+        string arduinoCliPath = scriptLoc.Replace(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "")
+            .Replace('\\', '/');
         Process process = new()
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = GetCommandInterpreter(),
-                Arguments = "-c \"" + scriptContent + "\"",
-                EnvironmentVariables = {["BINDIR"] = Directory.GetCurrentDirectory()}
+                Arguments = "cliDownload.sh",
+                Environment = {["BINDIR"] = arduinoCliPath},
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                WorkingDirectory = scriptLoc
+                
             }
         };
         process.Start();
         await process.WaitForExitAsync();
 
-        Console.WriteLine("finished downloading with code " + process.ExitCode);
+        Console.WriteLine(process.ExitCode == 0 ? "Download succeeded!" : "Download failed.");
+
     }
 
     public static async Task InoToAVROnBoard(string filePath)
@@ -35,7 +45,7 @@ internal static class ArduinoCompiler
         filePath += ".ino";
         string boardsTable = await GetBoards();
 
-        // Parse the output to get the Fully Qualified Board Name(FQBN) and port name of the connected device
+        // Parse the output to get the Fully Qualified Board Name and port name of the connected device
         string[] rows = boardsTable.Split( Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         foreach (string row in rows)
         {
@@ -43,12 +53,10 @@ internal static class ArduinoCompiler
             if (column.Length != 9 || column[2] != "Serial") 
                 continue;
             string portName = column[0];
-            string boardFQBN = column[7];
+            string boardFqbn = column[7];
 
-            Process compileProcess = await Compile(filePath, portName, boardFQBN);
-            Console.WriteLine(compileProcess.ExitCode == 0 ? "Compilation succeeded!" : "Compilation failed.");
-            
-            Process monitorProcess = await Monitor(portName, boardFQBN);
+            await Compile(filePath, portName, boardFqbn);
+            Process monitorProcess = await Monitor(portName, boardFqbn);
             Console.WriteLine("Exited with code: " + monitorProcess.ExitCode);
 
             break;
@@ -57,33 +65,55 @@ internal static class ArduinoCompiler
     private static string GetCommandInterpreter()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            return "cmd.exe";
+            return "bash.exe";
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             return "/bin/bash";
         throw new Exception("Unsupported operating system.");
     }
 
-    private static async Task<Process> Compile(string filePath, string portName, string boardFQBN)
+    private static readonly Regex MainPathRegex = new(@"C:\\.*main\.cpp");
+    private static readonly Regex InoFilePathRegex = new(@"C:\\.*\.ino");
+    public static async Task Compile(string filePath, string? portName, string boardFqbn)
     {
-        Process compileProcess = new();
-        compileProcess.StartInfo.FileName = "arduino-cli";
-        compileProcess.StartInfo.Arguments = $"compile --fqbn {boardFQBN} --port {portName} {filePath}";
-        compileProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(filePath);
+        Process compileProcess = new()
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = "arduino-cli",
+                Arguments = portName == null 
+                    ? $"compile --fqbn {boardFqbn} {filePath}" 
+                    : $"compile --fqbn {boardFqbn} --port {portName} {filePath}",
+                WorkingDirectory = filePath + "\\..\\bin",
+                // The following 3 is needed to read output
+                //RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false
+            },
+        };
         compileProcess.Start();
         await compileProcess.WaitForExitAsync();
-        return compileProcess;
+        //Console.WriteLine("output: " + await compileProcess.StandardOutput.ReadToEndAsync());
+        string error = await compileProcess.StandardError.ReadToEndAsync();
+        if (error.Trim().Length > 0)
+        {
+            error = InoFilePathRegex.Replace(MainPathRegex.Replace(error, "main.cpp"), "ArduinoFile");
+            Console.WriteLine("error:\n" + error);
+            throw new Exception("Failed compiling Arduino to AVR");
+        }
+        
     }
-    public static async Task<Process> Monitor(string portName, string boardFQBN)
+
+    private static async Task<Process> Monitor(string portName, string boardFqbn)
     {
         Process compileProcess = new();
         compileProcess.StartInfo.FileName = "arduino-cli";
-        compileProcess.StartInfo.Arguments = $"monitor --fqbn {boardFQBN} --port {portName}";
+        compileProcess.StartInfo.Arguments = $"monitor --fqbn {boardFqbn} --port {portName}";
         compileProcess.Start();
         await compileProcess.WaitForExitAsync();
         return compileProcess;
     }
 
-    private static async Task<string> GetBoards()
+    public static async Task<string> GetBoards()
     {
         Process listProcess = new();
         listProcess.StartInfo.FileName = "arduino-cli";
