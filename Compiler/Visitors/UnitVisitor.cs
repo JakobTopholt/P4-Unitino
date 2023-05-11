@@ -25,6 +25,8 @@ public class UnitVisitor : DepthFirstAdapter
     }
     public override void OutAUnitdeclGlobal(AUnitdeclGlobal node)
     {
+        symbolTable.AddIdToNode(node.GetId().ToString(), node);
+        
         StateUnit = false;
     }
     public override void OutASubunit(ASubunit node)

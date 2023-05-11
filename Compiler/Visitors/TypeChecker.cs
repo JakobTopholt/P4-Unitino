@@ -39,6 +39,68 @@ public class TypeChecker : exprTypeChecker
     {
     }
 
+    public override void OutAUnitType(AUnitType node)
+    {
+        List<ANumUnituse> nums = node.GetUnituse().OfType<ANumUnituse>().ToList();
+        List<ADenUnituse> dens = node.GetUnituse().OfType<ADenUnituse>().ToList();
+        List<AUnitdeclGlobal> newNums = new List<AUnitdeclGlobal>();
+        List<AUnitdeclGlobal> newDens = new List<AUnitdeclGlobal>();
+
+        foreach (ANumUnituse num in nums)
+        {
+            AUnitdeclGlobal? newNum = symbolTable.GetUnitFromId(num.GetId().ToString());
+            if (newNum != null)
+            {
+                newNums.Add(newNum);
+            }
+            else
+            {
+                // Not a recognized unit
+                symbolTable.AddNode(node, Symbol.notOk);
+            }
+        }
+        foreach (ADenUnituse den in dens)
+        {
+            AUnitdeclGlobal? newDen = symbolTable.GetUnitFromId(den.GetId().ToString());
+            if (newDen != null)
+            {
+                newDens.Add(newDen);
+            }
+            else
+            {
+                // Not a recognized unit
+                symbolTable.AddNode(node, Symbol.notOk);
+            }
+        }
+        Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unituse = new Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>(newNums, newDens);
+        symbolTable.AddNodeToUnit(node, unituse);
+        symbolTable.AddNode(node, Symbol.ok);
+    }
+    public override void OutAIntType(AIntType node)
+    {
+        symbolTable.AddNode(node, Symbol.Int);
+    }
+    public override void OutADecimalType(ADecimalType node)
+    {
+        symbolTable.AddNode(node, Symbol.Decimal);
+    }
+    public override void OutABoolType(ABoolType node)
+    {
+        symbolTable.AddNode(node, Symbol.Bool);
+    }
+    public override void OutACharType(ACharType node)
+    {
+        symbolTable.AddNode(node, Symbol.Char);
+    }
+    public override void OutAStringType(AStringType node)
+    {
+        symbolTable.AddNode(node, Symbol.String);
+    }
+    public override void OutAVoidType(AVoidType node)
+    {
+        symbolTable.AddNode(node, Symbol.Func);
+    }
+
     public override void InAUntypedGlobal(AUntypedGlobal node) 
     {
         symbolTable = symbolTable.EnterScope();

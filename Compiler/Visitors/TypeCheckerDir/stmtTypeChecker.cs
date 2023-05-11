@@ -113,7 +113,58 @@ public class stmtTypeChecker : DepthFirstAdapter
     }
     public override void OutAFunccallStmt(AFunccallStmt node)
     {
-       // the real one? 
+       // STANDALONE FUNCCAL
+       // Returtype er ubetydlig
+       
+       List<PType> args = symbolTable.GetFunctionArgs(symbolTable.GetFuncFromId(node.GetId().ToString()));
+       List<PExp>? parameters = node.GetParams() as List<PExp>;
+        if (args.Count() == parameters.Count())
+        {
+            for(int i = 0; i < args.Count(); i++)
+            {
+                switch (args[i])
+                {
+                    case AIntType:
+                        symbolTable.AddNode(node, symbolTable.GetSymbol(parameters[i]) == Symbol.Int ? Symbol.ok : Symbol.notOk);
+                        break;
+                    case ADecimalType:
+                        symbolTable.AddNode(node, symbolTable.GetSymbol(parameters[i]) == Symbol.Decimal ? Symbol.ok : Symbol.notOk);
+                        break;
+                    case ABoolType:
+                        symbolTable.AddNode(node, symbolTable.GetSymbol(parameters[i]) == Symbol.Bool ? Symbol.ok : Symbol.notOk);
+                        break;
+                    case ACharType:
+                        symbolTable.AddNode(node, symbolTable.GetSymbol(parameters[i]) == Symbol.Char ? Symbol.ok : Symbol.notOk);
+                        break;
+                    case AStringType:
+                        symbolTable.AddNode(node, symbolTable.GetSymbol(parameters[i]) == Symbol.String ? Symbol.ok : Symbol.notOk);
+                        break;
+                    case AUnitType argType:
+                    {
+                        var argUnit = symbolTable.GetUnit(argType);
+                        var paramUnit = symbolTable.GetUnit(parameters[i]);
+                        
+                        if (symbolTable.CompareCustomUnits(argUnit, paramUnit))
+                        {
+                            symbolTable.AddNodeToUnit(node, argUnit);
+                            symbolTable.AddNode(node, Symbol.ok);
+                        }
+                        else
+                        {
+                            symbolTable.AddNode(node, Symbol.notOk);
+                        }
+                        break; 
+                    }
+                    default:
+                        symbolTable.AddNode(node, Symbol.notOk);
+                        break;
+                }
+            }
+        }
+        else
+        {
+            symbolTable.AddNode(node, Symbol.notOk);
+        }
     }
 
     public Symbol? PTypeToSymbol(PType type)
@@ -135,20 +186,6 @@ public class stmtTypeChecker : DepthFirstAdapter
             default:
                 return null;
         }
-    }
-    public bool CompareCustomUnits(Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unit1, Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unit2)
-    { 
-        List<AUnitdeclGlobal> FuncNums = unit1.Item1;
-        List<AUnitdeclGlobal> ReturnNums = unit2.Item1;
-        List<AUnitdeclGlobal> FuncDens = unit1.Item2;
-        List<AUnitdeclGlobal> ReturnDens = unit2.Item2;
-                    
-        var sortedFuncNums = FuncNums.OrderBy(x => x).ToList();
-        var sortedReturnNums = ReturnNums.OrderBy(x => x).ToList();
-        var sortedFuncDens = FuncDens.OrderBy(x => x).ToList();
-        var sortedReturnDens = ReturnDens.OrderBy(x => x).ToList();
-
-        return sortedFuncNums.SequenceEqual(sortedReturnNums) && sortedFuncDens.SequenceEqual(sortedReturnDens);
     }
 
     public override void InAReturnStmt(AReturnStmt node)
@@ -200,7 +237,7 @@ public class stmtTypeChecker : DepthFirstAdapter
                       Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>? returnType = symbolTable.GetUnit(returnExp);
                       if (symbolTable.GetUnit(returnExp) != null)
                       {
-                          if (CompareCustomUnits(funcType, returnType))
+                          if (symbolTable.CompareCustomUnits(funcType, returnType))
                           {
                               symbolTable.AddNode(node, Symbol.ok);
                           }
@@ -219,7 +256,7 @@ public class stmtTypeChecker : DepthFirstAdapter
           case AUntypedGlobal aUntypedFunc:
               if (symbolTable.GetUnit(aUntypedFunc) != null)
               {
-                  symbolTable.AddNode(node, CompareCustomUnits(symbolTable.GetUnit(aUntypedFunc), symbolTable.GetUnit(returnExp)) ? Symbol.ok : Symbol.notOk);
+                  symbolTable.AddNode(node, symbolTable.CompareCustomUnits(symbolTable.GetUnit(aUntypedFunc), symbolTable.GetUnit(returnExp)) ? Symbol.ok : Symbol.notOk);
               } else if (symbolTable.GetReturnFromNode(aUntypedFunc) != null)
               {
                   symbolTable.AddNode(node, symbolTable.GetReturnFromNode(aUntypedFunc) == symbolTable.GetSymbol(returnExp) ? Symbol.ok : Symbol.notOk);
@@ -229,9 +266,11 @@ public class stmtTypeChecker : DepthFirstAdapter
                   if (symbolTable.GetUnit(returnExp) != null)
                   {
                       symbolTable.AddNodeToUnit(aUntypedFunc, symbolTable.GetUnit(returnExp));
+                      symbolTable.AddNodeToUnit(node, symbolTable.GetUnit(returnExp));
                   } else if (symbolTable.GetSymbol(returnExp) != null)
                   {
                       symbolTable.AddReturnSymbol(aUntypedFunc, symbolTable.GetSymbol(returnExp));
+                      symbolTable.AddNode(node, (Symbol)symbolTable.GetSymbol(returnExp));
                   }
               }
               break;

@@ -17,8 +17,8 @@ public class SymbolTable
     
     public Dictionary<string, AUnitdeclGlobal> SubunitToUnit = new();
     public Dictionary<Node, Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>> nodeToUnit = new();
-
-    private Dictionary<string, Node> functionidToNode = new();
+    
+    private readonly Dictionary<string, Node> funcidToNode = new();
     private Dictionary<Node, List<PType>> nodeToArgs = new();
     private Dictionary<Node, Symbol?> nodeToReturn = new();
     
@@ -58,7 +58,15 @@ public class SymbolTable
         parent._IsInCurrentScope(id);
     
     // Unit methods
-    public void AddIdToNode(string identifier, Node node) => idToNode.Add(identifier, node);
+    public void AddIdToNode(string identifier, AUnitdeclGlobal node) => idToNode.Add(identifier.Trim(), node);
+    public AUnitdeclGlobal? GetUnitFromId(string identifier)
+    {
+        return GetCurrentUnitFromId(identifier);
+    }
+    private AUnitdeclGlobal? GetCurrentUnitFromId(string identifier)
+    {
+        return idToNode.TryGetValue(identifier.Trim(), out Node? result) ? (AUnitdeclGlobal)result : parent?.GetCurrentUnitFromId(identifier);
+    }
     public Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>? GetUnit(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetUnit(node) : null;
     public Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>? GetUnit(Node expression)
     {
@@ -78,13 +86,37 @@ public class SymbolTable
             ? result
             : parent?.GetCurrentUnitFromSubunit(identifier);
     }
+    public bool CompareCustomUnits(Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unit1, Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unit2)
+    { 
+        List<AUnitdeclGlobal> FuncNums = unit1.Item1;
+        List<AUnitdeclGlobal> ReturnNums = unit2.Item1;
+        List<AUnitdeclGlobal> FuncDens = unit1.Item2;
+        List<AUnitdeclGlobal> ReturnDens = unit2.Item2;
+                    
+        var sortedFuncNums = FuncNums.OrderBy(x => x).ToList();
+        var sortedReturnNums = ReturnNums.OrderBy(x => x).ToList();
+        var sortedFuncDens = FuncDens.OrderBy(x => x).ToList();
+        var sortedReturnDens = ReturnDens.OrderBy(x => x).ToList();
+
+        return sortedFuncNums.SequenceEqual(sortedReturnNums) && sortedFuncDens.SequenceEqual(sortedReturnDens);
+    }
     
     // Function methods
+    public void AddIdToFunc(string identifier, Node node)
+    {
+        funcidToNode.Add(identifier.Trim(), node);
+    }
+
+    public Node? GetFuncFromId(string identifier)
+    {
+        return funcidToNode[identifier.Trim()];
+    }
+    
     public void AddFunctionArgs(Node node, List<PType> args)
     {
         nodeToArgs.Add(node, args);
     }
-    public List<PType>? GetFunctionParams(Node node)
+    public List<PType>? GetFunctionArgs(Node node)
     {
         return nodeToArgs[node];
     }
