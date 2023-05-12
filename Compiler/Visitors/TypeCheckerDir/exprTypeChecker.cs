@@ -250,27 +250,6 @@ public class exprTypeChecker : stmtTypeChecker
             symbolTable.AddNode(node, Symbol.notOk);
         }
     }
-
-    private void AddSingleUnitNumber(AUnitdeclGlobal? unitType, Node node)
-    {
-        // A single unitnumber eg. 50ms
-        if (unitType == null)
-        {
-            // Id is not a valid subunit
-            symbolTable.AddNode(node, Symbol.notOk);
-            return;
-        }
-
-        // Create a new unit tuple and add the unitnumber as a lone numerator
-        List<AUnitdeclGlobal> nums = new() { unitType };
-        List<AUnitdeclGlobal> dens = new();
-        var unit = new Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>(nums, dens);
-
-        // Map node to the unit
-        symbolTable.AddNodeToUnit(node, unit);
-        symbolTable.AddNode(node, Symbol.ok);
-    }
-
     public override void OutADivideExp(ADivideExp node)
     {
         PExp leftExpr = node.GetL();
@@ -289,11 +268,12 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(node, Symbol.Decimal);
                 break;
             default:
+                bool leftContainsUnit = symbolTable.nodeToUnit.ContainsKey(leftExpr);
+                bool rightContainsUnit = symbolTable.nodeToUnit.ContainsKey(rightExpr);
                 if (symbolTable.nodeToUnit.ContainsKey(leftExpr) && symbolTable.nodeToUnit.ContainsKey(rightExpr))
                 {
                     Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> left = symbolTable.GetUnit(leftExpr); // unit 1
-                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>
-                        right = symbolTable.GetUnit(rightExpr); // unit 2
+                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> right = symbolTable.GetUnit(rightExpr); // unit 2
 
                     List<AUnitdeclGlobal> a = left.Item1;
                     List<AUnitdeclGlobal> b = left.Item2;
@@ -311,17 +291,31 @@ public class exprTypeChecker : stmtTypeChecker
                     symbolTable.AddNodeToUnit(node, unituse);
                     symbolTable.AddNode(node, Symbol.ok);
                 }
+                else if ((leftContainsUnit || rightContainsUnit) && (symbolTable.GetSymbol(leftExpr) == Symbol.Int || symbolTable.GetSymbol(leftExpr) == Symbol.Decimal) 
+                         || (symbolTable.GetSymbol(rightExpr) == Symbol.Int || symbolTable.GetSymbol(rightExpr) == Symbol.Decimal))
+                {
+                    // Unitnumber + decimal/int eller decimal/int + UnitNumber
+                    var unit = leftContainsUnit ? symbolTable.GetUnit(leftExpr) :
+                        rightContainsUnit ? symbolTable.GetUnit(rightExpr) : null;
+                    
+                    if (unit != null)
+                    {
+                        symbolTable.AddNodeToUnit(node, unit);
+                        symbolTable.AddNode(node, Symbol.ok);
+                    }
+                    else
+                    {
+                        symbolTable.AddNode(node, Symbol.notOk);
+                    }
+                }
                 else
                 {
                     // not valid input expressions to a divide expression
                     symbolTable.AddNode(node, Symbol.notOk);
                 }
-
                 break;
         }
     }
-
-
     public override void OutAMultiplyExp(AMultiplyExp node)
     {
         PExp leftExpr = node.GetL();
@@ -340,11 +334,12 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(node, Symbol.Decimal);
                 break;
             default:
+                bool leftContainsUnit = symbolTable.nodeToUnit.ContainsKey(leftExpr);
+                bool rightContainsUnit = symbolTable.nodeToUnit.ContainsKey(rightExpr);
                 if (symbolTable.nodeToUnit.ContainsKey(leftExpr) && symbolTable.nodeToUnit.ContainsKey(rightExpr))
                 {
                     Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> left = symbolTable.GetUnit(leftExpr); // unit 1
-                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>
-                        right = symbolTable.GetUnit(rightExpr); // unit 2
+                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> right = symbolTable.GetUnit(rightExpr); // unit 2
 
                     List<AUnitdeclGlobal> a = left.Item1;
                     List<AUnitdeclGlobal> b = left.Item2;
@@ -362,12 +357,28 @@ public class exprTypeChecker : stmtTypeChecker
                     symbolTable.AddNodeToUnit(node, unituse);
                     symbolTable.AddNode(node, Symbol.ok);
                 }
+                else if ((leftContainsUnit || rightContainsUnit) && (symbolTable.GetSymbol(leftExpr) == Symbol.Int || symbolTable.GetSymbol(leftExpr) == Symbol.Decimal) 
+                         || (symbolTable.GetSymbol(rightExpr) == Symbol.Int || symbolTable.GetSymbol(rightExpr) == Symbol.Decimal))
+                {
+                    // Unitnumber + decimal/int eller decimal/int + UnitNumber
+                    var unit = leftContainsUnit ? symbolTable.GetUnit(leftExpr) :
+                        rightContainsUnit ? symbolTable.GetUnit(rightExpr) : null;
+                    
+                    if (unit != null)
+                    {
+                        symbolTable.AddNodeToUnit(node, unit);
+                        symbolTable.AddNode(node, Symbol.ok);
+                    }
+                    else
+                    {
+                        symbolTable.AddNode(node, Symbol.notOk);
+                    }
+                }
                 else
                 {
                     // not valid input expressions to a multiply expression
                     symbolTable.AddNode(node, Symbol.notOk);
                 }
-
                 break;
         }
     }
@@ -403,11 +414,12 @@ public class exprTypeChecker : stmtTypeChecker
                 break;
             default:
                 // Implement logikken for custom units her
+                bool leftContainsUnit = symbolTable.nodeToUnit.ContainsKey(leftExpr);
+                bool rightContainsUnit = symbolTable.nodeToUnit.ContainsKey(rightExpr);
                 if (symbolTable.nodeToUnit.ContainsKey(leftExpr) && symbolTable.nodeToUnit.ContainsKey(rightExpr))
                 {
                     Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> left = symbolTable.GetUnit(leftExpr); // unit 1
-                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>
-                        right = symbolTable.GetUnit(rightExpr); // unit 2
+                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> right = symbolTable.GetUnit(rightExpr); // unit 2
 
                     List<AUnitdeclGlobal> a = left.Item1;
                     List<AUnitdeclGlobal> b = left.Item2;
@@ -447,12 +459,28 @@ public class exprTypeChecker : stmtTypeChecker
                         symbolTable.AddNode(node, Symbol.notOk);
                     }
                 }
+                else if ((leftContainsUnit || rightContainsUnit) && (symbolTable.GetSymbol(leftExpr) == Symbol.Int || symbolTable.GetSymbol(leftExpr) == Symbol.Decimal) 
+                         || (symbolTable.GetSymbol(rightExpr) == Symbol.Int || symbolTable.GetSymbol(rightExpr) == Symbol.Decimal))
+                {
+                    // Unitnumber + decimal/int eller decimal/int + UnitNumber
+                    var unit = leftContainsUnit ? symbolTable.GetUnit(leftExpr) :
+                        rightContainsUnit ? symbolTable.GetUnit(rightExpr) : null;
+                    
+                    if (unit != null)
+                    {
+                        symbolTable.AddNodeToUnit(node, unit);
+                        symbolTable.AddNode(node, Symbol.ok);
+                    }
+                    else
+                    {
+                        symbolTable.AddNode(node, Symbol.notOk);
+                    }
+                }
                 else
                 {
-                    // not valid input expressions to a multiply expression
+                    // not valid input expression
                     symbolTable.AddNode(node, Symbol.notOk);
                 }
-
                 break;
         }
     }
@@ -476,11 +504,12 @@ public class exprTypeChecker : stmtTypeChecker
                 break;
             default:
                 // Implement logikken for custom units her
+                bool leftContainsUnit = symbolTable.nodeToUnit.ContainsKey(leftExpr);
+                bool rightContainsUnit = symbolTable.nodeToUnit.ContainsKey(rightExpr);
                 if (symbolTable.nodeToUnit.ContainsKey(leftExpr) && symbolTable.nodeToUnit.ContainsKey(rightExpr))
                 {
                     Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> left = symbolTable.GetUnit(leftExpr); // unit 1
-                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>
-                        right = symbolTable.GetUnit(rightExpr); // unit 2
+                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> right = symbolTable.GetUnit(rightExpr); // unit 2
 
                     List<AUnitdeclGlobal> a = left.Item1;
                     List<AUnitdeclGlobal> b = left.Item2;
@@ -520,12 +549,28 @@ public class exprTypeChecker : stmtTypeChecker
                         symbolTable.AddNode(node, Symbol.notOk);
                     }
                 }
+                else if ((leftContainsUnit || rightContainsUnit) && (symbolTable.GetSymbol(leftExpr) == Symbol.Int || symbolTable.GetSymbol(leftExpr) == Symbol.Decimal) 
+                         || (symbolTable.GetSymbol(rightExpr) == Symbol.Int || symbolTable.GetSymbol(rightExpr) == Symbol.Decimal))
+                {
+                    // Unitnumber + decimal/int eller decimal/int + UnitNumber
+                    var unit = leftContainsUnit ? symbolTable.GetUnit(leftExpr) :
+                        rightContainsUnit ? symbolTable.GetUnit(rightExpr) : null;
+                    
+                    if (unit != null)
+                    {
+                        symbolTable.AddNodeToUnit(node, unit);
+                        symbolTable.AddNode(node, Symbol.ok);
+                    }
+                    else
+                    {
+                        symbolTable.AddNode(node, Symbol.notOk);
+                    }
+                }
                 else
                 {
                     // not valid input expressions to a multiply expression
                     symbolTable.AddNode(node, Symbol.notOk);
                 }
-
                 break;
         }
     }
