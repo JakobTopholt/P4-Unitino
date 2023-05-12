@@ -59,14 +59,15 @@ public class VisitorTests
     [SetUp]
     public async Task DownloadCli()
     {
-        await ArduinoCompiler.DownloadCliAsync(Directory.GetCurrentDirectory().Replace("net6.0", ""));
+        await ArduinoCompiler.DownloadCliAsync();
     }
     private static readonly Regex SWhitespace = new(@"\s+");
     [TestCaseSource(typeof(FilesToTestsConverter), nameof(FilesToTestsConverter.CodeGenDataForIno))]
     public async Task CheckIfCodeGenWorksInArduino(string name, string codeGenText)
     {
         name = SWhitespace.Replace(name, "").Replace(':', '-');
-        string folder = Directory.GetCurrentDirectory() + "\\..\\" + name + "\\"; // For some reason someFile.ino needs to be in someFile/someFile.ino - https://github.com/arduino/arduino-cli/issues/1968
+        // For some reason someFile.ino needs to be in someFile/someFile.ino - https://github.com/arduino/arduino-cli/issues/1968
+        string folder = Directory.GetCurrentDirectory() + "\\..\\" + name + "\\"; 
         {
             Directory.CreateDirectory(folder);
             await using StreamWriter textWriter = File.CreateText(folder + name + ".ino");
@@ -81,17 +82,8 @@ public class VisitorTests
             string[] columns = row.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (columns.Length != 9 || columns[2] != "Serial") 
                 continue;
-            string boardFQBN = columns[7];
-            try
-            {
-                await ArduinoCompiler.Compile(folder, null, boardFQBN);
-                Assert.Pass("Compiled");
-            }
-            catch (Exception e)
-            {
-                Assert.Fail("Didn't compile");
-                throw;
-            }
+            string boardFqbn = columns[7];
+            Assert.That(await ArduinoCompiler.Compile(folder, null, boardFqbn), Is.True);
             return;
         }
         Assert.Inconclusive("Arduino board not plugged in");
