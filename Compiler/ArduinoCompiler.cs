@@ -89,7 +89,6 @@ public static class ArduinoCompiler
             ? $"compile --fqbn {boardFqbn} {folder}"
             : $"compile --fqbn {boardFqbn} --port {portName} {folder}", true);
         
-        compileProcess.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory() + "\\bin";
         compileProcess.Start();
         await compileProcess.WaitForExitAsync();
         string error = await compileProcess.StandardError.ReadToEndAsync();
@@ -126,15 +125,16 @@ public static class ArduinoCompiler
             StartInfo = redirect
                 ? new ProcessStartInfo
                 {
-                    FileName = "arduino-cli",
+                    FileName = "bin\\arduino-cli.exe",
                     Arguments = args,
                     UseShellExecute = false,
-                    RedirectStandardError = true
+                    RedirectStandardError = true,
                 }
                 : new ProcessStartInfo
                 {
-                    FileName = "arduino-cli",
-                    Arguments = args
+                    FileName = "bin\\arduino-cli.exe",
+                    Arguments = args,
+                    UseShellExecute = false,
                 }
         };
     }

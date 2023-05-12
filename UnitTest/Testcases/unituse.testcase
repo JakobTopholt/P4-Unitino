@@ -11,6 +11,10 @@ Time UnitFunc() {
 prog {
     Time a = 1/50ms;
 }
+
+loop {
+    int a;
+}
 ////
 
 ////
