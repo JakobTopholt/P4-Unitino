@@ -86,8 +86,7 @@ public class VisitorTests
             Assert.That(await ArduinoCompiler.Compile(folder, null, boardFqbn), Is.True);
             return;
         }
-        Assert.Inconclusive("Arduino board not plugged in");
-
+        Assert.That(await ArduinoCompiler.Compile(folder, null, null), Is.True);
     }
     
 }

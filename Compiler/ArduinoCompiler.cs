@@ -6,11 +6,16 @@ namespace Compiler;
 
 public static class ArduinoCompiler
 {
-    public static async Task DownloadCliAsync()
+    public static async Task<bool> DownloadCliAsync()
     {
         string scriptLoc = Directory.GetCurrentDirectory() + "\\";
-        if (File.Exists(scriptLoc + "bin\\ardino-cli.exe"))
-            return;
+        if (File.Exists(scriptLoc + "bin\\arduino-cli.exe"))
+            return true;
+        if (!File.Exists(@"C:\Program Files\Git\bin\bash.exe"))
+        {
+            Console.WriteLine("Need Git Bash at " + @"C:\Program Files\Git\bin\bash.exe" + " to install Arduino CLI");
+            return false;
+        }
         Console.WriteLine("Downloading Arduino CLI to " + scriptLoc + "bin\\arduino-cli");
         {
             using HttpClient httpClient = new();
@@ -18,33 +23,29 @@ public static class ArduinoCompiler
             await using StreamWriter textWriter = File.CreateText(scriptLoc + "cliDownload.sh");
             await textWriter.WriteAsync(await response.Content.ReadAsStringAsync());
         }
-        string arduinoCliPath = scriptLoc.Replace(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "")
-            .Replace('\\', '/');
         Directory.CreateDirectory(scriptLoc + "\\bin");
         Process process = new()
         {
             StartInfo = new ProcessStartInfo
             {
-                FileName = GetCommandInterpreter(),
-                Arguments = "cliDownload.sh",
-                Environment = {["BINDIR"] = arduinoCliPath},
+                FileName = @"C:\Program Files\Git\bin\bash.exe",
+                Arguments = $"--login -i -c \"{Path.Combine(scriptLoc, "cliDownload.sh").Replace('\\', '/')}\"",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 WorkingDirectory = scriptLoc
-                
             }
         };
         process.Start();
         await process.WaitForExitAsync();
-
+        
         if (process.ExitCode != 0)
         {
             Console.WriteLine("Download failed.");
-            return;
+            return false;
         }
-        File.Move(scriptLoc + "bin\\arduino-cli", scriptLoc + "bin\\arduino-cli.exe");
         Console.WriteLine("Download succeeded!");
+        return true;
     }
 
     public static async Task InoToAVROnBoard(string folder)
@@ -73,7 +74,7 @@ public static class ArduinoCompiler
     private static string GetCommandInterpreter()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            return "bash.exe";
+            return "\"C:\\Program Files\\Git\\bin\\bash.exe\"";
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             return "/bin/bash";
         throw new Exception("Unsupported operating system.");
@@ -81,8 +82,9 @@ public static class ArduinoCompiler
 
     private static readonly Regex MainPathRegex = new(@"C:\\.*main\.cpp");
     private static readonly Regex InoFilePathRegex = new(@"C:\\.*\.ino");
-    public static async Task<bool> Compile(string folder, string? portName, string boardFqbn)
+    public static async Task<bool> Compile(string folder, string? portName, string? boardFqbn)
     {
+        boardFqbn ??= "arduino:avr:uno";
         Process compileProcess = ArduinoCli(portName == null
             ? $"compile --fqbn {boardFqbn} {folder}"
             : $"compile --fqbn {boardFqbn} --port {portName} {folder}", true);
