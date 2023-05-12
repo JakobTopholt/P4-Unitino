@@ -12,6 +12,39 @@ public class exprTypeChecker : stmtTypeChecker
 
     }
 
+    public override void OutAExpExp(AExpExp node)
+    {
+        Symbol? type = symbolTable.GetSymbol(node.GetExp());
+        switch (type)
+        {
+            case Symbol.Int:
+                symbolTable.AddNode(node, Symbol.Int);
+                break;
+            case Symbol.Decimal:
+                symbolTable.AddNode(node, Symbol.Decimal);
+                break;
+            case Symbol.Bool:
+                symbolTable.AddNode(node, Symbol.Bool);
+                break;
+            case Symbol.Char:
+                symbolTable.AddNode(node, Symbol.Char);
+                break;
+            case Symbol.String:
+                symbolTable.AddNode(node, Symbol.String);
+                break;
+            case Symbol.Func:
+                symbolTable.AddNode(node, Symbol.Func);
+                break;
+            case Symbol.ok:
+                symbolTable.AddNode(node, Symbol.ok);
+                break;
+            default:
+                var unit = symbolTable.GetUnit(node.GetExp());
+                symbolTable.AddNode(node, unit != null ? Symbol.ok : Symbol.notOk);
+                break;
+        }
+    }
+
     public override void OutAUnitType(AUnitType node)
     {
         // Save reference from node to tuple
@@ -560,11 +593,11 @@ public class exprTypeChecker : stmtTypeChecker
     }
     
     public override void OutALogicalnotExp(ALogicalnotExp node) => symbolTable.AddNode(node,
-        symbolTable.GetSymbol(node) == Symbol.Bool ? Symbol.Bool : Symbol.notOk);
+        symbolTable.GetSymbol(node.GetExp()) == Symbol.Bool ? Symbol.Bool : Symbol.notOk);
 
     public override void OutACastExp(ACastExp node)
     {
-        Symbol? targetExpr = symbolTable.GetSymbol(node.GetType()); // er dette rigtigt?
+        Symbol? targetExpr = symbolTable.GetSymbol(node.GetType());
         Symbol? expr = symbolTable.GetSymbol(node.GetExp());
         switch (targetExpr, expr)
         {
