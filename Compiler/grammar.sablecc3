@@ -42,7 +42,12 @@ Tokens
     while = 'while';
     treturn = 'return';
     tvoid = 'void';
-
+    
+    tdelay = 'delay';
+    tsetpin = 'setpin';
+    low = 'low';
+    high = 'high';
+    
     tint = 'int';
     tdecimal = 'decimal';
     tbool = 'bool';
@@ -50,6 +55,7 @@ Tokens
     tstring = 'string';
     tunit = 'unit';
     tvalue = 'value';
+    tpin = 'pin';
     
     ttrue = 'true';
     tfalse = 'false';
@@ -155,7 +161,8 @@ Productions
                    | {decimal}  tdecimal    {-> New type.decimal()}
                    | {bool}     tbool       {-> New type.bool()}
                    | {char}     tchar       {-> New type.char()}
-                   | {string}   tstring     {-> New type.string()};
+                   | {string}   tstring     {-> New type.string()}
+                   | {pin}      tpin        {-> New type.pin()};
 
                                
     //// Functions and statements
@@ -177,11 +184,16 @@ Productions
     // Statements
     stmt_list {-> stmt*} = stmt stmt_list?                      {-> [stmt.stmt, stmt_list.stmt]};
     
-    stmt {-> stmt} = {assign}   assign semicolon                    {-> assign.stmt}
-                   | {decl}     unittype id semicolon               {-> New stmt.decl(unittype.type, id)}
-                   | {declass}  unittype id equal exp semicolon     {-> New stmt.declass(unittype.type, id, exp.exp)}
-                   | {funccall} id l_par params? r_par semicolon    {-> New stmt.funccall(id, [params.exp])}
-                   | {scoped}   scoped                              {-> scoped.stmt};
+    stmt {-> stmt} = {assign}   assign semicolon                        {-> assign.stmt}
+                   | {decl}     unittype id semicolon                   {-> New stmt.decl(unittype.type, id)}
+                   | {declass}  unittype id equal exp semicolon         {-> New stmt.declass(unittype.type, id, exp.exp)}
+                   | {funccall} id l_par params? r_par semicolon        {-> New stmt.funccall(id, [params.exp])}
+                   | {delay} tdelay l_par exp r_par semicolon           {-> New stmt.delay(exp.exp)}
+                   | {setpin} tsetpin l_par exp comma pintoggle r_par   {-> New stmt.setpin(exp.exp, pintoggle.pintoggle)}
+                   | {scoped}   scoped                                  {-> scoped.stmt};
+                   
+    pintoggle {-> pintoggle} = {high} high  {-> New pintoggle.high()}
+                             | {low} low    {-> New pintoggle.low()};
                    
     return {-> stmt} = treturn exp? semicolon               {-> New stmt.return(exp.exp)};
     
@@ -276,7 +288,11 @@ Abstract Syntax Tree
          | {else} stmt+
          | {for} [init]:stmt [cond]:exp [incre]:stmt stmt+ // incre is always an assignstmt
          | {while} exp stmt+
-         | {dowhile} stmt+ exp;
+         | {dowhile} stmt+ exp
+         | {delay} exp
+         | {setpin} exp pintoggle;
+         
+    pintoggle = {high} | {low};
               
     type = {int} 
          | {decimal}
@@ -284,7 +300,8 @@ Abstract Syntax Tree
          | {char}
          | {string}
          | {unit} unituse+
-         | {void};
+         | {void}
+         | {pin};
          
     unituse = {num} id // numerator
             | {den} id; // denumerator
