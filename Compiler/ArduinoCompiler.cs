@@ -9,7 +9,7 @@ public static class ArduinoCompiler
     public static async Task DownloadCliAsync()
     {
         string scriptLoc = Directory.GetCurrentDirectory() + "\\";
-        if (File.Exists(scriptLoc + "bin\\arduino-cli.exe"))
+        if (File.Exists(scriptLoc + "bin\\ardino-cli.exe"))
             return;
         Console.WriteLine("Downloading Arduino CLI to " + scriptLoc + "bin\\arduino-cli");
         {
@@ -20,6 +20,7 @@ public static class ArduinoCompiler
         }
         string arduinoCliPath = scriptLoc.Replace(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "")
             .Replace('\\', '/');
+        Directory.CreateDirectory(scriptLoc + "\\bin");
         Process process = new()
         {
             StartInfo = new ProcessStartInfo
