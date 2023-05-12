@@ -6,14 +6,15 @@ namespace Compiler;
 
 public static class ArduinoCompiler
 {
-    public static async Task<bool> DownloadCliAsync()
+    public static async Task<bool> DownloadCliAsync(string? nullableBash)
     {
+        string bash = nullableBash ?? GetCommandInterpreter();
         string scriptLoc = Directory.GetCurrentDirectory() + "\\";
         if (File.Exists(scriptLoc + "bin\\arduino-cli.exe"))
             return true;
-        if (!File.Exists(@"C:\Program Files\Git\bin\bash.exe"))
+        if (!File.Exists(bash))
         {
-            Console.WriteLine("Need Git Bash at " + @"C:\Program Files\Git\bin\bash.exe" + " to install Arduino CLI");
+            Console.WriteLine("Need Git Bash at " + bash + " to install Arduino CLI");
             return false;
         }
         Console.WriteLine("Downloading Arduino CLI to " + scriptLoc + "bin\\arduino-cli");
@@ -28,7 +29,7 @@ public static class ArduinoCompiler
         {
             StartInfo = new ProcessStartInfo
             {
-                FileName = @"C:\Program Files\Git\bin\bash.exe",
+                FileName = bash,
                 Arguments = $"--login -i -c \"{Path.Combine(scriptLoc, "cliDownload.sh").Replace('\\', '/')}\"",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
@@ -74,7 +75,7 @@ public static class ArduinoCompiler
     private static string GetCommandInterpreter()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            return "\"C:\\Program Files\\Git\\bin\\bash.exe\"";
+            return @"C:\Program Files\Git\bin\bash.exe";
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             return "/bin/bash";
         throw new Exception("Unsupported operating system.");
