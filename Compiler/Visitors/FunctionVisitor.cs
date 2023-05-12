@@ -18,7 +18,6 @@ public class FunctionVisitor : DepthFirstAdapter
     public override void OutStart(Start node) => symbolTable = symbolTable.ResetScope();
     public override void OutAArg(AArg node)
     {
-        // tilføj til symboltable 
         // Skal nok også ind i tredje pass ad typechecker (det lokale)
         
         if (!symbolTable.IsInCurrentScope(node.GetId()))
@@ -26,19 +25,19 @@ public class FunctionVisitor : DepthFirstAdapter
             switch (node.GetType())
             {
                 case AIntType:
-                    symbolTable.AddId(node.GetId().ToString(), node, Symbol.Int);
+                    symbolTable.AddNode(node, Symbol.Int);
                     break;
                 case ADecimalType:
-                    symbolTable.AddId(node.GetId().ToString(), node, Symbol.Decimal);
+                    symbolTable.AddNode(node, Symbol.Decimal);
                     break;
                 case ABoolType:
-                    symbolTable.AddId(node.GetId().ToString(), node, Symbol.Bool);
+                    symbolTable.AddNode(node, Symbol.Bool);
                     break;
                 case ACharType:
-                    symbolTable.AddId(node.GetId().ToString(), node, Symbol.Char);
+                    symbolTable.AddNode(node, Symbol.Char);
                     break;
                 case AStringType:
-                    symbolTable.AddId(node.GetId().ToString(), node, Symbol.String);
+                    symbolTable.AddNode(node, Symbol.String);
                     break;
                 case AUnitType customType:
                 {
@@ -54,7 +53,7 @@ public class FunctionVisitor : DepthFirstAdapter
         }
         else
         {
-            symbolTable.AddId(node.GetId().ToString(), node, Symbol.notOk);
+            symbolTable.AddNode(node, Symbol.notOk);
         }
     }
 
@@ -62,31 +61,32 @@ public class FunctionVisitor : DepthFirstAdapter
     {
         foreach (AArg arg in args)
         {
-            string id = arg.GetId().ToString();
+            string id = arg.GetId().ToString().Trim();
             PType type = arg.GetType();
             switch (type)
             {
                 case AIntType:
-                    symbolTable.AddId(id, node, Symbol.Int);
+                    symbolTable.AddIdToNode(id, arg);
                     break;
                 case ADecimalType:
-                    symbolTable.AddId(id, node, Symbol.Decimal);
+                    symbolTable.AddIdToNode(id, arg);
                     break;
                 case ABoolType:
-                    symbolTable.AddId(id, node, Symbol.Bool);
+                    symbolTable.AddIdToNode(id, arg);
                     break;
                 case ACharType:
-                    symbolTable.AddId(id, node, Symbol.Char);
+                    symbolTable.AddIdToNode(id, arg);
                     break;
                 case AStringType:
-                    symbolTable.AddId(id, node, Symbol.String);
+                    symbolTable.AddIdToNode(id, arg);
                     break;
                 case AUnitType customType:
                     var unit = symbolTable.GetUnit(customType);
                     if (unit != null)
                     {
-                        symbolTable.AddNodeToUnit(node, unit);
-                        symbolTable.AddNode(node, Symbol.ok);  
+                        // overvej om AddNodeToUnit skal fjernes her
+                        symbolTable.AddNodeToUnit(arg, unit);
+                        symbolTable.AddIdToNode(id, arg);
                     }
                     else
                     {
@@ -122,7 +122,8 @@ public class FunctionVisitor : DepthFirstAdapter
             symbolTable.AddIdToFunc(node.GetId().ToString(), node);
 
             symbolTable.EnterScope();
-            AddArgsToScope(node, node.GetArg());
+            //if(symbolTable.GetSymbol(node) != Symbol.notOk)
+                AddArgsToScope(node, node.GetArg());
         }
     }
 
@@ -185,7 +186,8 @@ public class FunctionVisitor : DepthFirstAdapter
             symbolTable.AddIdToFunc(node.GetId().ToString(), node);
 
             symbolTable.EnterScope();
-            AddArgsToScope(node, node.GetArg());
+            //if(symbolTable.GetSymbol(node) != Symbol.notOk)
+                AddArgsToScope(node, node.GetArg());
         }
     }
 

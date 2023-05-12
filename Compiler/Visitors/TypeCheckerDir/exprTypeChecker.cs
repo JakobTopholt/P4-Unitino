@@ -497,8 +497,54 @@ public class exprTypeChecker : stmtTypeChecker
         }
     }
 
-    public override void OutARemainderExp(ARemainderExp node) =>
-        AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
+    public override void OutARemainderExp(ARemainderExp node)
+    {
+        PExp L = node.GetL();
+        PExp R = node.GetR();
+        
+        Symbol? left = symbolTable.GetSymbol(L);
+        Symbol? right = symbolTable.GetSymbol(R);
+        switch (left)
+        {
+            case Symbol.Int:
+                if (right == Symbol.Int)
+                {
+                    symbolTable.AddNode(node, Symbol.Int);
+                } else if (right == Symbol.Decimal)
+                {
+                    symbolTable.AddNode(node, Symbol.Decimal);
+                }
+                else
+                { 
+                    symbolTable.AddNode(node, Symbol.notOk);  
+                }
+                break;
+            case Symbol.Decimal:
+                if (right == Symbol.Int || right == Symbol.Decimal)
+                {
+                    symbolTable.AddNode(node, Symbol.Decimal);
+                }
+                else
+                { 
+                    symbolTable.AddNode(node, Symbol.notOk);  
+                }
+                break;
+            default:
+                var unit1 = symbolTable.GetUnit(L);
+                var unit2 = symbolTable.GetUnit(R);
+
+                if (symbolTable.CompareCustomUnits(unit1, unit2))
+                {
+                    symbolTable.AddNodeToUnit(node, unit1);
+                    symbolTable.AddNode(node, Symbol.ok);
+                }
+                else
+                {
+                    symbolTable.AddNode(node, Symbol.notOk);
+                }
+                break;
+        }
+    }
 
     public override void OutATernaryExp(ATernaryExp node)
     {
@@ -512,45 +558,7 @@ public class exprTypeChecker : stmtTypeChecker
             symbolTable.AddNode(node, Symbol.notOk);
         }
     }
-
-    public override void OutAOrExp(AOrExp node)
-    {
-        Symbol? leftside = symbolTable.GetSymbol(node.GetL());
-        Symbol? rightside = symbolTable.GetSymbol(node.GetR());
-        if (leftside == Symbol.Bool && rightside == Symbol.Bool)
-        {
-            symbolTable.AddNode(node, Symbol.Bool);
-        }
-        else
-        {
-            symbolTable.AddNode(node, Symbol.notOk);
-        }
-    }
-
-    public override void OutAAndExp(AAndExp node)
-    {
-        Symbol? leftside = symbolTable.GetSymbol(node.GetL());
-        Symbol? rightside = symbolTable.GetSymbol(node.GetR());
-        if (leftside == Symbol.Bool && rightside == Symbol.Bool)
-        {
-            symbolTable.AddNode(node, Symbol.Bool);
-        }
-        else
-        {
-            symbolTable.AddNode(node, Symbol.notOk);
-        }
-    }
-
-    public override void OutAEqualExp(AEqualExp node) => AddBinaryToSymbolTable(node, node.GetL(), node.GetR());
-    public override void OutANotequalExp(ANotequalExp node) => AddBinaryToSymbolTable(node, node.GetL(), node.GetR());
-    public override void OutAGreaterExp(AGreaterExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
-    public override void OutALessExp(ALessExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
-    public override void OutAGreaterequalExp(AGreaterequalExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
-    public override void OutALessequalExp(ALessequalExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
-    public override void OutASuffixplusplusExp(ASuffixplusplusExp node) => AddUnaryToSymbolTable(node);
-    public override void OutASuffixminusminusExp(ASuffixminusminusExp node) => AddUnaryToSymbolTable(node);
-    public override void OutAUnaryminusExp(AUnaryminusExp node) => AddUnaryToSymbolTable(node);
-
+    
     public override void OutALogicalnotExp(ALogicalnotExp node) => symbolTable.AddNode(node,
         symbolTable.GetSymbol(node) == Symbol.Bool ? Symbol.Bool : Symbol.notOk);
 
@@ -597,29 +605,65 @@ public class exprTypeChecker : stmtTypeChecker
                 break;
         }
     }
+    public override void OutAOrExp(AOrExp node)
+    {
+        Symbol? leftside = symbolTable.GetSymbol(node.GetL());
+        Symbol? rightside = symbolTable.GetSymbol(node.GetR());
+        if (leftside == Symbol.Bool && rightside == Symbol.Bool)
+        {
+            symbolTable.AddNode(node, Symbol.Bool);
+        }
+        else
+        {
+            symbolTable.AddNode(node, Symbol.notOk);
+        }
+    }
 
+    public override void OutAAndExp(AAndExp node)
+    {
+        Symbol? leftside = symbolTable.GetSymbol(node.GetL());
+        Symbol? rightside = symbolTable.GetSymbol(node.GetR());
+        if (leftside == Symbol.Bool && rightside == Symbol.Bool)
+        {
+            symbolTable.AddNode(node, Symbol.Bool);
+        }
+        else
+        {
+            symbolTable.AddNode(node, Symbol.notOk);
+        }
+    }
+    public override void OutAEqualExp(AEqualExp node) => AddBinaryToSymbolTable(node, node.GetL(), node.GetR());
+    public override void OutANotequalExp(ANotequalExp node) => AddBinaryToSymbolTable(node, node.GetL(), node.GetR());
+    public override void OutAGreaterExp(AGreaterExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
+    public override void OutALessExp(ALessExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
+    public override void OutAGreaterequalExp(AGreaterequalExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
+    public override void OutALessequalExp(ALessequalExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
+    public override void OutASuffixplusplusExp(ASuffixplusplusExp node) => AddUnaryToSymbolTable(node);
+    public override void OutASuffixminusminusExp(ASuffixminusminusExp node) => AddUnaryToSymbolTable(node);
+    public override void OutAUnaryminusExp(AUnaryminusExp node) => AddUnaryToSymbolTable(node);
     public override void OutAPrefixminusminusExp(APrefixminusminusExp node) => AddUnaryToSymbolTable(node);
     public override void OutAPrefixplusplusExp(APrefixplusplusExp node) => AddUnaryToSymbolTable(node);
 
+    // Equals, Notequal
     private void AddBinaryToSymbolTable(Node Parent, Node L, Node R)
     {
         Symbol? left = symbolTable.GetSymbol(L);
         switch (left)
         {
             case Symbol.Int:
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Int ? Symbol.Int : Symbol.notOk);
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Int ? Symbol.Bool : Symbol.notOk);
                 break;
             case (Symbol.Decimal):
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Decimal ? Symbol.Decimal : Symbol.notOk);
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Decimal ? Symbol.Bool : Symbol.notOk);
                 break;
-            case (Symbol.Bool):
+            case Symbol.Bool:
                 symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Bool ? Symbol.Bool : Symbol.notOk);
                 break;
-            case (Symbol.String):
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.String ? Symbol.String : Symbol.notOk);
+            case Symbol.String:
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.String ? Symbol.Bool : Symbol.notOk);
                 break;
-            case (Symbol.Char):
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Int ? Symbol.Int : Symbol.notOk);
+            case Symbol.Char:
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Int ? Symbol.Bool : Symbol.notOk);
                 break;
             default:
                 var unit1 = symbolTable.GetUnit(L);
@@ -627,18 +671,36 @@ public class exprTypeChecker : stmtTypeChecker
 
                 if (symbolTable.CompareCustomUnits(unit1, unit2))
                 {
-                    symbolTable.AddNodeToUnit(Parent, unit1);
-                    symbolTable.AddNode(Parent, Symbol.ok);
+                    symbolTable.AddNode(Parent, Symbol.Bool);
                 }
                 else
                 {
                     symbolTable.AddNode(Parent, Symbol.notOk);
                 }
-
                 break;
         }
     }
-
+    // Binary without string, bool and unit
+    // Greater, GreaterEqual, Less, LessEqual
+    private void AddBinaryNumberToSymbolTable(Node Parent, Node L, Node R)
+    {
+        Symbol? left = symbolTable.GetSymbol(L);
+        switch (left)
+        {
+            case Symbol.Int:
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Int ? Symbol.Bool : Symbol.notOk);
+                break;
+            case (Symbol.Decimal):
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Decimal ? Symbol.Bool : Symbol.notOk);
+                break;
+            case Symbol.Char:
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Int ? Symbol.Bool : Symbol.notOk);
+                break;
+            default:
+                symbolTable.AddNode(Parent, Symbol.notOk);
+                break;
+        }
+    }
     private void AddUnaryToSymbolTable(Node node)
     {
         Symbol? expr = symbolTable.GetSymbol(node);
@@ -655,37 +717,6 @@ public class exprTypeChecker : stmtTypeChecker
                 break;
             default:
                 symbolTable.AddNode(node, Symbol.notOk);
-                break;
-        }
-    }
-
-    private void AddBinaryNumberToSymbolTable(Node Parent, Node L, Node R)
-    {
-        Symbol? left = symbolTable.GetSymbol(L);
-        switch (left)
-        {
-            case Symbol.Int:
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Int ? Symbol.Int : Symbol.notOk);
-                break;
-            case (Symbol.Decimal):
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Decimal ? Symbol.Decimal : Symbol.notOk);
-                break;
-            case (Symbol.Bool):
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Bool ? Symbol.Bool : Symbol.notOk);
-                break;
-            default:
-                var unit1 = symbolTable.GetUnit(L);
-                var unit2 = symbolTable.GetUnit(R);
-
-                if (symbolTable.CompareCustomUnits(unit1, unit2))
-                {
-                    symbolTable.AddNodeToUnit(Parent, unit1);
-                    symbolTable.AddNode(Parent, Symbol.ok);
-                }
-                else
-                {
-                    symbolTable.AddNode(Parent, Symbol.notOk);
-                }
                 break;
         }
     }

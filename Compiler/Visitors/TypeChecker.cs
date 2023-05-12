@@ -134,6 +134,7 @@ public class TypeChecker : exprTypeChecker
         symbolTable.AddNode(node, Symbol.Func);
     }
 
+    /* Lige nu laver den dobbeltarbejde og fucker vores scopes
     public override void InAUntypedGlobal(AUntypedGlobal node) 
     {
         symbolTable = symbolTable.EnterScope();
@@ -166,4 +167,5 @@ public class TypeChecker : exprTypeChecker
     {
         symbolTable = symbolTable.ExitScope();
     }
+    */
 }
