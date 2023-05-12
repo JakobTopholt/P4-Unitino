@@ -9,7 +9,7 @@ public static class ArduinoCompiler
     public static async Task DownloadCliAsync()
     {
         string scriptLoc = Directory.GetCurrentDirectory() + "\\";
-        if (File.Exists(scriptLoc + "bin\\arduino-cli"))
+        if (File.Exists(scriptLoc + "bin\\arduino-cli.exe"))
             return;
         Console.WriteLine("Downloading Arduino CLI to " + scriptLoc + "bin\\arduino-cli");
         {
@@ -37,8 +37,13 @@ public static class ArduinoCompiler
         process.Start();
         await process.WaitForExitAsync();
 
-        Console.WriteLine(process.ExitCode == 0 ? "Download succeeded!" : "Download failed.");
-
+        if (process.ExitCode != 0)
+        {
+            Console.WriteLine("Download failed.");
+            return;
+        }
+        File.Move(scriptLoc + "bin\\arduino-cli", scriptLoc + "bin\\arduino-cli.exe");
+        Console.WriteLine("Download succeeded!");
     }
 
     public static async Task InoToAVROnBoard(string folder)
@@ -60,8 +65,9 @@ public static class ArduinoCompiler
                 Console.WriteLine("Failed to compile");
             else
                 await Monitor(portName, boardFqbn);
-            break;
+            return;
         }
+        Console.WriteLine("Couldn't find an Arduino device to compile towards");
     }
     private static string GetCommandInterpreter()
     {

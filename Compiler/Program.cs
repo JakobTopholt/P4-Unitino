@@ -15,8 +15,7 @@ internal static class Program
         string inputFile = Path.GetFullPath(args[0]);
         // Download Arduino CLI while compiling Moduino to Arduino
         Task downloadCliAsync = ArduinoCompiler.DownloadCliAsync();
-        Console.WriteLine("Input file: " + inputFile);
-        Console.WriteLine("Compiling Moduino");
+        Console.WriteLine("Compiling: " + inputFile + ".mino");
         string folder = await ModuinoCompiler.CompileMinoToIno(inputFile);
         await downloadCliAsync;
         Console.WriteLine("Compiling Arduino ");
