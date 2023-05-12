@@ -39,20 +39,20 @@ public class SymbolTable
     {
         return idToNode[identifier.Trim()];
     }
-    public void AddId(TId identifier, Node node, Symbol symbol)
+    public void AddId(string identifier, Node node, Symbol symbol)
     {
-        idToNode.Add("" + identifier, node);
+        idToNode.Add(identifier.Trim(), node);
         AddNode(node, symbol);
     }
     public void AddNode(Node node, Symbol symbol) => nodeToSymbol.Add(node, symbol);
     public Symbol? GetSymbol(Node node) => GetCurrentSymbol(node);
     public Symbol? GetSymbol(string identifier) => GetCurrentSymbol(identifier);
     private Symbol? GetCurrentSymbol(Node node) => nodeToSymbol.TryGetValue(node, out Symbol symbol) ? symbol : parent?.GetCurrentSymbol(node);
-    private Symbol? GetCurrentSymbol(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentSymbol(identifier);
-    public bool IsInCurrentScope(TId id) => idToNode.ContainsKey(id.ToString());
+    private Symbol? GetCurrentSymbol(string identifier) => idToNode.TryGetValue(identifier.Trim(), out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentSymbol(identifier);
+    public bool IsInCurrentScope(TId id) => idToNode.ContainsKey(id.ToString().Trim());
     public bool IsInExtendedScope(TId id) => _IsInCurrentScope(id);
     private bool _IsInCurrentScope(TId id) =>
-        idToNode.ContainsKey(id.ToString()) || parent != null &&
+        idToNode.ContainsKey(id.ToString().Trim()) || parent != null &&
         parent._IsInCurrentScope(id);
     
     // Unit methods
@@ -65,7 +65,7 @@ public class SymbolTable
     {
         return idToNode.TryGetValue(identifier.Trim(), out Node? result) ? (AUnitdeclGlobal)result : parent?.GetCurrentUnitFromId(identifier);
     }
-    public Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>? GetUnit(string identifier) => idToNode.TryGetValue(identifier, out Node? node) ? GetUnit(node) : null;
+    public Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>? GetUnit(string identifier) => idToNode.TryGetValue(identifier.Trim(), out Node? node) ? GetUnit(node) : null;
     public Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>? GetUnit(Node expression)
     {
         Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>? temp;

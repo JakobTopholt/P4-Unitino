@@ -11,9 +11,9 @@ public class stmtTypeChecker : DepthFirstAdapter
         this.symbolTable = symbolTable;
     }
     public override void OutAAssignStmt(AAssignStmt node) {
-        Symbol? type = symbolTable.GetSymbol("" + node.GetId());
+        Symbol? idToType = symbolTable.GetSymbol(node.GetId().ToString().Trim());
         PExp exp = node.GetExp();
-        switch (type)
+        switch (idToType)
         {
             case Symbol.Int:
                 symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Int ? Symbol.ok : Symbol.notOk);
@@ -124,19 +124,19 @@ public class stmtTypeChecker : DepthFirstAdapter
             switch (node.GetType())
             {
                 case AIntType:
-                    symbolTable.AddId(node.GetId(), node, Symbol.Int);
+                    symbolTable.AddId(node.GetId().ToString(), node, Symbol.Int);
                     break;
                 case ADecimalType:
-                    symbolTable.AddId(node.GetId(), node, Symbol.Decimal);
+                    symbolTable.AddId(node.GetId().ToString(), node, Symbol.Decimal);
                     break;
                 case ABoolType:
-                    symbolTable.AddId(node.GetId(), node, Symbol.Bool);
+                    symbolTable.AddId(node.GetId().ToString(), node, Symbol.Bool);
                     break;
                 case ACharType:
-                    symbolTable.AddId(node.GetId(), node, Symbol.Char);
+                    symbolTable.AddId(node.GetId().ToString(), node, Symbol.Char);
                     break;
                 case AStringType:
-                    symbolTable.AddId(node.GetId(), node, Symbol.String);
+                    symbolTable.AddId(node.GetId().ToString(), node, Symbol.String);
                     break;
                 case AUnitType customType:
                     var unit = symbolTable.GetUnit(customType);
@@ -166,19 +166,19 @@ public class stmtTypeChecker : DepthFirstAdapter
                 switch (unit)
                 {
                     case AIntType a:
-                        symbolTable.AddId(node.GetId(), node, exprType == Symbol.Int ? Symbol.Int : Symbol.notOk);
+                        symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Int ? Symbol.Int : Symbol.notOk);
                         break;
                     case ADecimalType b:
-                        symbolTable.AddId(node.GetId(), node, exprType == Symbol.Decimal ? Symbol.Decimal : Symbol.notOk);
+                        symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Decimal ? Symbol.Decimal : Symbol.notOk);
                         break;
                     case ABoolType c:
-                        symbolTable.AddId(node.GetId(), node, exprType == Symbol.Bool ? Symbol.Bool : Symbol.notOk);
+                        symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Bool ? Symbol.Bool : Symbol.notOk);
                         break;
                     case ACharType d:
-                        symbolTable.AddId(node.GetId(), node, exprType == Symbol.Char ? Symbol.Char : Symbol.notOk);
+                        symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Char ? Symbol.Char : Symbol.notOk);
                         break;
                     case AStringType e:
-                        symbolTable.AddId(node.GetId(), node, exprType == Symbol.String ? Symbol.String : Symbol.notOk);
+                        symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.String ? Symbol.String : Symbol.notOk);
                         break;
                     case AUnitType customType:
                         var unitType = symbolTable.GetUnit(customType);

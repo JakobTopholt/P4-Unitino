@@ -26,19 +26,19 @@ public class FunctionVisitor : DepthFirstAdapter
             switch (node.GetType())
             {
                 case AIntType:
-                    symbolTable.AddId(node.GetId(), node, Symbol.Int);
+                    symbolTable.AddId(node.GetId().ToString(), node, Symbol.Int);
                     break;
                 case ADecimalType:
-                    symbolTable.AddId(node.GetId(), node, Symbol.Decimal);
+                    symbolTable.AddId(node.GetId().ToString(), node, Symbol.Decimal);
                     break;
                 case ABoolType:
-                    symbolTable.AddId(node.GetId(), node, Symbol.Bool);
+                    symbolTable.AddId(node.GetId().ToString(), node, Symbol.Bool);
                     break;
                 case ACharType:
-                    symbolTable.AddId(node.GetId(), node, Symbol.Char);
+                    symbolTable.AddId(node.GetId().ToString(), node, Symbol.Char);
                     break;
                 case AStringType:
-                    symbolTable.AddId(node.GetId(), node, Symbol.String);
+                    symbolTable.AddId(node.GetId().ToString(), node, Symbol.String);
                     break;
                 case AUnitType customType:
                 {
@@ -54,10 +54,52 @@ public class FunctionVisitor : DepthFirstAdapter
         }
         else
         {
-            symbolTable.AddId(node.GetId(), node, Symbol.notOk);
+            symbolTable.AddId(node.GetId().ToString(), node, Symbol.notOk);
         }
-        
     }
+
+    public void AddArgsToScope(Node node, IList args)
+    {
+        foreach (AArg arg in args)
+        {
+            string id = arg.GetId().ToString();
+            PType type = arg.GetType();
+            switch (type)
+            {
+                case AIntType:
+                    symbolTable.AddId(id, node, Symbol.Int);
+                    break;
+                case ADecimalType:
+                    symbolTable.AddId(id, node, Symbol.Decimal);
+                    break;
+                case ABoolType:
+                    symbolTable.AddId(id, node, Symbol.Bool);
+                    break;
+                case ACharType:
+                    symbolTable.AddId(id, node, Symbol.Char);
+                    break;
+                case AStringType:
+                    symbolTable.AddId(id, node, Symbol.String);
+                    break;
+                case AUnitType customType:
+                    var unit = symbolTable.GetUnit(customType);
+                    if (unit != null)
+                    {
+                        symbolTable.AddNodeToUnit(node, unit);
+                        symbolTable.AddNode(node, Symbol.ok);  
+                    }
+                    else
+                    {
+                        symbolTable.AddNode(node, Symbol.notOk);
+                    }
+                    break;
+                default:
+                    symbolTable.AddNode(node, Symbol.notOk);
+                    break;
+            }
+        }
+    }
+    
     public override void CaseAUntypedGlobal(AUntypedGlobal node)
     {
         InAUntypedGlobal(node);
@@ -80,6 +122,7 @@ public class FunctionVisitor : DepthFirstAdapter
             symbolTable.AddIdToFunc(node.GetId().ToString(), node);
 
             symbolTable.EnterScope();
+            AddArgsToScope(node, node.GetArg());
         }
     }
 
@@ -142,6 +185,7 @@ public class FunctionVisitor : DepthFirstAdapter
             symbolTable.AddIdToFunc(node.GetId().ToString(), node);
 
             symbolTable.EnterScope();
+            AddArgsToScope(node, node.GetArg());
         }
     }
 
