@@ -174,7 +174,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutAIdExp(AIdExp node)
     {
-        switch (symbolTable.GetSymbol(node.GetId()))
+        switch (symbolTable.GetSymbol(node.GetId().ToString().Trim()))
         {
             case Symbol.Int:
                 symbolTable.AddNode(node, Symbol.Int);
@@ -192,7 +192,7 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(node, Symbol.String);
                 break;
             default:
-                var unit = symbolTable.GetUnit(symbolTable.GetNodeFromId(node.GetId().ToString()));
+                var unit = symbolTable.GetUnit(node.GetId().ToString().Trim());
                 if (unit != null)
                 {
                     symbolTable.AddNodeToUnit(node, unit);

@@ -15,6 +15,9 @@ public class stmtTypeChecker : DepthFirstAdapter
         PExp exp = node.GetExp();
         switch (idToType)
         {
+            case Symbol.notOk:
+                symbolTable.AddNode(node, Symbol.notOk);
+                break;
             case Symbol.Int:
                 symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Int ? Symbol.ok : Symbol.notOk);
                 break;
@@ -363,7 +366,7 @@ public class stmtTypeChecker : DepthFirstAdapter
                   if (symbolTable.GetUnit(returnExp) != null)
                   {
                       symbolTable.AddNodeToUnit(aUntypedFunc, symbolTable.GetUnit(returnExp));
-                      symbolTable.AddNodeToUnit(node, symbolTable.GetUnit(returnExp));
+                      symbolTable.AddNode(node, Symbol.ok);
                   } else if (symbolTable.GetSymbol(returnExp) != null)
                   {
                       symbolTable.AddReturnSymbol(aUntypedFunc, symbolTable.GetSymbol(returnExp));

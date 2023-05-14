@@ -1,6 +1,6 @@
 ﻿casting expr
 ////
-func untypedlmao(int a){
+func untypedlmao(){
     bool a = true;
     int b = 5;
     decimal c = 3.5;
@@ -30,7 +30,7 @@ true
 //////
 casting expr false
 ////
-func untypedlmao(int a){
+func untypedlmao(){
     bool a = true;
     int b = 5;
     decimal c = 3.5;

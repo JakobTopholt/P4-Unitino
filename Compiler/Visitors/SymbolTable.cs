@@ -21,6 +21,8 @@ public class SymbolTable
     private readonly Dictionary<string, Node> funcidToNode = new();
     private Dictionary<Node, List<PType>> nodeToArgs = new();
     private Dictionary<Node, Symbol?> nodeToReturn = new();
+    public int Prog = 0;
+    public int Loop = 0;
     
     // General methods
     public SymbolTable EnterScope() => new(this, allTables);
@@ -37,8 +39,15 @@ public class SymbolTable
 
     public Node GetNodeFromId(string identifier)
     {
-        return idToNode[identifier.Trim()];
+        return GetCurrentNodeFromId(identifier);
     }
+
+    private Node GetCurrentNodeFromId(string identifier)
+    {
+        return idToNode.TryGetValue(identifier.Trim(), out Node node) ? node : parent?.GetCurrentNodeFromId(identifier);
+    }
+    
+    
     public void AddId(string identifier, Node node, Symbol symbol)
     {
         idToNode.Add(identifier.Trim(), node);

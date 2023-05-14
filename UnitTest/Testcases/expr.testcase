@@ -198,7 +198,7 @@ false
 logical compare expr
 ////
 func untypedlmao(int a){
-    int a = 5;
+    a = 5;
     int b = 2;
     int c = 7;
     bool d = a == b || b < 7 ;
@@ -214,9 +214,9 @@ true
 //////
 logical compare expr false
 ////
-func untypedlmao(int a){
+func untypedlmao(){
     int a = 5;
-    char b = "2";
+    char b = '2';
     decimal c = 7.5;
     bool d = a == b || b < 7 ;
     bool e = a != b && c > 5;
@@ -232,7 +232,7 @@ false
 suff-postfix expr 
 ////
 func untypedlmao(int a){
-    int a = 5;
+    a = 5;
     int b = 2;
     decimal d = 3.5;
     int c;
@@ -244,7 +244,7 @@ func untypedlmao(int a){
     bool falsk = !rigtige;  
 }
 func untypedlomo(int a){
-    int a = 5;
+    a = 5;
     int b = 2;
     decimal d = 3.5;
     int c;
@@ -260,7 +260,7 @@ true
 //////
 suff-postfix expr false
 ////
-func untypedlmao(int a){
+func untypedlmao(){
     string a = "5";
     bool b = true;
     decimal c;
@@ -271,7 +271,7 @@ func untypedlmao(int a){
     int rigtige = 5;
     bool falsk = !rigtige;  
 }
-func untypedlomo(int a){
+func untypedlomo(){
     int a = 5;
     int b = 2;
     decimal d = 3.5;
