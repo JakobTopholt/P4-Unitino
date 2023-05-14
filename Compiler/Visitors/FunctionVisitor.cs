@@ -24,7 +24,7 @@ public class FunctionVisitor : DepthFirstAdapter
     }
     public override void InAUntypedGlobal(AUntypedGlobal node)
     {
-        if(symbolTable.IsInExtendedScope(node.GetId()))
+        if(symbolTable.IsInExtendedScope(node.GetId().ToString()))
         {
             symbolTable.AddNode(node, Symbol.notOk);
         }
@@ -83,7 +83,7 @@ public class FunctionVisitor : DepthFirstAdapter
     }
     public override void InATypedGlobal(ATypedGlobal node)
     {
-        if(symbolTable.IsInExtendedScope(node.GetId()))
+        if(symbolTable.IsInExtendedScope(node.GetId().ToString()))
         {
             symbolTable.AddNode(node, Symbol.notOk);
         }

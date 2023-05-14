@@ -107,7 +107,7 @@ func untypedlmao(){
     int a = 3;
     string b = "xD";
     decimal cd = 3.5;
-    char g = "L";
+    char g = 'L';
     b = b * a;
     decimal d = 6.5;
     cd = cd* g;

@@ -256,7 +256,14 @@ public class exprTypeChecker : stmtTypeChecker
         PExp rightExpr = node.GetR();
         Symbol? leftSymbol = symbolTable.GetSymbol(leftExpr);
         Symbol? rightSymbol = symbolTable.GetSymbol(rightExpr);
-        switch (leftSymbol)
+        if (leftExpr is ANumberExp or ADecimalExp && rightExpr is AIdExp id)
+        {
+            symbolTable.AddNodeToUnit(node, symbolTable.GetUnit(id.GetId().ToString().Trim()));
+            symbolTable.AddNode(node, Symbol.ok);
+        }
+        else
+        {
+          switch (leftSymbol)
         {
             case Symbol.Int when rightSymbol is Symbol.Int:
                 symbolTable.AddNode(node, Symbol.Int);
@@ -314,6 +321,7 @@ public class exprTypeChecker : stmtTypeChecker
                     symbolTable.AddNode(node, Symbol.notOk);
                 }
                 break;
+        }  
         }
     }
     public override void OutAMultiplyExp(AMultiplyExp node)
@@ -418,6 +426,7 @@ public class exprTypeChecker : stmtTypeChecker
                 bool rightContainsUnit = symbolTable.nodeToUnit.ContainsKey(rightExpr);
                 if (symbolTable.nodeToUnit.ContainsKey(leftExpr) && symbolTable.nodeToUnit.ContainsKey(rightExpr))
                 {
+                    // har burgt noget nullable warning?
                     Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> left = symbolTable.GetUnit(leftExpr); // unit 1
                     Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> right = symbolTable.GetUnit(rightExpr); // unit 2
 
@@ -610,16 +619,24 @@ public class exprTypeChecker : stmtTypeChecker
             default:
                 var unit1 = symbolTable.GetUnit(L);
                 var unit2 = symbolTable.GetUnit(R);
-
-                if (symbolTable.CompareCustomUnits(unit1, unit2))
+                if (unit1 != null && unit2 != null)
                 {
-                    symbolTable.AddNodeToUnit(node, unit1);
-                    symbolTable.AddNode(node, Symbol.ok);
+                    if (symbolTable.CompareCustomUnits(unit1, unit2))
+                    {
+                        symbolTable.AddNodeToUnit(node, unit1);
+                        symbolTable.AddNode(node, Symbol.ok);
+                    }
+                    else
+                    {
+                        symbolTable.AddNode(node, Symbol.notOk);
+                    } 
                 }
                 else
                 {
                     symbolTable.AddNode(node, Symbol.notOk);
                 }
+
+                
                 break;
         }
     }

@@ -40,7 +40,7 @@ public class UnitVisitor : DepthFirstAdapter
     public override void OutASubunit(ASubunit node)
     {
         StateUnit = false;
-        if (!symbolTable.IsInExtendedScope(node.GetId()))
+        if (!symbolTable.IsInExtendedScope(node.GetId().ToString()))
         {
             PExp expr = node.GetExp();
 

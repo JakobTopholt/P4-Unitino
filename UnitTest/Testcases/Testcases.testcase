@@ -12,7 +12,7 @@ unit tid {
     s => value;
 }
 func scoped() {
-    for(int g; 6>=5; a++) {
+    for(int a; 6>=5; a++) {
         if(5 == 5) {
             while(!b ) {
                 a = -1;
@@ -30,7 +30,7 @@ func scoped() {
     }
 }
 ////
-gb
+true
 ////
 void setup() {
     f();

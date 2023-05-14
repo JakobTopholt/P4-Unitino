@@ -59,10 +59,25 @@ public class SymbolTable
     private Symbol? GetCurrentSymbol(Node node) => nodeToSymbol.TryGetValue(node, out Symbol symbol) ? symbol : parent?.GetCurrentSymbol(node);
     private Symbol? GetCurrentSymbol(string identifier) => idToNode.TryGetValue(identifier.Trim(), out Node? node) ? GetCurrentSymbol(node) : parent?.GetCurrentSymbol(identifier);
     public bool IsInCurrentScope(TId id) => idToNode.ContainsKey(id.ToString().Trim());
-    public bool IsInExtendedScope(TId id) => _IsInCurrentScope(id);
+    public bool IsInExtendedScope(string identifier)
+    {
+        if(idToNode.ContainsKey(identifier.Trim()))
+        {
+            return true;
+        }
+        if (parent == null)
+        {
+            return false;
+        }
+        parent?.IsInExtendedScope(identifier.Trim());
+        return false;
+    }
+
     private bool _IsInCurrentScope(TId id) =>
         idToNode.ContainsKey(id.ToString().Trim()) || parent != null &&
         parent._IsInCurrentScope(id);
+    
+    
     
     // Unit methods
     public void AddIdToNode(string identifier, Node node) => idToNode.Add(identifier.Trim(), node);
@@ -116,7 +131,9 @@ public class SymbolTable
 
     public Node? GetFuncFromId(string identifier)
     {
-        return funcidToNode[identifier.Trim()];
+        Node? func;
+        bool found = funcidToNode.TryGetValue(identifier, out func);
+        return found ? func : null;
     }
     
     public void AddFunctionArgs(Node node, List<PType> args)
