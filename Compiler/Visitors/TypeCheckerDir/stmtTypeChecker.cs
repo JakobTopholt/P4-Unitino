@@ -19,19 +19,19 @@ public class stmtTypeChecker : DepthFirstAdapter
                 symbolTable.AddNode(node, Symbol.notOk);
                 break;
             case Symbol.Int:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Int ? Symbol.ok : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Int ? Symbol.Int : Symbol.notOk);
                 break;
             case Symbol.Decimal:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Decimal ? Symbol.ok : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Decimal ? Symbol.Decimal : Symbol.notOk);
                 break;
             case Symbol.Bool:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Bool ? Symbol.ok : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Bool ? Symbol.Bool : Symbol.notOk);
                 break;
             case Symbol.Char:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Char ? Symbol.ok : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Char ? Symbol.Char : Symbol.notOk);
                 break;
             case Symbol.String:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.String ? Symbol.ok : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.String ? Symbol.String : Symbol.notOk);
                 break;
             default:
                 var typeUnit =symbolTable.GetUnit(symbolTable.GetNodeFromId(node.GetId().ToString().Trim()));

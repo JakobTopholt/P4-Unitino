@@ -214,22 +214,29 @@ public class TypeChecker : exprTypeChecker
         symbolTable = symbolTable.EnterScope();
         AddArgsToScope(node, node.GetArg());
     }
-    public override void OutAUntypedGlobal(AUntypedGlobal node) 
+    public override void OutAUntypedGlobal(AUntypedGlobal node)
     {
+        string symbols = "";
         // Stacktracing
         // Check om args er ok
         // Check om stmts er ok
         bool untypedIsOk = true;
-        foreach (PStmt stmt in node.GetStmt())
-        {
-            if (symbolTable.GetSymbol(stmt) == Symbol.notOk)
-                untypedIsOk = false;
-        }
         foreach (AArg arg in node.GetArg())
         {
+            symbols += symbolTable.GetSymbol(arg).ToString();
+
             if (symbolTable.GetSymbol(arg) == Symbol.notOk)
                 untypedIsOk = false;
         }
+        foreach (PStmt stmt in node.GetStmt())
+        {
+            symbols += symbolTable.GetSymbol(stmt).ToString();
+
+            if (symbolTable.GetSymbol(stmt) == Symbol.notOk)
+                untypedIsOk = false;
+        }
+        // throw new Exception(symbols);
+
         symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, untypedIsOk ? Symbol.ok : Symbol.notOk);
     }
@@ -240,21 +247,30 @@ public class TypeChecker : exprTypeChecker
     }
     public override void OutATypedGlobal(ATypedGlobal node)
     {
+        string symbols = "";
         // Stacktracing
         // Check om args er ok
         // Check om stmts er ok
         bool untypedIsOk = true;
-        foreach (PStmt stmt in node.GetStmt())
-        {
-            if (symbolTable.GetSymbol(stmt) == Symbol.notOk)
-                untypedIsOk = false;
-        }
         foreach (AArg arg in node.GetArg())
         {
+            symbols += symbolTable.GetSymbol(arg).ToString();
             if (symbolTable.GetSymbol(arg) == Symbol.notOk)
                 untypedIsOk = false;
         }
+        foreach (PStmt stmt in node.GetStmt())
+        {
+            symbols += symbolTable.GetSymbol(stmt).ToString();
+            if (symbolTable.GetSymbol(stmt) == Symbol.notOk)
+                untypedIsOk = false;
+        }
+        //throw new Exception(symbols);
+        
         symbolTable = symbolTable.ExitScope();
+        if (symbolTable.GetSymbol(node) != null)
+        {
+            
+        }
         symbolTable.AddNode(node, untypedIsOk ? Symbol.ok : Symbol.notOk);
     }
     public override void InALoopGlobal(ALoopGlobal node)

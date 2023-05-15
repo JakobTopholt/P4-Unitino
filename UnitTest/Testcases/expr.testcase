@@ -83,7 +83,7 @@ func untypedlmao(){
     decimal d = 6.5;
     d = d * cd;
     cd = cd / b;
-    a = d % b; 
+    decimal x = d % b; 
 }
 ////
 int a = 3;
@@ -132,7 +132,7 @@ false
 //////
 tern expr
 ////
-func untypedlmao(int a){
+func untypedlmao(){
     bool b = true;
     int c = 5;
     int d = 4;
@@ -165,7 +165,7 @@ false
 //////
 logical AND OR expr
 ////
-func untypedlmao(int a){
+func untypedlmao(){
     bool b = true;
     bool a = false;
     bool c = true;
@@ -231,8 +231,8 @@ false
 //////
 suff-postfix expr 
 ////
-func untypedlmao(int a){
-    a = 5;
+func untypedlmao(){
+    int a = 5;
     int b = 2;
     decimal d = 3.5;
     int c;
