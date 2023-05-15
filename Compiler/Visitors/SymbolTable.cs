@@ -64,6 +64,9 @@ public class SymbolTable
         if(idToNode.ContainsKey(identifier.Trim()))
         {
             return true;
+        } else if (funcidToNode.ContainsKey(identifier.Trim()))
+        {
+            return true;
         }
         if (parent == null)
         {
@@ -145,7 +148,12 @@ public class SymbolTable
         return nodeToArgs[node];
     }
     public void AddReturnSymbol(Node node, Symbol? symbol) => nodeToReturn.Add(node, symbol);
-    public Symbol? GetReturnFromNode(Node node) => nodeToReturn[node];
+    public Symbol? GetReturnFromNode(Node node)
+    {
+        Symbol? returnSymbol;
+        bool found = nodeToReturn.TryGetValue(node, out returnSymbol);
+        return found ? returnSymbol : null;
+    }
 }
 
 public enum Symbol

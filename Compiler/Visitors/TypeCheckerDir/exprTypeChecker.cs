@@ -210,6 +210,7 @@ public class exprTypeChecker : stmtTypeChecker
     public override void OutAUnitdecimalExp(AUnitdecimalExp node)
     {
         // A single unitnumber eg. 50ms
+        throw new Exception(node.GetId().ToString().Trim());
         AUnitdeclGlobal unitType = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
         if (unitType != null)
         {
@@ -258,7 +259,9 @@ public class exprTypeChecker : stmtTypeChecker
         Symbol? rightSymbol = symbolTable.GetSymbol(rightExpr);
         if (leftExpr is ANumberExp or ADecimalExp && rightExpr is AIdExp id)
         {
-            symbolTable.AddNodeToUnit(node, symbolTable.GetUnit(id.GetId().ToString().Trim()));
+            AUnitdeclGlobal? unitDecl = symbolTable.GetUnitdeclFromId(id.GetId().ToString().Trim());
+            //throw new Exception(unitD);
+            symbolTable.AddNodeToUnit(node, symbolTable.GetUnit(unitDecl));
             symbolTable.AddNode(node, Symbol.ok);
         }
         else
