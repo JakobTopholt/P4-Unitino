@@ -23,7 +23,8 @@ public class VisitorTests
     [TestCaseSource(typeof(FilesToTestsConverter), nameof(FilesToTestsConverter.TypeVisitorData))]
     public void TypeCheck(Start ast, bool correct)
     {
-        SymbolTable symbolTable = new(null);
+        List<SymbolTable> list = new();
+        SymbolTable symbolTable = new(null, list);
         UnitVisitor a = new(symbolTable);
         FunctionVisitor b = new(symbolTable);
         TypeChecker c = new(symbolTable);
@@ -37,7 +38,7 @@ public class VisitorTests
     public void CodeGen(Start ast, string codeGenText)
     {
         List<SymbolTable> list = new();
-        SymbolTable symbolTable = new(null);
+        SymbolTable symbolTable = new(null, list);
         UnitVisitor a = new(symbolTable);
         FunctionVisitor b = new(symbolTable);
         TypeChecker c = new(symbolTable);

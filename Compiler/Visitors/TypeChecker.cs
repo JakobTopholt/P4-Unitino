@@ -49,7 +49,7 @@ public class TypeChecker : exprTypeChecker
                 grammarIsOk = false;
         }
         symbolTable.AddNode(node, grammarIsOk ? Symbol.ok : Symbol.notOk);
-        symbolTable.ResetScope();
+        symbolTable = symbolTable.ResetScope();
     }
 
     public override void OutANumUnituse(ANumUnituse node)

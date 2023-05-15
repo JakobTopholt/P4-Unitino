@@ -18,7 +18,7 @@ public class UnitVisitor : DepthFirstAdapter
 
     public override void OutAGrammar(AGrammar node)
     {
-        symbolTable.ResetScope();
+        symbolTable = symbolTable.ResetScope();
     }
 
     public override void InAUnitdeclGlobal(AUnitdeclGlobal node)
