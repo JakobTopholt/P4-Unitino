@@ -15,10 +15,12 @@ public class UnitVisitor : DepthFirstAdapter
         this.symbolTable = symbolTable;
     }
     public static bool StateUnit;
-    public override void OutStart(Start node)
+
+    public override void OutAGrammar(AGrammar node)
     {
-        symbolTable = symbolTable.ResetScope();
+        symbolTable.ResetScope();
     }
+
     public override void InAUnitdeclGlobal(AUnitdeclGlobal node)
     {
         StateUnit = true;

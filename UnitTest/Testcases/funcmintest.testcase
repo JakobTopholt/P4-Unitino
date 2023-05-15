@@ -1,15 +1,15 @@
 ﻿lmao xD
 ////
 char function3(char a, char b, char c) {
-    char d = a+b+c;
+    string d = a+b+c;
     return d;
 }
 decimal function4(int a) {
-    decimal d = 3.5+a ;
+    decimal d = 3.5 + a ;
     char g = 'o';
     char b = 'b';
     char c = 'c';
-    function3(a, b, c);
+    function3(g, b, c);
     return d;
 }
 ////
@@ -20,7 +20,7 @@ char function3(char a, char b, char c) {
     return d;
 }
 decimal function4(int a) {
-    decimal d = 3.5+a;
+    decimal d = 3.5 + a;
     char g = 'o';
     char b = 'b';
     char c = 'c';

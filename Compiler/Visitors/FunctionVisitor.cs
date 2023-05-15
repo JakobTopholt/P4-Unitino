@@ -15,8 +15,11 @@ public class FunctionVisitor : DepthFirstAdapter
         this.symbolTable = symbolTable;
     }
     
-    public override void OutStart(Start node) => symbolTable = symbolTable.ResetScope();
-    
+    public override void OutAGrammar(AGrammar node)
+    {
+        symbolTable.ResetScope();
+    }
+
     public override void CaseAUntypedGlobal(AUntypedGlobal node)
     {
         InAUntypedGlobal(node);
