@@ -271,7 +271,6 @@ Abstract Syntax Tree
     subunit = id exp;
     arg = type id;
     
-    //stmt in CodeGen
     stmt = {assign}      id exp       
          | {plusassign}  id exp   
          | {minusassign} id exp  

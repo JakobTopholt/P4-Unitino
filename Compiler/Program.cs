@@ -1,40 +1,28 @@
-﻿using Compiler.Visitors;
-using Moduino.lexer;
-using Moduino.node;
-using Moduino.parser;
+﻿namespace Compiler;
 
-Start start;
+internal static class Program
 {
-    using FileStream fileStream = File.Open(Directory.GetCurrentDirectory() + "/../../../input.mino", FileMode.Open);
-    using TextReader textReader = new StreamReader(fileStream);
-    Lexer lexer = new (textReader);
-    Parser parser = new (lexer);
-    start = parser.Parse();
+    
+    public static async Task Main(string[] args)
+    {
+        //Usage: plug in Arduino board and run the compiler with "Moduino.exe [file]"
+        if (args.Length == 0)
+        {
+            Console.WriteLine("Usage: Moduino file [optional path to bash]");
+            Console.WriteLine("Bash is only needed for downloading Arduino CLI the first time");
+            return;
+        }
+
+        string? bash = args.Length >= 2 ? args[1] : null;
+
+        string inputFile = Path.GetFullPath(args[0]);
+        // Download Arduino CLI while compiling Moduino to Arduino
+        Task<bool> downloadCliAsync = ArduinoCompiler.DownloadCliAsync(bash);
+        Console.WriteLine("Compiling: " + inputFile + ".mino");
+        string folder = await ModuinoCompiler.CompileMinoToIno(inputFile);
+        if (!await downloadCliAsync) // CLI download failed
+            return;
+        Console.WriteLine("Compiling Arduino ");
+        await ArduinoCompiler.InoToAVROnBoard(folder);
+    }
 }
-// PrettyPrint Visitor
-start.Apply(new PrettyPrint());
-
-List<SymbolTable> tables = new();
-SymbolTable symbolTable = new(null, tables);
-// UnitVisitor
-start.Apply(new UnitVisitor(symbolTable));
-
-// FunctionVisitor
-start.Apply(new FunctionVisitor(symbolTable));
-
-// Typechecker
-start.Apply(new TypeChecker(symbolTable));
-
-// Codegen Visitor
-{
-    using FileStream stream = File.Create(Directory.GetCurrentDirectory() + "/../../../output.ino");
-    using StreamWriter writer = new(stream);
-    using CodeGen codegen = new (writer, symbolTable);
-    start.Apply(codegen);
-}
-
-
-// TODO Visitor 3: optional compiler optimization (lecture 20)
-
-
-

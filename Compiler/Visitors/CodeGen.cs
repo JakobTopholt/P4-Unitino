@@ -22,14 +22,12 @@ namespace Compiler.Visitors;
 public class CodeGen : DepthFirstAdapter, IDisposable
 {
     private SymbolTable symbolTable;
-
     private StreamWriter writer;
     private static readonly Regex whiteSpace = new(@"\s+");
     public CodeGen(StreamWriter writer, SymbolTable symbolTable )
     {
         this.writer = writer;
         this.symbolTable = symbolTable;
-
     }
 
     void Precedence(Node L, Node R, string ope)
@@ -43,15 +41,44 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     {
         writer.Write(new string(' ', _indent * 4) + s);
     }
+    
+    public void ScopeHandler(PStmt child)
+    {
+        switch (child)
+        {
+            // scoped
+            case AWhileStmt:
+            case ADowhileStmt:
+            case AForStmt:
+            case AIfStmt:
+            case AElseStmt:
+            case AElseifStmt:
+                break;
+            // non-scoped
+            case ADeclassStmt:
+            case ADeclStmt: 
+            case AAssignStmt: 
+            case AReturnStmt:
+            case AFunccallStmt:
+            case APlusassignStmt:
+            case AMinusassignStmt:
+            case ASuffixminusStmt:
+            case ASuffixplusStmt:
+            case APrefixminusStmt:
+            case APrefixplusStmt:    
+                writer.WriteLine(";");                    
+                break;
+        }
+    }
 
     public override void CaseAProgGlobal(AProgGlobal node)
     {
         Indent("void setup() {\r\n");
         _indent++;
-        foreach (Node child in node.GetStmt())
+        foreach (PStmt child in node.GetStmt())
         {
             child.Apply(this); 
-            writer.WriteLine(";");
+            ScopeHandler(child);
         }
         OutAProgGlobal(node);
     }
@@ -66,10 +93,10 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     {
         Indent("void loop() {\n");
         _indent++;
-        foreach (Node child in node.GetStmt())
+        foreach (PStmt child in node.GetStmt())
         {
             child.Apply(this);
-            writer.WriteLine(";");
+            ScopeHandler(child);
         }
         OutALoopGlobal(node);
     }
@@ -80,35 +107,24 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         Indent("}\n");
     }
 
-    
     public override void CaseATypedGlobal(ATypedGlobal node)
     {
         switch (node.GetType())
         {
             case AIntType:
                 Indent("int ");
-                node.GetId().Apply(this);
-                writer.Write("(");
                 break;
             case ADecimalType:
-                Indent("decimal ");
-                node.GetId().Apply(this);
-                writer.Write("(");
+                Indent("float ");
                 break;
             case ABoolType:
                 Indent("bool ");
-                node.GetId().Apply(this);
-                writer.Write("(");
                 break;
             case ACharType:
                 Indent("char ");
-                node.GetId().Apply(this);
-                writer.Write("(");
                 break;
             case AStringType:
                 Indent("string ");
-                node.GetId().Apply(this);
-                writer.Write("(");
                 break;
         }
         var customType = node.GetType() as AUnitType;
@@ -117,9 +133,9 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
             IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
             Indent($"float ");
-            node.GetId().Apply(this);
-            writer.Write("(");
         }
+        node.GetId().Apply(this);
+        writer.Write("(");
 
         int i = 0;
         var arg = node.GetArg();
@@ -135,25 +151,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         foreach (PStmt child in node.GetStmt())
         {
             child.Apply(this);
-            switch (child)
-            {
-                // scoped
-                case AWhileStmt:
-                case ADowhileStmt:
-                case AForStmt:
-                case AIfStmt:
-                case AElseStmt:
-                case AElseifStmt:
-                    break;
-                // non-scoped
-                case ADeclassStmt:
-                case ADeclStmt:
-                case AAssignStmt:
-                case AReturnStmt:
-                case AFunccallStmt:
-                    writer.WriteLine(";");                    
-                    break;
-            }
+            ScopeHandler(child);
         }
         OutATypedGlobal(node);
     }
@@ -183,23 +181,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         foreach (PStmt child in node.GetStmt())
         {
             child.Apply(this);
-            switch (child)
-            {
-                case AWhileStmt:
-                case ADowhileStmt:
-                case AForStmt:
-                case AIfStmt:
-                case AElseStmt:
-                case AElseifStmt:
-                    break;
-                case ADeclassStmt:
-                case ADeclStmt:
-                case AAssignStmt:
-                case AReturnStmt:
-                case AFunccallStmt:
-                    writer.WriteLine(";");                    
-                    break;
-            }
+            ScopeHandler(child);
         }
         OutAUntypedGlobal(node);
     }
@@ -218,7 +200,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 writer.Write("int ");
                 break;
             case ADecimalType:
-                writer.Write("decimal ");
+                writer.Write("float ");
                 break;
             case ABoolType:
                 writer.Write("bool ");
@@ -247,23 +229,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         foreach (PStmt child in node.GetStmt())
         {
             child.Apply(this);
-            switch (child)
-            {
-                case AWhileStmt:
-                case ADowhileStmt:
-                case AForStmt:
-                case AIfStmt:
-                case AElseStmt:
-                case AElseifStmt:
-                    break;
-                case ADeclassStmt:
-                case ADeclStmt:
-                case AAssignStmt:
-                case AReturnStmt:
-                case AFunccallStmt:
-                    writer.WriteLine(";");                    
-                    break;
-            }
+            ScopeHandler(child);
         }
         _indent--;
         OutAIfStmt(node);
@@ -290,23 +256,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         foreach (PStmt child in node.GetStmt())
         {
             child.Apply(this);
-            switch (child)
-            {
-                case AWhileStmt:
-                case ADowhileStmt:
-                case AForStmt:
-                case AIfStmt:
-                case AElseStmt:
-                case AElseifStmt:
-                    break;
-                case ADeclassStmt:
-                case ADeclStmt:
-                case AAssignStmt:
-                case AReturnStmt:
-                case AFunccallStmt:
-                    writer.WriteLine(";");                    
-                    break;
-            }
+            ScopeHandler(child);
         }
         _indent--;
         OutAForStmt(node);
@@ -326,23 +276,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         foreach (PStmt child in node.GetStmt())
         {
             child.Apply(this);
-            switch (child)
-            {
-                case AWhileStmt:
-                case ADowhileStmt:
-                case AForStmt:
-                case AIfStmt:
-                case AElseStmt:
-                case AElseifStmt:
-                    break;
-                case ADeclassStmt:
-                case ADeclStmt:
-                case AAssignStmt:
-                case AReturnStmt:
-                case AFunccallStmt:
-                    writer.WriteLine(";");                    
-                    break;
-            }
+            ScopeHandler(child);
         }
         _indent--;
         OutAWhileStmt(node);
@@ -362,23 +296,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         foreach (PStmt child in node.GetStmt())
         {
             child.Apply(this);
-            switch (child)
-            {
-                case AWhileStmt:
-                case ADowhileStmt:
-                case AForStmt:
-                case AIfStmt:
-                case AElseStmt:
-                case AElseifStmt:
-                    break;
-                case ADeclassStmt:
-                case ADeclStmt:
-                case AAssignStmt:
-                case AReturnStmt:
-                case AFunccallStmt:
-                    writer.WriteLine(";");                    
-                    break;
-            }
+            ScopeHandler(child);
         }
         _indent--;
         OutAElseifStmt(node);
@@ -396,23 +314,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         foreach (PStmt child in node.GetStmt())
         {
             child.Apply(this);
-            switch (child)
-            {
-                case AWhileStmt:
-                case ADowhileStmt:
-                case AForStmt:
-                case AIfStmt:
-                case AElseStmt:
-                case AElseifStmt:
-                    break;
-                case ADeclassStmt:
-                case ADeclStmt:
-                case AAssignStmt:
-                case AReturnStmt:
-                case AFunccallStmt:
-                    writer.WriteLine(";");                    
-                    break;
-            }
+            ScopeHandler(child);
         }
         _indent--;
         OutAElseStmt(node);
@@ -430,23 +332,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         foreach (PStmt child in node.GetStmt())
         {
             child.Apply(this);
-            switch (child)
-            {
-                case AWhileStmt:
-                case ADowhileStmt:
-                case AForStmt:
-                case AIfStmt:
-                case AElseStmt:
-                case AElseifStmt:
-                    break;
-                case ADeclassStmt:
-                case ADeclStmt:
-                case AAssignStmt:
-                case AReturnStmt:
-                case AFunccallStmt:
-                    writer.WriteLine(";");                    
-                    break;
-            }
+            ScopeHandler(child);
         }
         _indent--;
         Indent("} while(");
@@ -467,7 +353,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 Indent("int ");
                 break;
             case ADecimalType:
-                Indent("decimal ");
+                Indent("float ");
                 break;
             case ABoolType:
                 Indent("bool ");
@@ -479,63 +365,63 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 Indent("string ");
                 break;
             case AUnitType customType:
-            {
-              
-
                 break;
-            }
         }
-        node.GetId().Apply(this);
     }
     
     /*---------------------------------------------ExpStmt------------------------------------------------------------*/
 
-    public override void InAAssignStmt(AAssignStmt node)
+    public override void CaseAAssignStmt(AAssignStmt node)
     {
         Indent("");
         node.GetId().Apply(this);
-        writer.Write("= ");
+        writer.Write(" = ");
+        node.GetExp().Apply(this);
     }
 
-    public override void InAPlusassignStmt(APlusassignStmt node)
+    public override void CaseAPlusassignStmt(APlusassignStmt node)
     {
         Indent("");
         node.GetId().Apply(this);
-        writer.Write("+= ");
+        writer.Write(" += ");
+        node.GetExp().Apply(this);
     }
 
-    public override void InAMinusassignStmt(AMinusassignStmt node)
+    public override void CaseAMinusassignStmt(AMinusassignStmt node)
     {
         Indent("");
         node.GetId().Apply(this);
-        writer.Write("-= ");
+        writer.Write(" -= ");
+        node.GetExp().Apply(this);
     }
 
     public override void InAPrefixplusStmt(APrefixplusStmt node)
     {
-        Indent("");  
-        writer.Write("++");
-        node.GetId().Apply(this);
+        Indent("++");
     }
 
     public override void InASuffixplusStmt(ASuffixplusStmt node)
     {
         Indent("");
-        node.GetId().Apply(this);
+    }
+
+    public override void OutASuffixplusStmt(ASuffixplusStmt node)
+    {
         writer.Write("++");
     }
 
     public override void InAPrefixminusStmt(APrefixminusStmt node)
     {
-        Indent("");    
-        writer.Write("--");
-        node.GetId().Apply(this);
+        Indent("--");
     }
-
+    
     public override void InASuffixminusStmt(ASuffixminusStmt node)
     {
         Indent("");
-        node.GetId().Apply(this);
+    }
+
+    public override void OutASuffixminusStmt(ASuffixminusStmt node)
+    {
         writer.Write("--");
     }
 
@@ -552,7 +438,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 Indent(($"int "));
                 break;
             case ADecimalType b:
-                Indent(($"decimal "));
+                Indent(($"float "));
                 break;
             case ABoolType c:
                 Indent(($"bool "));
@@ -704,7 +590,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 writer.Write("(int)");
                 break;
             case ADecimalType b:
-                writer.Write("(decimal)");
+                writer.Write("(float)");
                 break;
             case ABoolType c:
                 writer.Write("(bool)");
@@ -736,7 +622,10 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseABooleanExp(ABooleanExp node)
     {
-        writer.Write(node.GetBoolean().ToString().Trim());
+        if (node.GetBoolean() is ATrueBoolean)
+            writer.Write("true");
+        else if (node.GetBoolean() is AFalseBoolean)
+            writer.Write("false");
     }
 
     public override void CaseAStringExp(AStringExp node)
@@ -762,7 +651,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         string? unitId = whiteSpace.Replace(((AUnitdeclGlobal)node.Parent()).GetId().ToString(),"");
         Indent($"float {unitId}");
         node.GetId().Apply(this);
-        writer.Write(")(float value) {{\n    return ");
+        writer.Write("(float value) {\n    return ");
         node.GetExp().Apply(this);
         writer.WriteLine(";");
         OutASubunit(node);
@@ -770,6 +659,16 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void OutASubunit(ASubunit node)
     {
         writer.WriteLine("}");
+    }
+
+    public override void CaseADenUnituse(ADenUnituse node)
+    {
+        Indent("0" + node.GetId());
+    }
+
+    public override void CaseANumUnituse(ANumUnituse node)
+    {
+        Indent("1" + node.GetId());
     }
 
     public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
