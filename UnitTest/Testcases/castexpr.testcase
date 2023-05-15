@@ -35,9 +35,8 @@ func untypedlmao(){
     int b = 5;
     decimal c = 3.5;
     string d = "lmao";
-    char e = 'xD';
+    char e = 'D';
   
-    
     decimal cd = (decimal)e;
     string de = (string)a;
     char ef = (char)e;

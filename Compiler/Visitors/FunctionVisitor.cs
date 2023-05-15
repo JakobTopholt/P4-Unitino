@@ -46,7 +46,7 @@ public class FunctionVisitor : DepthFirstAdapter
         {
             if (node.GetStmt().OfType<AReturnStmt>().Count() == 0)
             {
-                symbolTable.AddNode(node, Symbol.Func);
+                symbolTable.AddReturnSymbol(node, Symbol.Func);
             }
             else
             {
@@ -54,22 +54,22 @@ public class FunctionVisitor : DepthFirstAdapter
                 switch (symbolTable.GetSymbol(returnType))
                 {
                     case Symbol.Int:
-                        symbolTable.AddNode(node, Symbol.Int);
+                        symbolTable.AddReturnSymbol(node, Symbol.Int);
                         break;
                     case Symbol.Decimal:
-                        symbolTable.AddNode(node, Symbol.Decimal);
+                        symbolTable.AddReturnSymbol(node, Symbol.Decimal);
                         break;
                     case Symbol.Bool:
-                        symbolTable.AddNode(node, Symbol.Bool);
+                        symbolTable.AddReturnSymbol(node, Symbol.Bool);
                         break;
                     case Symbol.Char:
-                        symbolTable.AddNode(node, Symbol.Char);
+                        symbolTable.AddReturnSymbol(node, Symbol.Char);
                         break;
                     case Symbol.String:
-                        symbolTable.AddNode(node, Symbol.String);
+                        symbolTable.AddReturnSymbol(node, Symbol.String);
                         break;
                     default:
-                        symbolTable.AddNode(node, symbolTable.GetUnit(returnType) != null ? Symbol.ok : Symbol.notOk);
+                        symbolTable.AddReturnSymbol(node, symbolTable.GetUnit(returnType) != null ? Symbol.ok : Symbol.notOk);
                         break;
                 }
             }
@@ -107,36 +107,36 @@ public class FunctionVisitor : DepthFirstAdapter
             {
                 case AIntType:
                     symbolTable.AddIdToNode(node.GetId().ToString().Trim(), node);
-                    symbolTable.AddNode(node, Symbol.Int);
+                    symbolTable.AddReturnSymbol(node, Symbol.Int);
                     break;
                 case ADecimalType:
                     symbolTable.AddIdToNode(node.GetId().ToString().Trim(), node);
-                    symbolTable.AddNode(node, Symbol.Decimal);
+                    symbolTable.AddReturnSymbol(node, Symbol.Decimal);
                     break;
                 case ABoolType:
                     symbolTable.AddIdToNode(node.GetId().ToString().Trim(), node);
-                    symbolTable.AddNode(node, Symbol.Bool);
+                    symbolTable.AddReturnSymbol(node, Symbol.Bool);
                     break;
                 case ACharType:
                     symbolTable.AddIdToNode(node.GetId().ToString().Trim(), node);
-                    symbolTable.AddNode(node, Symbol.Char);
+                    symbolTable.AddReturnSymbol(node, Symbol.Char);
                     break;
                 case AStringType:
                     symbolTable.AddIdToNode(node.GetId().ToString().Trim(), node);
-                    symbolTable.AddNode(node, Symbol.String);
+                    symbolTable.AddReturnSymbol(node, Symbol.String);
                     break;
                 case AVoidType:
                     symbolTable.AddIdToNode(node.GetId().ToString().Trim(), node);
-                    symbolTable.AddNode(node, Symbol.Func);
+                    symbolTable.AddReturnSymbol(node, Symbol.Func);
                     break;
                 case AUnitType customType:
                     var unit = symbolTable.GetUnit(customType);
                     symbolTable.AddIdToNode(node.GetId().ToString().Trim(), node);
                     symbolTable.AddNodeToUnit(node, unit);
-                    symbolTable.AddNode(node, Symbol.ok);
+                    symbolTable.AddReturnSymbol(node, Symbol.ok);
                     break;
                 default:
-                    symbolTable.AddNode(node, Symbol.notOk);
+                    symbolTable.AddReturnSymbol(node, Symbol.notOk);
                     break;
             }
         }

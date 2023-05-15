@@ -216,7 +216,22 @@ public class TypeChecker : exprTypeChecker
     }
     public override void OutAUntypedGlobal(AUntypedGlobal node) 
     {
+        // Stacktracing
+        // Check om args er ok
+        // Check om stmts er ok
+        bool untypedIsOk = true;
+        foreach (PStmt stmt in node.GetStmt())
+        {
+            if (symbolTable.GetSymbol(stmt) == Symbol.notOk)
+                untypedIsOk = false;
+        }
+        foreach (AArg arg in node.GetArg())
+        {
+            if (symbolTable.GetSymbol(arg) == Symbol.notOk)
+                untypedIsOk = false;
+        }
         symbolTable = symbolTable.ExitScope();
+        symbolTable.AddNode(node, untypedIsOk ? Symbol.ok : Symbol.notOk);
     }
     public override void InATypedGlobal(ATypedGlobal node)
     {
@@ -225,7 +240,22 @@ public class TypeChecker : exprTypeChecker
     }
     public override void OutATypedGlobal(ATypedGlobal node)
     {
+        // Stacktracing
+        // Check om args er ok
+        // Check om stmts er ok
+        bool untypedIsOk = true;
+        foreach (PStmt stmt in node.GetStmt())
+        {
+            if (symbolTable.GetSymbol(stmt) == Symbol.notOk)
+                untypedIsOk = false;
+        }
+        foreach (AArg arg in node.GetArg())
+        {
+            if (symbolTable.GetSymbol(arg) == Symbol.notOk)
+                untypedIsOk = false;
+        }
         symbolTable = symbolTable.ExitScope();
+        symbolTable.AddNode(node, untypedIsOk ? Symbol.ok : Symbol.notOk);
     }
     public override void InALoopGlobal(ALoopGlobal node)
     {
