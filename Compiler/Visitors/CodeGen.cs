@@ -673,12 +673,12 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
     {
-        AUnitdeclGlobal test = symbolTable.itToUnitdecl[node.GetId().ToString().Trim()];
+        AUnitdeclGlobal test = symbolTable.ItToUnitDecl[node.GetId().ToString().Trim()];
         writer.Write(node.GetDecimal());
     }
     public override void CaseAUnitnumberExp(AUnitnumberExp node)
     {
-        AUnitdeclGlobal test = symbolTable.itToUnitdecl[node.GetId().ToString().Trim()];
+        AUnitdeclGlobal test = symbolTable.ItToUnitDecl[node.GetId().ToString().Trim()];
         writer.Write(node.GetNumber());
     }
     public void Dispose()

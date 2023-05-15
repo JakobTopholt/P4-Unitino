@@ -32,7 +32,7 @@ public class VisitorTests
         ast.Apply(a);
         ast.Apply(b);
         ast.Apply(c);
-        Assert.That(symbolTable.GetSymbol(ast.GetPGrammar()), Is.EqualTo(correct ? Symbol.ok : Symbol.notOk));
+        Assert.That(symbolTable.GetSymbol(ast.GetPGrammar()), Is.EqualTo(correct ? Symbol.Ok : Symbol.NotOk));
     }
     
     [TestCaseSource(typeof(FilesToTestsConverter), nameof(FilesToTestsConverter.CodeGenData))]

@@ -654,7 +654,7 @@ public class PrettyPrint : DepthFirstAdapter
     
     public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
     {
-        AUnitdeclGlobal test = symbolTable.SubunitToUnit[node.GetId().ToString().Trim()];
+        AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
         output.Write(node.GetDecimal());
     }
     public override void CaseAUnitnumberExp(AUnitnumberExp node)

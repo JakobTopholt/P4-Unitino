@@ -15,35 +15,33 @@ public class stmtTypeChecker : DepthFirstAdapter
         PExp exp = node.GetExp();
         switch (idToType)
         {
-            case Symbol.notOk:
-                symbolTable.AddNode(node, Symbol.notOk);
+            case Symbol.NotOk:
+                symbolTable.AddNode(node, Symbol.NotOk);
                 break;
             case Symbol.Int:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Int ? Symbol.Int : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Int ? Symbol.Int : Symbol.NotOk);
                 break;
             case Symbol.Decimal:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Decimal ? Symbol.Decimal : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Decimal ? Symbol.Decimal : Symbol.NotOk);
                 break;
             case Symbol.Bool:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Bool ? Symbol.Bool : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Bool ? Symbol.Bool : Symbol.NotOk);
                 break;
             case Symbol.Char:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Char ? Symbol.Char : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Char ? Symbol.Char : Symbol.NotOk);
                 break;
             case Symbol.String:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.String ? Symbol.String : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.String ? Symbol.String : Symbol.NotOk);
                 break;
             default:
-                var typeUnit =symbolTable.GetUnit(symbolTable.GetNodeFromId(node.GetId().ToString().Trim()));
-                var expUnit = symbolTable.GetUnit(exp);
-                if (typeUnit != null && expUnit != null)
+                if (symbolTable.GetNodeFromId(node.GetId().ToString().Trim(), out var typeUn) &&
+                    symbolTable.GetUnit(typeUn, out var typeUnit) &&
+                    symbolTable.GetUnit(exp, out var expUnit))
                 {
-                    symbolTable.AddNode(node, symbolTable.CompareCustomUnits(typeUnit, expUnit) ? Symbol.ok : Symbol.notOk);
+                    symbolTable.AddNode(node, symbolTable.CompareCustomUnits(typeUnit, expUnit) ? Symbol.Ok : Symbol.NotOk);
                 }
                 else
-                {
-                    symbolTable.AddNode(node, Symbol.notOk);
-                }
+                    symbolTable.AddNode(node, Symbol.NotOk);
                 break;
         }
     }
@@ -55,24 +53,25 @@ public class stmtTypeChecker : DepthFirstAdapter
         switch (type)
         {
             case Symbol.Int:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Int ? Symbol.ok : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Int ? Symbol.Ok : Symbol.NotOk);
                 break;
             case Symbol.Decimal:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Decimal ? Symbol.ok : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Decimal ? Symbol.Ok : Symbol.NotOk);
                 break;
             case Symbol.Bool:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Bool ? Symbol.ok : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Bool ? Symbol.Ok : Symbol.NotOk);
                 break;
             case Symbol.Char:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Char ? Symbol.ok : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Char ? Symbol.Ok : Symbol.NotOk);
                 break;
             case Symbol.String:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.String ? Symbol.ok : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.String ? Symbol.Ok : Symbol.NotOk);
                 break;
             default:
-                var typeUnit =symbolTable.GetUnit(symbolTable.GetNodeFromId(node.GetId().ToString()));
-                var expUnit = symbolTable.GetUnit(exp);
-                symbolTable.AddNode(node, symbolTable.CompareCustomUnits(typeUnit, expUnit) ? Symbol.ok : Symbol.notOk);
+                symbolTable.GetNodeFromId(node.GetId().ToString(), out var b);
+                symbolTable.GetUnit(b, out var typeUnit);
+                symbolTable.GetUnit(exp, out var expUnit);
+                symbolTable.AddNode(node, symbolTable.CompareCustomUnits(typeUnit, expUnit) ? Symbol.Ok : Symbol.NotOk);
                 break;
         }
     }
@@ -83,24 +82,25 @@ public class stmtTypeChecker : DepthFirstAdapter
         switch (type)
         {
             case Symbol.Int:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Int ? Symbol.ok : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Int ? Symbol.Ok : Symbol.NotOk);
                 break;
             case Symbol.Decimal:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Decimal ? Symbol.ok : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Decimal ? Symbol.Ok : Symbol.NotOk);
                 break;
             case Symbol.Bool:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Bool ? Symbol.ok : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Bool ? Symbol.Ok : Symbol.NotOk);
                 break;
             case Symbol.Char:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Char ? Symbol.ok : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Char ? Symbol.Ok : Symbol.NotOk);
                 break;
             case Symbol.String:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.String ? Symbol.ok : Symbol.notOk);
+                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.String ? Symbol.Ok : Symbol.NotOk);
                 break;
             default:
-                var typeUnit =symbolTable.GetUnit(symbolTable.GetNodeFromId(node.GetId().ToString()));
-                var expUnit = symbolTable.GetUnit(exp);
-                symbolTable.AddNode(node, symbolTable.CompareCustomUnits(typeUnit, expUnit) ? Symbol.ok : Symbol.notOk);
+                symbolTable.GetNodeFromId(node.GetId().ToString(), out var b);
+                symbolTable.GetUnit(b, out var typeUnit);
+                symbolTable.GetUnit(exp, out var expUnit);
+                symbolTable.AddNode(node, symbolTable.CompareCustomUnits(typeUnit, expUnit) ? Symbol.Ok : Symbol.NotOk);
                 break;
         }
     }
@@ -114,16 +114,16 @@ public class stmtTypeChecker : DepthFirstAdapter
         switch (expr)
         {
             case Symbol.Decimal:
-                symbolTable.AddNode(node,Symbol.ok);
+                symbolTable.AddNode(node,Symbol.Ok);
                 break;
             case Symbol.Int:
-                symbolTable.AddNode(node,Symbol.ok); 
+                symbolTable.AddNode(node,Symbol.Ok); 
                 break;
             case Symbol.Char:
-                symbolTable.AddNode(node,Symbol.ok);
+                symbolTable.AddNode(node,Symbol.Ok);
                 break;
             default:
-                symbolTable.AddNode(node,Symbol.notOk);
+                symbolTable.AddNode(node,Symbol.NotOk);
                 break;
         }
     }
@@ -149,19 +149,19 @@ public class stmtTypeChecker : DepthFirstAdapter
                     symbolTable.AddId(node.GetId().ToString(), node, Symbol.String);
                     break;
                 case AUnitType customType:
-                    var unit = symbolTable.GetUnit(customType);
+                    symbolTable.GetUnit(customType, out var unit);
                     symbolTable.AddIdToNode(node.GetId().ToString(), node);
                     symbolTable.AddNodeToUnit(node, unit);
-                    symbolTable.AddNode(node, Symbol.ok);
+                    symbolTable.AddNode(node, Symbol.Ok);
                     break; 
                 default:
-                    symbolTable.AddNode(node, Symbol.notOk);
+                    symbolTable.AddNode(node, Symbol.NotOk);
                     break;
             }
         }
         else
         {
-            symbolTable.AddNode(node, Symbol.notOk);
+            symbolTable.AddNode(node, Symbol.NotOk);
         }
     }
     public override void OutADeclassStmt(ADeclassStmt node)
@@ -176,50 +176,45 @@ public class stmtTypeChecker : DepthFirstAdapter
                 switch (unit)
                 {
                     case AIntType a:
-                        symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Int ? Symbol.Int : Symbol.notOk);
+                        symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Int ? Symbol.Int : Symbol.NotOk);
                         break;
                     case ADecimalType b:
-                        symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Decimal ? Symbol.Decimal : Symbol.notOk);
+                        symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Decimal ? Symbol.Decimal : Symbol.NotOk);
                         break;
                     case ABoolType c:
-                        symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Bool ? Symbol.Bool : Symbol.notOk);
+                        symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Bool ? Symbol.Bool : Symbol.NotOk);
                         break;
                     case ACharType d:
-                        symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Char ? Symbol.Char : Symbol.notOk);
+                        symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Char ? Symbol.Char : Symbol.NotOk);
                         break;
                     case AStringType e:
-                        symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.String ? Symbol.String : Symbol.notOk);
+                        symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.String ? Symbol.String : Symbol.NotOk);
                         break;
                     case AUnitType customType:
-                        var unitType = symbolTable.GetUnit(customType);
-                        var expType = symbolTable.GetUnit(node.GetExp());
-                        if (unitType != null && expType != null)
+                        if (symbolTable.GetUnit(customType, out var unitType) && 
+                            symbolTable.GetUnit(node.GetExp(), out var expType))
                         {
                             if (symbolTable.CompareCustomUnits(unitType, expType))
                             {
                                 symbolTable.AddIdToNode(node.GetId().ToString(), node);
                                 symbolTable.AddNodeToUnit(node, unitType);
-                                symbolTable.AddNode(node, Symbol.ok); 
+                                symbolTable.AddNode(node, Symbol.Ok); 
                             }
                             else
-                            {
-                                symbolTable.AddNode(node, Symbol.notOk);
-                            }
+                                symbolTable.AddNode(node, Symbol.NotOk);
                         }
                         else
-                        {
-                            symbolTable.AddNode(node, Symbol.notOk);
-                        }
+                            symbolTable.AddNode(node, Symbol.NotOk);
                         break; 
                     default:
-                        symbolTable.AddNode(node, Symbol.notOk);
+                        symbolTable.AddNode(node, Symbol.NotOk);
                         break;
                 }
             }
         }
         else
         {
-            symbolTable.AddNode(node, Symbol.notOk);
+            symbolTable.AddNode(node, Symbol.NotOk);
         }
     }
     public override void OutAFunccallStmt(AFunccallStmt node)
@@ -260,9 +255,8 @@ public class stmtTypeChecker : DepthFirstAdapter
                            break;
                        case AUnitType argType:
                        {
-                           var argUnit = symbolTable.GetUnit(argType);
-                           var paramUnit = symbolTable.GetUnit(parameters[i]);
-                            
+                           symbolTable.GetUnit(argType, out var argUnit);
+                           symbolTable.GetUnit(parameters[i], out var paramUnit);
                            if (!symbolTable.CompareCustomUnits(argUnit, paramUnit))
                            {
                                matches = false;
@@ -275,16 +269,16 @@ public class stmtTypeChecker : DepthFirstAdapter
                            break;
                    }
                }
-               symbolTable.AddNode(node, matches ? Symbol.ok : Symbol.notOk);
+               symbolTable.AddNode(node, matches ? Symbol.Ok : Symbol.NotOk);
            }
            else
            {
-               symbolTable.AddNode(node, Symbol.notOk);
+               symbolTable.AddNode(node, Symbol.NotOk);
            }
        }
        else
        {
-           symbolTable.AddNode(node, Symbol.notOk);
+           symbolTable.AddNode(node, Symbol.NotOk);
        }
     }
 
@@ -322,11 +316,11 @@ public class stmtTypeChecker : DepthFirstAdapter
       {
           case ALoopGlobal:
               // Should not have return in Loop
-              symbolTable.AddNode(node, Symbol.notOk);
+              symbolTable.AddNode(node, Symbol.NotOk);
               break;
           case AProgGlobal:
               // Should not have return in Prog
-              symbolTable.AddNode(node, Symbol.notOk);
+              symbolTable.AddNode(node, Symbol.NotOk);
               break;
           case ATypedGlobal aTypedFunc:
               PType typedType = aTypedFunc.GetType();
@@ -336,58 +330,49 @@ public class stmtTypeChecker : DepthFirstAdapter
               {
                   case Symbol.Int:
                       //Int function
-                      symbolTable.AddNode(node, symbolTable.GetSymbol(returnExp) == Symbol.Int ? Symbol.ok : Symbol.notOk);
+                      symbolTable.AddNode(node, symbolTable.GetSymbol(returnExp) == Symbol.Int ? Symbol.Ok : Symbol.NotOk);
                       break;
                   case Symbol.Decimal:
-                      symbolTable.AddNode(node, symbolTable.GetSymbol(returnExp) == Symbol.Decimal ? Symbol.ok : Symbol.notOk);
+                      symbolTable.AddNode(node, symbolTable.GetSymbol(returnExp) == Symbol.Decimal ? Symbol.Ok : Symbol.NotOk);
                       break;
                   case Symbol.Bool:
-                      symbolTable.AddNode(node, symbolTable.GetSymbol(returnExp) == Symbol.Bool ? Symbol.ok : Symbol.notOk);
+                      symbolTable.AddNode(node, symbolTable.GetSymbol(returnExp) == Symbol.Bool ? Symbol.Ok : Symbol.NotOk);
                       break;
                   case Symbol.Char:
-                      symbolTable.AddNode(node, symbolTable.GetSymbol(returnExp) == Symbol.Char ? Symbol.ok : Symbol.notOk);
+                      symbolTable.AddNode(node, symbolTable.GetSymbol(returnExp) == Symbol.Char ? Symbol.Ok : Symbol.NotOk);
                       break;
                   case Symbol.String:
-                      symbolTable.AddNode(node, symbolTable.GetSymbol(returnExp) == Symbol.String ? Symbol.ok : Symbol.notOk);
+                      symbolTable.AddNode(node, symbolTable.GetSymbol(returnExp) == Symbol.String ? Symbol.Ok : Symbol.NotOk);
                       break;
                   case Symbol.Func:
-                      symbolTable.AddNode(node, symbolTable.GetSymbol(returnExp) == Symbol.Func ? Symbol.ok : Symbol.notOk);
+                      symbolTable.AddNode(node, symbolTable.GetSymbol(returnExp) == Symbol.Func ? Symbol.Ok : Symbol.NotOk);
                       break;
                   default:
-                      Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> funcType = symbolTable.GetUnit(typedType);
-                      Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>? returnType = symbolTable.GetUnit(returnExp);
-                      if (symbolTable.GetUnit(returnExp) != null)
-                      {
-                          if (symbolTable.CompareCustomUnits(funcType, returnType))
-                          {
-                              symbolTable.AddNode(node, Symbol.ok);
-                          }
-                          else
-                          {
-                              symbolTable.AddNode(node, Symbol.notOk);
-                          }
-                      }
+                      symbolTable.GetUnit(typedType, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) funcType);
+                      symbolTable.GetUnit(returnExp, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) returnType);
+                      if (symbolTable.GetUnit(returnExp, out _))
+                          symbolTable.AddNode(node, symbolTable.CompareCustomUnits(funcType, returnType) ? Symbol.Ok : Symbol.NotOk);
                       else
-                      {
-                          symbolTable.AddNode(node, Symbol.notOk);
-                      }
+                          symbolTable.AddNode(node, Symbol.NotOk);
+
                       break;
               }
               break;
           case AUntypedGlobal aUntypedFunc:
-              if (symbolTable.GetUnit(aUntypedFunc) != null)
+              if (symbolTable.GetUnit(aUntypedFunc, out var func))
               {
-                  symbolTable.AddNode(node, symbolTable.CompareCustomUnits(symbolTable.GetUnit(aUntypedFunc), symbolTable.GetUnit(returnExp)) ? Symbol.ok : Symbol.notOk);
+                  symbolTable.GetUnit(returnExp, out var expUnit);
+                  symbolTable.AddNode(node, symbolTable.CompareCustomUnits(func, expUnit) ? Symbol.Ok : Symbol.NotOk);
               } else if (symbolTable.GetReturnFromNode(aUntypedFunc) != null)
               {
-                  symbolTable.AddNode(node, symbolTable.GetReturnFromNode(aUntypedFunc) == symbolTable.GetSymbol(returnExp) ? Symbol.ok : Symbol.notOk);
+                  symbolTable.AddNode(node, symbolTable.GetReturnFromNode(aUntypedFunc) == symbolTable.GetSymbol(returnExp) ? Symbol.Ok : Symbol.NotOk);
               }
               else
               {
-                  if (symbolTable.GetUnit(returnExp) != null)
+                  if (symbolTable.GetUnit(returnExp, out var expUnit))
                   {
-                      symbolTable.AddNodeToUnit(aUntypedFunc, symbolTable.GetUnit(returnExp));
-                      symbolTable.AddNode(node, Symbol.ok);
+                      symbolTable.AddNodeToUnit(aUntypedFunc, expUnit);
+                      symbolTable.AddNode(node, Symbol.Ok);
                   } else if (symbolTable.GetSymbol(returnExp) != null)
                   {
                       symbolTable.AddReturnSymbol(aUntypedFunc, symbolTable.GetSymbol(returnExp));
@@ -396,40 +381,40 @@ public class stmtTypeChecker : DepthFirstAdapter
               }
               break;
           default:
-              symbolTable.AddNode(node, Symbol.notOk);
+              symbolTable.AddNode(node, Symbol.NotOk);
               break;
       }
     }
     public override void OutAIfStmt(AIfStmt node)
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetExp());
-        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.ok);
+        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.Ok);
     }
     public override void OutAElseifStmt(AElseifStmt node)
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetExp());
-        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.ok);
+        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.Ok);
     }
     public override void OutAElseStmt(AElseStmt node)
     {
         // Check om der er en if eller else if inden
 
-        symbolTable.AddNode(node, Symbol.ok);
+        symbolTable.AddNode(node, Symbol.Ok);
     }
     public override void OutAForStmt(AForStmt node)
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetCond());
-        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.ok);
+        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.Ok);
     }
     public override void OutAWhileStmt(AWhileStmt node)
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetExp());
-        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.ok);
+        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.Ok);
     }
     public override void OutADowhileStmt(ADowhileStmt node)
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetExp());
-        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.ok);
+        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.Ok);
     }
 
 }
