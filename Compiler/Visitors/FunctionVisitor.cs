@@ -35,10 +35,7 @@ public class FunctionVisitor : DepthFirstAdapter
         {
             // Save arguments
             List<PType> args = node.GetArg().OfType<PType>().ToList();
-            if (args.Count > 0)
-            {
-                symbolTable.AddFunctionArgs(node, args);
-            }
+            symbolTable.AddFunctionArgs(node, args);
             symbolTable.AddIdToFunc(node.GetId().ToString(), node);
         }
     }
@@ -93,11 +90,13 @@ public class FunctionVisitor : DepthFirstAdapter
         else
         {
             // Save arguments
-            List<PType> args = node.GetArg().OfType<PType>().ToList();
-            if (args.Count > 0)
+            List<AArg> args = node.GetArg().OfType<AArg>().ToList();
+            List<PType> typeArgs = new List<PType>();
+            foreach (AArg arg in args)
             {
-                symbolTable.AddFunctionArgs(node, args);
+                typeArgs.Add(arg.GetType());
             }
+            symbolTable.AddFunctionArgs(node, typeArgs);
             symbolTable.AddIdToFunc(node.GetId().ToString(), node);
         }
     }

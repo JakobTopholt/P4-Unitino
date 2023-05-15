@@ -225,19 +225,16 @@ public class TypeChecker : exprTypeChecker
         foreach (AArg arg in node.GetArg())
         {
             symbols += symbolTable.GetSymbol(arg).ToString();
-
             if (symbolTable.GetSymbol(arg) == Symbol.notOk)
                 untypedIsOk = false;
         }
         foreach (PStmt stmt in node.GetStmt())
         {
             symbols += symbolTable.GetSymbol(stmt).ToString();
-
             if (symbolTable.GetSymbol(stmt) == Symbol.notOk)
                 untypedIsOk = false;
         }
-        // throw new Exception(symbols);
-
+        //throw new Exception(symbols);
         symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, untypedIsOk ? Symbol.ok : Symbol.notOk);
     }
@@ -249,6 +246,7 @@ public class TypeChecker : exprTypeChecker
     public override void OutATypedGlobal(ATypedGlobal node)
     {
         string symbols = "";
+        
         // Stacktracing
         // Check om args er ok
         // Check om stmts er ok
@@ -266,7 +264,6 @@ public class TypeChecker : exprTypeChecker
                 untypedIsOk = false;
         }
         //throw new Exception(symbols);
-        
         symbolTable = symbolTable.ExitScope();
         if (symbolTable.GetSymbol(node) != null)
         {

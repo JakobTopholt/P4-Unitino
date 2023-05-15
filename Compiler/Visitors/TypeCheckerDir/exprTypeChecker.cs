@@ -77,93 +77,96 @@ public class exprTypeChecker : stmtTypeChecker
     {
         // Funccall som en del af et return udtryk
         // returnvalue har betydning for om det er et correct call
-
-        List<PType> args = symbolTable.GetFunctionArgs(symbolTable.GetFuncFromId(node.GetId().ToString()));
-        List<PExp>? parameters = node.GetExp() as List<PExp>;
-        if (args.Count() == parameters.Count())
+        List<PExp>? parameters = node.GetExp().OfType<PExp>().ToList();
+        List<PType>? args = symbolTable.GetFunctionArgs(symbolTable.GetNodeFromId(node.GetId().ToString()));
+        bool matches = true;
+        for (int i = 0; i < args.Count; i++)
         {
-            bool matches = true;
-            for (int i = 0; i < args.Count(); i++)
+            Symbol? paramSymbol; 
+            Node? returnUnit;
+            if (parameters[i] is AIdExp x)
             {
-                switch (args[i])
-                {
-                    case AIntType:
-                        if (symbolTable.GetSymbol(parameters[i]) != Symbol.Int)
-                            matches = false;
-                        break;
-                    case ADecimalType:
-                        if (symbolTable.GetSymbol(parameters[i]) != Symbol.Decimal)
-                            matches = false;
-                        break;
-                    case ABoolType:
-                        if (symbolTable.GetSymbol(parameters[i]) != Symbol.Bool)
-                            matches = false;
-                        break;
-                    case ACharType:
-                        if (symbolTable.GetSymbol(parameters[i]) != Symbol.Char)
-                            matches = false;
-                        break;
-                    case AStringType:
-                        if (symbolTable.GetSymbol(parameters[i]) != Symbol.String)
-                            matches = false;
-                        break;
-                    case AUnitType argType:
-                    {
-                        var argUnit = symbolTable.GetUnit(argType);
-                        var paramUnit = symbolTable.GetUnit(parameters[i]);
-
-                        if (!symbolTable.CompareCustomUnits(argUnit, paramUnit))
-                        {
-                            matches = false;
-                            symbolTable.AddNodeToUnit(node, argUnit);
-                        }
-
-                        break;
-                    }
-                    default:
-                        matches = false;
-                        break;
-                }
-            }
-
-            if (matches)
-            {
-                var symbol = symbolTable.GetSymbol(symbolTable.GetNodeFromId(node.GetId().ToString()));
-                switch (symbol)
-                {
-                    case Symbol.Int:
-                        symbolTable.AddNode(node, Symbol.Int);
-                        break;
-                    case Symbol.Decimal:
-                        symbolTable.AddNode(node, Symbol.Decimal);
-                        break;
-                    case Symbol.Bool:
-                        symbolTable.AddNode(node, Symbol.Bool);
-                        break;
-                    case Symbol.Char:
-                        symbolTable.AddNode(node, Symbol.Char);
-                        break;
-                    case Symbol.String:
-                        symbolTable.AddNode(node, Symbol.String);
-                        break;
-                    default:
-                        var unit = symbolTable.GetUnit(symbolTable.GetNodeFromId(node.GetId().ToString()));
-                        if (unit != null)
-                        {
-                            symbolTable.AddNodeToUnit(node, unit);
-                            symbolTable.AddNode(node, Symbol.ok);
-                        }
-                        else
-                        {
-                            symbolTable.AddNode(node, Symbol.notOk);
-                        }
-
-                        break;
-                }
+                paramSymbol = symbolTable.GetSymbol(x.GetId().ToString().Trim());
+                returnUnit = symbolTable.GetNodeFromId(x.GetId().ToString().Trim());
             }
             else
             {
-                symbolTable.AddNode(node, Symbol.notOk);
+                paramSymbol = symbolTable.GetSymbol(parameters[i]);
+                returnUnit  = parameters[i];
+            }
+            switch (args[i])
+            {
+                case AIntType:
+                    if (paramSymbol != Symbol.Int)
+                        matches = false;
+                    break;
+                case ADecimalType:
+                    if (paramSymbol != Symbol.Decimal)
+                        matches = false;
+                    break;
+                case ABoolType:
+                    if (paramSymbol != Symbol.Bool)
+                        matches = false;
+                    break;
+                case ACharType:
+                    if (paramSymbol != Symbol.Char)
+                        matches = false;
+                    break;
+                case AStringType:
+                    if (paramSymbol != Symbol.String)
+                        matches = false;
+                    break;
+                case AUnitType argType:
+                {
+                    var argUnit = symbolTable.GetUnit(argType);
+                    var paramUnit = symbolTable.GetUnit(returnUnit);
+
+                    if (!symbolTable.CompareCustomUnits(argUnit, paramUnit))
+                    {
+                        matches = false;
+                        symbolTable.AddNodeToUnit(node, argUnit);
+                    }
+
+                    break;
+                }
+                default:
+                    matches = false;
+                    break;
+            }
+        }
+        if (matches)
+        {
+            var symbol = symbolTable.GetReturnFromNode(symbolTable.GetNodeFromId(node.GetId().ToString()));
+            switch (symbol)
+            {
+                case Symbol.Int:
+                    symbolTable.AddNode(node, Symbol.Int);
+                    break;
+                case Symbol.Decimal:
+                    symbolTable.AddNode(node, Symbol.Decimal);
+                    break;
+                case Symbol.Bool:
+                    symbolTable.AddNode(node, Symbol.Bool);
+                    break;
+                case Symbol.Char:
+                    symbolTable.AddNode(node, Symbol.Char);
+                    break;
+                case Symbol.String:
+                    symbolTable.AddNode(node, Symbol.String);
+                    break;
+                default:
+                    var unit = symbolTable.GetUnit(symbolTable.GetNodeFromId(node.GetId().ToString()));
+                    if (unit != null)
+                    {
+                        symbolTable.AddNodeToUnit(node, unit);
+                        symbolTable.AddNode(node, Symbol.ok);
+                    }
+                    else
+                    {
+                        symbolTable.AddNode(node, Symbol.notOk);
+                    }
+
+                    break;
             }
         }
         else
@@ -266,65 +269,65 @@ public class exprTypeChecker : stmtTypeChecker
         }
         else
         {
-          switch (leftSymbol)
-        {
-            case Symbol.Int when rightSymbol is Symbol.Int:
-                symbolTable.AddNode(node, Symbol.Int);
-                break;
-            case Symbol.Decimal when rightSymbol is Symbol.Decimal or Symbol.Int:
-                symbolTable.AddNode(node, Symbol.Decimal);
-                break;
-            case Symbol.Decimal or Symbol.Int when rightSymbol is Symbol.Decimal:
-                symbolTable.AddNode(node, Symbol.Decimal);
-                break;
-            default:
-                bool leftContainsUnit = symbolTable.nodeToUnit.ContainsKey(leftExpr);
-                bool rightContainsUnit = symbolTable.nodeToUnit.ContainsKey(rightExpr);
-                if (symbolTable.nodeToUnit.ContainsKey(leftExpr) && symbolTable.nodeToUnit.ContainsKey(rightExpr))
-                {
-                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> left = symbolTable.GetUnit(leftExpr); // unit 1
-                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> right = symbolTable.GetUnit(rightExpr); // unit 2
-
-                    List<AUnitdeclGlobal> a = left.Item1;
-                    List<AUnitdeclGlobal> b = left.Item2;
-                    List<AUnitdeclGlobal> c = right.Item1;
-                    List<AUnitdeclGlobal> d = right.Item2;
-
-                    List<AUnitdeclGlobal> ac = a.Intersect(c).ToList();
-                    List<AUnitdeclGlobal> bd = b.Intersect(d).ToList();
-
-                    List<AUnitdeclGlobal> numerators = a.Except(ac).Union(d.Except(bd)).ToList();
-                    List<AUnitdeclGlobal> denomerators = c.Except(ac).Union(b.Except(bd)).ToList();
-
-                    Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unituse =
-                        new Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>(numerators, denomerators);
-                    symbolTable.AddNodeToUnit(node, unituse);
-                    symbolTable.AddNode(node, Symbol.ok);
-                }
-                else if ((leftContainsUnit || rightContainsUnit) && (symbolTable.GetSymbol(leftExpr) == Symbol.Int || symbolTable.GetSymbol(leftExpr) == Symbol.Decimal) 
-                         || (symbolTable.GetSymbol(rightExpr) == Symbol.Int || symbolTable.GetSymbol(rightExpr) == Symbol.Decimal))
-                {
-                    // Unitnumber + decimal/int eller decimal/int + UnitNumber
-                    var unit = leftContainsUnit ? symbolTable.GetUnit(leftExpr) :
-                        rightContainsUnit ? symbolTable.GetUnit(rightExpr) : null;
-                    
-                    if (unit != null)
+            switch (leftSymbol)
+            {
+                case Symbol.Int when rightSymbol is Symbol.Int:
+                    symbolTable.AddNode(node, Symbol.Int);
+                    break;
+                case Symbol.Decimal when rightSymbol is Symbol.Decimal or Symbol.Int:
+                    symbolTable.AddNode(node, Symbol.Decimal);
+                    break;
+                case Symbol.Decimal or Symbol.Int when rightSymbol is Symbol.Decimal:
+                    symbolTable.AddNode(node, Symbol.Decimal);
+                    break;
+                default:
+                    bool leftContainsUnit = symbolTable.nodeToUnit.ContainsKey(leftExpr);
+                    bool rightContainsUnit = symbolTable.nodeToUnit.ContainsKey(rightExpr);
+                    if (symbolTable.nodeToUnit.ContainsKey(leftExpr) && symbolTable.nodeToUnit.ContainsKey(rightExpr))
                     {
-                        symbolTable.AddNodeToUnit(node, unit);
+                        Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> left = symbolTable.GetUnit(leftExpr); // unit 1
+                        Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> right = symbolTable.GetUnit(rightExpr); // unit 2
+
+                        List<AUnitdeclGlobal> a = left.Item1;
+                        List<AUnitdeclGlobal> b = left.Item2;
+                        List<AUnitdeclGlobal> c = right.Item1;
+                        List<AUnitdeclGlobal> d = right.Item2;
+
+                        List<AUnitdeclGlobal> ac = a.Intersect(c).ToList();
+                        List<AUnitdeclGlobal> bd = b.Intersect(d).ToList();
+
+                        List<AUnitdeclGlobal> numerators = a.Except(ac).Union(d.Except(bd)).ToList();
+                        List<AUnitdeclGlobal> denomerators = c.Except(ac).Union(b.Except(bd)).ToList();
+
+                        Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>> unituse =
+                            new Tuple<List<AUnitdeclGlobal>, List<AUnitdeclGlobal>>(numerators, denomerators);
+                        symbolTable.AddNodeToUnit(node, unituse);
                         symbolTable.AddNode(node, Symbol.ok);
+                    }
+                    else if ((leftContainsUnit || rightContainsUnit) && (symbolTable.GetSymbol(leftExpr) == Symbol.Int || symbolTable.GetSymbol(leftExpr) == Symbol.Decimal) 
+                             || (symbolTable.GetSymbol(rightExpr) == Symbol.Int || symbolTable.GetSymbol(rightExpr) == Symbol.Decimal))
+                    {
+                        // Unitnumber + decimal/int eller decimal/int + UnitNumber
+                        var unit = leftContainsUnit ? symbolTable.GetUnit(leftExpr) :
+                            rightContainsUnit ? symbolTable.GetUnit(rightExpr) : null;
+                    
+                        if (unit != null)
+                        {
+                            symbolTable.AddNodeToUnit(node, unit);
+                            symbolTable.AddNode(node, Symbol.ok);
+                        }
+                        else
+                        {
+                            symbolTable.AddNode(node, Symbol.notOk);
+                        }
                     }
                     else
                     {
+                        // not valid input expressions to a divide expression
                         symbolTable.AddNode(node, Symbol.notOk);
                     }
-                }
-                else
-                {
-                    // not valid input expressions to a divide expression
-                    symbolTable.AddNode(node, Symbol.notOk);
-                }
-                break;
-        }  
+                    break;
+            }  
         }
     }
     public override void OutAMultiplyExp(AMultiplyExp node)

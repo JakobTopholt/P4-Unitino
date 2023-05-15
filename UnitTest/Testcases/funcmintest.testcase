@@ -1,17 +1,21 @@
 ﻿lmao xD
 ////
-char function3(char a, char b, char c) {
-    string d = a+b+c;
-    return d;
-}
 decimal function4(int a) {
     decimal d = 3.5 + a ;
     char g = 'o';
     char b = 'b';
     char c = 'c';
-    function3(g, b, c);
+    string test = function3(g, b, c);
     return d;
 }
+
+string function3(char a, char b, char c) {
+    string d = a;
+    d += b;
+    d += c;
+    return d;
+}
+
 ////
 
 ////

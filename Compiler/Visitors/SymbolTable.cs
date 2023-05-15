@@ -152,7 +152,7 @@ public class SymbolTable
     public Node? GetFuncFromId(string identifier)
     {
         Node? func;
-        bool found = funcidToNode.TryGetValue(identifier, out func);
+        bool found = funcidToNode.TryGetValue(identifier.Trim(), out func);
         return found ? func : null;
     }
     
@@ -162,14 +162,14 @@ public class SymbolTable
     }
     public List<PType>? GetFunctionArgs(Node node)
     {
-        return nodeToArgs[node];
+        bool found = nodeToArgs.TryGetValue(node, out List<PType>? args);
+        return found ? args : parent?.GetFunctionArgs(node);
     }
     public void AddReturnSymbol(Node node, Symbol? symbol) => nodeToReturn.Add(node, symbol);
     public Symbol? GetReturnFromNode(Node node)
     {
-        Symbol? returnSymbol;
-        bool found = nodeToReturn.TryGetValue(node, out returnSymbol);
-        return found ? returnSymbol : null;
+        bool found = nodeToReturn.TryGetValue(node, out Symbol? returnSymbol);
+        return found ? returnSymbol : parent?.GetReturnFromNode(node);
     }
 }
 
