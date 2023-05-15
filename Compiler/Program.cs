@@ -14,10 +14,7 @@ Start start;
 // PrettyPrint Visitor
 start.Apply(new PrettyPrint());
 
-
-List<SymbolTable> AllTables = new() { };
-
-SymbolTable symbolTable = new(null, AllTables);
+SymbolTable symbolTable = new(null);
 // UnitVisitor
 start.Apply(new UnitVisitor(symbolTable));
 

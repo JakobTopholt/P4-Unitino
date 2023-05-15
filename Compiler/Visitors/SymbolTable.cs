@@ -5,11 +5,12 @@ namespace Compiler.Visitors;
 
 public class SymbolTable
 {
-    private List<SymbolTable> allTables = new();
-    public SymbolTable(SymbolTable? parent, List<SymbolTable> allTables)
+    private static readonly List<SymbolTable> AllTables = new();
+    private static int _currentTable;
+    public SymbolTable(SymbolTable? parent)
     {
         this.parent = parent;
-        this.allTables = allTables;
+        AllTables.Add(this);
     }
     private readonly SymbolTable? parent;
     private readonly Dictionary<string, Node> idToNode = new();
@@ -25,7 +26,11 @@ public class SymbolTable
     public int Loop = 0;
     
     // General methods
-    public SymbolTable EnterScope() => new(this, allTables);
+    public SymbolTable EnterScope()
+    {
+        return ++_currentTable < AllTables.Count ? AllTables[_currentTable] : new SymbolTable(this);
+    }
+
     public SymbolTable ExitScope() => parent ?? this;
     public SymbolTable ResetScope()
     {
@@ -34,6 +39,8 @@ public class SymbolTable
         {
             table = table.parent;
         }
+
+        _currentTable = 0;
         return table;
     }
 
