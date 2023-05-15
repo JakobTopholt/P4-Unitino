@@ -589,6 +589,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutARemainderExp(ARemainderExp node)
     {
+        throw new Exception("Yoyoy");
         PExp L = node.GetL();
         PExp R = node.GetR();
         
