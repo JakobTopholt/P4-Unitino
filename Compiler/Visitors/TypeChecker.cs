@@ -52,6 +52,11 @@ public class TypeChecker : exprTypeChecker
         symbolTable = symbolTable.ResetScope();
     }
 
+    public override void CaseAUnitdeclGlobal(AUnitdeclGlobal node)
+    {
+        
+    }
+
     public override void OutANumUnituse(ANumUnituse node)
     {
         // Does id to Unit exist?
@@ -260,13 +265,13 @@ public class TypeChecker : exprTypeChecker
             if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
                 untypedIsOk = false;
         }
-        //throw new Exception(symbols);
+        throw new Exception(symbols);
         symbolTable = symbolTable.ExitScope();
-        if (symbolTable.GetSymbol(node) != null)
+        if (!untypedIsOk)
         {
-            
+            symbolTable.AddNode(node, untypedIsOk ? Symbol.Ok : Symbol.NotOk);
+            Console.WriteLine();
         }
-        symbolTable.AddNode(node, untypedIsOk ? Symbol.Ok : Symbol.NotOk);
     }
     public override void InALoopGlobal(ALoopGlobal node)
     {

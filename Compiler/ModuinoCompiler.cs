@@ -37,7 +37,9 @@ internal static class ModuinoCompiler
         List<SymbolTable> AllTables = new();
 
         SymbolTable symbolTable = new(null, AllTables);
-        start.Apply(new UnitVisitor(symbolTable));
+        TypeChecker subunitsExprCheck = new TypeChecker(symbolTable);
+        
+        start.Apply(new UnitVisitor(symbolTable, subunitsExprCheck));
         start.Apply(new FunctionVisitor(symbolTable));
         start.Apply(new TypeChecker(symbolTable));
 

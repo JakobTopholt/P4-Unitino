@@ -65,10 +65,10 @@ public class exprTypeChecker : stmtTypeChecker
     public override void OutACharExp(ACharExp node) => symbolTable.AddNode(node, Symbol.Char);
 
     public override void OutAValueExp(AValueExp node)
-    {
-        //symbolTable.AddNode(node, Symbol.Decimal);
+    { 
+        symbolTable.AddNode(node, Symbol.Decimal);
         // ----- Logic missing here---- (tag stilling til hvad det under betød)
-        symbolTable.AddNode(node, UnitVisitor.StateUnit ? Symbol.Decimal : Symbol.NotOk);
+       // symbolTable.AddNode(node, UnitVisitor.StateUnit ? Symbol.Decimal : Symbol.NotOk);
     }
 
     public override void OutAFunccallExp(AFunccallExp node)
