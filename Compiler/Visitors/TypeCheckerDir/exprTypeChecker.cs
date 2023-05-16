@@ -76,7 +76,8 @@ public class exprTypeChecker : stmtTypeChecker
         // Funccall som en del af et return udtryk
         // returnvalue har betydning for om det er et correct call
         List<PExp>? parameters = node.GetExp().OfType<PExp>().ToList();
-        List<PType>? args = symbolTable.GetFunctionArgs(symbolTable.GetNodeFromId(node.GetId().ToString()));
+        symbolTable.GetNodeFromId(node.GetId().ToString(), out Node xxx);
+        List<PType>? args = symbolTable.GetFunctionArgs(xxx);
         bool matches = true;
         for (int i = 0; i < args.Count; i++)
         {
@@ -85,7 +86,7 @@ public class exprTypeChecker : stmtTypeChecker
             if (parameters[i] is AIdExp x)
             {
                 paramSymbol = symbolTable.GetSymbol(x.GetId().ToString().Trim());
-                returnUnit = symbolTable.GetNodeFromId(x.GetId().ToString().Trim());
+                symbolTable.GetNodeFromId(x.GetId().ToString().Trim(), out returnUnit);
             }
             else
             {
@@ -130,7 +131,8 @@ public class exprTypeChecker : stmtTypeChecker
         }
         if (matches)
         {
-            var symbol = symbolTable.GetReturnFromNode(symbolTable.GetNodeFromId(node.GetId().ToString()));
+            symbolTable.GetNodeFromId(node.GetId().ToString(), out Node result);
+            var symbol = symbolTable.GetReturnFromNode(result);
             switch (symbol)
             {
                 case Symbol.Int:

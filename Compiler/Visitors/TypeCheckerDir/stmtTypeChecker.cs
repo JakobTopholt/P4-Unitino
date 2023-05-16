@@ -324,7 +324,7 @@ public class stmtTypeChecker : DepthFirstAdapter
               if (returnExp is AIdExp x)
               {
                   returnSymbol = symbolTable.GetSymbol(x.GetId().ToString().Trim());
-                  returnUnit = symbolTable.GetNodeFromId(x.GetId().ToString().Trim());
+                  symbolTable.GetNodeFromId(x.GetId().ToString().Trim(), out returnUnit);
               }
               switch (typedType)
               {
