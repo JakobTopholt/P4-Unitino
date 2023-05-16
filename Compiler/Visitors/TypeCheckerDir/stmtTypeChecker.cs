@@ -334,27 +334,6 @@ public class stmtTypeChecker : DepthFirstAdapter
        }
     }
 
-    public Symbol? PTypeToSymbol(PType type)
-    {
-        switch (type)
-        {
-            case AIntType:
-                return Symbol.Bool;
-            case ADecimalType:
-                return Symbol.Decimal;
-            case ABoolType:
-                return Symbol.Bool;
-            case ACharType:
-                return Symbol.Char;
-            case AStringType:
-                return Symbol.String;
-            case AVoidType:
-                return Symbol.Func;
-            default:
-                return null;
-        }
-    }
-
     public override void InAReturnStmt(AReturnStmt node)
     {
       //already set before

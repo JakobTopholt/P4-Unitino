@@ -146,29 +146,10 @@ public class FunctionVisitor : DepthFirstAdapter
     }
     public override void CaseALoopGlobal(ALoopGlobal node)
     {
-        InALoopGlobal(node);
-        OutALoopGlobal(node);
-    }
-    public override void InALoopGlobal(ALoopGlobal node)
-    {
-        symbolTable.Loop++;
-        if (symbolTable.Loop != 1)
-        {
-            symbolTable.AddNode(node, Symbol.NotOk);
-        }
+     
     }
     public override void CaseAProgGlobal(AProgGlobal node)
     {
-        InAProgGlobal(node);
-        OutAProgGlobal(node);
+  
     }
-    public override void InAProgGlobal(AProgGlobal node)
-    {
-        symbolTable.Prog++;
-        if (symbolTable.Prog != 1)
-        {
-            symbolTable.AddNode(node, Symbol.NotOk);
-        }
-    }
-    
 }

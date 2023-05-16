@@ -117,7 +117,7 @@ public class exprTypeChecker : stmtTypeChecker
                     break;
                 case AUnitType argType:
                     if (symbolTable.GetUnit(argType, out var argUnit) && 
-                        symbolTable.GetUnit(parameters[i], out var paramUnit) && 
+                        symbolTable.GetUnit(returnUnit, out var paramUnit) && 
                         !symbolTable.CompareCustomUnits(argUnit, paramUnit))
                     {
                         matches = false;
@@ -206,7 +206,6 @@ public class exprTypeChecker : stmtTypeChecker
     public override void OutAUnitdecimalExp(AUnitdecimalExp node)
     {
         // A single unitnumber eg. 50ms
-        throw new Exception(node.GetId().ToString().Trim());
         AUnitdeclGlobal unitType = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
         if (unitType != null)
         {
