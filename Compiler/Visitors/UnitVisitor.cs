@@ -49,7 +49,7 @@ public class UnitVisitor : DepthFirstAdapter
             if (symbolTable.GetSymbol(expr) == Symbol.Decimal)
             {
                 // Subunit skal have gemt dens relation til parentunit
-                symbolTable.AddIdToUnitdecl(node.GetId().ToString(), (AUnitdeclGlobal) node.Parent());
+                symbolTable.AddIdToUnitdecl(node.GetId().ToString().Trim(), (AUnitdeclGlobal) node.Parent());
                 symbolTable.AddNode(node, Symbol.Decimal);
             }
             else

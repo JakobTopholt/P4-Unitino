@@ -15,9 +15,10 @@ public class PrettyPrint : DepthFirstAdapter
     private TextWriter output;
     private static readonly Regex whiteSpace = new(@"\s+");
 
-    public PrettyPrint(TextWriter? output = null)
+    public PrettyPrint(SymbolTable symbolTable, TextWriter? output = null)
     {
         this.output = output;
+        this.symbolTable = symbolTable;
     }
 
     private void PrintPrecedence(Node L, Node R, string ope)
@@ -64,7 +65,7 @@ public class PrettyPrint : DepthFirstAdapter
 
     public override void CaseAProgGlobal(AProgGlobal node)
     {
-        Indent("prog {\r\n");
+        Indent("void setup() {\r\n");
         _indent++;
         foreach (PStmt child in node.GetStmt())
         {
@@ -80,10 +81,9 @@ public class PrettyPrint : DepthFirstAdapter
         Indent("}\n");
     }
     
-    
     public override void CaseALoopGlobal(ALoopGlobal node)
     {
-        Indent("loop {\n");
+        Indent("void loop() {\n");
         _indent++;
         foreach (PStmt child in node.GetStmt())
         {
@@ -107,7 +107,7 @@ public class PrettyPrint : DepthFirstAdapter
                 Indent("int ");
                 break;
             case ADecimalType:
-                Indent("decimal ");
+                Indent("float ");
                 break;
             case ABoolType:
                 Indent("bool ");
@@ -116,15 +116,13 @@ public class PrettyPrint : DepthFirstAdapter
                 Indent("char ");
                 break;
             case AStringType:
-                Indent("string ");
+                Indent("String ");
                 break;
         }
         var customType = node.GetType() as AUnitType;
         if (customType != null)
         {
-            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
-            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
-            Indent($"decimal ");
+            Indent($"float ");
         }
         node.GetId().Apply(this);
         output.Write("(");
@@ -192,7 +190,7 @@ public class PrettyPrint : DepthFirstAdapter
                 output.Write("int ");
                 break;
             case ADecimalType:
-                output.Write("decimal ");
+                output.Write("float ");
                 break;
             case ABoolType:
                 output.Write("bool ");
@@ -201,12 +199,12 @@ public class PrettyPrint : DepthFirstAdapter
                 output.Write("char ");
                 break;
             case AStringType:
-                output.Write("string ");
+                output.Write("String ");
                 break;
-            case AUnitType customType:
-            {
-                break;
-            }
+        }
+        if (node.GetType() is AUnitType customType)
+        {
+            Indent($"float ");
         }
         node.GetId().Apply(this);
     }
@@ -368,7 +366,7 @@ public class PrettyPrint : DepthFirstAdapter
                 Indent("int ");
                 break;
             case ADecimalType:
-                Indent("decimal ");
+                Indent("float ");
                 break;
             case ABoolType:
                 Indent("bool ");
@@ -377,7 +375,7 @@ public class PrettyPrint : DepthFirstAdapter
                 Indent("char ");
                 break;
             case AStringType:
-                Indent("string ");
+                Indent("String ");
                 break;
             case AUnitType customType:
                 break;
@@ -453,7 +451,7 @@ public class PrettyPrint : DepthFirstAdapter
                 Indent(($"int "));
                 break;
             case ADecimalType b:
-                Indent(($"decimal "));
+                Indent(($"float "));
                 break;
             case ABoolType c:
                 Indent(($"bool "));
@@ -462,7 +460,7 @@ public class PrettyPrint : DepthFirstAdapter
                 Indent(($"char "));
                 break;
             case AStringType e:
-                Indent(($"string "));
+                Indent(($"String "));
                 break;
         }
         if (node.GetType() is AUnitType customType)
@@ -474,6 +472,23 @@ public class PrettyPrint : DepthFirstAdapter
         node.GetId().Apply(this);
         output.Write(" = ");
         node.GetExp().Apply(this);
+    }
+
+    public override void CaseAFunccallExp(AFunccallExp node)
+    {
+        output.Write("");
+        node.GetId().Apply(this);
+        output.Write("(");
+        var list = node.GetExp();
+        int i = 0;
+        foreach (Node child in node.GetExp())
+        {
+            child.Apply(this);
+            i++;
+            if(i != list.Count)
+                output.Write(", ");
+        }
+        output.Write(")");    
     }
 
     public override void CaseAFunccallStmt(AFunccallStmt node)
@@ -614,7 +629,7 @@ public class PrettyPrint : DepthFirstAdapter
                 output.Write("(char)");
                 break;
             case AStringType e: 
-                output.Write("(string)"); 
+                output.Write("(String)"); 
                 break;
         }
         node.GetExp().Apply(this);
@@ -640,7 +655,8 @@ public class PrettyPrint : DepthFirstAdapter
         if (node.GetBoolean() is ATrueBoolean)
             output.Write("true");
         else if (node.GetBoolean() is AFalseBoolean)
-            output.Write("false");    }
+            output.Write("false");    
+    }
     
     public override void CaseAStringExp(AStringExp node)
     {
@@ -659,7 +675,9 @@ public class PrettyPrint : DepthFirstAdapter
     }
     public override void CaseAUnitnumberExp(AUnitnumberExp node)
     {
-        //AUnitdeclGlobal test = symbolTable.SubunitToUnit[node.GetId().ToString().Trim()];
-        output.Write(node.GetNumber());
+        AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
+        output.Write(test.GetId().ToString() + node.GetId() + "(");
+        node.GetNumber().Apply(this);
+        output.Write(")");
     }
 }

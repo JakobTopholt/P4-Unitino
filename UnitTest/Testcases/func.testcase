@@ -30,23 +30,23 @@ decimal function4(int a) {
 func NormalFunc(int b, int a) {
     int i = 0;
 }
-prog {
+void setup() {
     int i = 0;
     NormalFunc(5, 7);
 }
-loop {
+void loop() {
     int i = 0;
 }
-string ImplicitTypedFunc() {
-    string i = "0";
+String ImplicitTypedFunc() {
+    String i = "0";
     return i;
 }
 char function3(char a, char b, char c){
     char d = a+b+c;
     return d;
 }
-decimal function4(int a){
-    decimal d = 3.5 + a;
+float function4(int a){
+    float d = 3.5 + a;
     char a = "a";
     char b = "b";
     char c = "c";
@@ -64,8 +64,8 @@ void setup() {
 void loop() {
     int i = 0;
 }
-string ImplicitTypedFunc() {
-    string i = "0";
+String ImplicitTypedFunc() {
+    String i = "0";
     return i;
 }
 char function3(char a, char b, char c) {
