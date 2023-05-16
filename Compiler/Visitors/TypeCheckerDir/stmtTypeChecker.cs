@@ -186,6 +186,7 @@ public class stmtTypeChecker : DepthFirstAdapter
                         symbolTable.AddId(node.GetId().ToString(), node, exprType is Symbol.String or Symbol.Char ? Symbol.String : Symbol.NotOk);
                         break;
                     case AUnitType customType:
+                        //throw new Exception("bruh");
                         if (symbolTable.GetUnit(customType, out var unitType) && 
                             symbolTable.GetUnit(node.GetExp(), out var expType))
                         {
@@ -324,6 +325,7 @@ public class stmtTypeChecker : DepthFirstAdapter
               if (returnExp is AIdExp x)
               {
                   returnSymbol = symbolTable.GetSymbol(x.GetId().ToString().Trim());
+                  //throw new Exception(returnSymbol.ToString());
                   symbolTable.GetNodeFromId(x.GetId().ToString().Trim(), out returnUnit);
               }
               switch (typedType)
@@ -347,9 +349,9 @@ public class stmtTypeChecker : DepthFirstAdapter
                       symbolTable.AddNode(node, Symbol.NotOk);
                       break;
                   case AUnitType customType:
+                      //throw new Exception("bruh");
                       symbolTable.GetUnit(typedType, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) funcType);
-                      symbolTable.GetUnit(returnExp, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) returnType);
-                      if (symbolTable.GetUnit(returnExp, out _))
+                      if (symbolTable.GetUnit(returnUnit, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) returnType))
                           symbolTable.AddNode(node, symbolTable.CompareCustomUnits(funcType, returnType) ? Symbol.Ok : Symbol.NotOk);
                       else
                           symbolTable.AddNode(node, Symbol.NotOk);
