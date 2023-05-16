@@ -42,13 +42,16 @@ public class TypeChecker : exprTypeChecker
 
     public override void OutAGrammar(AGrammar node)
     {
+        string symbols = "";
         bool grammarIsOk = true;
         List<PGlobal> globals = node.GetGlobal().OfType<PGlobal>().ToList();
         foreach (PGlobal global in globals)
         {
+            symbols += symbolTable.GetSymbol(global).ToString();
             if (symbolTable.GetSymbol(global) == Symbol.NotOk)
                 grammarIsOk = false;
         }
+        //throw new Exception(symbols);
         symbolTable.AddNode(node, grammarIsOk ? Symbol.Ok : Symbol.NotOk);
         symbolTable = symbolTable.ResetScope();
     }
@@ -286,7 +289,6 @@ public class TypeChecker : exprTypeChecker
 
     public override void OutALoopGlobal(ALoopGlobal node)
     {
-        
         if (symbolTable.GetSymbol(node) == null)
         {
             bool loopIsOk = true;
@@ -316,18 +318,18 @@ public class TypeChecker : exprTypeChecker
         if (symbolTable.GetSymbol(node) == null)
         {
             string symbols = "";
-            bool loopIsOk = true;
+            bool progIsOk = true;
 
             List<PStmt> stmts = node.GetStmt().OfType<PStmt>().ToList();
             foreach (PStmt stmt in stmts)
             {
                 symbols += symbolTable.GetSymbol(stmt).ToString();
                 if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
-                    loopIsOk = false;
+                    progIsOk = false;
             }
             //throw new Exception(symbols);
             symbolTable = symbolTable.ExitScope();
-            symbolTable.AddNode(node, loopIsOk ? Symbol.Ok : Symbol.NotOk);
+            symbolTable.AddNode(node, progIsOk ? Symbol.Ok : Symbol.NotOk);
         }
     }
 }

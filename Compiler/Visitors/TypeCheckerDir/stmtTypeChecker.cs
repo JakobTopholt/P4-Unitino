@@ -276,57 +276,56 @@ public class stmtTypeChecker : DepthFirstAdapter
        symbolTable.GetNodeFromId(node.GetId().ToString().Trim(), out Node? func);
        if (func != null)
        {
-           List<PType> args = symbolTable.GetFunctionArgs(func);
-           List<PExp>? parameters = node.GetParams() as List<PExp>;
-           if (args.Count() == parameters.Count())
+           List<PType>? args = symbolTable.GetFunctionArgs(func);
+           List<PExp> parameters = node.GetParams().OfType<PExp>().ToList();
+           bool matches = true;
+           for(int i = 0; i < args.Count(); i++)
            {
-               bool matches = true;
-               for(int i = 0; i < args.Count(); i++)
+               Node? parameter = parameters[i];
+               if (parameters[i] is AIdExp id)
                {
-                   switch (args[i])
-                   {
-                       case AIntType:
-                           if (symbolTable.GetSymbol(parameters[i]) != Symbol.Int)
-                               matches = false;
-                           break;
-                       case ADecimalType:
-                           if (symbolTable.GetSymbol(parameters[i]) != Symbol.Decimal)
-                               matches = false;
-                           break;
-                       case ABoolType:
-                           if (symbolTable.GetSymbol(parameters[i]) != Symbol.Bool)
-                               matches = false;
-                           break;
-                       case ACharType:
-                           if (symbolTable.GetSymbol(parameters[i]) != Symbol.Char)
-                               matches = false;
-                           break;
-                       case AStringType:
-                           if (symbolTable.GetSymbol(parameters[i]) != Symbol.String)
-                               matches = false;
-                           break;
-                       case AUnitType argType:
-                       {
-                           symbolTable.GetUnit(argType, out var argUnit);
-                           symbolTable.GetUnit(parameters[i], out var paramUnit);
-                           if (!symbolTable.CompareCustomUnits(argUnit, paramUnit))
-                           {
-                               matches = false;
-                               symbolTable.AddNodeToUnit(node, argUnit);
-                           }
-                           break; 
-                       }
-                       default:
-                           matches = false;
-                           break;
-                   }
+                   symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out parameter);
                }
-               symbolTable.AddNode(node, matches ? Symbol.Ok : Symbol.NotOk);
+                       
+               switch (args[i])
+               {
+                   case AIntType:
+                       if (symbolTable.GetSymbol(parameter) != Symbol.Int)
+                           matches = false;
+                       break;
+                   case ADecimalType:
+                       if (symbolTable.GetSymbol(parameter) != Symbol.Decimal)
+                           matches = false;
+                       break;
+                   case ABoolType:
+                       if (symbolTable.GetSymbol(parameter) != Symbol.Bool)
+                           matches = false;
+                       break;
+                   case ACharType:
+                       if (symbolTable.GetSymbol(parameter) != Symbol.Char)
+                           matches = false;
+                       break;
+                   case AStringType:
+                       if (symbolTable.GetSymbol(parameter) != Symbol.String)
+                           matches = false;
+                       break;
+                   case AUnitType argType:
+                   {
+                       symbolTable.GetUnit(argType, out var argUnit);
+                       symbolTable.GetUnit(parameter, out var paramUnit);
+                       if (!symbolTable.CompareCustomUnits(argUnit, paramUnit))
+                       {
+                           matches = false;
+                           symbolTable.AddNodeToUnit(node, argUnit);
+                       }
+                       break; 
+                   }
+                   default:
+                       matches = false;
+                       break;
+               }
            }
-           else
-           {
-               symbolTable.AddNode(node, Symbol.NotOk);
-           }
+           symbolTable.AddNode(node, matches ? Symbol.Ok : Symbol.NotOk);
        }
        else
        {
