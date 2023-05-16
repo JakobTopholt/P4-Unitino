@@ -5,7 +5,7 @@ unit Time {
     s => value * 1000;
 }
 Time UnitFunc() {
-    Time a = 50ms+1000s;
+    Time a = 50ms+1000ms;
     return a;
 }
 prog {

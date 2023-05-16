@@ -10,9 +10,12 @@ namespace Compiler.Visitors;
 public class UnitVisitor : DepthFirstAdapter
 {
     private SymbolTable symbolTable;
-    public UnitVisitor(SymbolTable symbolTable)
+    private TypeChecker typeChecker;
+    public UnitVisitor(SymbolTable symbolTable, TypeChecker typeChecker)
     {
         this.symbolTable = symbolTable;
+        this.typeChecker = typeChecker;
+
     }
     public static bool StateUnit;
 
@@ -20,7 +23,7 @@ public class UnitVisitor : DepthFirstAdapter
     {
         symbolTable = symbolTable.ResetScope();
     }
-
+    
     public override void InAUnitdeclGlobal(AUnitdeclGlobal node)
     {
         StateUnit = true;
@@ -39,24 +42,22 @@ public class UnitVisitor : DepthFirstAdapter
 
         StateUnit = false;
     }
-    public override void OutASubunit(ASubunit node)
+
+    public override void CaseASubunit(ASubunit node)
     {
         StateUnit = false;
         if (!symbolTable.IsInExtendedScope(node.GetId().ToString()))
         {
-            PExp expr = node.GetExp();
-
-            if (symbolTable.GetSymbol(expr) == Symbol.Decimal)
+            PExp expression = node.GetExp();
+            expression.Apply(typeChecker);
+            
+            if (symbolTable.GetSymbol(expression) != Symbol.Decimal)
             {
-                // Subunit skal have gemt dens relation til parentunit
-                symbolTable.AddIdToUnitdecl(node.GetId().ToString().Trim(), (AUnitdeclGlobal) node.Parent());
-                symbolTable.AddNode(node, Symbol.Decimal);
+                symbolTable.AddNode(node, Symbol.NotOk);
+                return;
             }
-            else
-            {
-                // Expression did not evaluate to valid
-                symbolTable.AddNode(node, Symbol.NotOk); 
-            }
+            symbolTable.AddNode(node, Symbol.Decimal);
+            symbolTable.AddIdToUnitdecl(node.GetId().ToString().Trim(), (AUnitdeclGlobal) node.Parent());
         }
         else
         {
@@ -64,5 +65,4 @@ public class UnitVisitor : DepthFirstAdapter
             symbolTable.AddNode(node, Symbol.NotOk);
         }
     }
-   
 }
