@@ -240,7 +240,7 @@ public class TypeChecker : exprTypeChecker
             if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
                 untypedIsOk = false;
         }
-        // throw new Exception(symbols);
+        //throw new Exception(symbols);
         symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, untypedIsOk ? Symbol.Ok : Symbol.NotOk);
     }

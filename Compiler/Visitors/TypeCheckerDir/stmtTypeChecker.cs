@@ -273,7 +273,7 @@ public class stmtTypeChecker : DepthFirstAdapter
     {
        // STANDALONE FUNCCAL
        // Returtype er ubetydlig
-       Node? func = symbolTable.GetFuncFromId(node.GetId().ToString().Trim());
+       symbolTable.GetNodeFromId(node.GetId().ToString().Trim(), out Node? func);
        if (func != null)
        {
            List<PType> args = symbolTable.GetFunctionArgs(func);
@@ -428,12 +428,20 @@ public class stmtTypeChecker : DepthFirstAdapter
     public override void OutAIfStmt(AIfStmt node)
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetExp());
-        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.Ok);
+        if (node.GetExp() is AIdExp id)
+        {
+            condExpr = symbolTable.GetSymbol(id.ToString().Trim());
+        }
+        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
     }
     public override void OutAElseifStmt(AElseifStmt node)
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetExp());
-        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.Ok);
+        if (node.GetExp() is AIdExp id)
+        {
+            condExpr = symbolTable.GetSymbol(id.ToString().Trim());
+        }
+        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
     }
     public override void OutAElseStmt(AElseStmt node)
     {
@@ -444,17 +452,17 @@ public class stmtTypeChecker : DepthFirstAdapter
     public override void OutAForStmt(AForStmt node)
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetCond());
-        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.Ok);
+        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
     }
     public override void OutAWhileStmt(AWhileStmt node)
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetExp());
-        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.Ok);
+        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
     }
     public override void OutADowhileStmt(ADowhileStmt node)
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetExp());
-        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.Ok);
+        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
     }
 
 }
