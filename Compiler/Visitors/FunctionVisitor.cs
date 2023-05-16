@@ -29,7 +29,7 @@ public class FunctionVisitor : DepthFirstAdapter
     {
         if(symbolTable.IsInExtendedScope(node.GetId().ToString()))
         {
-            symbolTable.AddNode(node, Symbol.notOk);
+            symbolTable.AddNode(node, Symbol.NotOk);
         }
         else
         {
@@ -69,7 +69,7 @@ public class FunctionVisitor : DepthFirstAdapter
                         symbolTable.AddReturnSymbol(node, Symbol.String);
                         break;
                     default:
-                        symbolTable.AddReturnSymbol(node, symbolTable.GetUnit(returnType) != null ? Symbol.ok : Symbol.notOk);
+                        symbolTable.AddReturnSymbol(node, symbolTable.GetUnit(returnType, out _) ? Symbol.Ok : Symbol.NotOk);
                         break;
                 }
             }
@@ -85,7 +85,7 @@ public class FunctionVisitor : DepthFirstAdapter
     {
         if(symbolTable.IsInExtendedScope(node.GetId().ToString()))
         {
-            symbolTable.AddNode(node, Symbol.notOk);
+            symbolTable.AddNode(node, Symbol.NotOk);
         }
         else
         {
@@ -132,13 +132,13 @@ public class FunctionVisitor : DepthFirstAdapter
                     symbolTable.AddReturnSymbol(node, Symbol.Func);
                     break;
                 case AUnitType customType:
-                    var unit = symbolTable.GetUnit(customType);
+                    symbolTable.GetUnit(customType, out var unit);
                     symbolTable.AddIdToNode(node.GetId().ToString().Trim(), node);
                     symbolTable.AddNodeToUnit(node, unit);
-                    symbolTable.AddReturnSymbol(node, Symbol.ok);
+                    symbolTable.AddReturnSymbol(node, Symbol.Ok);
                     break;
                 default:
-                    symbolTable.AddReturnSymbol(node, Symbol.notOk);
+                    symbolTable.AddReturnSymbol(node, Symbol.NotOk);
                     break;
             }
         }
@@ -154,7 +154,7 @@ public class FunctionVisitor : DepthFirstAdapter
         symbolTable.Loop++;
         if (symbolTable.Loop != 1)
         {
-            symbolTable.AddNode(node, Symbol.notOk);
+            symbolTable.AddNode(node, Symbol.NotOk);
         }
     }
     public override void CaseAProgGlobal(AProgGlobal node)
@@ -167,7 +167,7 @@ public class FunctionVisitor : DepthFirstAdapter
         symbolTable.Prog++;
         if (symbolTable.Prog != 1)
         {
-            symbolTable.AddNode(node, Symbol.notOk);
+            symbolTable.AddNode(node, Symbol.NotOk);
         }
     }
     

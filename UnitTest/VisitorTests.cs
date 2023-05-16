@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Compiler.Visitors;
 using NUnit.Framework;
 using System.Text;
@@ -31,7 +32,7 @@ public class VisitorTests
         ast.Apply(a);
         ast.Apply(b);
         ast.Apply(c);
-        Assert.That(symbolTable.GetSymbol(ast.GetPGrammar()), Is.EqualTo(correct ? Symbol.ok : Symbol.notOk));
+        Assert.That(symbolTable.GetSymbol(ast.GetPGrammar()), Is.EqualTo(correct ? Symbol.Ok : Symbol.NotOk));
     }
     
     [TestCaseSource(typeof(FilesToTestsConverter), nameof(FilesToTestsConverter.CodeGenData))]
@@ -51,7 +52,6 @@ public class VisitorTests
         ast.Apply(codeGen);
         writer.Flush();
         string code = Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int) stream.Length);
-        Assert.That(code.ReplaceLineEndings(), Is.EqualTo(codeGenText));
+        Assert.That(code.ToString().Trim().ReplaceLineEndings(), Is.EqualTo(codeGenText));
     }
-    
 }

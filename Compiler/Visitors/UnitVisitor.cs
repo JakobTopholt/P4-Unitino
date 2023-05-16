@@ -31,10 +31,10 @@ public class UnitVisitor : DepthFirstAdapter
         bool subunitsIsOk = true;
         foreach (ASubunit subunit in node.GetSubunit())
         {
-            if (symbolTable.GetSymbol(subunit) == Symbol.notOk)
+            if (symbolTable.GetSymbol(subunit) == Symbol.NotOk)
                 subunitsIsOk = false;
         }
-        symbolTable.AddNode(node, symbolTable.GetSymbol(node.GetId()) != Symbol.notOk && subunitsIsOk ? Symbol.ok : Symbol.notOk);
+        symbolTable.AddNode(node, symbolTable.GetSymbol(node.GetId()) != Symbol.NotOk && subunitsIsOk ? Symbol.Ok : Symbol.NotOk);
         symbolTable.AddIdToUnitdecl(node.GetId().ToString(), node);
 
         StateUnit = false;
@@ -55,13 +55,13 @@ public class UnitVisitor : DepthFirstAdapter
             else
             {
                 // Expression did not evaluate to valid
-                symbolTable.AddNode(node, Symbol.notOk); 
+                symbolTable.AddNode(node, Symbol.NotOk); 
             }
         }
         else
         {
             // Subunit's Id already declared
-            symbolTable.AddNode(node, Symbol.notOk);
+            symbolTable.AddNode(node, Symbol.NotOk);
         }
     }
    

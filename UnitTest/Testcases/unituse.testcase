@@ -5,11 +5,15 @@ unit Time {
     s => value * 1000;
 }
 Time UnitFunc() {
-    Time a = 50ms + 1000s;
+    //Time a = 1/50ms+1/1000ms;
     return a;
 }
 prog {
-    Time a = 50ms;
+    //Time a = 1/50ms;
+}
+
+loop {
+    int a;
 }
 ////
 
@@ -18,44 +22,19 @@ float Timems(float value) {
     return value;
 }
 float Times(float value) {
-    return value * 1000;
+    return value*1000;
+}
+float UnitFunc() {
+    float a = 1/Timems(50)+1/Timems(1000);
+    return a;
 }
 prog {
-    float a = Timems(50);
+    float a = 1/Timems(50);
 }
 ////
 true
 //////
 Check if units work
-////
-unit Time {
-    ms => value;
-}
-prog {
-    #Time a = 1/50ms;
-    #Time b = 1/5ms;
-    
-}
-////
-unit Time {
-    ms => value;
-}
-prog {
-    //Time a = 1/50ms;
-    //Time b = 1/5ms;
-}
-////
-float Timems(float value) {
-    return value;
-}
-prog {
-    float a = 1/Timems(50);
-    float b = 1/Timems(5);
-}
-////
-true
-//////
-Some mistake somewhere...
 ////
 unit Time {
     ms => value;
@@ -69,8 +48,36 @@ unit Time {
     ms => value;
 }
 prog {
-    Time a = 50ms//ms**ms//ms//ms//ms**ms;
-    Time b = //5ms;
+    float a = 1/Timems(50);
+    float b = 1/Timems(5);
+}
+////
+float Timems(float value) {
+    return value;
+}
+void setup() {
+    float a = 1/Timems(50);
+    float b = 1/Timems(5);
+}
+////
+true
+//////
+Some mistake somewhere
+////
+unit Time {
+    ms => value;
+}
+prog {
+    Time a = 1/50ms;
+    Time b = 1/5ms;
+}
+////
+unit Time {
+    ms => value;
+}
+prog {
+    Time a = 1/50ms;
+    Time b = 1/5ms;
 }
 ////
 float Timems(float value) {

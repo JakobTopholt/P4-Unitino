@@ -21,6 +21,17 @@ public static class FilesToTestsConverter
             return list;
         });
     }
+    public static IEnumerable<TestCaseData> CodeGenDataForIno()
+    {
+        return FileToTestCases().Aggregate(new List<TestCaseData>(), (list, data) =>
+        {
+            if (data.Ast == null)
+                list.Add(new TestCaseData(data.Name, data.CodeGen).SetName(data.Name).Ignore(data.Error));
+            else if (!string.IsNullOrEmpty(data.CodeGen))
+                list.Add(new TestCaseData(data.Name, data.CodeGen).SetName(data.Name));
+            return list;
+        });
+    }
 
     public static IEnumerable<TestCaseData> PrettyPrintData()
     {

@@ -23,8 +23,8 @@ char function3(char a, char b, char c) {
     char d = a+b+c;
     return d;
 }
-decimal function4(int a) {
-    decimal d = 3.5 + a;
+float function4(int a) {
+    float d = 3.5+a;
     char g = 'o';
     char b = 'b';
     char c = 'c';
