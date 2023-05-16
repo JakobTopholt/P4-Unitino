@@ -101,13 +101,9 @@ public class stmtTypeChecker : DepthFirstAdapter
                 break;
         }
     }
-    public override void OutAPrefixplusStmt(APrefixplusStmt node) => UnaryoperatorToSymbolTable(node);
-    public override void OutAPrefixminusStmt(APrefixminusStmt node) => UnaryoperatorToSymbolTable(node);
-    public override void OutASuffixplusStmt(ASuffixplusStmt node) => UnaryoperatorToSymbolTable(node);
-    public override void OutASuffixminusStmt(ASuffixminusStmt node) => UnaryoperatorToSymbolTable(node);
-    private void UnaryoperatorToSymbolTable(Node node)
+    public override void OutAPrefixplusStmt(APrefixplusStmt node)
     {
-        Symbol? expr = symbolTable.GetSymbol(node);
+        Symbol? expr = symbolTable.GetSymbol(node.GetId().ToString().Trim());
         switch (expr)
         {
             case Symbol.Decimal:
@@ -124,6 +120,67 @@ public class stmtTypeChecker : DepthFirstAdapter
                 break;
         }
     }
+
+    public override void OutAPrefixminusStmt(APrefixminusStmt node)
+    {
+        Symbol? expr = symbolTable.GetSymbol(node.GetId().ToString().Trim());
+        switch (expr)
+        {
+            case Symbol.Decimal:
+                symbolTable.AddNode(node,Symbol.Ok);
+                break;
+            case Symbol.Int:
+                symbolTable.AddNode(node,Symbol.Ok); 
+                break;
+            case Symbol.Char:
+                symbolTable.AddNode(node,Symbol.Ok);
+                break;
+            default:
+                symbolTable.AddNode(node,Symbol.NotOk);
+                break;
+        }
+    }
+
+    public override void OutASuffixplusStmt(ASuffixplusStmt node)
+    {
+        Symbol? expr = symbolTable.GetSymbol(node.GetId().ToString().Trim());
+        switch (expr)
+        {
+            case Symbol.Decimal:
+                symbolTable.AddNode(node,Symbol.Ok);
+                break;
+            case Symbol.Int:
+                symbolTable.AddNode(node,Symbol.Ok); 
+                break;
+            case Symbol.Char:
+                symbolTable.AddNode(node,Symbol.Ok);
+                break;
+            default:
+                symbolTable.AddNode(node,Symbol.NotOk);
+                break;
+        }
+    }
+
+    public override void OutASuffixminusStmt(ASuffixminusStmt node)
+    {
+        Symbol? expr = symbolTable.GetSymbol(node.GetId().ToString().Trim());
+        switch (expr)
+        {
+            case Symbol.Decimal:
+                symbolTable.AddNode(node,Symbol.Ok);
+                break;
+            case Symbol.Int:
+                symbolTable.AddNode(node,Symbol.Ok); 
+                break;
+            case Symbol.Char:
+                symbolTable.AddNode(node,Symbol.Ok);
+                break;
+            default:
+                symbolTable.AddNode(node,Symbol.NotOk);
+                break;
+        }
+    }
+
     public override void OutADeclStmt(ADeclStmt node)
     {
         if (!symbolTable.IsInCurrentScope(node.GetId()))

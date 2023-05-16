@@ -130,18 +130,18 @@ false
 outadecl stmt test
 ////
 func untyped(int a, decimal b, string c, char d, bool e){
-    int a;
-    decimal b;
-    string c;
-    char d;
-    bool e;    
+    int f;
+    decimal g;
+    string h;
+    char i;
+    bool j;    
 }
 func untypedtwo(int a, decimal b, string c, char d, bool e){
-    int a = 1;
-    decimal b = 1.5;
-    string c = "lmao";
-    char d = "a";
-    bool e = true;
+    int f = 1;
+    decimal g = 1.5;
+    string h = "lmao";
+    char i = 'a';
+    bool j = true;
    
 }
 
