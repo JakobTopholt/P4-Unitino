@@ -42,12 +42,16 @@ public class TypeChecker : exprTypeChecker
 
     public override void OutAGrammar(AGrammar node)
     {
+        string symbols = "";
         bool grammarIsOk = true;
-        foreach (PGlobal global in node.GetGlobal())
+        List<PGlobal> globals = node.GetGlobal().OfType<PGlobal>().ToList();
+        foreach (PGlobal global in globals)
         {
+            symbols += symbolTable.GetSymbol(global).ToString();
             if (symbolTable.GetSymbol(global) == Symbol.NotOk)
                 grammarIsOk = false;
         }
+        //throw new Exception(symbols);
         symbolTable.AddNode(node, grammarIsOk ? Symbol.Ok : Symbol.NotOk);
         symbolTable = symbolTable.ResetScope();
     }
@@ -225,13 +229,15 @@ public class TypeChecker : exprTypeChecker
         // Check om args er ok
         // Check om stmts er ok
         bool untypedIsOk = true;
-        foreach (AArg arg in node.GetArg())
+        List<AArg> args = node.GetArg().OfType<AArg>().ToList();
+        foreach (AArg arg in args)
         {
             symbols += symbolTable.GetSymbol(arg).ToString();
             if (symbolTable.GetSymbol(arg) == Symbol.NotOk)
                 untypedIsOk = false;
         }
-        foreach (PStmt stmt in node.GetStmt())
+        List<PStmt> stmts = node.GetStmt().OfType<PStmt>().ToList();
+        foreach (PStmt stmt in stmts)
         {
             symbols += symbolTable.GetSymbol(stmt).ToString();
             if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
@@ -252,64 +258,78 @@ public class TypeChecker : exprTypeChecker
         // Stacktracing
         // Check om args er ok
         // Check om stmts er ok
-        bool untypedIsOk = true;
-        foreach (AArg arg in node.GetArg())
+        bool typedIsOk = true;
+        List<AArg> args = node.GetArg().OfType<AArg>().ToList();
+        foreach (AArg arg in args)
         {
             symbols += symbolTable.GetSymbol(arg).ToString();
             if (symbolTable.GetSymbol(arg) == Symbol.NotOk)
-                untypedIsOk = false;
+                typedIsOk = false;
         }
-        foreach (PStmt stmt in node.GetStmt())
+        List<PStmt> stmts = node.GetStmt().OfType<PStmt>().ToList();
+        foreach (PStmt stmt in stmts)
         {
             symbols += symbolTable.GetSymbol(stmt).ToString();
             if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
-                untypedIsOk = false;
+                typedIsOk = false;
         }
         //throw new Exception(symbols);
         symbolTable = symbolTable.ExitScope();
-        if (!untypedIsOk)
-        {
-            symbolTable.AddNode(node, untypedIsOk ? Symbol.Ok : Symbol.NotOk);
-            Console.WriteLine();
-        }
+        symbolTable.AddNode(node, typedIsOk ? Symbol.Ok : Symbol.NotOk);
     }
     public override void InALoopGlobal(ALoopGlobal node)
     {
+        symbolTable.Loop++;
+        if (symbolTable.Loop != 1)
+        {
+            symbolTable.AddNode(node, Symbol.NotOk);
+        }
         symbolTable = symbolTable.EnterScope();
     }
 
     public override void OutALoopGlobal(ALoopGlobal node)
     {
-        symbolTable = symbolTable.ExitScope();
-        if (symbolTable.GetSymbol(node) != null)
+        if (symbolTable.GetSymbol(node) == null)
         {
             bool loopIsOk = true;
-            foreach (PStmt stmt in node.GetStmt())
+            List<PStmt> stmts = node.GetStmt().OfType<PStmt>().ToList();
+            foreach (PStmt stmt in stmts)
             {
                 if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
                     loopIsOk = false;
             }
-
+            symbolTable = symbolTable.ExitScope();
             symbolTable.AddNode(node, loopIsOk ? Symbol.Ok : Symbol.NotOk);
         }
     }
 
     public override void InAProgGlobal(AProgGlobal node)
     {
+        
+        symbolTable.Prog++;
+        if (symbolTable.Prog != 1)
+        {
+            symbolTable.AddNode(node, Symbol.NotOk);
+        }
         symbolTable = symbolTable.EnterScope();
     }
     public override void OutAProgGlobal(AProgGlobal node)
     {
-        symbolTable = symbolTable.ExitScope();
-        if (symbolTable.GetSymbol(node) != null)
+        if (symbolTable.GetSymbol(node) == null)
         {
-            bool loopIsOk = true;
-            foreach (PStmt stmt in node.GetStmt())
+            string symbols = "";
+            bool progIsOk = true;
+
+            List<PStmt> stmts = node.GetStmt().OfType<PStmt>().ToList();
+            foreach (PStmt stmt in stmts)
             {
+                symbols += symbolTable.GetSymbol(stmt).ToString();
                 if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
-                    loopIsOk = false;
+                    progIsOk = false;
             }
-            symbolTable.AddNode(node, loopIsOk ? Symbol.Ok : Symbol.NotOk);
+            //throw new Exception(symbols);
+            symbolTable = symbolTable.ExitScope();
+            symbolTable.AddNode(node, progIsOk ? Symbol.Ok : Symbol.NotOk);
         }
     }
 }

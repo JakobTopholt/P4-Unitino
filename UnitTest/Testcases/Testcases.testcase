@@ -1,6 +1,7 @@
 Test1
 ////
 prog {
+    int test = "hej";
     f();
 }
 loop {

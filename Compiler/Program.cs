@@ -8,7 +8,7 @@ internal static class Program
         //Usage: plug in Arduino board and run the compiler with "Moduino.exe [file]"
         if (args.Length == 0)
         {
-            Console.WriteLine("Usage: Moduino file [optional path to bash]");
+            Console.WriteLine("Usage: Compiler filepath [optional path to bash]");
             Console.WriteLine("Bash is only needed for downloading Arduino CLI the first time");
             return;
         }

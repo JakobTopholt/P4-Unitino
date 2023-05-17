@@ -709,7 +709,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
     {
-        AUnitdeclGlobal test = symbolTable.ItToUnitDecl[node.GetId().ToString().Trim()];
+        AUnitdeclGlobal test = symbolTable.IdToUnitDecl[node.GetId().ToString().Trim()];
         writer.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
                                                     + "(" + node.GetDecimal().ToString().Trim() + ")");    
     }

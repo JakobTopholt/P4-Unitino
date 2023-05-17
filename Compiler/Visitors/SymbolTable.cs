@@ -18,7 +18,7 @@ public class SymbolTable
     private readonly Dictionary<string, Node> _idToNode = new();
     private readonly Dictionary<Node, Symbol> _nodeToSymbol = new();
     
-    public readonly Dictionary<string, AUnitdeclGlobal> ItToUnitDecl = new();
+    public readonly Dictionary<string, AUnitdeclGlobal> IdToUnitDecl = new();
     public readonly Dictionary<Node, (List<AUnitdeclGlobal> numerator, List<AUnitdeclGlobal> denominator)> NodeToUnit = new();
     
     private readonly Dictionary<string, Node> _funcIdToNode = new();
@@ -32,7 +32,6 @@ public class SymbolTable
     {
         return ++_currentTable < _allTables.Count ? _allTables[_currentTable] : new SymbolTable(this, _allTables, _currentTable);
     }
-
     public SymbolTable ExitScope()
     {
         if (_parent == null) 
@@ -41,7 +40,6 @@ public class SymbolTable
         return _parent;
 
     }
-
     public SymbolTable ResetScope()
     {
         SymbolTable table = this;
@@ -53,18 +51,6 @@ public class SymbolTable
         _currentTable = 0;
         return table;
     }
-    
-    public bool GetNodeFromId(string identifier, out Node node) => _idToNode.TryGetValue(identifier.Trim(), out node) 
-                                                                   || (_parent != null && _parent.GetNodeFromId(identifier, out node));
-
-    public void AddId(string identifier, Node node, Symbol symbol)
-    {
-        _idToNode.Add(identifier.Trim(), node);
-        AddNode(node, symbol);
-    }
-    public void AddNode(Node node, Symbol symbol) => _nodeToSymbol.Add(node, symbol);
-    public Symbol? GetSymbol(Node node) => _nodeToSymbol.TryGetValue(node, out Symbol symbol) ? symbol : _parent?.GetSymbol(node);
-    public Symbol? GetSymbol(string identifier) => _idToNode.TryGetValue(identifier.Trim(), out Node? node) ? GetSymbol(node) : _parent?.GetSymbol(identifier);
     public bool IsInCurrentScope(TId id) => _idToNode.ContainsKey(id.ToString().Trim());
     public bool IsInExtendedScope(string identifier)
     {
@@ -77,6 +63,19 @@ public class SymbolTable
         return _parent?.IsInExtendedScope(identifier.Trim()) ?? false;
     }
     
+    public bool GetNodeFromId(string identifier, out Node node) => _idToNode.TryGetValue(identifier.Trim(), out node) 
+                                                                   || (_parent != null && _parent.GetNodeFromId(identifier, out node));
+    
+    public void AddId(string identifier, Node node, Symbol symbol)
+    {
+        _idToNode.Add(identifier.Trim(), node);
+        AddNode(node, symbol);
+    }
+    public void AddNode(Node node, Symbol symbol) => _nodeToSymbol.Add(node, symbol);
+    public Symbol? GetSymbol(Node node) => _nodeToSymbol.TryGetValue(node, out Symbol symbol) ? symbol : _parent?.GetSymbol(node);
+    public Symbol? GetSymbol(string identifier) => _idToNode.TryGetValue(identifier.Trim(), out Node? node) ? GetSymbol(node) : _parent?.GetSymbol(identifier);
+    
+    
     // Unit methods
     public void AddIdToNode(string identifier, Node node) => _idToNode.Add(identifier.Trim(), node);
     public bool GetUnit(string identifier, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unit)
@@ -84,14 +83,11 @@ public class SymbolTable
         unit = (null, null);
         return _idToNode.TryGetValue(identifier.Trim(), out Node? node) && GetUnit(node, out unit);
     }
-
     public bool GetUnit(Node expression, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unit) => NodeToUnit.TryGetValue(expression, out unit);
-
     public void AddNodeToUnit(Node node, (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unit) => NodeToUnit.Add(node, unit);
-    public void AddIdToUnitdecl(string identifier, AUnitdeclGlobal node) => ItToUnitDecl.Add(identifier.Trim(), node);
-    public AUnitdeclGlobal? GetUnitdeclFromId(string identifier) => ItToUnitDecl.TryGetValue(identifier.Trim(), out AUnitdeclGlobal? result)
+    public void AddIdToUnitdecl(string identifier, AUnitdeclGlobal node) => IdToUnitDecl.Add(identifier.Trim(), node);
+    public AUnitdeclGlobal? GetUnitdeclFromId(string identifier) => IdToUnitDecl.TryGetValue(identifier.Trim(), out AUnitdeclGlobal? result)
             ? result : _parent?.GetUnitdeclFromId(identifier);
-
     public bool CompareCustomUnits((List<AUnitdeclGlobal> funcNums, List<AUnitdeclGlobal> funcDens) unit1, (List<AUnitdeclGlobal> returnNums, List<AUnitdeclGlobal> returnDens) unit2)
     {
         var sortedFuncNums = unit1.funcNums.OrderBy(x => x).ToList();
@@ -102,17 +98,15 @@ public class SymbolTable
         return sortedFuncNums.SequenceEqual(sortedReturnNums) && sortedFuncDens.SequenceEqual(sortedReturnDens);
     }
     
+    
     // Function methods
     public void AddIdToFunc(string identifier, Node node) => _funcIdToNode.Add(identifier.Trim(), node);
-
     public Node? GetFuncFromId(string identifier)
     {
         bool found = _funcIdToNode.TryGetValue(identifier, out Node? func);
         return found ? func : null;
     }
-    
     public void AddFunctionArgs(Node node, List<PType> args) => _nodeToArgs.Add(node, args);
-
     public List<PType>? GetFunctionArgs(Node node)
     {
         bool found = _nodeToArgs.TryGetValue(node, out List<PType>? args);

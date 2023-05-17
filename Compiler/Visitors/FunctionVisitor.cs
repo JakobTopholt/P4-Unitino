@@ -36,7 +36,7 @@ public class FunctionVisitor : DepthFirstAdapter
             // Save arguments
             List<PType> args = node.GetArg().OfType<PType>().ToList();
             symbolTable.AddFunctionArgs(node, args);
-            symbolTable.AddIdToFunc(node.GetId().ToString(), node);
+            symbolTable.AddIdToNode(node.GetId().ToString(), node);
         }
     }
 
@@ -97,7 +97,7 @@ public class FunctionVisitor : DepthFirstAdapter
                 typeArgs.Add(arg.GetType());
             }
             symbolTable.AddFunctionArgs(node, typeArgs);
-            symbolTable.AddIdToFunc(node.GetId().ToString(), node);
+            symbolTable.AddIdToNode(node.GetId().ToString(), node);
         }
     }
 
@@ -108,32 +108,25 @@ public class FunctionVisitor : DepthFirstAdapter
             switch (node.GetType())
             {
                 case AIntType:
-                    symbolTable.AddIdToNode(node.GetId().ToString().Trim(), node);
                     symbolTable.AddReturnSymbol(node, Symbol.Int);
                     break;
                 case ADecimalType:
-                    symbolTable.AddIdToNode(node.GetId().ToString().Trim(), node);
                     symbolTable.AddReturnSymbol(node, Symbol.Decimal);
                     break;
                 case ABoolType:
-                    symbolTable.AddIdToNode(node.GetId().ToString().Trim(), node);
                     symbolTable.AddReturnSymbol(node, Symbol.Bool);
                     break;
                 case ACharType:
-                    symbolTable.AddIdToNode(node.GetId().ToString().Trim(), node);
                     symbolTable.AddReturnSymbol(node, Symbol.Char);
                     break;
                 case AStringType:
-                    symbolTable.AddIdToNode(node.GetId().ToString().Trim(), node);
                     symbolTable.AddReturnSymbol(node, Symbol.String);
                     break;
                 case AVoidType:
-                    symbolTable.AddIdToNode(node.GetId().ToString().Trim(), node);
                     symbolTable.AddReturnSymbol(node, Symbol.Func);
                     break;
                 case AUnitType customType:
                     symbolTable.GetUnit(customType, out var unit);
-                    symbolTable.AddIdToNode(node.GetId().ToString().Trim(), node);
                     symbolTable.AddNodeToUnit(node, unit);
                     symbolTable.AddReturnSymbol(node, Symbol.Ok);
                     break;
@@ -146,29 +139,10 @@ public class FunctionVisitor : DepthFirstAdapter
     }
     public override void CaseALoopGlobal(ALoopGlobal node)
     {
-        InALoopGlobal(node);
-        OutALoopGlobal(node);
-    }
-    public override void InALoopGlobal(ALoopGlobal node)
-    {
-        symbolTable.Loop++;
-        if (symbolTable.Loop != 1)
-        {
-            symbolTable.AddNode(node, Symbol.NotOk);
-        }
+     
     }
     public override void CaseAProgGlobal(AProgGlobal node)
     {
-        InAProgGlobal(node);
-        OutAProgGlobal(node);
+  
     }
-    public override void InAProgGlobal(AProgGlobal node)
-    {
-        symbolTable.Prog++;
-        if (symbolTable.Prog != 1)
-        {
-            symbolTable.AddNode(node, Symbol.NotOk);
-        }
-    }
-    
 }

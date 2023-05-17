@@ -101,13 +101,9 @@ public class stmtTypeChecker : DepthFirstAdapter
                 break;
         }
     }
-    public override void OutAPrefixplusStmt(APrefixplusStmt node) => UnaryoperatorToSymbolTable(node);
-    public override void OutAPrefixminusStmt(APrefixminusStmt node) => UnaryoperatorToSymbolTable(node);
-    public override void OutASuffixplusStmt(ASuffixplusStmt node) => UnaryoperatorToSymbolTable(node);
-    public override void OutASuffixminusStmt(ASuffixminusStmt node) => UnaryoperatorToSymbolTable(node);
-    private void UnaryoperatorToSymbolTable(Node node)
+    public override void OutAPrefixplusStmt(APrefixplusStmt node)
     {
-        Symbol? expr = symbolTable.GetSymbol(node);
+        Symbol? expr = symbolTable.GetSymbol(node.GetId().ToString().Trim());
         switch (expr)
         {
             case Symbol.Decimal:
@@ -124,6 +120,67 @@ public class stmtTypeChecker : DepthFirstAdapter
                 break;
         }
     }
+
+    public override void OutAPrefixminusStmt(APrefixminusStmt node)
+    {
+        Symbol? expr = symbolTable.GetSymbol(node.GetId().ToString().Trim());
+        switch (expr)
+        {
+            case Symbol.Decimal:
+                symbolTable.AddNode(node,Symbol.Ok);
+                break;
+            case Symbol.Int:
+                symbolTable.AddNode(node,Symbol.Ok); 
+                break;
+            case Symbol.Char:
+                symbolTable.AddNode(node,Symbol.Ok);
+                break;
+            default:
+                symbolTable.AddNode(node,Symbol.NotOk);
+                break;
+        }
+    }
+
+    public override void OutASuffixplusStmt(ASuffixplusStmt node)
+    {
+        Symbol? expr = symbolTable.GetSymbol(node.GetId().ToString().Trim());
+        switch (expr)
+        {
+            case Symbol.Decimal:
+                symbolTable.AddNode(node,Symbol.Ok);
+                break;
+            case Symbol.Int:
+                symbolTable.AddNode(node,Symbol.Ok); 
+                break;
+            case Symbol.Char:
+                symbolTable.AddNode(node,Symbol.Ok);
+                break;
+            default:
+                symbolTable.AddNode(node,Symbol.NotOk);
+                break;
+        }
+    }
+
+    public override void OutASuffixminusStmt(ASuffixminusStmt node)
+    {
+        Symbol? expr = symbolTable.GetSymbol(node.GetId().ToString().Trim());
+        switch (expr)
+        {
+            case Symbol.Decimal:
+                symbolTable.AddNode(node,Symbol.Ok);
+                break;
+            case Symbol.Int:
+                symbolTable.AddNode(node,Symbol.Ok); 
+                break;
+            case Symbol.Char:
+                symbolTable.AddNode(node,Symbol.Ok);
+                break;
+            default:
+                symbolTable.AddNode(node,Symbol.NotOk);
+                break;
+        }
+    }
+
     public override void OutADeclStmt(ADeclStmt node)
     {
         if (!symbolTable.IsInCurrentScope(node.GetId()))
@@ -216,86 +273,64 @@ public class stmtTypeChecker : DepthFirstAdapter
     {
        // STANDALONE FUNCCAL
        // Returtype er ubetydlig
-       Node? func = symbolTable.GetFuncFromId(node.GetId().ToString().Trim());
+       symbolTable.GetNodeFromId(node.GetId().ToString().Trim(), out Node? func);
        if (func != null)
        {
-           List<PType> args = symbolTable.GetFunctionArgs(func);
-           List<PExp>? parameters = node.GetParams() as List<PExp>;
-           if (args.Count() == parameters.Count())
+           List<PType>? args = symbolTable.GetFunctionArgs(func);
+           List<PExp> parameters = node.GetParams().OfType<PExp>().ToList();
+           bool matches = true;
+           for(int i = 0; i < args.Count(); i++)
            {
-               bool matches = true;
-               for(int i = 0; i < args.Count(); i++)
+               Node? parameter = parameters[i];
+               if (parameters[i] is AIdExp id)
                {
-                   switch (args[i])
-                   {
-                       case AIntType:
-                           if (symbolTable.GetSymbol(parameters[i]) != Symbol.Int)
-                               matches = false;
-                           break;
-                       case ADecimalType:
-                           if (symbolTable.GetSymbol(parameters[i]) != Symbol.Decimal)
-                               matches = false;
-                           break;
-                       case ABoolType:
-                           if (symbolTable.GetSymbol(parameters[i]) != Symbol.Bool)
-                               matches = false;
-                           break;
-                       case ACharType:
-                           if (symbolTable.GetSymbol(parameters[i]) != Symbol.Char)
-                               matches = false;
-                           break;
-                       case AStringType:
-                           if (symbolTable.GetSymbol(parameters[i]) != Symbol.String)
-                               matches = false;
-                           break;
-                       case AUnitType argType:
-                       {
-                           symbolTable.GetUnit(argType, out var argUnit);
-                           symbolTable.GetUnit(parameters[i], out var paramUnit);
-                           if (!symbolTable.CompareCustomUnits(argUnit, paramUnit))
-                           {
-                               matches = false;
-                               symbolTable.AddNodeToUnit(node, argUnit);
-                           }
-                           break; 
-                       }
-                       default:
-                           matches = false;
-                           break;
-                   }
+                   symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out parameter);
                }
-               symbolTable.AddNode(node, matches ? Symbol.Ok : Symbol.NotOk);
+                       
+               switch (args[i])
+               {
+                   case AIntType:
+                       if (symbolTable.GetSymbol(parameter) != Symbol.Int)
+                           matches = false;
+                       break;
+                   case ADecimalType:
+                       if (symbolTable.GetSymbol(parameter) != Symbol.Decimal)
+                           matches = false;
+                       break;
+                   case ABoolType:
+                       if (symbolTable.GetSymbol(parameter) != Symbol.Bool)
+                           matches = false;
+                       break;
+                   case ACharType:
+                       if (symbolTable.GetSymbol(parameter) != Symbol.Char)
+                           matches = false;
+                       break;
+                   case AStringType:
+                       if (symbolTable.GetSymbol(parameter) != Symbol.String)
+                           matches = false;
+                       break;
+                   case AUnitType argType:
+                   {
+                       symbolTable.GetUnit(argType, out var argUnit);
+                       symbolTable.GetUnit(parameter, out var paramUnit);
+                       if (!symbolTable.CompareCustomUnits(argUnit, paramUnit))
+                       {
+                           matches = false;
+                           symbolTable.AddNodeToUnit(node, argUnit);
+                       }
+                       break; 
+                   }
+                   default:
+                       matches = false;
+                       break;
+               }
            }
-           else
-           {
-               symbolTable.AddNode(node, Symbol.NotOk);
-           }
+           symbolTable.AddNode(node, matches ? Symbol.Ok : Symbol.NotOk);
        }
        else
        {
            symbolTable.AddNode(node, Symbol.NotOk);
        }
-    }
-
-    public Symbol? PTypeToSymbol(PType type)
-    {
-        switch (type)
-        {
-            case AIntType:
-                return Symbol.Bool;
-            case ADecimalType:
-                return Symbol.Decimal;
-            case ABoolType:
-                return Symbol.Bool;
-            case ACharType:
-                return Symbol.Char;
-            case AStringType:
-                return Symbol.String;
-            case AVoidType:
-                return Symbol.Func;
-            default:
-                return null;
-        }
     }
 
     public override void InAReturnStmt(AReturnStmt node)
@@ -392,12 +427,20 @@ public class stmtTypeChecker : DepthFirstAdapter
     public override void OutAIfStmt(AIfStmt node)
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetExp());
-        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.Ok);
+        if (node.GetExp() is AIdExp id)
+        {
+            condExpr = symbolTable.GetSymbol(id.ToString().Trim());
+        }
+        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
     }
     public override void OutAElseifStmt(AElseifStmt node)
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetExp());
-        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.Ok);
+        if (node.GetExp() is AIdExp id)
+        {
+            condExpr = symbolTable.GetSymbol(id.ToString().Trim());
+        }
+        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
     }
     public override void OutAElseStmt(AElseStmt node)
     {
@@ -408,17 +451,17 @@ public class stmtTypeChecker : DepthFirstAdapter
     public override void OutAForStmt(AForStmt node)
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetCond());
-        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.Ok);
+        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
     }
     public override void OutAWhileStmt(AWhileStmt node)
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetExp());
-        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.Ok);
+        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
     }
     public override void OutADowhileStmt(ADowhileStmt node)
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetExp());
-        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.Ok);
+        symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
     }
 
 }

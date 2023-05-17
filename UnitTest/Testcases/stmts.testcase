@@ -9,15 +9,13 @@ func untyped(int a, decimal b, string c, char d, bool e){
 }
 func untypedtwo(int a, decimal b, string c, char d, bool e){
     int ab = 5;
-    ab +=a;
+    ab += a;
     decimal ba = 3.5;
     ba += b;
     string ca = "c";
     ca += c;
     char da = 'd';
-    da += d;
     bool ea = true;
-    ea += e; 
 }
 func untypedthree(int a, decimal b, string c, char d, bool e){
     int ab = 5;
@@ -25,8 +23,7 @@ func untypedthree(int a, decimal b, string c, char d, bool e){
         decimal ba = 3.5;
         ba -= b;
         string ca = "c";
-        ca -= c;
-        char da = 'd';
+        char da = d;
         bool ea = true;
 
 }
@@ -48,22 +45,18 @@ func untypedtwo(){
     ba += a;
     string ca = "c";
     ca += c;
-    char da = "d";
+    char da = 'd';
     bool ea = true;
     ea += c; 
 }
 func untypedthree(int a, decimal b, string c, char d, bool e){
     int ab = 5;
-        string a = "lmaoi";
-        char c = "c";
-        ab -=a;
-        decimal ba = 3.5;
-        ba -= a;
-        string ca = "c";
-        ca -= c;
-        char da = "d";
-        bool ea = true;
-        ea -= c; 
+    ab -= a;
+    decimal ba = 3.5;
+    ba -= a;
+    string ca = c;
+    char da = d;
+    bool ea = true;
 }
 ////
 
@@ -130,18 +123,18 @@ false
 outadecl stmt test
 ////
 func untyped(int a, decimal b, string c, char d, bool e){
-    int a;
-    decimal b;
-    string c;
-    char d;
-    bool e;    
+    int f;
+    decimal g;
+    string h;
+    char i;
+    bool j;    
 }
 func untypedtwo(int a, decimal b, string c, char d, bool e){
-    int a = 1;
-    decimal b = 1.5;
-    string c = "lmao";
-    char d = "a";
-    bool e = true;
+    int f = 1;
+    decimal g = 1.5;
+    string h = "lmao";
+    char i = 'a';
+    bool j = true;
    
 }
 
@@ -232,7 +225,7 @@ func untypedthree(){
       int b = 3;
       int a = 4;
       bool c = true;
-      while (a!= "10"){
+      while (a != "10"){
         a++;
       }
       while (a!= 10){

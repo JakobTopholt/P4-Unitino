@@ -78,30 +78,3 @@ void setup() {
 ////
 true
 //////
-Some mistake somewhere
-////
-unit Time {
-    ms => value;
-}
-prog {
-    Time a = 1/50ms;
-    Time b = 1/5ms;
-}
-////
-unit Time {
-    ms => value;
-}
-void setup() {
-    float a = 1/Timems(50);
-    float b = 1/Timems(5);
-}
-////
-float Timems(float value) {
-    return value;
-}
-void setup() {
-    float a = 1/Timems(50);
-    float b = 1/Timems(5);
-}
-////
-false

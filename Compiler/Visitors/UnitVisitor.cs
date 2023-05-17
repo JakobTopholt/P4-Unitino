@@ -32,7 +32,8 @@ public class UnitVisitor : DepthFirstAdapter
     {
         symbolTable.AddIdToNode(node.GetId().ToString(), node);
         bool subunitsIsOk = true;
-        foreach (ASubunit subunit in node.GetSubunit())
+        List<ASubunit> subunits = node.GetSubunit().OfType<ASubunit>().ToList();
+        foreach (ASubunit subunit in subunits)
         {
             if (symbolTable.GetSymbol(subunit) == Symbol.NotOk)
                 subunitsIsOk = false;
