@@ -206,7 +206,6 @@ public class exprTypeChecker : stmtTypeChecker
     public override void OutAUnitdecimalExp(AUnitdecimalExp node)
     {
         // A single unitnumber eg. 50ms
-        throw new Exception(node.GetId().ToString().Trim());
         AUnitdeclGlobal unitType = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
         if (unitType != null)
         {

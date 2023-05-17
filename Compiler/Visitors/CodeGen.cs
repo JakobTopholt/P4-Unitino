@@ -139,8 +139,6 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         var customType = node.GetType() as AUnitType;
         if (customType != null)
         {
-            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
-            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
             Indent($"float ");
         }
         node.GetId().Apply(this);
@@ -218,7 +216,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 writer.Write("char ");
                 break;
             case AStringType:
-                writer.Write("string ");
+                writer.Write("String ");
                 break;
             case AUnitType customType:
             {
@@ -505,7 +503,6 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         }
         writer.Write(")");
     }
-
     /*--------------------------------- CaseExp ----------------------------------------------------------------------*/
     public override void CaseADivideExp(ADivideExp node)
     {
@@ -612,6 +609,14 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseACastExp(ACastExp node)
     {
+
+        PExp expression = node.GetExp();
+        Symbol? exprSymbol = symbolTable.GetSymbol(expression);
+        if (expression is AIdExp id)
+        {
+            exprSymbol = symbolTable.GetSymbol(id.GetId().ToString().Trim());
+        }
+        
         switch (node.GetType())
         {
             case AIntType:
@@ -627,12 +632,15 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 writer.Write("(char)");
                 break;
             case AStringType:
+                if (exprSymbol is Symbol.Char)
+                {
+                    writer.Write("(bingbong)");
+                }
                 writer.Write("(String)");
                 break;
         }
         node.GetExp().Apply(this);
     }
-
     public override void CaseTId(TId node)
     {
         writer.Write(node.ToString().Trim());
@@ -702,12 +710,14 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
     {
         AUnitdeclGlobal test = symbolTable.ItToUnitDecl[node.GetId().ToString().Trim()];
-        writer.Write(node.GetDecimal());
+        writer.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
+                                                    + "(" + node.GetDecimal().ToString().Trim() + ")");    
     }
     public override void CaseAUnitnumberExp(AUnitnumberExp node)
     {
-        AUnitdeclGlobal test = symbolTable.ItToUnitDecl[node.GetId().ToString().Trim()];
-        writer.Write(node.GetNumber());
+        AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
+        writer.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
+                                                    + "(" + node.GetNumber().ToString().Trim() + ")");
     }
     public void Dispose()
     {

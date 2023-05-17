@@ -670,14 +670,14 @@ public class PrettyPrint : DepthFirstAdapter
     
     public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
     {
-        AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
-        output.Write(node.GetDecimal());
+        AUnitdeclGlobal test = symbolTable.ItToUnitDecl[node.GetId().ToString().Trim()];
+        output.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
+                                                    + "(" + node.GetDecimal().ToString().Trim() + ")");    
     }
     public override void CaseAUnitnumberExp(AUnitnumberExp node)
     {
         AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
-        output.Write(test.GetId().ToString() + node.GetId() + "(");
-        node.GetNumber().Apply(this);
-        output.Write(")");
+        output.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
+                                                    + "(" + node.GetNumber().ToString().Trim() + ")");
     }
 }

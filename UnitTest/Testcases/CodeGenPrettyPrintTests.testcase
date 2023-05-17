@@ -5,8 +5,8 @@ loop {
 }
 prog {
     int a = 5;
-    string b = "abc";
     char c = 'e';
+    string b = (string)c;
     bool d = true;
     float e = 1.11;
     argTest(a, b, c, d, e);
@@ -21,8 +21,8 @@ void loop() {
 }
 void setup() {
     int a = 5;
-    String b = "abc";
     char c = 'e';
+    String b = (String)c;
     bool d = true;
     float e = 1.11;
     argTest(a, b, c, d, e);
@@ -37,8 +37,8 @@ void loop() {
 }
 void setup() {
     int a = 5;
-    String b = "abc";
     char c = 'e';
+    String b = (String)c;
     bool d = true;
     float e = 1.11;
     argTest(a, b, c, d, e);
