@@ -1,7 +1,7 @@
 ﻿lmao xD
 ////
-char function3(char a, char b, char c) {
-    char d = a+b+c;
+string function3(char a, char b, char c) {
+    string d = (string)a;
     return d;
 }
 decimal function4(int a) {
@@ -15,8 +15,12 @@ decimal function4(int a) {
 ////
 
 ////
-char function3(char a, char b, char c) {
-    char d = a+b+c;
+void setup() {
+}
+void loop() {
+}
+String function3(char a, char b, char c) {
+    String d = String(a);
     return d;
 }
 float function4(int a) {

@@ -32,6 +32,7 @@ public class SymbolTable
     {
         return ++_currentTable < _allTables.Count ? _allTables[_currentTable] : new SymbolTable(this, _allTables, _currentTable);
     }
+
     public SymbolTable ExitScope()
     {
         if (_parent == null) 

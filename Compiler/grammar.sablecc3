@@ -189,7 +189,7 @@ Productions
                    | {declass}  unittype id equal exp semicolon         {-> New stmt.declass(unittype.type, id, exp.exp)}
                    | {funccall} id l_par params? r_par semicolon        {-> New stmt.funccall(id, [params.exp])}
                    | {delay} tdelay l_par exp r_par semicolon           {-> New stmt.delay(exp.exp)}
-                   | {setpin} tsetpin l_par exp comma pintoggle r_par   {-> New stmt.setpin(exp.exp, pintoggle.pintoggle)}
+                   | {setpin} tsetpin l_par exp comma pintoggle r_par semicolon {-> New stmt.setpin(exp.exp, pintoggle.pintoggle)}
                    | {scoped}   scoped                                  {-> scoped.stmt};
                    
     pintoggle {-> pintoggle} = {high} high  {-> New pintoggle.high()}

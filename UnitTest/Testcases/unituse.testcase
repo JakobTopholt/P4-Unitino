@@ -75,6 +75,8 @@ void setup() {
     float c = 1/Timems(50)*1/Times(5);
     float d = 1/Timems(50)/1/Times(5);
 }
+void loop() {
+}
 ////
 true
 //////

@@ -4,11 +4,13 @@ loop {
     int b = 69420;
 }
 prog {
+    delay(100);
+    setpin(11, high);
     int a = 5;
     char c = 'e';
-    string b = (string)c;
     bool d = true;
-    float e = 1.11;
+    decimal e = 1.11;
+    string b = (string)e;
     argTest(a, b, c, d, e);
 }
 int argTest(int a, string b, char c, bool d, decimal e) {
@@ -22,9 +24,9 @@ void loop() {
 void setup() {
     int a = 5;
     char c = 'e';
-    String b = (String)c;
     bool d = true;
     float e = 1.11;
+    String b = (String)e;
     argTest(a, b, c, d, e);
 }
 int argTest(int a, String b, char c, bool d, float e) {
@@ -36,11 +38,13 @@ void loop() {
     int b = 69420;
 }
 void setup() {
+    delay(100);
+    digitalWrite(11, HIGH);
     int a = 5;
     char c = 'e';
-    String b = (String)c;
     bool d = true;
     float e = 1.11;
+    String b = String(e, 8);
     argTest(a, b, c, d, e);
 }
 int argTest(int a, String b, char c, bool d, float e) {

@@ -34,6 +34,14 @@ public class PrettyPrint : DepthFirstAdapter
         output.Write(new string(' ', _indent * 4) + s);
     }
     
+    public override void InAGrammar(AGrammar node)
+    {
+        if(symbolTable.Prog == 0)
+            output.WriteLine("void setup() {\n    \n}");
+        if (symbolTable.Loop == 0)
+            output.WriteLine("void loop() {\n    \n}");
+    }
+    
     public void ScopeHandler(PStmt child)
     {
         switch (child)
@@ -670,7 +678,7 @@ public class PrettyPrint : DepthFirstAdapter
     
     public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
     {
-        AUnitdeclGlobal test = symbolTable.ItToUnitDecl[node.GetId().ToString().Trim()];
+        AUnitdeclGlobal test = symbolTable.IdToUnitDecl[node.GetId().ToString().Trim()];
         output.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
                                                     + "(" + node.GetDecimal().ToString().Trim() + ")");    
     }
