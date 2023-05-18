@@ -671,14 +671,12 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseACastExp(ACastExp node)
     {
-
         PExp expression = node.GetExp();
         Symbol? exprSymbol = symbolTable.GetSymbol(expression);
         if (expression is AIdExp id)
         {
             exprSymbol = symbolTable.GetSymbol(id.GetId().ToString().Trim());
         }
-        
         switch (node.GetType())
         {
             case AIntType:
@@ -787,7 +785,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
     {
-        AUnitdeclGlobal test = symbolTable.IdToUnitDecl[node.GetId().ToString().Trim()];
+        AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
         writer.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
                                                     + "(" + node.GetDecimal().ToString().Trim() + ")");    
     }

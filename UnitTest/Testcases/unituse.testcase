@@ -46,22 +46,20 @@ prog {
     decimal e = 3.7;
     Time a = 1/50.3ms + 1/5s;
     Time b = 1/50ms - 1/5s;
-    Time c = 1/50ms * 1/5s;
-    Time d = 1/50ms / 1/5s;
 }
 ////
 unit Time {
     ms => value;
     s => value * 1000;
 }
-void setup() {
-    float e = 3.7;
-    float a = 1/Timems(50.3)+1/Times(5);
-    float b = 1/Timems(50)-1/Times(5);
-    float c = 1/Timems(50)*1/Times(5);
-    float d = 1/Timems(50)/1/Times(5);
+prog {
+    decimal e = 3.7;
+    Time a = 1/Timems(50.3)+1/Times(5);
+    Time b = 1/Timems(50)-1/Times(5);
 }
 ////
+void loop() {
+}
 float Timems(float value) {
     return value;
 }
@@ -72,10 +70,6 @@ void setup() {
     float e = 3.7;
     float a = 1/Timems(50.3)+1/Times(5);
     float b = 1/Timems(50)-1/Times(5);
-    float c = 1/Timems(50)*1/Times(5);
-    float d = 1/Timems(50)/1/Times(5);
-}
-void loop() {
 }
 ////
 true

@@ -18,18 +18,20 @@ int argTest(int a, string b, char c, bool d, decimal e) {
     return a;
 }
 ////
-void loop() {
+loop {
     int b = 69420;
 }
-void setup() {
+prog {
+    delay(100);
+    setpin(11, high);
     int a = 5;
     char c = 'e';
     bool d = true;
-    float e = 1.11;
-    String b = (String)e;
+    decimal e = 1.11;
+    string b = (string)e;
     argTest(a, b, c, d, e);
 }
-int argTest(int a, String b, char c, bool d, float e) {
+int argTest(int a, string b, char c, bool d, decimal e) {
     int f;
     return a;
 }
