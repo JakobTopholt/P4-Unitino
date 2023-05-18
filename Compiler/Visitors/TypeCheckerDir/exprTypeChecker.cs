@@ -237,7 +237,7 @@ public class exprTypeChecker : stmtTypeChecker
     public override void OutAUnitnumberExp(AUnitnumberExp node)
     {
         // A single unitnumber eg. 50ms
-        AUnitdeclGlobal unitType = symbolTable.GetUnitdeclFromId(node.GetId().ToString());
+        AUnitdeclGlobal unitType = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
         if (unitType != null)
         {
             // Create a new unit tuple and add the unitnumber as a lone numerator
