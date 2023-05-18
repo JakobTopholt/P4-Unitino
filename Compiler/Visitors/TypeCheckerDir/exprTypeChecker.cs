@@ -12,6 +12,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     }
 
+    public int bruh = 5;
     public override void OutAExpExp(AExpExp node)
     {
         Node? exp = node.GetExp();

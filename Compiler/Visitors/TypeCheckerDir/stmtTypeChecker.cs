@@ -3,6 +3,7 @@ using Moduino.node;
 
 namespace Compiler.Visitors.TypeCheckerDir;
 
+
 public class stmtTypeChecker : DepthFirstAdapter
 {
     protected SymbolTable symbolTable;
@@ -10,16 +11,44 @@ public class stmtTypeChecker : DepthFirstAdapter
     {
         this.symbolTable = symbolTable;
     }
+
+    public string tempLocation = "";
+    public string tempResult = "";
+    public List<string?> errorResults = new List<string>();
+    public int index = 0;
+    public int indent = 0;
+    
+    private string IndentedString(string s)
+    {
+        return new string(' ', indent * 3) + s;
+    }
+    public override void InAAssignStmt(AAssignStmt node)
+    {
+        tempLocation += IndentedString($"in Assignment {node}\n");
+        indent++;
+    }
+
     public override void OutAAssignStmt(AAssignStmt node) {
         Symbol? idToType = symbolTable.GetSymbol(node.GetId().ToString().Trim());
         PExp exp = node.GetExp();
+        Symbol? expSymbol = symbolTable.GetSymbol(exp);
         switch (idToType)
         {
             case Symbol.NotOk:
                 symbolTable.AddNode(node, Symbol.NotOk);
                 break;
             case Symbol.Int:
-                symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Int ? Symbol.Int : Symbol.NotOk);
+                if (expSymbol == Symbol.Int)
+                {
+                    symbolTable.AddNode(node, Symbol.Int);
+                }
+                else
+                {
+                    //throw new Exception("bruh");
+                    symbolTable.AddNode(node, Symbol.NotOk);
+                    //Console.WriteLine("expression is not an integer");
+                    tempResult += IndentedString("expression is not an integer");
+                }
                 break;
             case Symbol.Decimal:
                 symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Decimal ? Symbol.Decimal : Symbol.NotOk);
@@ -44,6 +73,13 @@ public class stmtTypeChecker : DepthFirstAdapter
                     symbolTable.AddNode(node, Symbol.NotOk);
                 break;
         }
+
+        if (tempResult != "")
+        {
+            errorResults.Add(tempLocation  + tempResult);
+        }
+        
+        
     }
     public override void OutAPlusassignStmt(APlusassignStmt node)
     {

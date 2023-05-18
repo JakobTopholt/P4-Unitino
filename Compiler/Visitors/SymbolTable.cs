@@ -26,7 +26,7 @@ public class SymbolTable
     private readonly Dictionary<Node, Symbol?> _nodeToReturn = new();
     public int Prog = 0;
     public int Loop = 0;
-    
+
     // General methods
     public SymbolTable EnterScope()
     {

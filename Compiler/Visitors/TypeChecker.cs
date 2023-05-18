@@ -52,6 +52,10 @@ public class TypeChecker : exprTypeChecker
                 grammarIsOk = false;
         }
         //throw new Exception(symbols);
+        foreach (string error in errorResults)
+        {
+            Console.WriteLine(error);
+        }
         symbolTable.AddNode(node, grammarIsOk ? Symbol.Ok : Symbol.NotOk);
         symbolTable = symbolTable.ResetScope();
     }
@@ -216,8 +220,10 @@ public class TypeChecker : exprTypeChecker
             }
         }
     }
-    public override void InAUntypedGlobal(AUntypedGlobal node) 
+    public override void InAUntypedGlobal(AUntypedGlobal node)
     {
+        tempLocation += $"In function {node.GetId()}\n";
+        indent++;
         symbolTable = symbolTable.EnterScope();
         AddArgsToScope(node, node.GetArg());
     }
@@ -242,9 +248,15 @@ public class TypeChecker : exprTypeChecker
             if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
                 untypedIsOk = false;
         }
+        //Console.WriteLine(node.GetId().ToString() + ":");
+        //Console.WriteLine(symbols);
         //throw new Exception(symbols);
         symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, untypedIsOk ? Symbol.Ok : Symbol.NotOk);
+        tempLocation = "";
+        tempResult = "";
+        indent--;
+        index++;
     }
     public override void InATypedGlobal(ATypedGlobal node)
     {
@@ -272,6 +284,8 @@ public class TypeChecker : exprTypeChecker
             if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
                 typedIsOk = false;
         }
+        //Console.WriteLine(node.GetId().ToString() + ":");
+        //Console.WriteLine(symbols);
         //throw new Exception(symbols);
         symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, typedIsOk ? Symbol.Ok : Symbol.NotOk);
