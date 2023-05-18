@@ -77,7 +77,7 @@ public class stmtTypeChecker : DepthFirstAdapter
     }
     public override void OutAMinusassignStmt(AMinusassignStmt node)
     {
-        Symbol? type = symbolTable.GetSymbol("" + node.GetId());
+        Symbol? type = symbolTable.GetSymbol("" + node.GetId().ToString().Trim());
         PExp exp = node.GetExp();
         switch (type)
         {
@@ -224,6 +224,10 @@ public class stmtTypeChecker : DepthFirstAdapter
         if (!symbolTable.IsInCurrentScope(node.GetId()))
         {
             Symbol? exprType = symbolTable.GetSymbol(node.GetExp());
+            if (node.GetExp() is AIdExp id)
+            {
+                exprType = symbolTable.GetSymbol(id.GetId().ToString().Trim());
+            }
             PType unit = node.GetType();
             switch (unit)
                 {
@@ -341,7 +345,12 @@ public class stmtTypeChecker : DepthFirstAdapter
       {
           parent = parent.Parent();
       }
-      PExp? returnExp = node.GetExp();
+      Node? returnExp = node.GetExp();
+      if (returnExp is AIdExp id)
+      {
+          symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out returnExp);
+      }
+      Symbol? returnSymbol = symbolTable.GetSymbol(returnExp);
       switch (parent)
       {
           case ALoopGlobal:
@@ -354,15 +363,6 @@ public class stmtTypeChecker : DepthFirstAdapter
               break;
           case ATypedGlobal aTypedFunc:
               PType typedType = aTypedFunc.GetType();
-              //throw new Exception(symbolTable.GetSymbol(returnExp).ToString());
-              Symbol? returnSymbol = symbolTable.GetSymbol(returnExp);
-              Node? returnUnit = returnExp;
-              if (returnExp is AIdExp x)
-              {
-                  returnSymbol = symbolTable.GetSymbol(x.GetId().ToString().Trim());
-                  //throw new Exception(returnSymbol.ToString());
-                  symbolTable.GetNodeFromId(x.GetId().ToString().Trim(), out returnUnit);
-              }
               switch (typedType)
               {
                   case AIntType:
@@ -383,14 +383,12 @@ public class stmtTypeChecker : DepthFirstAdapter
                   case AVoidType:
                       symbolTable.AddNode(node, Symbol.NotOk);
                       break;
-                  case AUnitType customType:
-                      //throw new Exception("bruh");
+                  case AUnitType:
                       symbolTable.GetUnit(typedType, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) funcType);
-                      if (symbolTable.GetUnit(returnUnit, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) returnType))
+                      if (symbolTable.GetUnit(returnExp, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) returnType))
                           symbolTable.AddNode(node, symbolTable.CompareCustomUnits(funcType, returnType) ? Symbol.Ok : Symbol.NotOk);
                       else
                           symbolTable.AddNode(node, Symbol.NotOk);
-
                       break;
                   default:
                       symbolTable.AddNode(node, Symbol.NotOk);
@@ -445,7 +443,6 @@ public class stmtTypeChecker : DepthFirstAdapter
     public override void OutAElseStmt(AElseStmt node)
     {
         // Check om der er en if eller else if inden
-
         symbolTable.AddNode(node, Symbol.Ok);
     }
     public override void OutAForStmt(AForStmt node)
@@ -455,13 +452,43 @@ public class stmtTypeChecker : DepthFirstAdapter
     }
     public override void OutAWhileStmt(AWhileStmt node)
     {
-        Symbol? condExpr = symbolTable.GetSymbol(node.GetExp());
+        Node? exp = node.GetExp();
+        if (exp is AIdExp id)
+        {
+            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
+        }
+        Symbol? condExpr = symbolTable.GetSymbol(exp);
         symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
     }
     public override void OutADowhileStmt(ADowhileStmt node)
     {
-        Symbol? condExpr = symbolTable.GetSymbol(node.GetExp());
+        Node? exp = node.GetExp();
+        if (exp is AIdExp id)
+        {
+            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
+        }
+        Symbol? condExpr = symbolTable.GetSymbol(exp);
         symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
     }
-
+    public override void OutADelayStmt(ADelayStmt node)
+    {
+        Node? exp = node.GetExp();
+        if (exp is AIdExp id)
+        {
+            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
+        }
+        // Missing logic 
+        
+    }
+    public override void OutASetpinStmt(ASetpinStmt node)
+    {
+        Node? exp = node.GetExp();
+        if (exp is AIdExp id)
+        {
+            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
+        }
+        // missing logic
+        
+        
+    }
 }

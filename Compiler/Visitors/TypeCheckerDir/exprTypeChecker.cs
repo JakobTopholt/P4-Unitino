@@ -14,7 +14,12 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutAExpExp(AExpExp node)
     {
-        Symbol? type = symbolTable.GetSymbol(node.GetExp());
+        Node? exp = node.GetExp();
+        if (exp is AIdExp id)
+        {
+            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
+        }
+        Symbol? type = symbolTable.GetSymbol(exp);
         switch (type)
         {
             case Symbol.Int:
@@ -40,22 +45,12 @@ public class exprTypeChecker : stmtTypeChecker
                 break;
             default:
                 symbolTable.AddNode(node, symbolTable.GetUnit(node.GetExp(), out _) ? Symbol.Ok : Symbol.NotOk);
+                // Missing logic, make sure to also save the Customunit to the new node if there is one
+                
                 break;
         }
     }
-
-    public override void OutAUnitType(AUnitType node)
-    {
-        // Save reference from node to tuple
-        // Implement logic here
-
-        List<AUnitdeclGlobal> newNums = new List<AUnitdeclGlobal>();
-        List<AUnitdeclGlobal> newDens = new List<AUnitdeclGlobal>();
-
-        (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unit = (newNums, newDens);
-        symbolTable.AddNodeToUnit(node, unit);
-    }
-
+    
     public override void OutADecimalExp(ADecimalExp node) => symbolTable.AddNode(node, Symbol.Decimal);
     public override void OutANumberExp(ANumberExp node) => symbolTable.AddNode(node, Symbol.Int);
     public override void OutABooleanExp(ABooleanExp node) => symbolTable.AddNode(node, Symbol.Bool);
@@ -258,8 +253,16 @@ public class exprTypeChecker : stmtTypeChecker
     }
     public override void OutADivideExp(ADivideExp node)
     {
-        PExp leftExpr = node.GetL();
-        PExp rightExpr = node.GetR();
+        Node leftExpr = node.GetL();
+        if (leftExpr is AIdExp idLeft)
+        {
+            symbolTable.GetNodeFromId(idLeft.GetId().ToString().Trim(), out leftExpr);
+        }
+        Node rightExpr = node.GetR();
+        if (rightExpr is AIdExp idRight)
+        {
+            symbolTable.GetNodeFromId(idRight.GetId().ToString().Trim(), out rightExpr);
+        }
         Symbol? leftSymbol = symbolTable.GetSymbol(leftExpr);
         Symbol? rightSymbol = symbolTable.GetSymbol(rightExpr);
         if (leftExpr is ANumberExp or ADecimalExp && rightExpr is AIdExp id)
@@ -332,8 +335,16 @@ public class exprTypeChecker : stmtTypeChecker
     }
     public override void OutAMultiplyExp(AMultiplyExp node)
     {
-        PExp leftExpr = node.GetL();
-        PExp rightExpr = node.GetR();
+        Node leftExpr = node.GetL();
+        if (leftExpr is AIdExp idLeft)
+        {
+            symbolTable.GetNodeFromId(idLeft.GetId().ToString().Trim(), out leftExpr);
+        }
+        Node rightExpr = node.GetR();
+        if (rightExpr is AIdExp idRight)
+        {
+            symbolTable.GetNodeFromId(idRight.GetId().ToString().Trim(), out rightExpr);
+        }
         Symbol? leftSymbol = symbolTable.GetSymbol(leftExpr);
         Symbol? rightSymbol = symbolTable.GetSymbol(rightExpr);
         switch (leftSymbol)
@@ -395,8 +406,16 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutAPlusExp(APlusExp node)
     {
-        PExp leftExpr = node.GetL();
-        PExp rightExpr = node.GetR();
+        Node leftExpr = node.GetL();
+        if (leftExpr is AIdExp idLeft)
+        {
+            symbolTable.GetNodeFromId(idLeft.GetId().ToString().Trim(), out leftExpr);
+        }
+        Node rightExpr = node.GetR();
+        if (rightExpr is AIdExp idRight)
+        {
+            symbolTable.GetNodeFromId(idRight.GetId().ToString().Trim(), out rightExpr);
+        }
         Symbol? leftSymbol = symbolTable.GetSymbol(leftExpr);
         Symbol? rightSymbol = symbolTable.GetSymbol(rightExpr);
         switch (leftSymbol)
@@ -496,8 +515,16 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutAMinusExp(AMinusExp node)
     {
-        PExp leftExpr = node.GetL();
-        PExp rightExpr = node.GetR();
+        Node leftExpr = node.GetL();
+        if (leftExpr is AIdExp idLeft)
+        {
+            symbolTable.GetNodeFromId(idLeft.GetId().ToString().Trim(), out leftExpr);
+        }
+        Node rightExpr = node.GetR();
+        if (rightExpr is AIdExp idRight)
+        {
+            symbolTable.GetNodeFromId(idRight.GetId().ToString().Trim(), out rightExpr);
+        }
         Symbol? leftSymbol = symbolTable.GetSymbol(leftExpr);
         Symbol? rightSymbol = symbolTable.GetSymbol(rightExpr);
         switch (leftSymbol)
@@ -584,11 +611,18 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutARemainderExp(ARemainderExp node)
     {
-        PExp L = node.GetL();
-        PExp R = node.GetR();
-        
-        Symbol? left = symbolTable.GetSymbol(L);
-        Symbol? right = symbolTable.GetSymbol(R);
+        Node leftExpr = node.GetL();
+        if (leftExpr is AIdExp idLeft)
+        {
+            symbolTable.GetNodeFromId(idLeft.GetId().ToString().Trim(), out leftExpr);
+        }
+        Node rightExpr = node.GetR();
+        if (rightExpr is AIdExp idRight)
+        {
+            symbolTable.GetNodeFromId(idRight.GetId().ToString().Trim(), out rightExpr);
+        }
+        Symbol? left = symbolTable.GetSymbol(leftExpr);
+        Symbol? right = symbolTable.GetSymbol(rightExpr);
         switch (left)
         {
             case Symbol.Int:
@@ -615,7 +649,7 @@ public class exprTypeChecker : stmtTypeChecker
                 }
                 break;
             default:
-                if (symbolTable.GetUnit(L, out var unit1) && symbolTable.GetUnit(R, out var unit2))
+                if (symbolTable.GetUnit(leftExpr, out var unit1) && symbolTable.GetUnit(rightExpr, out var unit2))
                 {
                     if (symbolTable.CompareCustomUnits(unit1, unit2))
                     {
@@ -631,20 +665,30 @@ public class exprTypeChecker : stmtTypeChecker
                 {
                     symbolTable.AddNode(node, Symbol.NotOk);
                 }
-
-                
                 break;
         }
     }
 
     public override void OutATernaryExp(ATernaryExp node)
     {
-        Symbol? Cond = symbolTable.GetSymbol(node.GetCond());
-        if (Cond == Symbol.Bool)
+        Node condExp = node.GetCond();
+        if (condExp is AIdExp id)
         {
-            PExp trueExpr = node.GetTrue();
-            PExp falseExpr = node.GetFalse();
-
+            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out condExp);
+        }
+        Symbol? condition = symbolTable.GetSymbol(condExp);
+        if (condition == Symbol.Bool)
+        {
+            Node trueExpr = node.GetTrue();
+            if (trueExpr is AIdExp idTrue)
+            {
+                symbolTable.GetNodeFromId(idTrue.GetId().ToString().Trim(), out trueExpr);
+            }
+            Node falseExpr = node.GetFalse();
+            if (falseExpr is AIdExp idFalse)
+            {
+                symbolTable.GetNodeFromId(idFalse.GetId().ToString().Trim(), out falseExpr);
+            }
             var trueSymbol = symbolTable.GetSymbol(trueExpr);
             var falseSymbol = symbolTable.GetSymbol(falseExpr);
             switch (trueSymbol)
@@ -696,13 +740,35 @@ public class exprTypeChecker : stmtTypeChecker
         }
     }
     
-    public override void OutALogicalnotExp(ALogicalnotExp node) => symbolTable.AddNode(node,
-        symbolTable.GetSymbol(node.GetExp()) == Symbol.Bool ? Symbol.Bool : Symbol.NotOk);
+    public override void OutALogicalnotExp(ALogicalnotExp node)
+    {
+        Node exp = node.GetExp();
+        if (exp is AIdExp id)
+        {
+            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
+        }
+        if (exp != null)
+        {
+            symbolTable.AddNode(node,
+                symbolTable.GetSymbol(exp) == Symbol.Bool ? Symbol.Bool : Symbol.NotOk);
+        }
+        else
+        {
+            symbolTable.AddNode(node, Symbol.NotOk);
+        }
+        
+        
+    }
 
     public override void OutACastExp(ACastExp node)
     {
         Symbol? targetExpr = symbolTable.GetSymbol(node.GetType());
-        Symbol? expr = symbolTable.GetSymbol(node.GetExp());
+        Node exp = node.GetExp();
+        if (exp is AIdExp id)
+        {
+            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
+        }
+        Symbol? expr = symbolTable.GetSymbol(exp);
         switch (targetExpr, expr)
         {
             //typecasting to the same lmao
@@ -744,8 +810,18 @@ public class exprTypeChecker : stmtTypeChecker
     }
     public override void OutAOrExp(AOrExp node)
     {
-        Symbol? leftside = symbolTable.GetSymbol(node.GetL());
-        Symbol? rightside = symbolTable.GetSymbol(node.GetR());
+        Node leftExpr = node.GetL();
+        if (leftExpr is AIdExp idLeft)
+        {
+            symbolTable.GetNodeFromId(idLeft.GetId().ToString().Trim(), out leftExpr);
+        }
+        Node rightExpr = node.GetR();
+        if (rightExpr is AIdExp idRight)
+        {
+            symbolTable.GetNodeFromId(idRight.GetId().ToString().Trim(), out rightExpr);
+        }
+        Symbol? leftside = symbolTable.GetSymbol(leftExpr);
+        Symbol? rightside = symbolTable.GetSymbol(rightExpr);
         if (leftside == Symbol.Bool && rightside == Symbol.Bool)
         {
             symbolTable.AddNode(node, Symbol.Bool);
@@ -758,8 +834,18 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutAAndExp(AAndExp node)
     {
-        Symbol? leftside = symbolTable.GetSymbol(node.GetL());
-        Symbol? rightside = symbolTable.GetSymbol(node.GetR());
+        Node leftExpr = node.GetL();
+        if (leftExpr is AIdExp idLeft)
+        {
+            symbolTable.GetNodeFromId(idLeft.GetId().ToString().Trim(), out leftExpr);
+        }
+        Node rightExpr = node.GetR();
+        if (rightExpr is AIdExp idRight)
+        {
+            symbolTable.GetNodeFromId(idRight.GetId().ToString().Trim(), out rightExpr);
+        }
+        Symbol? leftside = symbolTable.GetSymbol(leftExpr);
+        Symbol? rightside = symbolTable.GetSymbol(rightExpr);
         if (leftside == Symbol.Bool && rightside == Symbol.Bool)
         {
             symbolTable.AddNode(node, Symbol.Bool);
@@ -777,7 +863,12 @@ public class exprTypeChecker : stmtTypeChecker
     public override void OutALessequalExp(ALessequalExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
     public override void OutASuffixplusplusExp(ASuffixplusplusExp node)
     {
-        Symbol? expr = symbolTable.GetSymbol(node.GetExp());
+        Node exp = node.GetExp();
+        if (exp is AIdExp id)
+        {
+            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
+        }
+        Symbol? expr = symbolTable.GetSymbol(exp);
         switch (expr)
         {
             case Symbol.Decimal:
@@ -797,7 +888,12 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutASuffixminusminusExp(ASuffixminusminusExp node)
     {
-        Symbol? expr = symbolTable.GetSymbol(node.GetExp());
+        Node exp = node.GetExp();
+        if (exp is AIdExp id)
+        {
+            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
+        }
+        Symbol? expr = symbolTable.GetSymbol(exp);
         switch (expr)
         {
             case Symbol.Decimal:
@@ -817,7 +913,12 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutAUnaryminusExp(AUnaryminusExp node)
     {
-        Symbol? expr = symbolTable.GetSymbol(node.GetExp());
+        Node exp = node.GetExp();
+        if (exp is AIdExp id)
+        {
+            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
+        }
+        Symbol? expr = symbolTable.GetSymbol(exp);
         switch (expr)
         {
             case Symbol.Decimal:
@@ -837,7 +938,12 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutAPrefixminusminusExp(APrefixminusminusExp node)
     {
-        Symbol? expr = symbolTable.GetSymbol(node.GetExp());
+        Node exp = node.GetExp();
+        if (exp is AIdExp id)
+        {
+            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
+        }
+        Symbol? expr = symbolTable.GetSymbol(exp);
         switch (expr)
         {
             case Symbol.Decimal:
@@ -857,7 +963,12 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutAPrefixplusplusExp(APrefixplusplusExp node)
     {
-        Symbol? expr = symbolTable.GetSymbol(node.GetExp());
+        Node exp = node.GetExp();
+        if (exp is AIdExp id)
+        {
+            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
+        }
+        Symbol? expr = symbolTable.GetSymbol(exp);
         switch (expr)
         {
             case Symbol.Decimal:
@@ -878,27 +989,37 @@ public class exprTypeChecker : stmtTypeChecker
     // Equals, Notequal
     private void AddBinaryToSymbolTable(Node Parent, Node L, Node R)
     {
-        Symbol? left = symbolTable.GetSymbol(L);
+        Node leftExpr = L;
+        if (leftExpr is AIdExp idLeft)
+        {
+            symbolTable.GetNodeFromId(idLeft.GetId().ToString().Trim(), out leftExpr);
+        }
+        Node rightExpr = R;
+        if (rightExpr is AIdExp idRight)
+        {
+            symbolTable.GetNodeFromId(idRight.GetId().ToString().Trim(), out rightExpr);
+        }
+        Symbol? left = symbolTable.GetSymbol(leftExpr);
         switch (left)
         {
             case Symbol.Int:
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Int ? Symbol.Bool : Symbol.NotOk);
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Int ? Symbol.Bool : Symbol.NotOk);
                 break;
             case (Symbol.Decimal):
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Decimal ? Symbol.Bool : Symbol.NotOk);
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Decimal ? Symbol.Bool : Symbol.NotOk);
                 break;
             case Symbol.Bool:
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Bool ? Symbol.Bool : Symbol.NotOk);
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Bool ? Symbol.Bool : Symbol.NotOk);
                 break;
             case Symbol.String:
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.String ? Symbol.Bool : Symbol.NotOk);
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.String ? Symbol.Bool : Symbol.NotOk);
                 break;
             case Symbol.Char:
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Int ? Symbol.Bool : Symbol.NotOk);
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Int ? Symbol.Bool : Symbol.NotOk);
                 break;
             default:
-                symbolTable.GetUnit(L, out var unit1);
-                symbolTable.GetUnit(R, out var unit2);
+                symbolTable.GetUnit(leftExpr, out var unit1);
+                symbolTable.GetUnit(rightExpr, out var unit2);
 
                 symbolTable.AddNode(Parent, symbolTable.CompareCustomUnits(unit1, unit2) ? Symbol.Bool : Symbol.NotOk);
                 break;
@@ -908,17 +1029,27 @@ public class exprTypeChecker : stmtTypeChecker
     // Greater, GreaterEqual, Less, LessEqual
     private void AddBinaryNumberToSymbolTable(Node Parent, Node L, Node R)
     {
-        Symbol? left = symbolTable.GetSymbol(L);
+        Node leftExpr = L;
+        if (leftExpr is AIdExp idLeft)
+        {
+            symbolTable.GetNodeFromId(idLeft.GetId().ToString().Trim(), out leftExpr);
+        }
+        Node rightExpr = R;
+        if (rightExpr is AIdExp idRight)
+        {
+            symbolTable.GetNodeFromId(idRight.GetId().ToString().Trim(), out rightExpr);
+        }
+        Symbol? left = symbolTable.GetSymbol(leftExpr);
         switch (left)
         {
             case Symbol.Int:
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Int ? Symbol.Bool : Symbol.NotOk);
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Int ? Symbol.Bool : Symbol.NotOk);
                 break;
             case (Symbol.Decimal):
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Decimal ? Symbol.Bool : Symbol.NotOk);
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Decimal ? Symbol.Bool : Symbol.NotOk);
                 break;
             case Symbol.Char:
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(R) == Symbol.Int ? Symbol.Bool : Symbol.NotOk);
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Int ? Symbol.Bool : Symbol.NotOk);
                 break;
             default:
                 symbolTable.AddNode(Parent, Symbol.NotOk);

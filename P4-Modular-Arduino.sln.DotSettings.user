@@ -7,6 +7,15 @@
     &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests.PrettyPrint&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=20f6c953_002D111b_002D4a93_002D9881_002Dbf3a95120151/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="All tests from Solution #5" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Solution /&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=2f6a5346_002Dee87_002D47e9_002Da0f8_002D9fb2cf9ddc81/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="VisitorTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Project Location="C:\Users\aleks\RiderProjects\P4-Modular-Arduino\UnitTest" Presentation="&amp;lt;UnitTest&amp;gt;" /&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=61dc6ed5_002Dd1fa_002D415e_002Db2e4_002D538d7534ef9d/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Solution /&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
 	
 	
 	

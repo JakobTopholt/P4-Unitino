@@ -72,7 +72,6 @@ public class TypeChecker : exprTypeChecker
         symbolTable.AddNode(node,
             symbolTable.GetUnitdeclFromId(node.GetId().ToString()) != null ? Symbol.Ok : Symbol.NotOk);
     }
-
     public override void OutAUnitType(AUnitType node)
     {
         List<ANumUnituse> nums = node.GetUnituse().OfType<ANumUnituse>().ToList();
