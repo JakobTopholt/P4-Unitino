@@ -1,11 +1,8 @@
 ﻿Unit Testing
 ////
-loop {
-    int b = 69420;
-}
 prog {
     delay(100);
-    setpin(11, high);
+    #setpin(11, high);
     int a = 5;
     char c = 'e';
     bool d = true;
@@ -13,17 +10,16 @@ prog {
     string b = (string)e;
     argTest(a, b, c, d, e);
 }
+loop {
+    int b = 69420;
+}
 int argTest(int a, string b, char c, bool d, decimal e) {
     int f;
     return a;
 }
 ////
-loop {
-    int b = 69420;
-}
 prog {
     delay(100);
-    setpin(11, high);
     int a = 5;
     char c = 'e';
     bool d = true;
@@ -31,17 +27,16 @@ prog {
     string b = (string)e;
     argTest(a, b, c, d, e);
 }
+loop {
+    int b = 69420;
+}
 int argTest(int a, string b, char c, bool d, decimal e) {
     int f;
     return a;
 }
 ////
-void loop() {
-    int b = 69420;
-}
 void setup() {
     delay(100);
-    digitalWrite(11, HIGH);
     int a = 5;
     char c = 'e';
     bool d = true;
@@ -49,9 +44,12 @@ void setup() {
     String b = String(e, 8);
     argTest(a, b, c, d, e);
 }
+void loop() {
+    int b = 69420;
+}
 int argTest(int a, String b, char c, bool d, float e) {
     int f;
     return a;
 }
 ////
-false
+true
