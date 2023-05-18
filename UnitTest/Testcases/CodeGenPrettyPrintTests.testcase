@@ -6,6 +6,7 @@ loop {
 prog {
     delay(100);
     setpin(11, high);
+    pin h = 5;
     int a = 5;
     char c = 'e';
     bool d = true;
@@ -24,6 +25,7 @@ loop {
 prog {
     delay(100);
     setpin(11, high);
+    pin h = 7;
     int a = 5;
     char c = 'e';
     bool d = true;
@@ -42,6 +44,7 @@ void loop() {
 void setup() {
     delay(100);
     digitalWrite(11, HIGH);
+    int h = 5;
     int a = 5;
     char c = 'e';
     bool d = true;

@@ -248,10 +248,9 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             case AStringType:
                 writer.Write("String ");
                 break;
-            case AUnitType customType:
-            {
+            case APinType:
+                Indent("int ");
                 break;
-            }
         }
         node.GetId().Apply(this);
     }
@@ -401,7 +400,8 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             case AStringType:
                 Indent("String ");
                 break;
-            case AUnitType customType:
+            case APinType:
+                Indent("int ");
                 break;
         }
     }
@@ -519,6 +519,9 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 break;
             case AStringType e:
                 Indent(($"String "));
+                break;
+            case APinType:
+                Indent("int ");
                 break;
         }
         if (node.GetType() is AUnitType customType)
