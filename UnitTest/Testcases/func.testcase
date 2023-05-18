@@ -10,6 +10,14 @@ prog {
 loop {
     int i = 0;
 }
+string ImplicitTypedFunc() {
+    string i = "0";
+    return i;
+}
+char function3(char a, char b, char c) {
+    char d = a;
+    return d;
+}
 decimal function4(int i) {
     decimal d = 3.5 + i;
     char a = 'a';
@@ -18,17 +26,6 @@ decimal function4(int i) {
     function3(a, b, c);
     return d;
 }
-string function3(char a, char b, char c) {
-    string d = a;
-    d += b;
-    d += c;
-    return d;
-}
-char ImplicitTypedFunc() {
-    char i = '0';
-    return i;
-}
-
 ////
 func NormalFunc(int b, int a) {
     int i = 0;
@@ -45,14 +42,14 @@ string ImplicitTypedFunc() {
     return i;
 }
 char function3(char a, char b, char c){
-    char d = a+b+c;
+    char d = a;
     return d;
 }
-decimal function4(int a){
-    decimal d = 3.5 + a;
-    char a = "a";
-    char b = "b";
-    char c = "c";
+decimal function4(int i){
+    decimal d = 3.5 + i;
+    char a = 'a';
+    char b = 'b';
+    char c = 'c';
     function3(a, b, c);
     return d;
 }
@@ -67,19 +64,19 @@ void setup() {
 void loop() {
     int i = 0;
 }
-string ImplicitTypedFunc() {
-    string i = "0";
+String ImplicitTypedFunc() {
+    String i = "0";
     return i;
 }
 char function3(char a, char b, char c) {
-    char d = a+b+c;
+    char d = a;
     return d;
 }
-float function4(int a) {
-    float d = 3.5+a;
-    char a = "a";
-    char b = "b";
-    char c = "c";
+float function4(int i) {
+    float d = 3.5+i;
+    char a = 'a';
+    char b = 'b';
+    char c = 'c';
     function3(a, b, c);
     return d;
 }

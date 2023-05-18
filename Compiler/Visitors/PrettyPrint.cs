@@ -15,9 +15,10 @@ public class PrettyPrint : DepthFirstAdapter
     private TextWriter output;
     private static readonly Regex whiteSpace = new(@"\s+");
 
-    public PrettyPrint(TextWriter? output = null)
+    public PrettyPrint(SymbolTable symbolTable, TextWriter? output = null)
     {
         this.output = output;
+        this.symbolTable = symbolTable;
     }
 
     private void PrintPrecedence(Node L, Node R, string ope)
@@ -32,7 +33,7 @@ public class PrettyPrint : DepthFirstAdapter
     {
         output.Write(new string(' ', _indent * 4) + s);
     }
-    
+
     public void ScopeHandler(PStmt child)
     {
         switch (child)
@@ -56,7 +57,9 @@ public class PrettyPrint : DepthFirstAdapter
             case ASuffixminusStmt:
             case ASuffixplusStmt:
             case APrefixminusStmt:
-            case APrefixplusStmt: 
+            case APrefixplusStmt:
+            case ADelayStmt:
+            case ASetpinStmt: 
                 output.WriteLine(";");                    
                 break;
         }
@@ -79,7 +82,6 @@ public class PrettyPrint : DepthFirstAdapter
         _indent--;
         Indent("}\n");
     }
-    
     
     public override void CaseALoopGlobal(ALoopGlobal node)
     {
@@ -122,9 +124,7 @@ public class PrettyPrint : DepthFirstAdapter
         var customType = node.GetType() as AUnitType;
         if (customType != null)
         {
-            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
-            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
-            Indent($"decimal ");
+            Indent($"float ");
         }
         node.GetId().Apply(this);
         output.Write("(");
@@ -203,10 +203,10 @@ public class PrettyPrint : DepthFirstAdapter
             case AStringType:
                 output.Write("string ");
                 break;
-            case AUnitType customType:
-            {
-                break;
-            }
+        }
+        if (node.GetType() is AUnitType customType)
+        {
+            Indent($"float ");
         }
         node.GetId().Apply(this);
     }
@@ -469,11 +469,28 @@ public class PrettyPrint : DepthFirstAdapter
         {
             IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
             IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
-            Indent(($"float "));
+            Indent(customType.ToString().Trim());
         }
         node.GetId().Apply(this);
         output.Write(" = ");
         node.GetExp().Apply(this);
+    }
+
+    public override void CaseAFunccallExp(AFunccallExp node)
+    {
+        output.Write("");
+        node.GetId().Apply(this);
+        output.Write("(");
+        var list = node.GetExp();
+        int i = 0;
+        foreach (Node child in node.GetExp())
+        {
+            child.Apply(this);
+            i++;
+            if(i != list.Count)
+                output.Write(", ");
+        }
+        output.Write(")");    
     }
 
     public override void CaseAFunccallStmt(AFunccallStmt node)
@@ -601,25 +618,61 @@ public class PrettyPrint : DepthFirstAdapter
     {
         switch (node.GetType())
         {
-            case AIntType a:
+            case AIntType:
                 output.Write("(int)");
+                node.GetExp().Apply(this);
                 break;
-            case ADecimalType b:
-                output.Write("(float)"); 
+            case ADecimalType:
+                output.Write("(float)");
+                node.GetExp().Apply(this);
                 break;
-            case ABoolType c:
+            case ABoolType:
                 output.Write("(bool)");
+                node.GetExp().Apply(this);
                 break;
-            case ACharType d:
+            case ACharType:
                 output.Write("(char)");
+                node.GetExp().Apply(this);
                 break;
-            case AStringType e: 
-                output.Write("(string)"); 
+            case AStringType:
+                output.Write("(string)");
+                node.GetExp().Apply(this);
                 break;
         }
-        node.GetExp().Apply(this);
     }
-    
+    public override void CaseASetpinStmt(ASetpinStmt node)
+    {
+        Indent("setpin(");
+        node.GetExp().Apply(this);
+        output.Write(", ");
+        node.GetPintoggle().Apply(this);
+        OutASetpinStmt(node);
+    }
+
+    public override void OutASetpinStmt(ASetpinStmt node)
+    {
+        output.Write(")");
+    }
+
+    public override void CaseAHighPintoggle(AHighPintoggle node)
+    {
+        output.Write("high");
+    }
+
+    public override void CaseALowPintoggle(ALowPintoggle node)
+    {
+        output.Write("low");
+    }
+
+    public override void InADelayStmt(ADelayStmt node)
+    {
+        Indent("delay(");
+    }
+
+    public override void OutADelayStmt(ADelayStmt node)
+    {
+        output.Write(")");
+    }
     public override void CaseTId(TId node)
     {
         output.Write(node.ToString().Trim());
@@ -640,7 +693,8 @@ public class PrettyPrint : DepthFirstAdapter
         if (node.GetBoolean() is ATrueBoolean)
             output.Write("true");
         else if (node.GetBoolean() is AFalseBoolean)
-            output.Write("false");    }
+            output.Write("false");    
+    }
     
     public override void CaseAStringExp(AStringExp node)
     {
@@ -655,11 +709,13 @@ public class PrettyPrint : DepthFirstAdapter
     public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
     {
         AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
-        output.Write(node.GetDecimal());
+        output.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
+                                                    + "(" + node.GetDecimal().ToString().Trim() + ")");    
     }
     public override void CaseAUnitnumberExp(AUnitnumberExp node)
     {
-        //AUnitdeclGlobal test = symbolTable.SubunitToUnit[node.GetId().ToString().Trim()];
-        output.Write(node.GetNumber());
+        AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
+        output.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
+                                                    + "(" + node.GetNumber().ToString().Trim() + ")");
     }
 }

@@ -8,6 +8,10 @@ unit unit1 {
     ms => value;
 }
 ////
+void setup() {
+}
+void loop() {
+}
 float unit1ms(float value) {
     return value;
 }
@@ -26,6 +30,10 @@ unit unit2 {
     s => value*1000;
 }
 ////
+void setup() {
+}
+void loop() {
+}
 float unit2ms(float value) {
     return value;
 }
@@ -51,6 +59,10 @@ unit unit4 {
     s => value*1000;
 }
 ////
+void setup() {
+}
+void loop() {
+}
 float unit3ms(float value) {
     return value;
 }
@@ -70,6 +82,10 @@ unit unit5 {
     ms => value;
 }
 ////
+void setup() {
+}
+void loop() {
+}
 float unit5ms(float value) {
     return value;
 }

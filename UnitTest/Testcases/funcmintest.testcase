@@ -1,5 +1,9 @@
 ﻿lmao xD
 ////
+string function3(char a, char b, char c) {
+    string d = (string)a;
+    return d;
+}
 decimal function4(int a) {
     decimal d = 3.5 + a ;
     char g = 'o';
@@ -8,19 +12,15 @@ decimal function4(int a) {
     string test = function3(g, b, c);
     return d;
 }
+////
 
-string function3(char a, char b, char c) {
-    string d = a;
-    d += b;
-    d += c;
-    return d;
+////
+void setup() {
 }
-
-////
-
-////
-char function3(char a, char b, char c) {
-    char d = a+b+c;
+void loop() {
+}
+String function3(char a, char b, char c) {
+    String d = String(a);
     return d;
 }
 float function4(int a) {
@@ -28,7 +28,7 @@ float function4(int a) {
     char g = 'o';
     char b = 'b';
     char c = 'c';
-    function3(a, b, c);
+    String test = function3(g, b, c);
     return d;
 }
 ////

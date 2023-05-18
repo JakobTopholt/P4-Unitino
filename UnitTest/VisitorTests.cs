@@ -14,9 +14,19 @@ public class VisitorTests
     [TestCaseSource(typeof(FilesToTestsConverter), nameof(FilesToTestsConverter.PrettyPrintData))]
     public void PrettyPrint(Start ast, string prettyPrint)
     {
+        List<SymbolTable> list = new();
+        SymbolTable symbolTable = new(null, list);
+        TypeChecker subunitsExprCheck = new TypeChecker(symbolTable);
+        UnitVisitor a = new(symbolTable, subunitsExprCheck);
+        FunctionVisitor b = new(symbolTable);
+        TypeChecker c = new(symbolTable);
+        ast.Apply(a);
+        ast.Apply(b);
+        ast.Apply(c);
+        
         StringBuilder sb = new();
         TextWriter output = new StringWriter(sb);
-        ast.Apply(new PrettyPrint(output));
+        ast.Apply(new PrettyPrint(symbolTable, output));
         Assert.That(WhiteSpace.Replace(sb.ToString(), ""), 
             Is.EqualTo(prettyPrint));
     }
