@@ -725,7 +725,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 {
                     writer.Write("String(");
                     node.GetExp().Apply(this);
-                    writer.Write(", 8)");
+                    writer.Write(", 6)");
                 }
                 break;
         }
