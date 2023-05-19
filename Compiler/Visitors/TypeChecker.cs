@@ -10,32 +10,6 @@ namespace Compiler.Visitors;
 
 public class TypeChecker : exprTypeChecker
 {
-    
-    // TASKS
-    
-    // 1
-    // Implement all the declarations, assignments and all nodes which need to be scanned by the visitor
-    // To be controlled
-
-    // 2
-    // Implement unitTypechecking into DelcStmnt og DeclAssStmt
-    // WIP
-    
-    // 3 
-    // Mangler at håndtere funktions parametre
-    // WIP
-
-    // 4
-    // Typechecking for functioncall (Functioncalls needs to get returntype based on functioncallID) or node reference?
-    // Then compare in exp or whatever
-    // To do
-    
-    // 5
-    // Typecast hierachry
-    // We need to implement an understanding of the types precedence. int --> float,  float --> string eg. basicly the implicit typecasting
-    // This is probably a feauture we will have to work on more, when we want to implement precedence for custom unit types.
-    // To do
-    
     public TypeChecker(SymbolTable symbolTable) : base(symbolTable)
     {
     }
@@ -51,7 +25,6 @@ public class TypeChecker : exprTypeChecker
             if (symbolTable.GetSymbol(global) == Symbol.NotOk)
                 grammarIsOk = false;
         }
-        //throw new Exception(symbols);
         foreach (string error in errorResults)
         {
             Console.WriteLine(error);
@@ -65,17 +38,43 @@ public class TypeChecker : exprTypeChecker
         
     }
 
+    public override void InANumUnituse(ANumUnituse node)
+    {
+        tempLocation += IndentedString($"in A NumUnit: {node.GetId()}\n");
+        indent++;
+    }
+
     public override void OutANumUnituse(ANumUnituse node)
     {
         // Does id to Unit exist?
         symbolTable.AddNode(node,
             symbolTable.GetUnitdeclFromId(node.GetId().ToString()) != null ? Symbol.Ok : Symbol.NotOk);
+        tempLocation += symbolTable.GetUnitdeclFromId(node.GetId().ToString()) != null ? "" : IndentedString($"{node.GetId()} not a valid subunit\n");
+        PrintError();
+        indent--;
     }
+
+    public override void InADenUnituse(ADenUnituse node)
+    {
+        tempLocation += IndentedString($"in A DenUnit: {node.GetId()}\n");
+        indent++;
+    }
+
     public override void OutADenUnituse(ADenUnituse node)
     {
         symbolTable.AddNode(node,
             symbolTable.GetUnitdeclFromId(node.GetId().ToString()) != null ? Symbol.Ok : Symbol.NotOk);
+        tempLocation += symbolTable.GetUnitdeclFromId(node.GetId().ToString()) != null ? "" : IndentedString($"{node.GetId()} not a valid subunit\n");
+        PrintError();
+        indent--;
     }
+
+    public override void InAUnitType(AUnitType node)
+    {
+        tempLocation += IndentedString($"in a Unittype: {node.GetUnituse()}\n");
+        indent++;
+    }
+
     public override void OutAUnitType(AUnitType node)
     {
         List<ANumUnituse> nums = node.GetUnituse().OfType<ANumUnituse>().ToList();
@@ -121,6 +120,8 @@ public class TypeChecker : exprTypeChecker
         {
             symbolTable.AddNode(node, Symbol.NotOk);
         }
+        PrintError();
+        indent--;
     }
     public override void OutAIntType(AIntType node)
     {
@@ -146,6 +147,13 @@ public class TypeChecker : exprTypeChecker
     {
         symbolTable.AddNode(node, Symbol.Func);
     }
+
+    public override void InAArg(AArg node)
+    {
+        tempLocation += IndentedString($"in argument: {node.GetType() + " " + node.GetId()}\n");
+        indent++;
+    }
+
     public override void OutAArg(AArg node)
     {
         // Skal nok også ind i tredje pass ad typechecker (det lokale)
@@ -177,6 +185,8 @@ public class TypeChecker : exprTypeChecker
                 symbolTable.AddNode(node, Symbol.NotOk);
                 break;
         }
+        PrintError();
+        indent--;
     }
 
     public void AddArgsToScope(Node node, IList args)
@@ -229,28 +239,21 @@ public class TypeChecker : exprTypeChecker
     }
     public override void OutAUntypedGlobal(AUntypedGlobal node)
     {
-        string symbols = "";
-        // Stacktracing
         // Check om args er ok
         // Check om stmts er ok
         bool untypedIsOk = true;
         List<AArg> args = node.GetArg().OfType<AArg>().ToList();
         foreach (AArg arg in args)
         {
-            symbols += symbolTable.GetSymbol(arg).ToString();
             if (symbolTable.GetSymbol(arg) == Symbol.NotOk)
                 untypedIsOk = false;
         }
         List<PStmt> stmts = node.GetStmt().OfType<PStmt>().ToList();
         foreach (PStmt stmt in stmts)
         {
-            symbols += symbolTable.GetSymbol(stmt).ToString();
             if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
                 untypedIsOk = false;
         }
-        //Console.WriteLine(node.GetId().ToString() + ":");
-        //Console.WriteLine(symbols);
-        //throw new Exception(symbols);
         symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, untypedIsOk ? Symbol.Ok : Symbol.NotOk);
         Location = "";
@@ -268,28 +271,21 @@ public class TypeChecker : exprTypeChecker
     }
     public override void OutATypedGlobal(ATypedGlobal node)
     {
-        string symbols = "";
-        // Stacktracing
         // Check om args er ok
         // Check om stmts er ok
         bool typedIsOk = true;
         List<AArg> args = node.GetArg().OfType<AArg>().ToList();
         foreach (AArg arg in args)
         {
-            symbols += symbolTable.GetSymbol(arg).ToString();
             if (symbolTable.GetSymbol(arg) == Symbol.NotOk)
                 typedIsOk = false;
         }
         List<PStmt> stmts = node.GetStmt().OfType<PStmt>().ToList();
         foreach (PStmt stmt in stmts)
         {
-            symbols += symbolTable.GetSymbol(stmt).ToString();
             if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
                 typedIsOk = false;
         }
-        //Console.WriteLine(node.GetId().ToString() + ":");
-        //Console.WriteLine(symbols);
-        //throw new Exception(symbols);
         symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, typedIsOk ? Symbol.Ok : Symbol.NotOk);
         Location = "";
@@ -347,17 +343,14 @@ public class TypeChecker : exprTypeChecker
     {
         if (symbolTable.GetSymbol(node) == null)
         {
-            string symbols = "";
             bool progIsOk = true;
 
             List<PStmt> stmts = node.GetStmt().OfType<PStmt>().ToList();
             foreach (PStmt stmt in stmts)
             {
-                symbols += symbolTable.GetSymbol(stmt).ToString();
                 if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
                     progIsOk = false;
             }
-            //throw new Exception(symbols);
             symbolTable = symbolTable.ExitScope();
             symbolTable.AddNode(node, progIsOk ? Symbol.Ok : Symbol.NotOk);
             Location = "";
