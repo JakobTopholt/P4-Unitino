@@ -49,7 +49,7 @@ public class TypeChecker : exprTypeChecker
         // Does id to Unit exist?
         symbolTable.AddNode(node,
             symbolTable.GetUnitdeclFromId(node.GetId().ToString()) != null ? Symbol.Ok : Symbol.NotOk);
-        tempLocation += symbolTable.GetUnitdeclFromId(node.GetId().ToString()) != null ? "" : IndentedString($"{node.GetId()} not a valid subunit\n");
+        tempResult += symbolTable.GetUnitdeclFromId(node.GetId().ToString()) != null ? "" : IndentedString($"{node.GetId()} not a valid subunit\n");
         PrintError();
         indent--;
     }
@@ -64,7 +64,7 @@ public class TypeChecker : exprTypeChecker
     {
         symbolTable.AddNode(node,
             symbolTable.GetUnitdeclFromId(node.GetId().ToString()) != null ? Symbol.Ok : Symbol.NotOk);
-        tempLocation += symbolTable.GetUnitdeclFromId(node.GetId().ToString()) != null ? "" : IndentedString($"{node.GetId()} not a valid subunit\n");
+        tempResult += symbolTable.GetUnitdeclFromId(node.GetId().ToString()) != null ? "" : IndentedString($"{node.GetId()} not a valid subunit\n");
         PrintError();
         indent--;
     }
@@ -77,6 +77,7 @@ public class TypeChecker : exprTypeChecker
 
     public override void OutAUnitType(AUnitType node)
     {
+        // KOM HERTIL
         List<ANumUnituse> nums = node.GetUnituse().OfType<ANumUnituse>().ToList();
         List<ADenUnituse> dens = node.GetUnituse().OfType<ADenUnituse>().ToList();
         List<AUnitdeclGlobal> newNums = new List<AUnitdeclGlobal>();
