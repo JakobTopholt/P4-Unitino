@@ -2,7 +2,7 @@
 ////
 func untyped(int a, decimal b, string c, char d, bool e){
     int ab = a;
-    #a = "a";
+    a = "a";
     decimal ba = b;
     string ca = c;
     char da = d;
@@ -10,6 +10,7 @@ func untyped(int a, decimal b, string c, char d, bool e){
 }
 func untypedtwo(int a, decimal b, string c, char d, bool e){
     int ab = 5;
+    b = "hej";
     ab += a;
     decimal ba = 3.5;
     ba += b;
