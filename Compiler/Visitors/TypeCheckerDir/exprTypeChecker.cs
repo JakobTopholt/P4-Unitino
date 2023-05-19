@@ -68,7 +68,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InAFunccallExp(AFunccallExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In funccall: {node.GetId()}()\n");
         indent++;
     }
 
@@ -85,6 +85,7 @@ public class exprTypeChecker : stmtTypeChecker
         if (argAmount != paramAmount)
         {
             symbolTable.AddNode(node, Symbol.NotOk);
+            tempResult += IndentedString("Not same amount of Arguments and Parameters");
         }
         else
         {
@@ -107,23 +108,38 @@ public class exprTypeChecker : stmtTypeChecker
                 {
                     case AIntType:
                         if (paramSymbol != Symbol.Int)
+                        {
                             matches = false;
+                            tempResult += IndentedString("Parameter should be of type Int");
+                        }
                         break;
                     case ADecimalType:
                         if (paramSymbol != Symbol.Decimal)
+                        {
                             matches = false;
+                            tempResult += IndentedString("Parameter should be of type Decimal");
+                        }
                         break;
                     case ABoolType:
                         if (paramSymbol != Symbol.Bool)
+                        {
                             matches = false;
+                            tempResult += IndentedString("Parameter should be of type Bool");
+                        }
                         break;
                     case ACharType:
                         if (paramSymbol != Symbol.Char)
+                        {
                             matches = false;
+                            tempResult += IndentedString("Parameter should be of type Char");
+                        }
                         break;
                     case AStringType:
                         if (paramSymbol != Symbol.String)
+                        {
                             matches = false;
+                            tempResult += IndentedString("Parameter should be of type String");
+                        }
                         break;
                     case AUnitType argType:
                         if (symbolTable.GetUnit(argType, out var argUnit) && 
@@ -131,6 +147,7 @@ public class exprTypeChecker : stmtTypeChecker
                             !symbolTable.CompareCustomUnits(argUnit, paramUnit))
                         {
                             matches = false;
+                            tempResult += IndentedString("Parameter is not same unitType as Argument");
                             symbolTable.AddNodeToUnit(node, argUnit);
                         }
                         break;
@@ -176,6 +193,7 @@ public class exprTypeChecker : stmtTypeChecker
             else
             {
                 symbolTable.AddNode(node, Symbol.NotOk);
+                // Allready added error message
             } 
         }
         PrintError();
@@ -184,7 +202,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InAIdExp(AIdExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"in IdExp: {node.GetId()}\n");
         indent++;
     }
 
@@ -216,8 +234,8 @@ public class exprTypeChecker : stmtTypeChecker
                 else
                 {
                     symbolTable.AddNode(node, Symbol.NotOk);
+                    tempResult += IndentedString($"{node.GetId()} is not a valid id (no value associated with it)");
                 }
-
                 break;
         }
         PrintError();
@@ -226,7 +244,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InAUnitdecimalExp(AUnitdecimalExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In unitdecimal: {node.GetDecimal().ToString() + node.GetId()}\n");
         indent++;
     }
 
@@ -248,6 +266,7 @@ public class exprTypeChecker : stmtTypeChecker
         {
             // Id is not a valid subunit
             symbolTable.AddNode(node, Symbol.NotOk);
+            tempResult += IndentedString($"{node.GetId()} does not exist");
         }
         PrintError();
         indent--;
@@ -255,7 +274,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InAUnitnumberExp(AUnitnumberExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In unitnumber: {node.GetNumber().ToString() + node.GetId()}\n");
         indent++;
     }
 
@@ -279,6 +298,7 @@ public class exprTypeChecker : stmtTypeChecker
         {
             // Id is not a valid subunit
             symbolTable.AddNode(node, Symbol.NotOk);
+            tempResult += IndentedString($"{node.GetId()} does not exist");
         }
         PrintError();
         indent--;
@@ -286,7 +306,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InADivideExp(ADivideExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In divideExpression: {node.GetL() + "/" + node.GetR()}\n");
         indent++;
     }
 
@@ -307,7 +327,6 @@ public class exprTypeChecker : stmtTypeChecker
         if (leftExpr is ANumberExp or ADecimalExp && rightExpr is AIdExp id)
         {
             AUnitdeclGlobal? unitDecl = symbolTable.GetUnitdeclFromId(id.GetId().ToString().Trim());
-            //throw new Exception(unitD);
             if (unitDecl is null || !symbolTable.GetUnit(unitDecl, out var tuple)) 
                 return;
             symbolTable.AddNodeToUnit(node, tuple);
@@ -361,12 +380,16 @@ public class exprTypeChecker : stmtTypeChecker
                         symbolTable.AddNode(node, Symbol.Ok);
                     }
                     else
+                    {
                         symbolTable.AddNode(node, Symbol.NotOk);
+                        tempResult += IndentedString("No valid units in expression");
+                    }
                 }
                 else
                 {
                     // not valid input expressions to a divide expression
                     symbolTable.AddNode(node, Symbol.NotOk);
+                    tempResult += IndentedString("Not a valid divide expression! only use allowed types");
                 }
                 break;
             }  
@@ -377,7 +400,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InAMultiplyExp(AMultiplyExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In multiplyExpression: {node.GetL() + "*" + node.GetR()}\n");
         indent++;
     }
 
@@ -441,12 +464,17 @@ public class exprTypeChecker : stmtTypeChecker
                         symbolTable.AddNode(node, Symbol.Ok);
                     }
                     else
+                    {
                         symbolTable.AddNode(node, Symbol.NotOk);
+                        tempResult += IndentedString("No valid units in expression");
+                    }
+                        
                 }
                 else
                 {
                     // not valid input expressions to a multiply expression
                     symbolTable.AddNode(node, Symbol.NotOk);
+                    tempResult += IndentedString("Not a valid multiply expression! only use allowed types");
                 }
                 break;
         }
@@ -456,7 +484,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InAPlusExp(APlusExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In plusExpression: {node.GetL() + "+" + node.GetR()}\n");
         indent++;
     }
 
@@ -543,6 +571,8 @@ public class exprTypeChecker : stmtTypeChecker
                     else
                     {
                         symbolTable.AddNode(node, Symbol.NotOk);
+                        tempResult += IndentedString("Not the same unitTypes used in expression");
+
                     }
                 }
                 else if ((leftContainsUnit || rightContainsUnit) && (symbolTable.GetSymbol(leftExpr) == Symbol.Int || symbolTable.GetSymbol(leftExpr) == Symbol.Decimal) 
@@ -558,12 +588,14 @@ public class exprTypeChecker : stmtTypeChecker
                     else
                     {
                         symbolTable.AddNode(node, Symbol.NotOk);
+                        tempResult += IndentedString("Not the same unitTypes used in expression!");
                     }
                 }
                 else
                 {
                     // not valid input expression
                     symbolTable.AddNode(node, Symbol.NotOk);
+                    tempResult += IndentedString("Not the same Types used in expression!");
                 }
                 break;
         }
@@ -573,7 +605,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InAMinusExp(AMinusExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In minusExpression: {node.GetL() + "-" + node.GetR()}\n");
         indent++;
     }
 
@@ -647,6 +679,7 @@ public class exprTypeChecker : stmtTypeChecker
                     else
                     {
                         symbolTable.AddNode(node, Symbol.NotOk);
+                        tempResult += IndentedString("Not the same unitTypes used in expression!");
                     }
                 }
                 else if ((leftContainsUnit || rightContainsUnit) && (symbolTable.GetSymbol(leftExpr) == Symbol.Int || symbolTable.GetSymbol(leftExpr) == Symbol.Decimal) 
@@ -662,12 +695,14 @@ public class exprTypeChecker : stmtTypeChecker
                     else
                     {
                         symbolTable.AddNode(node, Symbol.NotOk);
+                        tempResult += IndentedString("Not the same unitTypes used in expression!");
                     }
                 }
                 else
                 {
                     // not valid input expressions to a multiply expression
                     symbolTable.AddNode(node, Symbol.NotOk);
+                    tempResult += IndentedString("Not the same Types used in expression!");
                 }
                 break;
         }
@@ -677,7 +712,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InARemainderExp(ARemainderExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In remainderExpression: {node.GetL() + "%" + node.GetR()}\n");
         indent++;
     }
 
@@ -708,6 +743,7 @@ public class exprTypeChecker : stmtTypeChecker
                 else
                 { 
                     symbolTable.AddNode(node, Symbol.NotOk);  
+                    tempResult += IndentedString("Only int and decimals are allowed in remainder expression");
                 }
                 break;
             case Symbol.Decimal:
@@ -718,6 +754,7 @@ public class exprTypeChecker : stmtTypeChecker
                 else
                 { 
                     symbolTable.AddNode(node, Symbol.NotOk);  
+                    tempResult += IndentedString("Only decimals are allowed in remainder expression");
                 }
                 break;
             default:
@@ -731,11 +768,13 @@ public class exprTypeChecker : stmtTypeChecker
                     else
                     {
                         symbolTable.AddNode(node, Symbol.NotOk);
+                        tempResult += IndentedString("Not same unitTypes");
                     } 
                 }
                 else
                 {
                     symbolTable.AddNode(node, Symbol.NotOk);
+                    tempResult += IndentedString("Remainder expressions is only allowed with ints, decimals and units");
                 }
                 break;
         }
@@ -745,7 +784,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InATernaryExp(ATernaryExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In ternaryExpression: {node.GetCond() + " ? " + node.GetTrue() + " : " + node.GetFalse()}\n");
         indent++;
     }
 
@@ -775,18 +814,23 @@ public class exprTypeChecker : stmtTypeChecker
             {
                 case Symbol.Int:
                     symbolTable.AddNode(node, falseSymbol == Symbol.Int ? Symbol.Int : Symbol.NotOk);
+                    tempResult += falseSymbol == Symbol.Int ? "" : IndentedString("True and false exp should be of same type");
                     break;
                 case Symbol.Decimal:
                     symbolTable.AddNode(node, falseSymbol == Symbol.Decimal ? Symbol.Decimal : Symbol.NotOk);
+                    tempResult += falseSymbol == Symbol.Decimal ? "" : IndentedString("True and false exp should be of same type");
                     break;
                 case Symbol.Bool:
                     symbolTable.AddNode(node, falseSymbol == Symbol.Bool ? Symbol.Bool : Symbol.NotOk);
+                    tempResult += falseSymbol == Symbol.Bool ? "" : IndentedString("True and false exp should be of same type");
                     break;
                 case Symbol.Char:
                     symbolTable.AddNode(node, falseSymbol == Symbol.Char ? Symbol.Char : Symbol.NotOk);
+                    tempResult += falseSymbol == Symbol.Char ? "" : IndentedString("True and false exp should be of same type");
                     break;
                 case Symbol.String:
                     symbolTable.AddNode(node, falseSymbol == Symbol.String ? Symbol.String : Symbol.NotOk);
+                    tempResult += falseSymbol == Symbol.String ? "" : IndentedString("True and false exp should be of same type");
                     break;
                 default:
                     // compare custom unit
@@ -805,11 +849,14 @@ public class exprTypeChecker : stmtTypeChecker
                         else
                         {
                             symbolTable.AddNode(node, Symbol.NotOk);
+                            tempResult += IndentedString("UnitTypes does not match");
+
                         }
                     }
                     else
                     {
                         symbolTable.AddNode(node, Symbol.NotOk);
+                        tempResult += IndentedString("Illegal type used in trueExpression");
                     }
                     break;
             }
@@ -817,6 +864,7 @@ public class exprTypeChecker : stmtTypeChecker
         else
         {
             symbolTable.AddNode(node, Symbol.NotOk);
+            tempResult += IndentedString("Condition expression is not a boolean");
         }
         PrintError();
         indent--;
@@ -824,7 +872,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InALogicalnotExp(ALogicalnotExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In notExpression: {node.GetExp()}\n");
         indent++;
     }
 
@@ -835,14 +883,16 @@ public class exprTypeChecker : stmtTypeChecker
         {
             symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
         }
+        Symbol? symbol = symbolTable.GetSymbol(exp);
         if (exp != null)
         {
-            symbolTable.AddNode(node,
-                symbolTable.GetSymbol(exp) == Symbol.Bool ? Symbol.Bool : Symbol.NotOk);
+            symbolTable.AddNode(node, symbol == Symbol.Bool ? Symbol.Bool : Symbol.NotOk);
+            tempResult += symbol == Symbol.Bool ? "" : IndentedString("Expression should be a boolean");
         }
         else
         {
             symbolTable.AddNode(node, Symbol.NotOk);
+            tempResult += IndentedString("Expression is empty");
         }
         PrintError();
         indent--;
@@ -850,7 +900,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InACastExp(ACastExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In castExpression: {"(" + node.GetType() + ")" +" " + node.GetExp()}\n");
         indent++;
     }
 
@@ -899,6 +949,7 @@ public class exprTypeChecker : stmtTypeChecker
                 break;
             default:
                 symbolTable.AddNode(node, Symbol.NotOk);
+                tempResult += IndentedString("Illegal cast types");
                 break;
         }
         PrintError();
@@ -907,7 +958,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InAOrExp(AOrExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In orExpression: {node.GetL() + "||" + node.GetR()}\n");
         indent++;
     }
 
@@ -932,6 +983,7 @@ public class exprTypeChecker : stmtTypeChecker
         else
         {
             symbolTable.AddNode(node, Symbol.NotOk);
+            tempResult += IndentedString("Both expressions should be booleans");
         }
         PrintError();
         indent--;
@@ -939,7 +991,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InAAndExp(AAndExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In andExpression: {node.GetL() + "&&" + node.GetR()}\n");
         indent++;
     }
 
@@ -964,6 +1016,7 @@ public class exprTypeChecker : stmtTypeChecker
         else
         {
             symbolTable.AddNode(node, Symbol.NotOk);
+            tempResult += IndentedString("Both expressions should be booleans");
         }
         PrintError();
         indent--;
@@ -971,7 +1024,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InASuffixplusplusExp(ASuffixplusplusExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In suffixplusplus Expression: {node.GetExp()}\n");
         indent++;
     }
 
@@ -996,6 +1049,7 @@ public class exprTypeChecker : stmtTypeChecker
                 break;
             default:
                 symbolTable.AddNode(node, Symbol.NotOk);
+                tempResult += IndentedString("can only be int, decimal or char types");
                 break;
         }
         PrintError();
@@ -1004,7 +1058,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InASuffixminusminusExp(ASuffixminusminusExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In suffixminusminus Expression: {node.GetExp()}\n");
         indent++;
     }
 
@@ -1029,6 +1083,7 @@ public class exprTypeChecker : stmtTypeChecker
                 break;
             default:
                 symbolTable.AddNode(node, Symbol.NotOk);
+                tempResult += IndentedString("can only be int, decimal or char types");
                 break;
         }
         PrintError();
@@ -1037,7 +1092,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InAUnaryminusExp(AUnaryminusExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In unaryminus Expression: {node.GetExp()}\n");
         indent++;
     }
 
@@ -1062,6 +1117,7 @@ public class exprTypeChecker : stmtTypeChecker
                 break;
             default:
                 symbolTable.AddNode(node, Symbol.NotOk);
+                tempResult += IndentedString("can only be int, decimal or char types");
                 break;
         }
         PrintError();
@@ -1070,7 +1126,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InAPrefixminusminusExp(APrefixminusminusExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In prefixminusminus Expression: {node.GetExp()}\n");
         indent++;
     }
 
@@ -1095,6 +1151,7 @@ public class exprTypeChecker : stmtTypeChecker
                 break;
             default:
                 symbolTable.AddNode(node, Symbol.NotOk);
+                tempResult += IndentedString("can only be int, decimal or char types");
                 break;
         }
         PrintError();
@@ -1103,7 +1160,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InAPrefixplusplusExp(APrefixplusplusExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In prefixplusplus Expression: {node.GetExp()}\n");
         indent++;
     }
 
@@ -1128,6 +1185,7 @@ public class exprTypeChecker : stmtTypeChecker
                 break;
             default:
                 symbolTable.AddNode(node, Symbol.NotOk);
+                tempResult += IndentedString("can only be int, decimal or char types");
                 break;
         }
         PrintError();
@@ -1136,37 +1194,37 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void InAEqualExp(AEqualExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In an equal Expression: {node.GetL() + "==" + node.GetR()}\n");
         indent++;
     }
     public override void OutAEqualExp(AEqualExp node) => AddBinaryToSymbolTable(node, node.GetL(), node.GetR());
     public override void InANotequalExp(ANotequalExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In an notEqual Expression: {node.GetL() + "!=" + node.GetR()}\n");
         indent++;
     }
     public override void OutANotequalExp(ANotequalExp node) => AddBinaryToSymbolTable(node, node.GetL(), node.GetR());
     public override void InAGreaterExp(AGreaterExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In a greater Expression: {node.GetL() + ">" + node.GetR()}\n");
         indent++;
     }
     public override void OutAGreaterExp(AGreaterExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
     public override void InALessExp(ALessExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In a less Expression: {node.GetL() + "<" + node.GetR()}\n");
         indent++;
     }
     public override void OutALessExp(ALessExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
     public override void InAGreaterequalExp(AGreaterequalExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In a greaterEqual Expression: {node.GetL() + ">=" + node.GetR()}\n");
         indent++;
     }
     public override void OutAGreaterequalExp(AGreaterequalExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
     public override void InALessequalExp(ALessequalExp node)
     {
-        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        tempLocation += IndentedString($"In a lessEqual Expression: {node.GetL() + "<=" + node.GetR()}\n");
         indent++;
     }
     public override void OutALessequalExp(ALessequalExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
@@ -1188,30 +1246,45 @@ public class exprTypeChecker : stmtTypeChecker
         {
             case Symbol.Int:
                 symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Int ? Symbol.Bool : Symbol.NotOk);
+                tempResult += symbolTable.GetSymbol(rightExpr) == Symbol.Int ? "" : IndentedString("Types does not match");
                 break;
             case (Symbol.Decimal):
                 symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Decimal ? Symbol.Bool : Symbol.NotOk);
+                tempResult += symbolTable.GetSymbol(rightExpr) == Symbol.Decimal ? "" : IndentedString("Types does not match");
                 break;
             case Symbol.Bool:
                 symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Bool ? Symbol.Bool : Symbol.NotOk);
+                tempResult += symbolTable.GetSymbol(rightExpr) == Symbol.Bool ? "" : IndentedString("Types does not match");
                 break;
             case Symbol.String:
                 symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.String ? Symbol.Bool : Symbol.NotOk);
+                tempResult += symbolTable.GetSymbol(rightExpr) == Symbol.String ? "" : IndentedString("Types does not match");
                 break;
             case Symbol.Char:
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Int ? Symbol.Bool : Symbol.NotOk);
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Char ? Symbol.Bool : Symbol.NotOk);
+                tempResult += symbolTable.GetSymbol(rightExpr) == Symbol.Char ? "" : IndentedString("Types does not match");
                 break;
             default:
-                symbolTable.GetUnit(leftExpr, out var unit1);
-                symbolTable.GetUnit(rightExpr, out var unit2);
-
-                symbolTable.AddNode(Parent, symbolTable.CompareCustomUnits(unit1, unit2) ? Symbol.Bool : Symbol.NotOk);
+                bool leftContainsUnit = symbolTable.NodeToUnit.ContainsKey(leftExpr);
+                bool rightContainsUnit = symbolTable.NodeToUnit.ContainsKey(rightExpr);
+                if (leftContainsUnit && rightContainsUnit)
+                {
+                    symbolTable.GetUnit(leftExpr, out var unit1);
+                    symbolTable.GetUnit(rightExpr, out var unit2);
+                    symbolTable.AddNode(Parent, symbolTable.CompareCustomUnits(unit1, unit2) ? Symbol.Bool : Symbol.NotOk);
+                    tempResult += symbolTable.CompareCustomUnits(unit1, unit2) ? "" : IndentedString("unitTypes does not match");
+                }
+                else
+                {
+                    symbolTable.AddNode(Parent, Symbol.NotOk);
+                    tempResult += IndentedString("types does not match");
+                }
                 break;
         }
         PrintError();
         indent--;
     }
-    // Binary without string, bool and unit
+    // Binary without string, bool
     // Greater, GreaterEqual, Less, LessEqual
     private void AddBinaryNumberToSymbolTable(Node Parent, Node L, Node R)
     {
@@ -1229,16 +1302,29 @@ public class exprTypeChecker : stmtTypeChecker
         switch (left)
         {
             case Symbol.Int:
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Int ? Symbol.Bool : Symbol.NotOk);
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) is Symbol.Int or Symbol.Decimal or Symbol.Char ? Symbol.Bool : Symbol.NotOk);
                 break;
             case (Symbol.Decimal):
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Decimal ? Symbol.Bool : Symbol.NotOk);
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) is Symbol.Int or Symbol.Decimal ? Symbol.Bool : Symbol.NotOk);
                 break;
             case Symbol.Char:
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Int ? Symbol.Bool : Symbol.NotOk);
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) is Symbol.Int or Symbol.Char ? Symbol.Bool : Symbol.NotOk);
                 break;
             default:
-                symbolTable.AddNode(Parent, Symbol.NotOk);
+                bool leftContainsUnit = symbolTable.NodeToUnit.ContainsKey(leftExpr);
+                bool rightContainsUnit = symbolTable.NodeToUnit.ContainsKey(rightExpr);
+                if (leftContainsUnit && rightContainsUnit)
+                {
+                    symbolTable.GetUnit(leftExpr, out var unit1);
+                    symbolTable.GetUnit(rightExpr, out var unit2);
+                    symbolTable.AddNode(Parent, symbolTable.CompareCustomUnits(unit1, unit2) ? Symbol.Bool : Symbol.NotOk);
+                    tempResult += symbolTable.CompareCustomUnits(unit1, unit2) ? "" : IndentedString("unitTypes does not match");
+                }
+                else
+                {
+                    symbolTable.AddNode(Parent, Symbol.NotOk);
+                    tempResult += IndentedString("types does not match");
+                }
                 break;
         }
         PrintError();
