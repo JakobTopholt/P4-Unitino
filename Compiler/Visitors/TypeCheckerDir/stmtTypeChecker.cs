@@ -13,23 +13,29 @@ public class stmtTypeChecker : DepthFirstAdapter
     }
 
     public string tempLocation = "";
+    public string Location = "";
     public string tempResult = "";
     public List<string?> errorResults = new List<string>();
     public int index = 0;
     public int indent = 0;
     public bool reported = false;
-    
-    private string IndentedString(string s)
+
+    protected string IndentedString(string s)
     {
         return new string(' ', indent * 3) + s;
     }
 
-    private void PrintError()
+    protected void PrintError()
     {
         if (tempResult != "" && !reported)
         {
-            errorResults.Add(tempLocation  + tempResult);
+            errorResults.Add(Location + tempLocation  + tempResult);
+            tempLocation = "";
             reported = true;
+        }
+        else
+        {
+            tempLocation = "";
         }
     }
     
@@ -366,19 +372,19 @@ public class stmtTypeChecker : DepthFirstAdapter
                         break;
                     case ADecimalType b:
                         symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Decimal ? Symbol.Decimal : Symbol.NotOk);
-                        tempResult += exprType == Symbol.Int ? "" : IndentedString("expression is not an Int");
+                        tempResult += exprType == Symbol.Decimal ? "" : IndentedString("expression is not an Int");
                         break;
                     case ABoolType c:
                         symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Bool ? Symbol.Bool : Symbol.NotOk);
-                        tempResult += exprType == Symbol.Int ? "" : IndentedString("expression is not an Int");
+                        tempResult += exprType == Symbol.Bool ? "" : IndentedString("expression is not an Int");
                         break;
                     case ACharType d:
                         symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Char ? Symbol.Char : Symbol.NotOk);
-                        tempResult += exprType == Symbol.Int ? "" : IndentedString("expression is not an Int");
+                        tempResult += exprType == Symbol.Char ? "" : IndentedString("expression is not an Int");
                         break;
                     case AStringType e:
                         symbolTable.AddId(node.GetId().ToString(), node, exprType is Symbol.String or Symbol.Char ? Symbol.String : Symbol.NotOk);
-                        tempResult += exprType == Symbol.Int ? "" : IndentedString("expression is not an Int");
+                        tempResult += exprType == Symbol.String ? "" : IndentedString("expression is not an Int");
                         break;
                     case AUnitType customType:
                         //throw new Exception("bruh");

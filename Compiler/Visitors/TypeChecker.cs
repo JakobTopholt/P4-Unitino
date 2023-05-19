@@ -222,7 +222,7 @@ public class TypeChecker : exprTypeChecker
     }
     public override void InAUntypedGlobal(AUntypedGlobal node)
     {
-        tempLocation += $"In function {node.GetId()}\n";
+        Location += $"In function {node.GetId()}\n";
         indent++;
         symbolTable = symbolTable.EnterScope();
         AddArgsToScope(node, node.GetArg());
@@ -253,7 +253,7 @@ public class TypeChecker : exprTypeChecker
         //throw new Exception(symbols);
         symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, untypedIsOk ? Symbol.Ok : Symbol.NotOk);
-        tempLocation = "";
+        Location = "";
         tempResult = "";
         reported = false;
         indent--;
@@ -261,7 +261,7 @@ public class TypeChecker : exprTypeChecker
     }
     public override void InATypedGlobal(ATypedGlobal node)
     {
-        tempLocation += $"In function {node.GetId()}\n";
+        Location += $"In function {node.GetId()}\n";
         indent++;
         symbolTable = symbolTable.EnterScope();
         AddArgsToScope(node, node.GetArg());
@@ -292,7 +292,7 @@ public class TypeChecker : exprTypeChecker
         //throw new Exception(symbols);
         symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, typedIsOk ? Symbol.Ok : Symbol.NotOk);
-        tempLocation = "";
+        Location = "";
         tempResult = "";
         reported = false;
         indent--;
@@ -300,7 +300,7 @@ public class TypeChecker : exprTypeChecker
     }
     public override void InALoopGlobal(ALoopGlobal node)
     {
-        tempLocation += "In Loop \n";
+        Location += "In Loop \n";
         indent++;
         symbolTable.Loop++;
         if (symbolTable.Loop != 1)
@@ -324,7 +324,7 @@ public class TypeChecker : exprTypeChecker
             }
             symbolTable = symbolTable.ExitScope();
             symbolTable.AddNode(node, loopIsOk ? Symbol.Ok : Symbol.NotOk);
-            tempLocation = "";
+            Location = "";
             tempResult = "";
             reported = false;
             indent--;
@@ -334,7 +334,7 @@ public class TypeChecker : exprTypeChecker
 
     public override void InAProgGlobal(AProgGlobal node)
     {
-        tempLocation += "In Prog \n";
+        Location += "In Prog \n";
         indent++;
         symbolTable.Prog++;
         if (symbolTable.Prog != 1)
@@ -360,7 +360,7 @@ public class TypeChecker : exprTypeChecker
             //throw new Exception(symbols);
             symbolTable = symbolTable.ExitScope();
             symbolTable.AddNode(node, progIsOk ? Symbol.Ok : Symbol.NotOk);
-            tempLocation = "";
+            Location = "";
             tempResult = "";
             reported = false;
             indent--;

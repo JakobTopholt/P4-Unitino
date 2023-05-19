@@ -11,8 +11,7 @@ public class exprTypeChecker : stmtTypeChecker
     {
 
     }
-
-    public int bruh = 5;
+    
     public override void OutAExpExp(AExpExp node)
     {
         Node? exp = node.GetExp();
@@ -65,6 +64,12 @@ public class exprTypeChecker : stmtTypeChecker
         symbolTable.AddNode(node, Symbol.Decimal);
         // ----- Logic missing here---- (tag stilling til hvad det under betød)
        // symbolTable.AddNode(node, UnitVisitor.StateUnit ? Symbol.Decimal : Symbol.NotOk);
+    }
+
+    public override void InAFunccallExp(AFunccallExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
     }
 
     public override void OutAFunccallExp(AFunccallExp node)
@@ -173,6 +178,14 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(node, Symbol.NotOk);
             } 
         }
+        PrintError();
+        indent--;
+    }
+
+    public override void InAIdExp(AIdExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
     }
 
     public override void OutAIdExp(AIdExp node)
@@ -207,6 +220,14 @@ public class exprTypeChecker : stmtTypeChecker
 
                 break;
         }
+        PrintError();
+        indent--;
+    }
+
+    public override void InAUnitdecimalExp(AUnitdecimalExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
     }
 
     public override void OutAUnitdecimalExp(AUnitdecimalExp node)
@@ -228,6 +249,14 @@ public class exprTypeChecker : stmtTypeChecker
             // Id is not a valid subunit
             symbolTable.AddNode(node, Symbol.NotOk);
         }
+        PrintError();
+        indent--;
+    }
+
+    public override void InAUnitnumberExp(AUnitnumberExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
     }
 
     public override void OutAUnitnumberExp(AUnitnumberExp node)
@@ -251,7 +280,16 @@ public class exprTypeChecker : stmtTypeChecker
             // Id is not a valid subunit
             symbolTable.AddNode(node, Symbol.NotOk);
         }
+        PrintError();
+        indent--;
     }
+
+    public override void InADivideExp(ADivideExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
+    }
+
     public override void OutADivideExp(ADivideExp node)
     {
         Node leftExpr = node.GetL();
@@ -278,7 +316,7 @@ public class exprTypeChecker : stmtTypeChecker
         else
         {
           switch (leftSymbol)
-        {
+            {
             case Symbol.Int when rightSymbol is Symbol.Int:
                 symbolTable.AddNode(node, Symbol.Int);
                 break;
@@ -331,9 +369,18 @@ public class exprTypeChecker : stmtTypeChecker
                     symbolTable.AddNode(node, Symbol.NotOk);
                 }
                 break;
-        }  
+            }  
         }
+        PrintError();
+        indent--;
     }
+
+    public override void InAMultiplyExp(AMultiplyExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
+    }
+
     public override void OutAMultiplyExp(AMultiplyExp node)
     {
         Node leftExpr = node.GetL();
@@ -403,6 +450,14 @@ public class exprTypeChecker : stmtTypeChecker
                 }
                 break;
         }
+        PrintError();
+        indent--;
+    }
+
+    public override void InAPlusExp(APlusExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
     }
 
     public override void OutAPlusExp(APlusExp node)
@@ -512,6 +567,14 @@ public class exprTypeChecker : stmtTypeChecker
                 }
                 break;
         }
+        PrintError();
+        indent--;
+    }
+
+    public override void InAMinusExp(AMinusExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
     }
 
     public override void OutAMinusExp(AMinusExp node)
@@ -608,6 +671,14 @@ public class exprTypeChecker : stmtTypeChecker
                 }
                 break;
         }
+        PrintError();
+        indent--;
+    }
+
+    public override void InARemainderExp(ARemainderExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
     }
 
     public override void OutARemainderExp(ARemainderExp node)
@@ -668,6 +739,14 @@ public class exprTypeChecker : stmtTypeChecker
                 }
                 break;
         }
+        PrintError();
+        indent--;
+    }
+
+    public override void InATernaryExp(ATernaryExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
     }
 
     public override void OutATernaryExp(ATernaryExp node)
@@ -739,8 +818,16 @@ public class exprTypeChecker : stmtTypeChecker
         {
             symbolTable.AddNode(node, Symbol.NotOk);
         }
+        PrintError();
+        indent--;
     }
-    
+
+    public override void InALogicalnotExp(ALogicalnotExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
+    }
+
     public override void OutALogicalnotExp(ALogicalnotExp node)
     {
         Node exp = node.GetExp();
@@ -757,8 +844,14 @@ public class exprTypeChecker : stmtTypeChecker
         {
             symbolTable.AddNode(node, Symbol.NotOk);
         }
-        
-        
+        PrintError();
+        indent--;
+    }
+
+    public override void InACastExp(ACastExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
     }
 
     public override void OutACastExp(ACastExp node)
@@ -808,7 +901,16 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(node, Symbol.NotOk);
                 break;
         }
+        PrintError();
+        indent--;
     }
+
+    public override void InAOrExp(AOrExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
+    }
+
     public override void OutAOrExp(AOrExp node)
     {
         Node leftExpr = node.GetL();
@@ -831,6 +933,14 @@ public class exprTypeChecker : stmtTypeChecker
         {
             symbolTable.AddNode(node, Symbol.NotOk);
         }
+        PrintError();
+        indent--;
+    }
+
+    public override void InAAndExp(AAndExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
     }
 
     public override void OutAAndExp(AAndExp node)
@@ -855,13 +965,16 @@ public class exprTypeChecker : stmtTypeChecker
         {
             symbolTable.AddNode(node, Symbol.NotOk);
         }
+        PrintError();
+        indent--;
     }
-    public override void OutAEqualExp(AEqualExp node) => AddBinaryToSymbolTable(node, node.GetL(), node.GetR());
-    public override void OutANotequalExp(ANotequalExp node) => AddBinaryToSymbolTable(node, node.GetL(), node.GetR());
-    public override void OutAGreaterExp(AGreaterExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
-    public override void OutALessExp(ALessExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
-    public override void OutAGreaterequalExp(AGreaterequalExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
-    public override void OutALessequalExp(ALessequalExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
+
+    public override void InASuffixplusplusExp(ASuffixplusplusExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
+    }
+
     public override void OutASuffixplusplusExp(ASuffixplusplusExp node)
     {
         Node exp = node.GetExp();
@@ -885,6 +998,14 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(node, Symbol.NotOk);
                 break;
         }
+        PrintError();
+        indent--;
+    }
+
+    public override void InASuffixminusminusExp(ASuffixminusminusExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
     }
 
     public override void OutASuffixminusminusExp(ASuffixminusminusExp node)
@@ -910,6 +1031,14 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(node, Symbol.NotOk);
                 break;
         }
+        PrintError();
+        indent--;
+    }
+
+    public override void InAUnaryminusExp(AUnaryminusExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
     }
 
     public override void OutAUnaryminusExp(AUnaryminusExp node)
@@ -935,6 +1064,14 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(node, Symbol.NotOk);
                 break;
         }
+        PrintError();
+        indent--;
+    }
+
+    public override void InAPrefixminusminusExp(APrefixminusminusExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
     }
 
     public override void OutAPrefixminusminusExp(APrefixminusminusExp node)
@@ -960,6 +1097,14 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(node, Symbol.NotOk);
                 break;
         }
+        PrintError();
+        indent--;
+    }
+
+    public override void InAPrefixplusplusExp(APrefixplusplusExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
     }
 
     public override void OutAPrefixplusplusExp(APrefixplusplusExp node)
@@ -985,8 +1130,46 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(node, Symbol.NotOk);
                 break;
         }
+        PrintError();
+        indent--;
     }
 
+    public override void InAEqualExp(AEqualExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
+    }
+    public override void OutAEqualExp(AEqualExp node) => AddBinaryToSymbolTable(node, node.GetL(), node.GetR());
+    public override void InANotequalExp(ANotequalExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
+    }
+    public override void OutANotequalExp(ANotequalExp node) => AddBinaryToSymbolTable(node, node.GetL(), node.GetR());
+    public override void InAGreaterExp(AGreaterExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
+    }
+    public override void OutAGreaterExp(AGreaterExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
+    public override void InALessExp(ALessExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
+    }
+    public override void OutALessExp(ALessExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
+    public override void InAGreaterequalExp(AGreaterequalExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
+    }
+    public override void OutAGreaterequalExp(AGreaterequalExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
+    public override void InALessequalExp(ALessequalExp node)
+    {
+        tempLocation += IndentedString($"In {node.GetId()}()\n");
+        indent++;
+    }
+    public override void OutALessequalExp(ALessequalExp node) => AddBinaryNumberToSymbolTable(node, node.GetL(), node.GetR());
     // Equals, Notequal
     private void AddBinaryToSymbolTable(Node Parent, Node L, Node R)
     {
@@ -1025,6 +1208,8 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(Parent, symbolTable.CompareCustomUnits(unit1, unit2) ? Symbol.Bool : Symbol.NotOk);
                 break;
         }
+        PrintError();
+        indent--;
     }
     // Binary without string, bool and unit
     // Greater, GreaterEqual, Less, LessEqual
@@ -1056,6 +1241,8 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(Parent, Symbol.NotOk);
                 break;
         }
+        PrintError();
+        indent--;
     }
 }
 

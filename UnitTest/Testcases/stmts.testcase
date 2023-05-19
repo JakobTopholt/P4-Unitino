@@ -2,10 +2,11 @@
 ////
 func untyped(int a, decimal b, string c, char d, bool e){
     int ab = a;
-    a = "a";
+    #a = "a";
     decimal ba = b;
     string ca = c;
     char da = d;
+    d = "je";
     bool ea = e; 
 }
 func untypedtwo(int a, decimal b, string c, char d, bool e){
