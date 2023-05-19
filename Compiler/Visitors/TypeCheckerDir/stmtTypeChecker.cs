@@ -534,10 +534,12 @@ public class stmtTypeChecker : DepthFirstAdapter
           case ALoopGlobal:
               // Should not have return in Loop
               symbolTable.AddNode(node, Symbol.NotOk);
+              tempResult += IndentedString("Returnstmt should not be in Loop");
               break;
           case AProgGlobal:
               // Should not have return in Prog
               symbolTable.AddNode(node, Symbol.NotOk);
+              tempResult += IndentedString("Returnstmt should not be in Prog");
               break;
           case ATypedGlobal aTypedFunc:
               PType typedType = aTypedFunc.GetType();
@@ -545,28 +547,41 @@ public class stmtTypeChecker : DepthFirstAdapter
               {
                   case AIntType:
                       symbolTable.AddNode(node, returnSymbol == Symbol.Int ? Symbol.Ok : Symbol.NotOk);
+                      tempResult += returnSymbol == Symbol.Int ? "" : IndentedString("expression is not an Int");
                       break;
                   case ADecimalType:
                       symbolTable.AddNode(node, returnSymbol == Symbol.Decimal ? Symbol.Ok : Symbol.NotOk);
+                      tempResult += returnSymbol == Symbol.Decimal ? "" : IndentedString("expression is not an Decimal");
                       break;
                   case ABoolType:
                       symbolTable.AddNode(node, returnSymbol == Symbol.Bool ? Symbol.Ok : Symbol.NotOk);
+                      tempResult += returnSymbol == Symbol.Bool ? "" : IndentedString("expression is not an Bool");
                       break;
                   case ACharType:
                       symbolTable.AddNode(node, returnSymbol == Symbol.Char ? Symbol.Ok : Symbol.NotOk);
+                      tempResult += returnSymbol == Symbol.Char ? "" : IndentedString("expression is not an Char");
                       break;
                   case AStringType:
                       symbolTable.AddNode(node, returnSymbol == Symbol.String ? Symbol.Ok : Symbol.NotOk);
+                      tempResult += returnSymbol == Symbol.String ? "" : IndentedString("expression is not an String");
                       break;
                   case AVoidType:
                       symbolTable.AddNode(node, Symbol.NotOk);
+                      tempResult += IndentedString("ReturnStmt should not be in a void function");
+
                       break;
                   case AUnitType:
                       symbolTable.GetUnit(typedType, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) funcType);
                       if (symbolTable.GetUnit(returnExp, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) returnType))
+                      {
                           symbolTable.AddNode(node, symbolTable.CompareCustomUnits(funcType, returnType) ? Symbol.Ok : Symbol.NotOk);
+                          tempResult += symbolTable.CompareCustomUnits(funcType, returnType) ? "" : IndentedString("return is not correct unitType");
+                      }
                       else
+                      {
                           symbolTable.AddNode(node, Symbol.NotOk);
+                          tempResult += IndentedString("return have no unitType");
+                      }
                       break;
                   default:
                       symbolTable.AddNode(node, Symbol.NotOk);
@@ -578,9 +593,11 @@ public class stmtTypeChecker : DepthFirstAdapter
               {
                   symbolTable.GetUnit(returnExp, out var expUnit);
                   symbolTable.AddNode(node, symbolTable.CompareCustomUnits(func, expUnit) ? Symbol.Ok : Symbol.NotOk);
+                  tempResult += symbolTable.CompareCustomUnits(func, expUnit) ? "" : IndentedString("return is not correct unitType");
               } else if (symbolTable.GetReturnFromNode(aUntypedFunc) != null)
               {
                   symbolTable.AddNode(node, symbolTable.GetReturnFromNode(aUntypedFunc) == symbolTable.GetSymbol(returnExp) ? Symbol.Ok : Symbol.NotOk);
+                  tempResult += symbolTable.GetReturnFromNode(aUntypedFunc) == symbolTable.GetSymbol(returnExp) ? "" : IndentedString("return is not correct type");
               }
               else
               {
@@ -597,6 +614,7 @@ public class stmtTypeChecker : DepthFirstAdapter
               break;
           default:
               symbolTable.AddNode(node, Symbol.NotOk);
+              tempResult += IndentedString("returnStmt not in a fuction");
               break;
       }
       PrintError();
@@ -617,6 +635,7 @@ public class stmtTypeChecker : DepthFirstAdapter
             condExpr = symbolTable.GetSymbol(id.ToString().Trim());
         }
         symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
+        tempResult += condExpr == Symbol.Bool ? "" : IndentedString("Condition is not a boolean");
         PrintError();
         indent--;
     }
@@ -635,6 +654,7 @@ public class stmtTypeChecker : DepthFirstAdapter
             condExpr = symbolTable.GetSymbol(id.ToString().Trim());
         }
         symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
+        tempResult += condExpr == Symbol.Bool ? "" : IndentedString("Condition is not a boolean");
         PrintError();
         indent--;
     }
@@ -663,6 +683,7 @@ public class stmtTypeChecker : DepthFirstAdapter
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetCond());
         symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
+        tempResult += condExpr == Symbol.Bool ? "" : IndentedString("Condition is not a boolean");
         PrintError();
         indent--;
     }
@@ -682,6 +703,7 @@ public class stmtTypeChecker : DepthFirstAdapter
         }
         Symbol? condExpr = symbolTable.GetSymbol(exp);
         symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
+        tempResult += condExpr == Symbol.Bool ? "" : IndentedString("Condition is not a boolean");
         PrintError();
         indent--;
     }
@@ -701,6 +723,7 @@ public class stmtTypeChecker : DepthFirstAdapter
         }
         Symbol? condExpr = symbolTable.GetSymbol(exp);
         symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
+        tempResult += condExpr == Symbol.Bool ? "" : IndentedString("Condition is not a boolean");
         PrintError();
         indent--;
     }
