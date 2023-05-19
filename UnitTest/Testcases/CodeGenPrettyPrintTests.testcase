@@ -10,6 +10,7 @@ prog {
     int a = 5;
     char c = 'e';
     bool d = true;
+    string l = d?"ja":"nej";
     decimal e = 1.11;
     string b = (string)e;
     argTest(a, b, c, d, e);
@@ -25,10 +26,11 @@ loop {
 prog {
     delay(100);
     setpin(11, high);
-    pin h = 7;
+    pin h = 5;
     int a = 5;
     char c = 'e';
     bool d = true;
+    string l = d?"ja":"nej";
     decimal e = 1.11;
     string b = (string)e;
     argTest(a, b, c, d, e);
@@ -48,6 +50,7 @@ void setup() {
     int a = 5;
     char c = 'e';
     bool d = true;
+    String l = d?"ja":"nej";
     float e = 1.11;
     String b = String(e, 8);
     argTest(a, b, c, d, e);

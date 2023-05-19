@@ -407,6 +407,16 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     }
     
     /*---------------------------------------------ExpStmt------------------------------------------------------------*/
+    public override void CaseATernaryExp(ATernaryExp node)
+    {
+        writer.Write("");
+        node.GetCond().Apply(this);
+        writer.Write("?");
+        node.GetTrue().Apply(this);
+        writer.Write(":");
+        node.GetFalse().Apply(this);
+    }
+
     public override void CaseASetpinStmt(ASetpinStmt node)
     {
         Indent("digitalWrite(");

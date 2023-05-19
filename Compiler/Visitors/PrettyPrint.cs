@@ -392,7 +392,15 @@ public class PrettyPrint : DepthFirstAdapter
     }
     
     /*---------------------------------------------------------------------------------------------*/
-
+    public override void CaseATernaryExp(ATernaryExp node)
+    {
+        output.Write("");
+        node.GetCond().Apply(this);
+        output.Write("?");
+        node.GetTrue().Apply(this);
+        output.Write(":");
+        node.GetFalse().Apply(this);
+    }
     public override void CaseAAssignStmt(AAssignStmt node)
     {
         Indent("");
