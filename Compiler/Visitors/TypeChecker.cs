@@ -95,6 +95,7 @@ public class TypeChecker : exprTypeChecker
             {
                 // Not a recognized unit
                 aunittypeIsOk = false;
+                tempResult += IndentedString($"{num.GetId()} is not a valid unitType");
             }
         }
         foreach (ADenUnituse den in dens)
@@ -108,9 +109,9 @@ public class TypeChecker : exprTypeChecker
             {
                 // Not a recognized unit
                 aunittypeIsOk = false;
+                tempResult += IndentedString($"{den.GetId()} is not a valid unitType");
             }
         }
-
         if (aunittypeIsOk)
         {
             (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unituse = (newNums, newDens);
@@ -184,6 +185,7 @@ public class TypeChecker : exprTypeChecker
             }
             default:
                 symbolTable.AddNode(node, Symbol.NotOk);
+                tempResult += IndentedString("Is not a valid type");
                 break;
         }
         PrintError();
@@ -223,10 +225,12 @@ public class TypeChecker : exprTypeChecker
                     else
                     {
                         symbolTable.AddNode(node, Symbol.NotOk);
+                        tempResult += IndentedString($"{arg.GetId()} is not a valid unitType");
                     }
                     break;
                 default:
                     symbolTable.AddNode(node, Symbol.NotOk);
+                    tempResult += IndentedString($"{arg.GetId()} is not a valid Type");
                     break;
             }
         }
@@ -261,7 +265,6 @@ public class TypeChecker : exprTypeChecker
         tempResult = "";
         reported = false;
         indent--;
-        index++;
     }
     public override void InATypedGlobal(ATypedGlobal node)
     {
@@ -293,7 +296,6 @@ public class TypeChecker : exprTypeChecker
         tempResult = "";
         reported = false;
         indent--;
-        index++;
     }
     public override void InALoopGlobal(ALoopGlobal node)
     {
@@ -325,7 +327,6 @@ public class TypeChecker : exprTypeChecker
             tempResult = "";
             reported = false;
             indent--;
-            index++;
         }
     }
 
@@ -358,10 +359,6 @@ public class TypeChecker : exprTypeChecker
             tempResult = "";
             reported = false;
             indent--;
-            index++;
-            
         }
-        
     }
-    
 }

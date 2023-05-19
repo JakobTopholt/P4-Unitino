@@ -883,16 +883,16 @@ public class exprTypeChecker : stmtTypeChecker
         {
             symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
         }
-        Symbol? symbol = symbolTable.GetSymbol(exp);
-        if (exp != null)
-        {
-            symbolTable.AddNode(node, symbol == Symbol.Bool ? Symbol.Bool : Symbol.NotOk);
-            tempResult += symbol == Symbol.Bool ? "" : IndentedString("Expression should be a boolean");
-        }
-        else
+        if (exp == null)
         {
             symbolTable.AddNode(node, Symbol.NotOk);
             tempResult += IndentedString("Expression is empty");
+        }
+        else if (exp != null)
+        {
+            Symbol? symbol = symbolTable.GetSymbol(exp);
+            symbolTable.AddNode(node, symbol == Symbol.Bool ? Symbol.Bool : Symbol.NotOk);
+            tempResult += symbol == Symbol.Bool ? "" : IndentedString("Expression should be a boolean");
         }
         PrintError();
         indent--;

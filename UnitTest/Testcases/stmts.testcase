@@ -6,12 +6,12 @@ func untyped(int a, decimal b, string c, char d, bool e){
     decimal ba = b;
     string ca = c;
     char da = d;
-    d = "je";
+    #d = "je";
     bool ea = e; 
 }
 func untypedtwo(int a, decimal b, string c, char d, bool e){
     int ab = 5;
-    b = "hej";
+    #b = "hej";
     ab += a;
     decimal ba = 3.5;
     ba += b;

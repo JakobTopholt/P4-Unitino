@@ -16,7 +16,6 @@ public class stmtTypeChecker : DepthFirstAdapter
     public string Location = "";
     public string tempResult = "";
     public List<string?> errorResults = new List<string>();
-    public int index = 0;
     public int indent = 0;
     public bool reported = false;
 
