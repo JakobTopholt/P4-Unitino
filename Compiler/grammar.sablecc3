@@ -6,7 +6,6 @@ Helpers
     lowercase = ['a' .. 'z'];
     uppercase = ['A' .. 'Z'];
     digit = ['0' .. '9'];
-    hex_digit = [digit + [['a' .. 'f'] + ['A' .. 'F']]];
 
     tab = 9;
     cr = 13;
@@ -60,8 +59,6 @@ Tokens
     ttrue = 'true';
     tfalse = 'false';
 
-    l_bkt = '[';
-    r_bkt = ']';
     l_par = '(';
     r_par = ')';
     l_brace =  '{';
@@ -71,8 +68,6 @@ Tokens
     tminusminus = '--';
     tplusassign = '+=';
     tminusassign = '-=';
-    tslashslash = '//';
-    tstarstar = '**';
     tbarbar = '||';
     tand = '&&';
     tequalequal = '==';
@@ -90,21 +85,17 @@ Tokens
 
     equal = '=';
     q_mark = '?';
-    bar = '|';
-    tamparsand = '&';
     not = '!';
     arrow = '=>';
 
     comma = ',';
     semicolon = ';';
     colon = ':';
-    dot = '.';
 
     id = id_part ('_' id_part)*;
 
     decimal = digit+ '.' digit+;
     number = digit+;
-    hex = '0' ('x' | 'X') hex_digit+;
 
     string = '"' string_char+ '"';
     char = ''' char_char+ '''; //TODO: test if string and char works correctly
@@ -140,12 +131,12 @@ Productions
     
     // first unituse is rather special because here the star shouldn't be used
     firstunituse {-> unituse} = {num}   id      {-> New unituse.num(id)}
-                              | {usual} tslashslash id {-> New unituse.den(id)};
+                              | {usual} slash id {-> New unituse.den(id)};
                               
     unituse_list {-> unituse*} = unituse unituse_list? {-> [unituse.unituse, unituse_list.unituse]};
     
-    unituse {-> unituse} = {num}    tstarstar id     {-> New unituse.num(id)}
-                         | {den}    tslashslash id    {-> New unituse.den(id)};
+    unituse {-> unituse} = {num}    star id     {-> New unituse.num(id)}
+                         | {den}    slash id    {-> New unituse.den(id)};
     
     // For usage in expressions ex: 50 ms, 5 s, 50 meters
     unitnumber {-> exp} = {unitdecimal} decimal id {-> New exp.unitdecimal(decimal, id)}
