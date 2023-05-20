@@ -2,36 +2,13 @@
 ////
 func untyped(int a, decimal b, string c, char d, bool e){
     int ab = a;
-    #a = "a";
     decimal ba = b;
     string ca = c;
     char da = d;
-    #d = "je";
     bool ea = e; 
 }
-func untypedtwo(int a, decimal b, string c, char d, bool e){
-    int ab = 5;
-    #b = "hej";
-    ab += a;
-    decimal ba = 3.5;
-    ba += b;
-    string ca = "c";
-    ca += c;
-    char da = 'd';
-    bool ea = true;
-}
-func untypedthree(int a, decimal b, string c, char d, bool e){
-    int ab = 5;
-        ab -=a;
-        decimal ba = 3.5;
-        ba -= b;
-        string ca = "c";
-        char da = d;
-        bool ea = true;
-
-}
 ////
-
+ 
 ////
 
 ////
@@ -68,6 +45,37 @@ func untypedthree(int a, decimal b, string c, char d, bool e){
 ////
 false
 //////
+Plusassign Test
+////
+unit Distance{
+    m => value;
+    km => value/1000;
+}
+unit Time{
+    min => value;
+    h => value*60;
+}
+func untyped(int a, decimal b, string c, char d, Distance dist, Distance/Time speed){
+    int ab = 0;
+    ab += a;
+    decimal ba = 1.2;
+    ba += b;
+    string ca = "s";
+    ca += c;
+    char da = 'd';
+    da += a; 
+    Distance homeToWork = 40km + 543m;
+    homeToWork += dist;
+    Distance/Time avgSpeedWork = HomeToWork/(1h + 15min);
+    avgSpeedWork += speed;
+}
+////
+
+////
+
+////
+true
+//////
 suffpostfix test
 ////
 func untyped(int a, decimal b, string c, char d, bool e){
@@ -89,11 +97,9 @@ func untyped(int a, decimal b, string c, char d, bool e){
      --ba;
      --da;  
 }
-
 ////
 
 ////
-
 
 ////
 true
