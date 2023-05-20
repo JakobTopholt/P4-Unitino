@@ -40,7 +40,7 @@ public class TypeChecker : exprTypeChecker
 
     public override void InANumUnituse(ANumUnituse node)
     {
-        tempLocation += IndentedString($"in A NumUnit: {node.GetId()}\n");
+        locations.Push(IndentedString($"in A NumUnit: {node.GetId()}\n"));
         indent++;
     }
 
@@ -56,7 +56,7 @@ public class TypeChecker : exprTypeChecker
 
     public override void InADenUnituse(ADenUnituse node)
     {
-        tempLocation += IndentedString($"in A DenUnit: {node.GetId()}\n");
+        locations.Push(IndentedString($"in A DenUnit: {node.GetId()}\n"));
         indent++;
     }
 
@@ -71,7 +71,7 @@ public class TypeChecker : exprTypeChecker
 
     public override void InAUnitType(AUnitType node)
     {
-        tempLocation += IndentedString($"in a Unittype: {node.GetUnituse()}\n");
+        locations.Push( IndentedString($"in a Unittype: {node.GetUnituse()}\n"));
         indent++;
     }
 
@@ -95,7 +95,7 @@ public class TypeChecker : exprTypeChecker
             {
                 // Not a recognized unit
                 aunittypeIsOk = false;
-                tempResult += IndentedString($"{num.GetId()} is not a valid unitType");
+                tempResult += IndentedString($"{num.GetId()} is not a valid unitType\n");
             }
         }
         foreach (ADenUnituse den in dens)
@@ -109,7 +109,7 @@ public class TypeChecker : exprTypeChecker
             {
                 // Not a recognized unit
                 aunittypeIsOk = false;
-                tempResult += IndentedString($"{den.GetId()} is not a valid unitType");
+                tempResult += IndentedString($"{den.GetId()} is not a valid unitType\n");
             }
         }
         if (aunittypeIsOk)
@@ -152,7 +152,7 @@ public class TypeChecker : exprTypeChecker
 
     public override void InAArg(AArg node)
     {
-        tempLocation += IndentedString($"in argument: {node.GetType() + " " + node.GetId()}\n");
+        locations.Push(IndentedString($"in argument: {node.GetType() + " " + node.GetId()}\n"));
         indent++;
     }
 
@@ -185,7 +185,7 @@ public class TypeChecker : exprTypeChecker
             }
             default:
                 symbolTable.AddNode(node, Symbol.NotOk);
-                tempResult += IndentedString("Is not a valid type");
+                tempResult += IndentedString("Is not a valid type\n");
                 break;
         }
         PrintError();
@@ -215,33 +215,24 @@ public class TypeChecker : exprTypeChecker
                 case AStringType:
                     symbolTable.AddIdToNode(id, arg);
                     break;
-                case AUnitType customType:
-                    if (symbolTable.GetUnit(customType, out var unit))
-                    {
-                        // overvej om AddNodeToUnit skal fjernes her
-                        symbolTable.AddNodeToUnit(arg, unit);
-                        symbolTable.AddIdToNode(id, arg);
-                    }
-                    else
-                    {
-                        symbolTable.AddNode(node, Symbol.NotOk);
-                        tempResult += IndentedString($"{arg.GetId()} is not a valid unitType");
-                    }
+                case AUnitType:
+                    symbolTable.AddIdToNode(id, arg);
                     break;
                 default:
                     symbolTable.AddNode(node, Symbol.NotOk);
-                    tempResult += IndentedString($"{arg.GetId()} is not a valid Type");
+                    tempResult += IndentedString($"{arg.GetId()} is not a valid Type\n");
                     break;
             }
         }
     }
     public override void InAUntypedGlobal(AUntypedGlobal node)
     {
-        Location += $"In function {node.GetId()}\n";
+        locations.Push($"In function {node.GetId()}\n");
         indent++;
         symbolTable = symbolTable.EnterScope();
         AddArgsToScope(node, node.GetArg());
     }
+
     public override void OutAUntypedGlobal(AUntypedGlobal node)
     {
         // Check om args er ok
@@ -261,14 +252,13 @@ public class TypeChecker : exprTypeChecker
         }
         symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, untypedIsOk ? Symbol.Ok : Symbol.NotOk);
-        Location = "";
-        tempResult = "";
+        locations.Clear();
         reported = false;
         indent--;
     }
     public override void InATypedGlobal(ATypedGlobal node)
     {
-        Location += $"In function {node.GetId()}\n";
+        locations.Push($"In function {node.GetId()}\n");
         indent++;
         symbolTable = symbolTable.EnterScope();
         AddArgsToScope(node, node.GetArg());
@@ -292,14 +282,13 @@ public class TypeChecker : exprTypeChecker
         }
         symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, typedIsOk ? Symbol.Ok : Symbol.NotOk);
-        Location = "";
-        tempResult = "";
+        locations.Clear();
         reported = false;
         indent--;
     }
     public override void InALoopGlobal(ALoopGlobal node)
     {
-        Location += "In Loop \n";
+        locations.Push("In Loop \n");
         indent++;
         symbolTable.Loop++;
         if (symbolTable.Loop != 1)
@@ -323,8 +312,7 @@ public class TypeChecker : exprTypeChecker
             }
             symbolTable = symbolTable.ExitScope();
             symbolTable.AddNode(node, loopIsOk ? Symbol.Ok : Symbol.NotOk);
-            Location = "";
-            tempResult = "";
+            locations.Clear();
             reported = false;
             indent--;
         }
@@ -332,7 +320,7 @@ public class TypeChecker : exprTypeChecker
 
     public override void InAProgGlobal(AProgGlobal node)
     {
-        Location += "In Prog \n";
+        locations.Push("In Prog \n");
         indent++;
         symbolTable.Prog++;
         if (symbolTable.Prog != 1)
@@ -355,8 +343,7 @@ public class TypeChecker : exprTypeChecker
             }
             symbolTable = symbolTable.ExitScope();
             symbolTable.AddNode(node, progIsOk ? Symbol.Ok : Symbol.NotOk);
-            Location = "";
-            tempResult = "";
+            locations.Clear();
             reported = false;
             indent--;
         }
