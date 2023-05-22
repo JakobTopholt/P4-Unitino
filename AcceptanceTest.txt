@@ -1,0 +1,134 @@
+Acceptance test:
+# This is an example of a possible usecase of moduino where the programmer have utilisied our unitType system to setup and manage a "Smart garden" with arduinos. 
+# You could imagine that the developer of this system would end up having many more varaibles and different plants to keep in mind as he expand the capabilities.
+# Here Moduinos typesystem hopefully prove effective as it is very flexible and have potential to reduce a lot of code and confusion. No Bias xD
+
+# Units 
+unit Volume{
+    ml => value;
+    dl => value/100;
+    l => value/1000;
+}
+unit Time{
+    min => value;
+    h => min/60;
+    day => h/24;
+    week => day/7;
+    month => day/60;
+    year => month*12;
+}
+unit Weight{
+    g => value;
+    kg => value/1000;
+}
+unit Humidity{
+    #percentage
+    damp => value;
+
+
+# setup
+prog(){
+    # Pin def here?
+    tomatoSensor = PIN(1);
+    citrusSensor = PIN(2);
+    chilliSensor = PIN(3);
+    mushroomSensor = PIN(4);
+    dampnessSensor = PIN(5);
+
+    Weight tomatoesWeight = tomatoSensor.result;
+    Weight citrusWeight = citrusSensor.result;
+    Weight chillisWeight = chilliSensor.result;
+    Weight mushroomsWeight = mushroomSensor.result;
+    Humidity dampness = dampnessSensor.result;
+
+    Volume/Weight tomatoWater = 210l/1kg; 
+    Volume/Weight citrustreeWater = 600l/1kg; 
+    Volume/Weight chilliWater = 320l/1kg; 
+
+    Time/Volume tomatoPlants = 80day/(tomatoWater * tomatoesWeight);
+    Time/Volume citrusTree = 7month/(citrustreeWater  * citrusWeight);
+    Time/Volume chilliPlants = 150day/(chilliWater  * chillisWeight);
+    Time mushrooms = 6.5week;
+
+    Time tomatoWatercycle = 3days;
+    Time citrusWatercycle = 1week;
+    Time chilliWatercycle = 2week;
+    Time mushroomWatercycle = 85damp;
+
+    Time internalTime = 0day;
+}
+
+# update
+loop(){
+   # read
+   readWeightSensor();
+   readHumiditySensor();
+
+   # action
+   # Tomatoes
+   // Fix remainder(%) in typechecker (wont allow same custom units pt)
+   if (internalTime % tomatoWatercycle == 0){
+       updatePlant(tomatoPlants, tomatoWatercycle);
+   }
+   # Citrus
+   if (internalTime % citrusWatercycle == 0) {
+       updatePlant(citrusTree, citrusWatercycle);
+   }
+   # Chilli
+   if (internalTime % chilliWatercycle == 0) {
+       updatePlant(chilliPlants, chilliWatercycle);
+   }
+   updateMushroom();
+   
+   # report
+   generateGardenStatistic();
+   internalTime += 1day; 
+   delay(1day);
+}
+
+# update methods
+func readWeightSensor(){
+   #read arduinoSensor (Pin?)
+   tomatoesWeight = tomatoSensor.result;
+   citrusWeight = citrusSensor.result;
+   chillisWeight = chilliSensor.result;
+   mushroomsWeight = mushroomSensor.result;
+}
+func readHumiditySensor(){
+   #read arduinoSensor  (Pin?)
+   dampness = dampnessSensor.result;
+}
+func updatePlant(PIN arduinoSensor, Time/Volume plant, Time sinceLastWater){
+   // regn volumen ud
+   Volume neededWater = plant.Time / sinceLastWater;
+   activateWaterpump(arduinoSensor, neededwater);
+}
+func updateMushroom(){
+   if (dampness < mushroomWatercycle){
+      activateHumidifier(mushroomWatercycle));
+   }
+   mushrooms -= 1day;
+}
+
+# action methods
+func activateWaterpump(PIN arduinoSensor, Volume water){
+   # activate a arduino sensor  (Pin?)
+   if(arduinosensor = tomatoSensor){
+      waterPump1.activate(water);
+   }
+   else if(arduinosensor = citrusSensor ){
+      waterPump2.activate(water);
+   }
+   else if(arduinosensor = chilliSensor){
+      waterPump3.activate(water);
+   }
+   else if(arduinosensor = mushroomSensor){
+      waterPump4.activate(water);
+   } 
+}
+func activateHumidifier(Humidity dampness){
+   # activate a arduino sensor (Pin?)
+   Humidifier.activate(dampness);
+}
+
+
