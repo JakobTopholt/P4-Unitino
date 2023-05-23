@@ -144,7 +144,7 @@ public class exprTypeChecker : stmtTypeChecker
                     case AUnitType argType:
                         if (symbolTable.GetUnit(argType, out var argUnit) && 
                             symbolTable.GetUnit(returnUnit, out var paramUnit) && 
-                            !symbolTable.CompareCustomUnits(argUnit, paramUnit))
+                            !symbolTable.CompareUnitTypes(argUnit, paramUnit))
                         {
                             matches = false;
                             tempResult += IndentedString("Parameter is not same unitType as Argument\n");
@@ -760,7 +760,7 @@ public class exprTypeChecker : stmtTypeChecker
             default:
                 if (symbolTable.GetUnit(leftExpr, out var unit1) && symbolTable.GetUnit(rightExpr, out var unit2))
                 {
-                    if (symbolTable.CompareCustomUnits(unit1, unit2))
+                    if (symbolTable.CompareUnitTypes(unit1, unit2))
                     {
                         symbolTable.AddNodeToUnit(node, unit1);
                         symbolTable.AddNode(node, Symbol.Ok);
@@ -841,7 +841,7 @@ public class exprTypeChecker : stmtTypeChecker
                         // Tjek at typerne er ens 
                         symbolTable.GetUnit(trueExpr, out var trueUnit); // unit 1
                         symbolTable.GetUnit(falseExpr, out var falseUnit); // unit 2
-                        if (symbolTable.CompareCustomUnits(trueUnit, falseUnit))
+                        if (symbolTable.CompareUnitTypes(trueUnit, falseUnit))
                         {
                             symbolTable.AddNodeToUnit(node, trueUnit);
                             symbolTable.AddNode(node, Symbol.Ok);
@@ -1271,8 +1271,8 @@ public class exprTypeChecker : stmtTypeChecker
                 {
                     symbolTable.GetUnit(leftExpr, out var unit1);
                     symbolTable.GetUnit(rightExpr, out var unit2);
-                    symbolTable.AddNode(Parent, symbolTable.CompareCustomUnits(unit1, unit2) ? Symbol.Bool : Symbol.NotOk);
-                    tempResult += symbolTable.CompareCustomUnits(unit1, unit2) ? "" : IndentedString("unitTypes does not match\n");
+                    symbolTable.AddNode(Parent, symbolTable.CompareUnitTypes(unit1, unit2) ? Symbol.Bool : Symbol.NotOk);
+                    tempResult += symbolTable.CompareUnitTypes(unit1, unit2) ? "" : IndentedString("unitTypes does not match\n");
                 }
                 else
                 {
@@ -1317,8 +1317,8 @@ public class exprTypeChecker : stmtTypeChecker
                 {
                     symbolTable.GetUnit(leftExpr, out var unit1);
                     symbolTable.GetUnit(rightExpr, out var unit2);
-                    symbolTable.AddNode(Parent, symbolTable.CompareCustomUnits(unit1, unit2) ? Symbol.Bool : Symbol.NotOk);
-                    tempResult += symbolTable.CompareCustomUnits(unit1, unit2) ? "" : IndentedString("unitTypes does not match\n");
+                    symbolTable.AddNode(Parent, symbolTable.CompareUnitTypes(unit1, unit2) ? Symbol.Bool : Symbol.NotOk);
+                    tempResult += symbolTable.CompareUnitTypes(unit1, unit2) ? "" : IndentedString("unitTypes does not match\n");
                 }
                 else
                 {

@@ -89,14 +89,14 @@ public class SymbolTable
     public void AddIdToUnitdecl(string identifier, AUnitdeclGlobal node) => IdToUnitDecl.Add(identifier.Trim(), node);
     public AUnitdeclGlobal? GetUnitdeclFromId(string identifier) => IdToUnitDecl.TryGetValue(identifier.Trim(), out AUnitdeclGlobal? result)
             ? result : _parent?.GetUnitdeclFromId(identifier);
-    public bool CompareCustomUnits((List<AUnitdeclGlobal> funcNums, List<AUnitdeclGlobal> funcDens) unit1, (List<AUnitdeclGlobal> returnNums, List<AUnitdeclGlobal> returnDens) unit2)
+    public bool CompareUnitTypes((List<AUnitdeclGlobal> nums, List<AUnitdeclGlobal> dens) unit1, (List<AUnitdeclGlobal> nums, List<AUnitdeclGlobal> dens) unit2)
     {
-        var sortedFuncNums = unit1.funcNums.OrderBy(x => x).ToList();
-        var sortedReturnNums = unit2.returnNums.OrderBy(x => x).ToList();
-        var sortedFuncDens = unit1.funcDens.OrderBy(x => x).ToList();
-        var sortedReturnDens = unit2.returnDens.OrderBy(x => x).ToList();
+        var sortedUnit1Nums = unit1.nums.OrderBy(x => x).ToList();
+        var sortedUnit2Nums = unit2.nums.OrderBy(x => x).ToList();
+        var sortedUnit1Dens = unit1.dens.OrderBy(x => x).ToList();
+        var sortedUnit2Dens = unit2.dens.OrderBy(x => x).ToList();
 
-        return sortedFuncNums.SequenceEqual(sortedReturnNums) && sortedFuncDens.SequenceEqual(sortedReturnDens);
+        return sortedUnit1Nums.SequenceEqual(sortedUnit2Nums) && sortedUnit1Dens.SequenceEqual(sortedUnit2Dens);
     }
     
     

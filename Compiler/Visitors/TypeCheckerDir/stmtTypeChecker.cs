@@ -85,8 +85,8 @@ public class stmtTypeChecker : DepthFirstAdapter
                     symbolTable.GetUnit(typeUn, out var typeUnit) &&
                     symbolTable.GetUnit(exp, out var expUnit))
                 {
-                    symbolTable.AddNode(node, symbolTable.CompareCustomUnits(typeUnit, expUnit) ? Symbol.Ok : Symbol.NotOk);
-                    tempResult += symbolTable.CompareCustomUnits(typeUnit, expUnit) ? "" : IndentedString("expression is not correct unitType\n");
+                    symbolTable.AddNode(node, symbolTable.CompareUnitTypes(typeUnit, expUnit) ? Symbol.Ok : Symbol.NotOk);
+                    tempResult += symbolTable.CompareUnitTypes(typeUnit, expUnit) ? "" : IndentedString("expression is not correct unitType\n");
                 }
                 else
                 {
@@ -138,8 +138,8 @@ public class stmtTypeChecker : DepthFirstAdapter
                 {
                     symbolTable.GetUnit(b, out var typeUnit);
                     symbolTable.GetUnit(exp, out var expUnit);
-                    symbolTable.AddNode(node, symbolTable.CompareCustomUnits(typeUnit, expUnit) ? Symbol.Ok : Symbol.NotOk);
-                    tempResult += symbolTable.CompareCustomUnits(typeUnit, expUnit) ? "" : IndentedString("expression is not correct unitType\n");
+                    symbolTable.AddNode(node, symbolTable.CompareUnitTypes(typeUnit, expUnit) ? Symbol.Ok : Symbol.NotOk);
+                    tempResult += symbolTable.CompareUnitTypes(typeUnit, expUnit) ? "" : IndentedString("expression is not correct unitType\n");
                 }
                 else
                 {
@@ -186,8 +186,8 @@ public class stmtTypeChecker : DepthFirstAdapter
                 {
                     symbolTable.GetUnit(b, out var typeUnit);
                     symbolTable.GetUnit(exp, out var expUnit);
-                    symbolTable.AddNode(node, symbolTable.CompareCustomUnits(typeUnit, expUnit) ? Symbol.Ok : Symbol.NotOk);
-                    tempResult += symbolTable.CompareCustomUnits(typeUnit, expUnit) ? "" : IndentedString("expression is not correct unitType\n");
+                    symbolTable.AddNode(node, symbolTable.CompareUnitTypes(typeUnit, expUnit) ? Symbol.Ok : Symbol.NotOk);
+                    tempResult += symbolTable.CompareUnitTypes(typeUnit, expUnit) ? "" : IndentedString("expression is not correct unitType\n");
                 }
                 else
                 {
@@ -409,7 +409,7 @@ public class stmtTypeChecker : DepthFirstAdapter
                         if (symbolTable.GetUnit(customType, out var unitType) && 
                             symbolTable.GetUnit(node.GetExp(), out var expType))
                         {
-                            if (symbolTable.CompareCustomUnits(unitType, expType))
+                            if (symbolTable.CompareUnitTypes(unitType, expType))
                             {
                                 symbolTable.AddIdToNode(node.GetId().ToString(), node);
                                 symbolTable.AddNodeToUnit(node, unitType);
@@ -508,7 +508,7 @@ public class stmtTypeChecker : DepthFirstAdapter
                    {
                        symbolTable.GetUnit(argType, out var argUnit);
                        symbolTable.GetUnit(parameter, out var paramUnit);
-                       if (!symbolTable.CompareCustomUnits(argUnit, paramUnit))
+                       if (!symbolTable.CompareUnitTypes(argUnit, paramUnit))
                        {
                            matches = false;
                            symbolTable.AddNodeToUnit(node, argUnit);
@@ -598,8 +598,8 @@ public class stmtTypeChecker : DepthFirstAdapter
                       symbolTable.GetUnit(typedType, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) funcType);
                       if (symbolTable.GetUnit(returnExp, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) returnType))
                       {
-                          symbolTable.AddNode(node, symbolTable.CompareCustomUnits(funcType, returnType) ? Symbol.Ok : Symbol.NotOk);
-                          tempResult += symbolTable.CompareCustomUnits(funcType, returnType) ? "" : IndentedString("return is not correct unitType\n");
+                          symbolTable.AddNode(node, symbolTable.CompareUnitTypes(funcType, returnType) ? Symbol.Ok : Symbol.NotOk);
+                          tempResult += symbolTable.CompareUnitTypes(funcType, returnType) ? "" : IndentedString("return is not correct unitType\n");
                       }
                       else
                       {
@@ -616,8 +616,8 @@ public class stmtTypeChecker : DepthFirstAdapter
               if (symbolTable.GetUnit(aUntypedFunc, out var func))
               {
                   symbolTable.GetUnit(returnExp, out var expUnit);
-                  symbolTable.AddNode(node, symbolTable.CompareCustomUnits(func, expUnit) ? Symbol.Ok : Symbol.NotOk);
-                  tempResult += symbolTable.CompareCustomUnits(func, expUnit) ? "" : IndentedString("return is not correct unitType\n");
+                  symbolTable.AddNode(node, symbolTable.CompareUnitTypes(func, expUnit) ? Symbol.Ok : Symbol.NotOk);
+                  tempResult += symbolTable.CompareUnitTypes(func, expUnit) ? "" : IndentedString("return is not correct unitType\n");
               } else if (symbolTable.GetReturnFromNode(aUntypedFunc) != null)
               {
                   symbolTable.AddNode(node, symbolTable.GetReturnFromNode(aUntypedFunc) == symbolTable.GetSymbol(returnExp) ? Symbol.Ok : Symbol.NotOk);
