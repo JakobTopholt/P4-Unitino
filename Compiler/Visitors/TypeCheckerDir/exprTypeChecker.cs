@@ -354,16 +354,16 @@ public class exprTypeChecker : stmtTypeChecker
                           && symbolTable.GetUnit(rightExpr, out (List<AUnitdeclGlobal> num, List<AUnitdeclGlobal> den) right)))
                         return;
 
-                    List<AUnitdeclGlobal> a = left.num;
-                    List<AUnitdeclGlobal> b = left.den;
-                    List<AUnitdeclGlobal> c = right.num;
-                    List<AUnitdeclGlobal> d = right.den;
+                    List<AUnitdeclGlobal> unitLeftNums = left.num;
+                    List<AUnitdeclGlobal> unitLeftDens = left.den;
+                    List<AUnitdeclGlobal> unitRightNums = right.num;
+                    List<AUnitdeclGlobal> unitRightDens = right.den;
 
-                    List<AUnitdeclGlobal> ac = a.Intersect(c).ToList();
-                    List<AUnitdeclGlobal> bd = b.Intersect(d).ToList();
+                    List<AUnitdeclGlobal> numOverlap = unitLeftNums.Intersect(unitRightNums).ToList();
+                    List<AUnitdeclGlobal> denOverlap = unitLeftDens.Intersect(unitRightDens).ToList();
 
-                    List<AUnitdeclGlobal> numerators = a.Except(ac).Union(d.Except(bd)).ToList();
-                    List<AUnitdeclGlobal> denomerators = c.Except(ac).Union(b.Except(bd)).ToList();
+                    List<AUnitdeclGlobal> numerators = unitLeftNums.Except(numOverlap).Union(unitRightDens.Except(denOverlap)).ToList();
+                    List<AUnitdeclGlobal> denomerators = unitRightNums.Except(numOverlap).Union(unitLeftDens.Except(denOverlap)).ToList();
 
                     (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unituse = (numerators, denomerators);
                     symbolTable.AddNodeToUnit(node, unituse);
@@ -438,16 +438,16 @@ public class exprTypeChecker : stmtTypeChecker
                           && symbolTable.GetUnit(rightExpr, out (List<AUnitdeclGlobal> num, List<AUnitdeclGlobal> den) right)))
                         return;
 
-                    List<AUnitdeclGlobal> a = left.num;
-                    List<AUnitdeclGlobal> b = left.den;
-                    List<AUnitdeclGlobal> c = right.num;
-                    List<AUnitdeclGlobal> d = right.den;
+                    List<AUnitdeclGlobal> unitLeftNums = left.num;
+                    List<AUnitdeclGlobal> unitLeftDens = left.den;
+                    List<AUnitdeclGlobal> unitRightNums = right.num;
+                    List<AUnitdeclGlobal> unitRightDens = right.den;
 
-                    List<AUnitdeclGlobal> ad = a.Intersect(d).ToList();
-                    List<AUnitdeclGlobal> bc = b.Intersect(c).ToList();
+                    List<AUnitdeclGlobal> leftNumRightDen = unitLeftNums.Intersect(unitRightDens).ToList();
+                    List<AUnitdeclGlobal> leftDenRightNums = unitLeftDens.Intersect(unitRightNums).ToList();
 
-                    List<AUnitdeclGlobal> numerators = a.Except(ad).Union(d.Except(bc)).ToList();
-                    List<AUnitdeclGlobal> denomerators = c.Except(ad).Union(b.Except(bc)).ToList();
+                    List<AUnitdeclGlobal> numerators = unitLeftNums.Except(leftNumRightDen).Union(unitRightDens.Except(leftDenRightNums)).ToList();
+                    List<AUnitdeclGlobal> denomerators = unitRightNums.Except(leftNumRightDen).Union(unitLeftDens.Except(leftDenRightNums)).ToList();
 
                     (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unituse = (numerators, denomerators);
                     symbolTable.AddNodeToUnit(node, unituse);

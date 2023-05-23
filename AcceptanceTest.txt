@@ -11,11 +11,11 @@ unit Volume{
 }
 unit Time{
     min => value;
-    h => min/60;
-    day => h/24;
-    week => day/7;
-    month => day/60;
-    year => month*12;
+    h => value/60;
+    day => value/60/24;
+    week => value/60/24/7;
+    month => value/60/24/7/30;
+    year => value/60/24/7/30/12;
 }
 unit Weight{
     g => value;
@@ -25,15 +25,19 @@ unit Humidity{
     #percentage
     damp => value;
 
-
 # setup
 prog(){
-    # Pin def here?
-    tomatoSensor = PIN(1);
-    citrusSensor = PIN(2);
-    chilliSensor = PIN(3);
-    mushroomSensor = PIN(4);
-    dampnessSensor = PIN(5);
+    # Pin def here? 
+    pin tomatoSensor = 1;
+    pin citrusSensor = 2;
+    pin chilliSensor = 3;
+    pin mushroomSensor = 4;
+    pin dampnessSensor = 5;
+    pin waterPump1 = 6;
+    pin waterPump1 = 7;
+    pin waterPump1 = 8;
+    pin waterPump1 = 9;
+    pin humidifier = 10;
 
     Weight tomatoesWeight = tomatoSensor.result;
     Weight citrusWeight = citrusSensor.result;
@@ -50,7 +54,7 @@ prog(){
     Time/Volume chilliPlants = 150day/(chilliWater  * chillisWeight);
     Time mushrooms = 6.5week;
 
-    Time tomatoWatercycle = 3days;
+    Time tomatoWatercycle = 3day;
     Time citrusWatercycle = 1week;
     Time chilliWatercycle = 2week;
     Time mushroomWatercycle = 85damp;
@@ -88,17 +92,17 @@ loop(){
 
 # update methods
 func readWeightSensor(){
-   #read arduinoSensor (Pin?)
+   #read arduinoSensor 
    tomatoesWeight = tomatoSensor.result;
    citrusWeight = citrusSensor.result;
    chillisWeight = chilliSensor.result;
    mushroomsWeight = mushroomSensor.result;
 }
 func readHumiditySensor(){
-   #read arduinoSensor  (Pin?)
+   #read arduinoSensor 
    dampness = dampnessSensor.result;
 }
-func updatePlant(PIN arduinoSensor, Time/Volume plant, Time sinceLastWater){
+func updatePlant(pin arduinoSensor, Time/Volume plant, Time sinceLastWater){
    // regn volumen ud
    Volume neededWater = plant.Time / sinceLastWater;
    activateWaterpump(arduinoSensor, neededwater);
@@ -111,24 +115,24 @@ func updateMushroom(){
 }
 
 # action methods
-func activateWaterpump(PIN arduinoSensor, Volume water){
+func activateWaterpump(pin arduinoSensor, Volume water){
    # activate a arduino sensor  (Pin?)
-   if(arduinosensor = tomatoSensor){
+   if(arduinosensor == tomatoSensor){
       waterPump1.activate(water);
    }
-   else if(arduinosensor = citrusSensor ){
+   else if(arduinosensor == citrusSensor ){
       waterPump2.activate(water);
    }
-   else if(arduinosensor = chilliSensor){
+   else if(arduinosensor == chilliSensor){
       waterPump3.activate(water);
    }
-   else if(arduinosensor = mushroomSensor){
+   else if(arduinosensor == mushroomSensor){
       waterPump4.activate(water);
    } 
 }
 func activateHumidifier(Humidity dampness){
-   # activate a arduino sensor (Pin?)
-   Humidifier.activate(dampness);
+   # activate a arduino sensor
+   humidifier.activate(dampness);
 }
 
 
