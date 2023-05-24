@@ -52,7 +52,7 @@ void setup() {
     bool d = true;
     String l = d?"ja":"nej";
     float e = 1.11;
-    String b = String(e, 8);
+    String b = String(e, 6);
     argTest(a, b, c, d, e);
 }
 int argTest(int a, String b, char c, bool d, float e) {
