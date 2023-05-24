@@ -455,9 +455,9 @@ public class PrettyPrint : DepthFirstAdapter
         output.Write("--");
     }
     
-    public override void CaseAReturnStmt(AReturnStmt node)
+    public override void InAReturnStmt(AReturnStmt node)
     {
-        Indent($"return {node.GetExp().ToString().Trim()}");
+        Indent("return ");
     }
     
     public override void CaseADeclassStmt(ADeclassStmt node)
@@ -726,14 +726,12 @@ public class PrettyPrint : DepthFirstAdapter
     
     public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
     {
-        AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
-        output.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
-                                                    + "(" + node.GetDecimal().ToString().Trim() + ")");    
+        output.Write(node.GetDecimal().ToString().Trim());
+        node.GetId().Apply(this);   
     }
     public override void CaseAUnitnumberExp(AUnitnumberExp node)
     {
-        AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
-        output.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
-                                                    + "(" + node.GetNumber().ToString().Trim() + ")");
+        output.Write(node.GetNumber().ToString().Trim());
+        node.GetId().Apply(this);
     }
 }

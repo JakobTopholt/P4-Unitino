@@ -163,7 +163,7 @@ Productions
                      | {untyped}  tfunc id l_par args? r_par l_brace stmt_list? return? r_brace      {-> New global.untyped(id, [args.arg], [stmt_list.stmt, return.stmt])}
                      | {typed}    functype id l_par args? r_par l_brace stmt_list? return? r_brace   {-> New global.typed(functype.type, id, [args.arg], [stmt_list.stmt, return.stmt])};
             
-    //arguments used to declare a function and params when using a function
+    // params used to declare a function and args when using a function //TODO: we fcked this up xD
     params {-> exp*} = {list}   exp comma params   {-> [exp.exp, params.exp]}
                      | {single} exp                 {-> [exp.exp]};
                      

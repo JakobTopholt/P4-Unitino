@@ -195,7 +195,29 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void CaseAUntypedGlobal(AUntypedGlobal node)
     {
         InAUntypedGlobal(node);
-        Indent("void ");
+        switch (symbolTable.GetSymbol(node))
+        {
+            case Symbol.Bool:
+                Indent("bool ");
+                break;
+            case Symbol.Char:
+                Indent("char ");
+                break;
+            case Symbol.Decimal:
+                Indent("float ");
+                break;
+            case Symbol.Ok:
+            case Symbol.NotOk:
+            case Symbol.Func:
+                Indent("void ");
+                break;
+            case Symbol.Int:
+                Indent("int ");
+                break;
+            case Symbol.String:
+                Indent("String ");
+                break;
+        }
         node.GetId().Apply(this);
         writer.Write("(");
         _indent++;
