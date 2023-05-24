@@ -248,10 +248,9 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             case AStringType:
                 writer.Write("String ");
                 break;
-            case AUnitType customType:
-            {
+            case APinType:
+                Indent("int ");
                 break;
-            }
         }
         node.GetId().Apply(this);
     }
@@ -401,12 +400,23 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             case AStringType:
                 Indent("String ");
                 break;
-            case AUnitType customType:
+            case APinType:
+                Indent("int ");
                 break;
         }
     }
     
     /*---------------------------------------------ExpStmt------------------------------------------------------------*/
+    public override void CaseATernaryExp(ATernaryExp node)
+    {
+        writer.Write("");
+        node.GetCond().Apply(this);
+        writer.Write("?");
+        node.GetTrue().Apply(this);
+        writer.Write(":");
+        node.GetFalse().Apply(this);
+    }
+
     public override void CaseASetpinStmt(ASetpinStmt node)
     {
         Indent("digitalWrite(");
@@ -519,6 +529,9 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 break;
             case AStringType e:
                 Indent(($"String "));
+                break;
+            case APinType:
+                Indent("int ");
                 break;
         }
         if (node.GetType() is AUnitType customType)
@@ -712,7 +725,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 {
                     writer.Write("String(");
                     node.GetExp().Apply(this);
-                    writer.Write(", 8)");
+                    writer.Write(", 6)");
                 }
                 break;
         }
