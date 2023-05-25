@@ -23,23 +23,24 @@ unit Humidity{
 }
 # setup
 prog{
-    # Pin def here? 
-    pin tomatoSensor = 1;
-    pin citrusSensor = 2;
-    pin chilliSensor = 3;
-    pin mushroomSensor = 4;
-    pin dampnessSensor = 5;
-    pin waterPump1 = 6;
-    pin waterPump1 = 7;
-    pin waterPump1 = 8;
-    pin waterPump1 = 9;
-    pin humidifier = 10;
+    # Pin def 
+    tomatoSensor = setPin(1, input);
+    citrusSensor = setPin(2, input);
+    chilliSensor = setPin(3, input);
+    mushroomSensor = setPin(4, input);
+    dampnessSensor = setPin(5, input);
+    
+    waterPump1 = setPin(6, output);
+    waterPump2 = setPin(7, output);
+    waterPump3 = setPin(8, output);
+    waterPump4 = setPin(9, output);
+    humidifier = setPin(10, output);
 
-    Weight tomatoesWeight = 500g;     #tomatoSensor.result
-    Weight citrusTreeWeight = 2kg;    #citrusSensor.result
-    Weight chillisWeight = 100g;      #chilliSensor.result
-    Weight mushroomsWeight = 200g;    #mushroomSensor.result
-    Humidity dampness = 80;           #dampnessSensor.result
+    Weight tomatoesWeight = 500g;    #readpin(tomatoSensor)
+    Weight citrusTreeWeight = 2kg;   #readpin(citrusSensor)
+    Weight chillisWeight = 100g;     #readpin(chilliSensor)
+    Weight mushroomsWeight = 200g;   #readpin(mushroomSensor)
+    Humidity dampness = 80;          #readpin(dampnessSensor)
 
     Volume/Weight tomatoWater = 210l/1kg; 
     Volume/Weight citrustreeWater = 600l/1kg; 
@@ -60,7 +61,7 @@ prog{
 
 # update
 loop{
-   # read
+   # read sensors
    readWeightSensor();
    readHumiditySensor();
 
@@ -87,15 +88,13 @@ loop{
 
 # update methods
 func readWeightSensor(){
-   #read arduinoSensor 
-   #tomatoesWeight = tomatoSensor.result;
-   #citrusWeight = citrusSensor.result;
-   #chillisWeight = chilliSensor.result;
-   #mushroomsWeight = mushroomSensor.result;
+   Weight tomatoesWeight += 50g;      #readpin(tomatoSensor)
+   Weight citrusTreeWeight += 100g;   #readpin(citrusSensor)
+   Weight chillisWeight += 30g;       #readpin(chilliSensor)
+   Weight mushroomsWeight += 20g;     #readpin(mushroomSensor)  
 }
 func readHumiditySensor(){
-   #read arduinoSensor 
-   #dampness = dampnessSensor.result;
+   Humidity dampness = 80;       #readpin(dampnessSensor)
 }
 func updatePlant(pin arduinoSensor, Time/Volume plant, Time sinceLastWater){
    Volume neededWater = plant / sinceLastWater;
@@ -110,27 +109,46 @@ func updateMushroom(){
 
 # action methods
 func activateWaterpump(pin arduinoSensor, Volume water){
-   # activate a arduino sensor
-   Time/Volume pumpFlow = 40ml/1s;
-   Time timePumping = pumpFlow * water; 
-
+   # activate a arduino enabled pump
+   Volume/Time pumpFlow = 40ml/1s;
+   Time timePumping = pumpFlow / water; 
    if(arduinosensor == tomatoSensor){
-      #waterPump1; #timePumping
+      # pump water for the calculated time
+      writepin(waterPump1, high);
+      int runTime = (int)timePumping/1ms;
+      delay(runTime);
+      writepin(waterPump1, low);
    }
    else if(arduinosensor == citrusSensor ){
-      #waterPump2; #timePumping
+      # pump water for the calculated time
+      writepin(waterPump2, high);
+      int runTime = (int)timePumping/1ms;
+      delay(runTime);
+      writepin(waterPump2, low);
    }
    else if(arduinosensor == chilliSensor){
-      #waterPump3; #timePumping
+      # pump water for the calculated time
+      writepin(waterPump3, high);
+      int runTime = (int)timePumping/1ms;
+      delay(runTime);
+      writepin(waterPump3, low);
    }
    else if(arduinosensor == mushroomSensor){
-      #waterPump4; #timePumping
+      # pump water for the calculated time
+      writepin(waterPump4, high);
+      int runTime = (int)timePumping/1ms;
+      delay(runTime);
+      writepin(waterPump4, low);
    } 
 }
 func activateHumidifier(Humidity dampness){
-   # Logic for activating humidifier untill desired dampness
    # Har brug for at aktivere read humidifier sensor flere gange tll dampness er opnået.
-   # humidifier.activate(dampness);
+   Time/Humidity humFlow = 5damp/1min;
+   Time runTime = humFlow / dampness; 
+  
+   writepin(humidifier, high);             # humidifier.activate;
+   delay((int)runTime/1ms);
+   writepin(humidifier, low);
 }
 
 
