@@ -448,7 +448,6 @@ public class stmtTypeChecker : DepthFirstAdapter
                             else
                             {
                                 symbolTable.AddNode(node, Symbol.NotOk);
-                                symbolTable.AddNode(node, Symbol.NotOk);
                                 tempResult += IndentedString("expression is not correct unitType\n");
                             }
                         }
@@ -635,8 +634,8 @@ public class stmtTypeChecker : DepthFirstAdapter
                       tempResult += IndentedString("ReturnStmt should not be in a void function\n");
                       break;
                   case AUnitType:
-                      symbolTable.GetUnit(typedType, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) funcType);
-                      if (symbolTable.GetUnit(returnExp, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) returnType))
+                      symbolTable.GetUnit(typedType, out (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) funcType);
+                      if (symbolTable.GetUnit(returnExp, out (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) returnType))
                       {
                           symbolTable.AddNode(node, symbolTable.CompareUnitTypes(funcType, returnType) ? Symbol.Ok : Symbol.NotOk);
                           tempResult += symbolTable.CompareUnitTypes(funcType, returnType) ? "" : IndentedString("return is not correct unitType\n");

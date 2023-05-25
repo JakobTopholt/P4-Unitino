@@ -23,31 +23,36 @@ unit Humidity{
 }
 # setup
 prog{
-    # Pin def 
-    tomatoSensor = setPin(1, input);
-    citrusSensor = setPin(2, input);
-    chilliSensor = setPin(3, input);
-    mushroomSensor = setPin(4, input);
-    dampnessSensor = setPin(5, input);
+    # Pin definition
+    pin tomatoSensor = 1;
+    pin citrusSensor = 2;
+    pin chilliSensor = 3;
+    pin mushroomSensor = 4;
+    pin dampnessSensor = 5;
     
-    waterPump1 = setPin(6, output);
-    waterPump2 = setPin(7, output);
-    waterPump3 = setPin(8, output);
-    waterPump4 = setPin(9, output);
-    humidifier = setPin(10, output);
+    pin waterPump1 = 6;
+    setpin(waterPump1, output);
+    pin waterPump2 = 7;
+    setpin(waterPump2, output);
+    pin waterPump3 = 8;
+    setpin(waterPump3, output);
+    pin waterPump4 = 9;
+    setpin(waterPump4, output);
+    pin humidifier = 10;
+    setpin(humidifier, output);
 
     Weight tomatoesWeight = 500g;    #readpin(tomatoSensor)
     Weight citrusTreeWeight = 2kg;   #readpin(citrusSensor)
     Weight chillisWeight = 100g;     #readpin(chilliSensor)
     Weight mushroomsWeight = 200g;   #readpin(mushroomSensor)
-    Humidity dampness = 80;          #readpin(dampnessSensor)
+    Humidity dampness = 80damp;          #readpin(dampnessSensor)
 
     Volume/Weight tomatoWater = 210l/1kg; 
     Volume/Weight citrustreeWater = 600l/1kg; 
     Volume/Weight chilliWater = 320l/1kg; 
 
     Time/Volume tomatoPlants = 80day/(tomatoWater * tomatoesWeight);
-    Time/Volume citrusTree = 7month/(citrustreeWater  * citrusWeight);
+    Time/Volume citrusTree = 7month/(citrustreeWater  * citrusTreeWeight);
     Time/Volume chilliPlants = 150day/(chilliWater  * chillisWeight);
     Time mushrooms = 6.5week;
 

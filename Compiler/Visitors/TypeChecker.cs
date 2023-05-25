@@ -80,8 +80,10 @@ public class TypeChecker : exprTypeChecker
         // KOM HERTIL
         List<ANumUnituse> nums = node.GetUnituse().OfType<ANumUnituse>().ToList();
         List<ADenUnituse> dens = node.GetUnituse().OfType<ADenUnituse>().ToList();
-        List<AUnitdeclGlobal> newNums = new List<AUnitdeclGlobal>();
-        List<AUnitdeclGlobal> newDens = new List<AUnitdeclGlobal>();
+        //List<AUnitdeclGlobal> newNums = new List<AUnitdeclGlobal>();
+        //List<AUnitdeclGlobal> newDens = new List<AUnitdeclGlobal>();
+        SortedList<string, AUnitdeclGlobal> newNums = new SortedList<string, AUnitdeclGlobal>();
+        SortedList<string, AUnitdeclGlobal> newDens = new SortedList<string, AUnitdeclGlobal>();
 
         bool aunittypeIsOk = true;
         foreach (ANumUnituse num in nums)
@@ -89,7 +91,7 @@ public class TypeChecker : exprTypeChecker
             AUnitdeclGlobal? newNum = symbolTable.GetUnitdeclFromId(num.GetId().ToString());
             if (newNum != null)
             {
-                newNums.Add(newNum);
+                newNums.Add(newNum.GetId().ToString().Trim(),newNum);
             }
             else
             {
@@ -103,7 +105,7 @@ public class TypeChecker : exprTypeChecker
             AUnitdeclGlobal? newDen = symbolTable.GetUnitdeclFromId(den.GetId().ToString());
             if (newDen != null)
             {
-                newDens.Add(newDen);
+                newDens.Add(newDen.GetId().ToString().Trim(),newDen);;
             }
             else
             {
@@ -114,7 +116,7 @@ public class TypeChecker : exprTypeChecker
         }
         if (aunittypeIsOk)
         {
-            (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unituse = (newNums, newDens);
+            (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unituse = (newNums, newDens);
             symbolTable.AddNodeToUnit(node, unituse);
             symbolTable.AddNode(node, Symbol.Ok);
         }
@@ -350,8 +352,6 @@ public class TypeChecker : exprTypeChecker
         {
             symbolTable.AddNode(node, Symbol.NotOk);
         }
-        symbolTable = symbolTable.EnterScope();
-        
     }
 
     public override void OutALoopGlobal(ALoopGlobal node)
@@ -365,7 +365,6 @@ public class TypeChecker : exprTypeChecker
                 if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
                     loopIsOk = false;
             }
-            symbolTable = symbolTable.ExitScope();
             symbolTable.AddNode(node, loopIsOk ? Symbol.Ok : Symbol.NotOk);
             locations.Clear();
             reported = false;
@@ -382,7 +381,6 @@ public class TypeChecker : exprTypeChecker
         {
             symbolTable.AddNode(node, Symbol.NotOk);
         }
-        symbolTable = symbolTable.EnterScope();
     }
     public override void OutAProgGlobal(AProgGlobal node)
     {
@@ -396,7 +394,6 @@ public class TypeChecker : exprTypeChecker
                 if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
                     progIsOk = false;
             }
-            symbolTable = symbolTable.ExitScope();
             symbolTable.AddNode(node, progIsOk ? Symbol.Ok : Symbol.NotOk);
             locations.Clear();
             reported = false;
