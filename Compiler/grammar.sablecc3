@@ -244,7 +244,7 @@ Productions
                 | {boolean}         boolean                                 {-> New exp.boolean(boolean.boolean)}
                 | {string}          string                                  {-> New exp.string(string)}
                 | {char}            char                                    {-> New exp.char(char)}
-                | {exp}             l_par exp r_par                         {-> exp.exp};
+                | {exp}             l_par exp r_par                         {-> New exp.exp(exp.exp)};
                 
     //// Miscellaneous    
     boolean {-> boolean} = {true} ttrue {-> New boolean.true()}
