@@ -793,7 +793,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         }
     }
 
-    public override void CaseASubunit(ASubunit node)
+    public override void CaseASubunit(ASubunit node) //TODO: prefix ALL units with U, prefix ALL function with F and all variables with V
     {
         string? unitId = whiteSpace.Replace(((AUnitdeclGlobal)node.Parent()).GetId().ToString(),"");
         Indent($"float {unitId}");
