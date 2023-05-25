@@ -129,6 +129,7 @@ public enum Symbol
     Char,
     String,
     Func,
+    Pin,
     Ok, 
     NotOk,
 }

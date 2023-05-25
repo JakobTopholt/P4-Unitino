@@ -618,10 +618,15 @@ public class stmtTypeChecker : DepthFirstAdapter
                   symbolTable.GetUnit(returnExp, out var expUnit);
                   symbolTable.AddNode(node, symbolTable.CompareUnitTypes(func, expUnit) ? Symbol.Ok : Symbol.NotOk);
                   tempResult += symbolTable.CompareUnitTypes(func, expUnit) ? "" : IndentedString("return is not correct unitType\n");
-              } else if (symbolTable.GetReturnFromNode(aUntypedFunc) != null)
+              } else if (symbolTable.GetReturnFromNode(aUntypedFunc) != null && symbolTable.GetReturnFromNode(aUntypedFunc) != Symbol.NotOk)
               {
-                  symbolTable.AddNode(node, symbolTable.GetReturnFromNode(aUntypedFunc) == symbolTable.GetSymbol(returnExp) ? Symbol.Ok : Symbol.NotOk);
-                  tempResult += symbolTable.GetReturnFromNode(aUntypedFunc) == symbolTable.GetSymbol(returnExp) ? "" : IndentedString("return is not correct type\n");
+                  Symbol? symbol = symbolTable.GetSymbol(returnExp);
+                  if (symbol != null)
+                  {
+                      Symbol nonNullSymbol = (Symbol)symbol;
+                      symbolTable.AddNode(node, symbolTable.GetReturnFromNode(aUntypedFunc) == nonNullSymbol ? nonNullSymbol : Symbol.NotOk);
+                      tempResult += symbolTable.GetReturnFromNode(aUntypedFunc) == nonNullSymbol ? "" : IndentedString("return is not correct type\n");
+                  }
               }
               else
               {
@@ -765,8 +770,15 @@ public class stmtTypeChecker : DepthFirstAdapter
         {
             symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
         }
-        // Missing logic 
-        
+        if (symbolTable.GetSymbol(exp) == Symbol.Int)
+        {
+            symbolTable.AddNode(node, Symbol.Ok);
+        }
+        else
+        {
+            symbolTable.AddNode(node, Symbol.NotOk);
+            tempResult += IndentedString("Delaystatement needs an integer value");
+        }
         PrintError();
         indent--;
     }
@@ -784,8 +796,15 @@ public class stmtTypeChecker : DepthFirstAdapter
         {
             symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
         }
-        // missing logic
-        
+        if (symbolTable.GetSymbol(exp) == Symbol.Pin)
+        {
+            symbolTable.AddNode(node, Symbol.Ok);
+        }
+        else
+        {
+            symbolTable.AddNode(node, Symbol.NotOk);
+            tempResult += IndentedString("Setpin statement is not of pin type");
+        }
         PrintError();
         indent--;
     }

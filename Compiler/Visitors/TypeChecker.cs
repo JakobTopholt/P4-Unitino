@@ -150,6 +150,11 @@ public class TypeChecker : exprTypeChecker
         symbolTable.AddNode(node, Symbol.Func);
     }
 
+    public override void OutAPinType(APinType node)
+    {
+        symbolTable.AddNode(node, Symbol.Pin);
+    }
+
     public override void InAArg(AArg node)
     {
         locations.Push(IndentedString($"in argument: {node.GetType() + " " + node.GetId()}\n"));
