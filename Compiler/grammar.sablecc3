@@ -45,8 +45,13 @@ Tokens
     tdelay = 'delay';
     tsetpin = 'setpin';
     treadpin = 'readpin';
+    twritepin = 'writepin';
+    
     low = 'low';
     high = 'high';
+    tinput = 'input';
+    toutput = 'output';
+    tinput_pullup = 'input_pullup';
     
     tint = 'int';
     tdecimal = 'decimal';
@@ -181,12 +186,17 @@ Productions
                    | {declass}  unittype id equal exp semicolon         {-> New stmt.declass(unittype.type, id, exp.exp)}
                    | {funccall} id l_par params? r_par semicolon        {-> New stmt.funccall(id, [params.exp])}
                    | {delay} tdelay l_par exp r_par semicolon           {-> New stmt.delay(exp.exp)}
-                   | {setpin} tsetpin l_par exp comma pintoggle r_par semicolon {-> New stmt.setpin(exp.exp, pintoggle.pintoggle)}
+                   | {setpin} tsetpin l_par exp comma pinmode r_par semicolon {-> New stmt.setpin(exp.exp, pinmode.pinmode)}
                    | {readpin} treadpin l_par exp r_par semicolon       {-> New stmt.readpin(exp.exp)}
+                   | {writepin} twritepin l_par exp comma pintoggle r_par semicolon {-> New stmt.writepin(exp.exp, pintoggle.pintoggle)}
                    | {scoped}   scoped                                  {-> scoped.stmt};
                    
     pintoggle {-> pintoggle} = {high} high  {-> New pintoggle.high()}
                              | {low} low    {-> New pintoggle.low()};
+    
+    pinmode {-> pinmode} = {input} tinput   {-> New pinmode.input()}
+                         | {output} toutput {-> New pinmode.output()}
+                         | {input_pullup} tinput_pullup {-> New pinmode.input_pullup()};
                    
     return {-> stmt} = treturn exp? semicolon               {-> New stmt.return(exp.exp)};
     
@@ -282,10 +292,12 @@ Abstract Syntax Tree
          | {while} exp stmt+
          | {dowhile} stmt+ exp
          | {delay} exp
-         | {setpin} exp pintoggle
-         | {readpin} exp;
+         | {setpin} exp pinmode
+         | {readpin} exp
+         | {writepin} exp pintoggle;
          
     pintoggle = {high} | {low};
+    pinmode = {input} | {output} | {input_pullup};
               
     type = {int} 
          | {decimal}
