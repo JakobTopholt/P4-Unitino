@@ -347,5 +347,3 @@ Abstract Syntax Tree
         
     boolean = {true} | {false};
     
-// TODO: Arrays
-// TODO: Switch

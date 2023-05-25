@@ -54,8 +54,8 @@ unit Time {
 }
 prog {
     decimal e = 3.7;
-    Time a = 1/Timems(50.3)+1/Times(5);
-    Time b = 1/Timems(50)-1/Times(5);
+    Time a = 1/50.3ms + 1/5s;
+    Time b = 1/50ms - 1/5s;
 }
 ////
 void loop() {

@@ -1,0 +1,154 @@
+# Arduino-compatible smart garden
+
+unit Volume{
+    ml => value;
+    dl => value/100;
+    l => value/1000;
+}
+unit Time{
+    min => value;
+    h => value/60;
+    day => value/60/24;
+    week => value/60/24/7;
+    month => value/60/24/7/30;
+    year => value/60/24/7/30/12;
+}
+unit Weight{
+    g => value;
+    kg => value/1000;
+}
+unit Humidity{
+    #percentage
+    damp => value;
+}
+# setup
+prog{
+    # Pin def 
+    tomatoSensor = setPin(1, input);
+    citrusSensor = setPin(2, input);
+    chilliSensor = setPin(3, input);
+    mushroomSensor = setPin(4, input);
+    dampnessSensor = setPin(5, input);
+    
+    waterPump1 = setPin(6, output);
+    waterPump2 = setPin(7, output);
+    waterPump3 = setPin(8, output);
+    waterPump4 = setPin(9, output);
+    humidifier = setPin(10, output);
+
+    Weight tomatoesWeight = 500g;    #readpin(tomatoSensor)
+    Weight citrusTreeWeight = 2kg;   #readpin(citrusSensor)
+    Weight chillisWeight = 100g;     #readpin(chilliSensor)
+    Weight mushroomsWeight = 200g;   #readpin(mushroomSensor)
+    Humidity dampness = 80;          #readpin(dampnessSensor)
+
+    Volume/Weight tomatoWater = 210l/1kg; 
+    Volume/Weight citrustreeWater = 600l/1kg; 
+    Volume/Weight chilliWater = 320l/1kg; 
+
+    Time/Volume tomatoPlants = 80day/(tomatoWater * tomatoesWeight);
+    Time/Volume citrusTree = 7month/(citrustreeWater  * citrusWeight);
+    Time/Volume chilliPlants = 150day/(chilliWater  * chillisWeight);
+    Time mushrooms = 6.5week;
+
+    Time tomatoWatercycle = 3day;
+    Time citrusWatercycle = 1week;
+    Time chilliWatercycle = 2week;
+    Time mushroomWatercycle = 85damp;
+
+    Time internalTime = 0day;
+}
+
+# update
+loop{
+   # read sensors
+   readWeightSensor();
+   readHumiditySensor();
+
+   # action
+   # Tomatoes
+   if (internalTime % tomatoWatercycle == 0){
+       updatePlant(tomatoPlants, tomatoWatercycle);
+   }
+   # Citrus
+   if (internalTime % citrusWatercycle == 0) {
+       updatePlant(citrusTree, citrusWatercycle);
+   }
+   # Chilli
+   if (internalTime % chilliWatercycle == 0) {
+       updatePlant(chilliPlants, chilliWatercycle);
+   }
+   updateMushroom();
+   
+   # report
+   generateGardenStatistic();
+   internalTime += 1day; 
+   delay(1day);
+}
+
+# update methods
+func readWeightSensor(){
+   tomatoesWeight += 50g;      #readpin(tomatoSensor)
+   citrusTreeWeight += 100g;   #readpin(citrusSensor)
+   chillisWeight += 30g;       #readpin(chilliSensor)
+   mushroomsWeight += 20g;     #readpin(mushroomSensor)  
+}
+func readHumiditySensor(){
+   dampness = 80;       #readpin(dampnessSensor)
+}
+func updatePlant(pin arduinoSensor, Time/Volume plant, Time sinceLastWater){
+   Volume neededWater = plant / sinceLastWater;
+   activateWaterpump(arduinoSensor, neededwater);
+}
+func updateMushroom(){
+   if (dampness < mushroomWatercycle){
+      activateHumidifier(mushroomWatercycle);
+   }
+   mushrooms -= 1day;
+}
+
+# action methods
+func activateWaterpump(pin arduinoSensor, Volume water){
+   # activate a arduino enabled pump
+   Volume/Time pumpFlow = 40ml/1s;
+   Time timePumping = pumpFlow / water; 
+   if(arduinosensor == tomatoSensor){
+      # pump water for the calculated time
+      writepin(waterPump1, high);
+      int runTime = (int)timePumping/1ms;
+      delay(runTime);
+      writepin(waterPump1, low);
+   }
+   else if(arduinosensor == citrusSensor ){
+      # pump water for the calculated time
+      writepin(waterPump2, high);
+      int runTime = (int)timePumping/1ms;
+      delay(runTime);
+      writepin(waterPump2, low);
+   }
+   else if(arduinosensor == chilliSensor){
+      # pump water for the calculated time
+      writepin(waterPump3, high);
+      int runTime = (int)timePumping/1ms;
+      delay(runTime);
+      writepin(waterPump3, low);
+   }
+   else if(arduinosensor == mushroomSensor){
+      # pump water for the calculated time
+      writepin(waterPump4, high);
+      int runTime = (int)timePumping/1ms;
+      delay(runTime);
+      writepin(waterPump4, low);
+   } 
+}
+func activateHumidifier(Humidity dampness){
+   # Har brug for at aktivere read humidifier sensor flere gange tll dampness er opnået.
+   Time/Humidity humFlow = 5damp/1min;
+   Time runTime = humFlow / dampness; 
+  
+   writepin(humidifier, high);             # humidifier.activate;
+   delay((int)runTime/1ms);
+   writepin(humidifier, low);
+}
+
+
