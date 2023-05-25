@@ -88,13 +88,13 @@ loop{
 
 # update methods
 func readWeightSensor(){
-   Weight tomatoesWeight += 50g;      #readpin(tomatoSensor)
-   Weight citrusTreeWeight += 100g;   #readpin(citrusSensor)
-   Weight chillisWeight += 30g;       #readpin(chilliSensor)
-   Weight mushroomsWeight += 20g;     #readpin(mushroomSensor)  
+   tomatoesWeight += 50g;      #readpin(tomatoSensor)
+   citrusTreeWeight += 100g;   #readpin(citrusSensor)
+   chillisWeight += 30g;       #readpin(chilliSensor)
+   mushroomsWeight += 20g;     #readpin(mushroomSensor)  
 }
 func readHumiditySensor(){
-   Humidity dampness = 80;       #readpin(dampnessSensor)
+   dampness = 80;       #readpin(dampnessSensor)
 }
 func updatePlant(pin arduinoSensor, Time/Volume plant, Time sinceLastWater){
    Volume neededWater = plant / sinceLastWater;
