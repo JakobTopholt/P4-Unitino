@@ -187,7 +187,6 @@ Productions
                    | {funccall} id l_par params? r_par semicolon        {-> New stmt.funccall(id, [params.exp])}
                    | {delay} tdelay l_par exp r_par semicolon           {-> New stmt.delay(exp.exp)}
                    | {setpin} tsetpin l_par exp comma pinmode r_par semicolon {-> New stmt.setpin(exp.exp, pinmode.pinmode)}
-                   | {readpin} treadpin l_par exp r_par semicolon       {-> New stmt.readpin(exp.exp)}
                    | {writepin} twritepin l_par exp comma pintoggle r_par semicolon {-> New stmt.writepin(exp.exp, pintoggle.pintoggle)}
                    | {scoped}   scoped                                  {-> scoped.stmt};
                    
@@ -249,6 +248,7 @@ Productions
                 | {funccall}        id l_par params? r_par                  {-> New exp.funccall(id, [params.exp])} // <- array and structaccess goes here
                 | p0 {-> p0.exp};
     p0 {-> exp} = {id}              id {-> New exp.id(id)}
+                | {readpin} treadpin l_par exp r_par semicolon              {-> New exp.readpin(exp.exp)}
                 | {decimal}         decimal                                 {-> New exp.decimal(decimal)}
                 | {unit}            unitnumber                              {-> unitnumber.exp}
                 | {value}           tvalue                                  {-> New exp.value()}
@@ -293,7 +293,6 @@ Abstract Syntax Tree
          | {dowhile} stmt+ exp
          | {delay} exp
          | {setpin} exp pinmode
-         | {readpin} exp
          | {writepin} exp pintoggle;
          
     pintoggle = {high} | {low};
@@ -335,6 +334,7 @@ Abstract Syntax Tree
         | {prefixminusminus}exp
         | {funccall}        id exp*
         | {id}              id
+        | {readpin}         exp
         | {unitnumber}      number id
         | {unitdecimal}     decimal id
         | {decimal}         decimal
