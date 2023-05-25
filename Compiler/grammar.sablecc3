@@ -248,7 +248,7 @@ Productions
                 | {funccall}        id l_par params? r_par                  {-> New exp.funccall(id, [params.exp])} // <- array and structaccess goes here
                 | p0 {-> p0.exp};
     p0 {-> exp} = {id}              id {-> New exp.id(id)}
-                | {readpin} treadpin l_par exp r_par semicolon              {-> New exp.readpin(exp.exp)}
+                | {readpin} treadpin l_par exp r_par                        {-> New exp.readpin(exp.exp)}
                 | {decimal}         decimal                                 {-> New exp.decimal(decimal)}
                 | {unit}            unitnumber                              {-> unitnumber.exp}
                 | {value}           tvalue                                  {-> New exp.value()}
