@@ -40,6 +40,9 @@ public class exprTypeChecker : stmtTypeChecker
             case Symbol.Func:
                 symbolTable.AddNode(node, Symbol.Func);
                 break;
+            case Symbol.Pin:
+                symbolTable.AddNode(node, Symbol.Pin);
+                break;
             case Symbol.Ok:
                 symbolTable.AddNode(node, Symbol.Ok);
                 break;
@@ -141,6 +144,13 @@ public class exprTypeChecker : stmtTypeChecker
                             tempResult += IndentedString("Parameter should be of type String\n");
                         }
                         break;
+                    case APinType:
+                        if (paramSymbol != Symbol.Pin)
+                        {
+                            matches = false;
+                            tempResult += IndentedString("Parameter should be of type Pin\n");
+                        }
+                        break;
                     case AUnitType argType:
                         if (symbolTable.GetUnit(argType, out var argUnit) && 
                             symbolTable.GetUnit(returnUnit, out var paramUnit) && 
@@ -176,6 +186,9 @@ public class exprTypeChecker : stmtTypeChecker
                         break;
                     case Symbol.String:
                         symbolTable.AddNode(node, Symbol.String);
+                        break;
+                    case Symbol.Pin:
+                        symbolTable.AddNode(node, Symbol.Pin);
                         break;
                     default:
                         if (symbolTable.GetUnit(node.GetId().ToString(), out var unit))
@@ -224,6 +237,9 @@ public class exprTypeChecker : stmtTypeChecker
                 break;
             case Symbol.String:
                 symbolTable.AddNode(node, Symbol.String);
+                break;
+            case Symbol.Pin:
+                symbolTable.AddNode(node, Symbol.Pin);
                 break;
             default:
                 if (symbolTable.GetUnit(node.GetId().ToString().Trim(), out var unit))
@@ -336,7 +352,7 @@ public class exprTypeChecker : stmtTypeChecker
         {
           switch (leftSymbol)
             {
-            case Symbol.Int when rightSymbol is Symbol.Int:
+            case Symbol.Int or Symbol.Pin when rightSymbol is Symbol.Int or Symbol.Pin:
                 symbolTable.AddNode(node, Symbol.Int);
                 break;
             case Symbol.Decimal when rightSymbol is Symbol.Decimal or Symbol.Int:
@@ -420,7 +436,7 @@ public class exprTypeChecker : stmtTypeChecker
         Symbol? rightSymbol = symbolTable.GetSymbol(rightExpr);
         switch (leftSymbol)
         {
-            case Symbol.Int when rightSymbol is Symbol.Int:
+            case Symbol.Int or Symbol.Pin when rightSymbol is Symbol.Int or Symbol.Pin:
                 symbolTable.AddNode(node, Symbol.Int);
                 break;
             case Symbol.Decimal when rightSymbol is Symbol.Decimal or Symbol.Int:
@@ -504,7 +520,7 @@ public class exprTypeChecker : stmtTypeChecker
         Symbol? rightSymbol = symbolTable.GetSymbol(rightExpr);
         switch (leftSymbol)
         {
-            case Symbol.Int when rightSymbol is Symbol.Int:
+            case Symbol.Int or Symbol.Pin when rightSymbol is Symbol.Int or Symbol.Pin:
                 symbolTable.AddNode(node, Symbol.Int);
                 break;
             case Symbol.Decimal or Symbol.Int when rightSymbol is Symbol.Decimal or Symbol.Int:
@@ -526,7 +542,6 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(node, Symbol.String);
                 break;
             default:
-                // Implement logikken for custom units her
                 bool leftContainsUnit = symbolTable.NodeToUnit.ContainsKey(leftExpr);
                 bool rightContainsUnit = symbolTable.NodeToUnit.ContainsKey(rightExpr);
                 if (leftContainsUnit && rightContainsUnit)
@@ -625,7 +640,7 @@ public class exprTypeChecker : stmtTypeChecker
         Symbol? rightSymbol = symbolTable.GetSymbol(rightExpr);
         switch (leftSymbol)
         {
-            case Symbol.Int when rightSymbol is Symbol.Int:
+            case Symbol.Int or Symbol.Pin when rightSymbol is Symbol.Int or Symbol.Pin:
                 symbolTable.AddNode(node, Symbol.Int);
                 break;
             case Symbol.Decimal when rightSymbol is Symbol.Decimal or Symbol.Int:
@@ -732,8 +747,8 @@ public class exprTypeChecker : stmtTypeChecker
         Symbol? right = symbolTable.GetSymbol(rightExpr);
         switch (left)
         {
-            case Symbol.Int:
-                if (right == Symbol.Int)
+            case Symbol.Int or Symbol.Pin:
+                if (right is Symbol.Int or Symbol.Pin)
                 {
                     symbolTable.AddNode(node, Symbol.Int);
                 } else if (right == Symbol.Decimal)
@@ -831,6 +846,10 @@ public class exprTypeChecker : stmtTypeChecker
                 case Symbol.String:
                     symbolTable.AddNode(node, falseSymbol == Symbol.String ? Symbol.String : Symbol.NotOk);
                     tempResult += falseSymbol == Symbol.String ? "" : IndentedString("True and false exp should be of same type\n");
+                    break;
+                case Symbol.Pin:
+                    symbolTable.AddNode(node, falseSymbol == Symbol.Pin ? Symbol.Pin : Symbol.NotOk);
+                    tempResult += falseSymbol == Symbol.Pin ? "" : IndentedString("True and false exp should be of same type\n");
                     break;
                 default:
                     // compare custom unit
@@ -931,7 +950,17 @@ public class exprTypeChecker : stmtTypeChecker
             case (Symbol.Char, Symbol.Char):
                 symbolTable.AddNode(node, Symbol.Char);
                 break;
+            case (Symbol.Pin, Symbol.Pin):
+                symbolTable.AddNode(node, Symbol.Pin);
+                break;
+            
             /*-- casting to new types --*/
+            case (Symbol.Pin, Symbol.Int):
+                symbolTable.AddNode(node, Symbol.Pin);
+                break;
+            case (Symbol.Int, Symbol.Pin):
+                symbolTable.AddNode(node, Symbol.Int);
+                break;
             case (Symbol.Decimal, Symbol.Int):
                 symbolTable.AddNode(node, Symbol.Decimal);
                 break;
@@ -1038,14 +1067,17 @@ public class exprTypeChecker : stmtTypeChecker
         Symbol? expr = symbolTable.GetSymbol(exp);
         switch (expr)
         {
-            case Symbol.Decimal:
-                symbolTable.AddNode(node, Symbol.Decimal);
-                break;
             case Symbol.Int:
                 symbolTable.AddNode(node, Symbol.Int);
                 break;
+            case Symbol.Decimal:
+                symbolTable.AddNode(node, Symbol.Decimal);
+                break;
             case Symbol.Char:
                 symbolTable.AddNode(node, Symbol.Char);
+                break;
+            case Symbol.Pin:
+                symbolTable.AddNode(node, Symbol.Pin);
                 break;
             default:
                 symbolTable.AddNode(node, Symbol.NotOk);
@@ -1072,14 +1104,17 @@ public class exprTypeChecker : stmtTypeChecker
         Symbol? expr = symbolTable.GetSymbol(exp);
         switch (expr)
         {
-            case Symbol.Decimal:
-                symbolTable.AddNode(node, Symbol.Decimal);
-                break;
             case Symbol.Int:
                 symbolTable.AddNode(node, Symbol.Int);
                 break;
+            case Symbol.Decimal:
+                symbolTable.AddNode(node, Symbol.Decimal);
+                break;
             case Symbol.Char:
                 symbolTable.AddNode(node, Symbol.Char);
+                break;
+            case Symbol.Pin:
+                symbolTable.AddNode(node, Symbol.Pin);
                 break;
             default:
                 symbolTable.AddNode(node, Symbol.NotOk);
@@ -1106,14 +1141,17 @@ public class exprTypeChecker : stmtTypeChecker
         Symbol? expr = symbolTable.GetSymbol(exp);
         switch (expr)
         {
-            case Symbol.Decimal:
-                symbolTable.AddNode(node, Symbol.Decimal);
-                break;
             case Symbol.Int:
                 symbolTable.AddNode(node, Symbol.Int);
                 break;
+            case Symbol.Decimal:
+                symbolTable.AddNode(node, Symbol.Decimal);
+                break;
             case Symbol.Char:
                 symbolTable.AddNode(node, Symbol.Char);
+                break;
+            case Symbol.Pin:
+                symbolTable.AddNode(node, Symbol.Pin);
                 break;
             default:
                 symbolTable.AddNode(node, Symbol.NotOk);
@@ -1140,14 +1178,17 @@ public class exprTypeChecker : stmtTypeChecker
         Symbol? expr = symbolTable.GetSymbol(exp);
         switch (expr)
         {
-            case Symbol.Decimal:
-                symbolTable.AddNode(node, Symbol.Decimal);
-                break;
             case Symbol.Int:
                 symbolTable.AddNode(node, Symbol.Int);
                 break;
+            case Symbol.Decimal:
+                symbolTable.AddNode(node, Symbol.Decimal);
+                break;
             case Symbol.Char:
                 symbolTable.AddNode(node, Symbol.Char);
+                break;
+            case Symbol.Pin:
+                symbolTable.AddNode(node, Symbol.Pin);
                 break;
             default:
                 symbolTable.AddNode(node, Symbol.NotOk);
@@ -1174,14 +1215,17 @@ public class exprTypeChecker : stmtTypeChecker
         Symbol? expr = symbolTable.GetSymbol(exp);
         switch (expr)
         {
-            case Symbol.Decimal:
-                symbolTable.AddNode(node, Symbol.Decimal);
-                break;
             case Symbol.Int:
                 symbolTable.AddNode(node, Symbol.Int);
                 break;
+            case Symbol.Decimal:
+                symbolTable.AddNode(node, Symbol.Decimal);
+                break;
             case Symbol.Char:
                 symbolTable.AddNode(node, Symbol.Char);
+                break;
+            case Symbol.Pin:
+                symbolTable.AddNode(node, Symbol.Pin);
                 break;
             default:
                 symbolTable.AddNode(node, Symbol.NotOk);
@@ -1264,6 +1308,10 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Char ? Symbol.Bool : Symbol.NotOk);
                 tempResult += symbolTable.GetSymbol(rightExpr) == Symbol.Char ? "" : IndentedString("Types does not match\n");
                 break;
+            case Symbol.Pin:
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Pin ? Symbol.Bool : Symbol.NotOk);
+                tempResult += symbolTable.GetSymbol(rightExpr) == Symbol.Pin ? "" : IndentedString("Types does not match\n");
+                break;
             default:
                 bool leftContainsUnit = symbolTable.NodeToUnit.ContainsKey(leftExpr);
                 bool rightContainsUnit = symbolTable.NodeToUnit.ContainsKey(rightExpr);
@@ -1302,13 +1350,16 @@ public class exprTypeChecker : stmtTypeChecker
         switch (left)
         {
             case Symbol.Int:
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) is Symbol.Int or Symbol.Decimal or Symbol.Char ? Symbol.Bool : Symbol.NotOk);
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) is Symbol.Int or Symbol.Decimal or Symbol.Char or Symbol.Pin ? Symbol.Bool : Symbol.NotOk);
                 break;
             case (Symbol.Decimal):
                 symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) is Symbol.Int or Symbol.Decimal ? Symbol.Bool : Symbol.NotOk);
                 break;
             case Symbol.Char:
                 symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) is Symbol.Int or Symbol.Char ? Symbol.Bool : Symbol.NotOk);
+                break;
+            case Symbol.Pin:
+                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) is Symbol.Int or Symbol.Pin ? Symbol.Bool : Symbol.NotOk);
                 break;
             default:
                 bool leftContainsUnit = symbolTable.NodeToUnit.ContainsKey(leftExpr);
