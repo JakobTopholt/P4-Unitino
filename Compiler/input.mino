@@ -6,12 +6,13 @@ unit Volume{
     l => value/1000;
 }
 unit Time{
-    min => value;
-    h => value/60;
-    day => value/60/24;
-    week => value/60/24/7;
-    month => value/60/24/7/30;
-    year => value/60/24/7/30/12;
+    ms => value;
+    s => value/1000;
+    min => value/1000/60;
+    h => value/1000/60/60;
+    day => value/1000/60/60/24;
+    week => value/1000/60/60/24/7;
+    month => value/1000/60/60/24/7/30;
 }
 unit Weight{
     g => value;
@@ -52,16 +53,20 @@ prog{
     Volume/Weight chilliWater = 320l/1kg; 
 
     Time/Volume tomatoPlants = 80day/(tomatoWater * tomatoesWeight);
-    Time/Volume citrusTree = 7month/(citrustreeWater  * citrusWeight);
+    Time/Volume citrusTree = 7month/(citrustreeWater  * citrusTreeWeight);
     Time/Volume chilliPlants = 150day/(chilliWater  * chillisWeight);
     Time mushrooms = 6.5week;
 
     Time tomatoWatercycle = 3day;
     Time citrusWatercycle = 1week;
     Time chilliWatercycle = 2week;
-    Time mushroomWatercycle = 85damp;
-
+    Humidity mushroomWatercycle = 85damp;
+    
+    
     Time internalTime = 0day;
+    Time tomatoTime = 0day;
+    Time citrusTime = 0day;
+    Time chilliTime = 0day;
 }
 
 # update
@@ -72,16 +77,19 @@ loop{
 
    # action
    # Tomatoes
-   if (internalTime % tomatoWatercycle == 0){
-       updatePlant(tomatoPlants, tomatoWatercycle);
+   if (tomatoTime < internalTime){
+       updatePlant(waterPump1, tomatoPlants, tomatoWatercycle);
+       tomatoTime += tomatoWatercycle;
    }
    # Citrus
-   if (internalTime % citrusWatercycle == 0) {
-       updatePlant(citrusTree, citrusWatercycle);
+   if (citrusTime < internalTime) {
+       updatePlant(waterPump2, citrusTree, citrusWatercycle);
+       citrusTime += citrusWatercycle;
    }
    # Chilli
-   if (internalTime % chilliWatercycle == 0) {
-       updatePlant(chilliPlants, chilliWatercycle);
+   if (chilliTime < internalTime ) {
+       updatePlant(waterPump3, chilliPlants, chilliWatercycle);
+       chilliTime += chilliWatercycle;
    }
    updateMushroom();
    
@@ -99,7 +107,7 @@ func readWeightSensor(){
    mushroomsWeight += 20g;     #readpin(mushroomSensor)  
 }
 func readHumiditySensor(){
-   dampness = 80;       #readpin(dampnessSensor)
+   dampness = 80damp;       #readpin(dampnessSensor)
 }
 func updatePlant(pin arduinoSensor, Time/Volume plant, Time sinceLastWater){
    Volume neededWater = plant / sinceLastWater;
@@ -115,33 +123,33 @@ func updateMushroom(){
 # action methods
 func activateWaterpump(pin arduinoSensor, Volume water){
    # activate a arduino enabled pump
-   Volume/Time pumpFlow = 40ml/1s;
+   Volume / Time pumpFlow = 40ml/1s;
    Time timePumping = pumpFlow / water; 
-   if(arduinosensor == tomatoSensor){
+   if(arduinoSensor == tomatoSensor){
       # pump water for the calculated time
       writepin(waterPump1, high);
-      int runTime = (int)timePumping/1ms;
+      int runTime = (int)(timePumping/1ms);
       delay(runTime);
       writepin(waterPump1, low);
    }
-   else if(arduinosensor == citrusSensor ){
+   else if(arduinoSensor == citrusSensor ){
       # pump water for the calculated time
       writepin(waterPump2, high);
-      int runTime = (int)timePumping/1ms;
+      int runTime = (int)(timePumping/1ms);
       delay(runTime);
       writepin(waterPump2, low);
    }
-   else if(arduinosensor == chilliSensor){
+   else if(arduinoSensor == chilliSensor){
       # pump water for the calculated time
       writepin(waterPump3, high);
-      int runTime = (int)timePumping/1ms;
+      int runTime = (int)(timePumping/1ms);
       delay(runTime);
       writepin(waterPump3, low);
    }
-   else if(arduinosensor == mushroomSensor){
+   else if(arduinoSensor == mushroomSensor){
       # pump water for the calculated time
       writepin(waterPump4, high);
-      int runTime = (int)timePumping/1ms;
+      int runTime = (int)(timePumping/1ms);
       delay(runTime);
       writepin(waterPump4, low);
    } 

@@ -447,6 +447,7 @@ public class stmtTypeChecker : DepthFirstAdapter
                             }
                             else
                             {
+                                symbolTable.AddIdToNode(node.GetId().ToString(), node);
                                 symbolTable.AddNode(node, Symbol.NotOk);
                                 tempResult += IndentedString("expression is not correct unitType\n");
                             }

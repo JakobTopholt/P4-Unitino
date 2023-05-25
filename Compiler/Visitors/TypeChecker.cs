@@ -183,6 +183,9 @@ public class TypeChecker : exprTypeChecker
             case AStringType:
                 symbolTable.AddNode(node, Symbol.String);
                 break;
+            case APinType:
+                symbolTable.AddNode(node, Symbol.Pin);
+                break;
             case AUnitType customType:
             {
                 symbolTable.GetUnit(customType, out var unit);
@@ -208,20 +211,11 @@ public class TypeChecker : exprTypeChecker
             switch (type)
             {
                 case AIntType:
-                    symbolTable.AddIdToNode(id, arg);
-                    break;
                 case ADecimalType:
-                    symbolTable.AddIdToNode(id, arg);
-                    break;
                 case ABoolType:
-                    symbolTable.AddIdToNode(id, arg);
-                    break;
                 case ACharType:
-                    symbolTable.AddIdToNode(id, arg);
-                    break;
                 case AStringType:
-                    symbolTable.AddIdToNode(id, arg);
-                    break;
+                case APinType:
                 case AUnitType:
                     symbolTable.AddIdToNode(id, arg);
                     break;
