@@ -44,6 +44,7 @@ Tokens
     
     tdelay = 'delay';
     tsetpin = 'setpin';
+    treadpin = 'readpin';
     low = 'low';
     high = 'high';
     
@@ -181,6 +182,7 @@ Productions
                    | {funccall} id l_par params? r_par semicolon        {-> New stmt.funccall(id, [params.exp])}
                    | {delay} tdelay l_par exp r_par semicolon           {-> New stmt.delay(exp.exp)}
                    | {setpin} tsetpin l_par exp comma pintoggle r_par semicolon {-> New stmt.setpin(exp.exp, pintoggle.pintoggle)}
+                   | {readpin} treadpin l_par exp r_par semicolon       {-> New stmt.readpin(exp.exp)}
                    | {scoped}   scoped                                  {-> scoped.stmt};
                    
     pintoggle {-> pintoggle} = {high} high  {-> New pintoggle.high()}
@@ -280,7 +282,8 @@ Abstract Syntax Tree
          | {while} exp stmt+
          | {dowhile} stmt+ exp
          | {delay} exp
-         | {setpin} exp pintoggle;
+         | {setpin} exp pintoggle
+         | {readpin} exp;
          
     pintoggle = {high} | {low};
               
