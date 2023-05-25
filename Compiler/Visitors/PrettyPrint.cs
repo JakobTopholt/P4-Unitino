@@ -401,6 +401,35 @@ public class PrettyPrint : DepthFirstAdapter
         output.Write(":");
         node.GetFalse().Apply(this);
     }
+
+    public override void CaseASetpinStmt(ASetpinStmt node)
+    {
+        Indent("pinMode(");
+        node.GetExp().Apply(this);
+        output.Write(", ");
+        node.GetPinmode().Apply(this);
+        OutASetpinStmt(node);
+    }
+
+    public override void OutASetpinStmt(ASetpinStmt node)
+    {
+        output.Write(")");
+    }
+
+    public override void CaseAInputPinmode(AInputPinmode node)
+    {
+        output.Write("INPUT");
+    }
+
+    public override void CaseAOutputPinmode(AOutputPinmode node)
+    {
+        output.Write("OUTPUT");
+    }
+
+    public override void CaseAInputPullupPinmode(AInputPullupPinmode node)
+    {
+        output.Write("INPUT_PULLUP");
+    }
     public override void CaseAAssignStmt(AAssignStmt node)
     {
         Indent("");
@@ -631,6 +660,10 @@ public class PrettyPrint : DepthFirstAdapter
     {
         output.Write($"!{node.GetExp()}");
     }
+    public override void CaseAReadpinExp(AReadpinExp node)
+    {
+        output.Write($"digitalRead({node.GetExp().ToString().Trim()})");
+    }
     
     public override void CaseACastExp(ACastExp node)
     {
@@ -658,16 +691,17 @@ public class PrettyPrint : DepthFirstAdapter
                 break;
         }
     }
-    public override void CaseASetpinStmt(ASetpinStmt node)
+
+    public override void CaseAWritepinStmt(AWritepinStmt node)
     {
         Indent("setpin(");
         node.GetExp().Apply(this);
         output.Write(", ");
         node.GetPintoggle().Apply(this);
-        OutASetpinStmt(node);
+        OutAWritepinStmt(node);
     }
 
-    public override void OutASetpinStmt(ASetpinStmt node)
+    public override void OutAWritepinStmt(AWritepinStmt node)
     {
         output.Write(")");
     }
