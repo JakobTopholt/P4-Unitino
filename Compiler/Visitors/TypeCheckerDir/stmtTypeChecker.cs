@@ -770,8 +770,15 @@ public class stmtTypeChecker : DepthFirstAdapter
         {
             symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
         }
-        // Missing logic 
-        
+        if (symbolTable.GetSymbol(exp) == Symbol.Int)
+        {
+            symbolTable.AddNode(node, Symbol.Ok);
+        }
+        else
+        {
+            symbolTable.AddNode(node, Symbol.NotOk);
+            tempResult += IndentedString("Delaystatement needs an integer value");
+        }
         PrintError();
         indent--;
     }
@@ -789,8 +796,15 @@ public class stmtTypeChecker : DepthFirstAdapter
         {
             symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
         }
-        // missing logic
-        
+        if (symbolTable.GetSymbol(exp) == Symbol.Pin)
+        {
+            symbolTable.AddNode(node, Symbol.Ok);
+        }
+        else
+        {
+            symbolTable.AddNode(node, Symbol.NotOk);
+            tempResult += IndentedString("Setpin statement is not of pin type");
+        }
         PrintError();
         indent--;
     }
