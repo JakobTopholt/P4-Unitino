@@ -1,7 +1,5 @@
-# This is an example of a possible usecase of moduino where the programmer have utilisied our unitType system to setup and manage a "Smart garden" with arduinos. 
-# You could imagine that the developer of this system would end up having many more varaibles and different plants to keep in mind as he expand the capabilities.
-# Here Moduinos typesystem hopefully prove effective as it is very flexible and have potential to reduce a lot of code and confusion. No Bias xD
-# Units 
+# Arduino-compatible smart garden
+
 unit Volume{
     ml => value;
     dl => value/100;
@@ -113,25 +111,26 @@ func updateMushroom(){
 # action methods
 func activateWaterpump(pin arduinoSensor, Volume water){
    # activate a arduino sensor
-   Volume/Time pump = 20ml/1s;
+   Time/Volume pumpFlow = 40ml/1s;
+   Time timePumping = pumpFlow * water; 
 
- 
    if(arduinosensor == tomatoSensor){
-      #waterPump1.activate(water);
+      #waterPump1; #timePumping
    }
    else if(arduinosensor == citrusSensor ){
-      #waterPump2.activate(water);
+      #waterPump2; #timePumping
    }
    else if(arduinosensor == chilliSensor){
-      #waterPump3.activate(water);
+      #waterPump3; #timePumping
    }
    else if(arduinosensor == mushroomSensor){
-      #waterPump4.activate(water);
+      #waterPump4; #timePumping
    } 
 }
 func activateHumidifier(Humidity dampness){
-   # activate a arduino sensor
-   humidifier.activate(dampness);
+   # Logic for activating humidifier untill desired dampness
+   # Har brug for at aktivere read humidifier sensor flere gange tll dampness er opnået.
+   # humidifier.activate(dampness);
 }
 
 
