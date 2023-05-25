@@ -27,9 +27,11 @@ loop {
 }
 prog {
     delay(100);
-    setpin(11, high);
-    pin h = 5;
-    int a = 5;
+    pin h = 11;
+    setpin(11,input);
+    writepin(11,high);
+    decimal a = readpin(11);
+    int p = 5;
     char c = 'e';
     bool d = true;
     string l = d?"ja":"nej";
