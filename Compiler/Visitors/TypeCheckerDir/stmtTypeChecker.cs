@@ -607,27 +607,27 @@ public class stmtTypeChecker : DepthFirstAdapter
               switch (typedType)
               {
                   case AIntType:
-                      symbolTable.AddNode(node, returnSymbol == Symbol.Int ? Symbol.Ok : Symbol.NotOk);
+                      symbolTable.AddNode(node, returnSymbol == Symbol.Int ? Symbol.Int : Symbol.NotOk);
                       tempResult += returnSymbol == Symbol.Int ? "" : IndentedString("expression is not an Int\n");
                       break;
                   case ADecimalType:
-                      symbolTable.AddNode(node, returnSymbol == Symbol.Decimal ? Symbol.Ok : Symbol.NotOk);
+                      symbolTable.AddNode(node, returnSymbol == Symbol.Decimal ? Symbol.Decimal : Symbol.NotOk);
                       tempResult += returnSymbol == Symbol.Decimal ? "" : IndentedString("expression is not an Decimal\n");
                       break;
                   case ABoolType:
-                      symbolTable.AddNode(node, returnSymbol == Symbol.Bool ? Symbol.Ok : Symbol.NotOk);
+                      symbolTable.AddNode(node, returnSymbol == Symbol.Bool ? Symbol.Bool : Symbol.NotOk);
                       tempResult += returnSymbol == Symbol.Bool ? "" : IndentedString("expression is not an Bool\n");
                       break;
                   case ACharType:
-                      symbolTable.AddNode(node, returnSymbol == Symbol.Char ? Symbol.Ok : Symbol.NotOk);
+                      symbolTable.AddNode(node, returnSymbol == Symbol.Char ? Symbol.Char : Symbol.NotOk);
                       tempResult += returnSymbol == Symbol.Char ? "" : IndentedString("expression is not an Char\n");
                       break;
                   case AStringType:
-                      symbolTable.AddNode(node, returnSymbol == Symbol.String ? Symbol.Ok : Symbol.NotOk);
+                      symbolTable.AddNode(node, returnSymbol == Symbol.String ? Symbol.String : Symbol.NotOk);
                       tempResult += returnSymbol == Symbol.String ? "" : IndentedString("expression is not an String\n");
                       break;
                   case APinType:
-                      symbolTable.AddNode(node, returnSymbol == Symbol.Pin ? Symbol.Ok : Symbol.NotOk);
+                      symbolTable.AddNode(node, returnSymbol == Symbol.Pin ? Symbol.Pin : Symbol.NotOk);
                       tempResult += returnSymbol == Symbol.Pin ? "" : IndentedString("expression is not a pin\n");
                       break;
                   case AVoidType:
@@ -658,14 +658,14 @@ public class stmtTypeChecker : DepthFirstAdapter
                   symbolTable.GetUnit(returnExp, out var expUnit);
                   symbolTable.AddNode(node, symbolTable.CompareUnitTypes(func, expUnit) ? Symbol.Ok : Symbol.NotOk);
                   tempResult += symbolTable.CompareUnitTypes(func, expUnit) ? "" : IndentedString("return is not correct unitType\n");
-              } else if (symbolTable.GetReturnFromNode(aUntypedFunc) != null && symbolTable.GetReturnFromNode(aUntypedFunc) != Symbol.NotOk)
+              } else if (symbolTable.GetSymbol(aUntypedFunc) != null && symbolTable.GetSymbol(aUntypedFunc) != Symbol.NotOk)
               {
                   Symbol? symbol = symbolTable.GetSymbol(returnExp);
                   if (symbol != null)
                   {
                       Symbol nonNullSymbol = (Symbol)symbol;
-                      symbolTable.AddNode(node, symbolTable.GetReturnFromNode(aUntypedFunc) == nonNullSymbol ? nonNullSymbol : Symbol.NotOk);
-                      tempResult += symbolTable.GetReturnFromNode(aUntypedFunc) == nonNullSymbol ? "" : IndentedString("return is not correct type\n");
+                      symbolTable.AddNode(node, symbolTable.GetSymbol(aUntypedFunc) == nonNullSymbol ? nonNullSymbol : Symbol.NotOk);
+                      tempResult += symbolTable.GetSymbol(aUntypedFunc) == nonNullSymbol ? "" : IndentedString("return is not correct type\n");
                   }
               }
               else
@@ -673,10 +673,12 @@ public class stmtTypeChecker : DepthFirstAdapter
                   if (symbolTable.GetUnit(returnExp, out var expUnit))
                   {
                       symbolTable.AddNodeToUnit(aUntypedFunc, expUnit);
+                      symbolTable.AddNode(aUntypedFunc, Symbol.Ok);
                       symbolTable.AddNode(node, Symbol.Ok);
                   } else if (symbolTable.GetSymbol(returnExp) != null)
                   {
-                      symbolTable.AddReturnSymbol(aUntypedFunc, symbolTable.GetSymbol(returnExp));
+                      //symbolTable.AddReturnSymbol(aUntypedFunc, symbolTable.GetSymbol(returnExp));
+                      symbolTable.AddNode(aUntypedFunc, (Symbol)symbolTable.GetSymbol(returnExp));
                       symbolTable.AddNode(node, (Symbol)symbolTable.GetSymbol(returnExp));
                   }
               }

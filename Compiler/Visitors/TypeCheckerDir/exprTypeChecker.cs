@@ -169,7 +169,7 @@ public class exprTypeChecker : stmtTypeChecker
             if (matches)
             {
                 symbolTable.GetNodeFromId(node.GetId().ToString(), out Node result);
-                var symbol = symbolTable.GetReturnFromNode(result);
+                var symbol = symbolTable.GetSymbol(result);
                 switch (symbol)
                 {
                     case Symbol.Int:

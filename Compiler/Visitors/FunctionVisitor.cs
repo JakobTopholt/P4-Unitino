@@ -39,42 +39,7 @@ public class FunctionVisitor : DepthFirstAdapter
             symbolTable.AddIdToNode(node.GetId().ToString(), node);
         }
     }
-
-    public override void OutAUntypedGlobal(AUntypedGlobal node)
-    {
-        if (symbolTable.GetSymbol(node) == null)
-        {
-            if (node.GetStmt().OfType<AReturnStmt>().Count() == 0)
-            {
-                symbolTable.AddReturnSymbol(node, Symbol.Func);
-            }
-            else
-            {
-                AReturnStmt returnType = node.GetStmt().OfType<AReturnStmt>().ToList()[0];
-                switch (symbolTable.GetSymbol(returnType))
-                {
-                    case Symbol.Int:
-                        symbolTable.AddReturnSymbol(node, Symbol.Int);
-                        break;
-                    case Symbol.Decimal:
-                        symbolTable.AddReturnSymbol(node, Symbol.Decimal);
-                        break;
-                    case Symbol.Bool:
-                        symbolTable.AddReturnSymbol(node, Symbol.Bool);
-                        break;
-                    case Symbol.Char:
-                        symbolTable.AddReturnSymbol(node, Symbol.Char);
-                        break;
-                    case Symbol.String:
-                        symbolTable.AddReturnSymbol(node, Symbol.String);
-                        break;
-                    default:
-                        symbolTable.AddReturnSymbol(node, symbolTable.GetUnit(returnType, out _) ? Symbol.Ok : Symbol.NotOk);
-                        break;
-                }
-            }
-        }
-    }
+    
 
     public override void CaseATypedGlobal(ATypedGlobal node)
     {
@@ -100,43 +65,7 @@ public class FunctionVisitor : DepthFirstAdapter
             symbolTable.AddIdToNode(node.GetId().ToString(), node);
         }
     }
-
-    public override void OutATypedGlobal(ATypedGlobal node)
-    {
-        if (symbolTable.GetSymbol(node) == null)
-        {
-            switch (node.GetType())
-            {
-                case AIntType:
-                    symbolTable.AddReturnSymbol(node, Symbol.Int);
-                    break;
-                case ADecimalType:
-                    symbolTable.AddReturnSymbol(node, Symbol.Decimal);
-                    break;
-                case ABoolType:
-                    symbolTable.AddReturnSymbol(node, Symbol.Bool);
-                    break;
-                case ACharType:
-                    symbolTable.AddReturnSymbol(node, Symbol.Char);
-                    break;
-                case AStringType:
-                    symbolTable.AddReturnSymbol(node, Symbol.String);
-                    break;
-                case AVoidType:
-                    symbolTable.AddReturnSymbol(node, Symbol.Func);
-                    break;
-                case AUnitType customType:
-                    symbolTable.GetUnit(customType, out var unit);
-                    symbolTable.AddNodeToUnit(node, unit);
-                    symbolTable.AddReturnSymbol(node, Symbol.Ok);
-                    break;
-                default:
-                    symbolTable.AddReturnSymbol(node, Symbol.NotOk);
-                    break;
-            }
-        }
-
-    }
+    
     public override void CaseALoopGlobal(ALoopGlobal node)
     {
      
