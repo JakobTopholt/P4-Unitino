@@ -120,6 +120,9 @@ public class PrettyPrint : DepthFirstAdapter
             case AStringType:
                 Indent("string ");
                 break;
+            case APinType:
+                Indent("pin ");
+                break;
         }
         var customType = node.GetType() as AUnitType;
         if (customType != null)
@@ -202,6 +205,9 @@ public class PrettyPrint : DepthFirstAdapter
                 break;
             case AStringType:
                 output.Write("string ");
+                break;
+            case APinType:
+                Indent("pin ");
                 break;
         }
         if (node.GetType() is AUnitType customType)
@@ -379,13 +385,22 @@ public class PrettyPrint : DepthFirstAdapter
             case AStringType:
                 Indent("string ");
                 break;
-            case AUnitType customType:
+            case APinType:
+                Indent("pin ");
                 break;
         }
     }
     
     /*---------------------------------------------------------------------------------------------*/
-
+    public override void CaseATernaryExp(ATernaryExp node)
+    {
+        output.Write("");
+        node.GetCond().Apply(this);
+        output.Write("?");
+        node.GetTrue().Apply(this);
+        output.Write(":");
+        node.GetFalse().Apply(this);
+    }
     public override void CaseAAssignStmt(AAssignStmt node)
     {
         Indent("");
@@ -440,9 +455,9 @@ public class PrettyPrint : DepthFirstAdapter
         output.Write("--");
     }
     
-    public override void CaseAReturnStmt(AReturnStmt node)
+    public override void InAReturnStmt(AReturnStmt node)
     {
-        Indent($"return {node.GetExp().ToString().Trim()}");
+        Indent("return ");
     }
     
     public override void CaseADeclassStmt(ADeclassStmt node)
@@ -463,6 +478,9 @@ public class PrettyPrint : DepthFirstAdapter
                 break;
             case AStringType e:
                 Indent(($"string "));
+                break;
+            case APinType:
+                Indent("pin ");
                 break;
         }
         if (node.GetType() is AUnitType customType)
@@ -708,14 +726,12 @@ public class PrettyPrint : DepthFirstAdapter
     
     public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
     {
-        AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
-        output.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
-                                                    + "(" + node.GetDecimal().ToString().Trim() + ")");    
+        output.Write(node.GetDecimal().ToString().Trim());
+        node.GetId().Apply(this);   
     }
     public override void CaseAUnitnumberExp(AUnitnumberExp node)
     {
-        AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
-        output.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
-                                                    + "(" + node.GetNumber().ToString().Trim() + ")");
+        output.Write(node.GetNumber().ToString().Trim());
+        node.GetId().Apply(this);
     }
 }

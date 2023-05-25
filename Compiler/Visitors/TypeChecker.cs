@@ -150,6 +150,11 @@ public class TypeChecker : exprTypeChecker
         symbolTable.AddNode(node, Symbol.Func);
     }
 
+    public override void OutAPinType(APinType node)
+    {
+        symbolTable.AddNode(node, Symbol.Pin);
+    }
+
     public override void InAArg(AArg node)
     {
         locations.Push(IndentedString($"in argument: {node.GetType() + " " + node.GetId()}\n"));
@@ -251,7 +256,22 @@ public class TypeChecker : exprTypeChecker
                 untypedIsOk = false;
         }
         symbolTable = symbolTable.ExitScope();
-        symbolTable.AddNode(node, untypedIsOk ? Symbol.Ok : Symbol.NotOk);
+        if (!untypedIsOk)
+        {
+            // Overwrite the saved type with notOk
+            if (symbolTable._nodeToSymbol.ContainsKey(node))
+            {
+                symbolTable._nodeToSymbol.Remove(node);
+            }
+            symbolTable.AddNode(node, Symbol.NotOk);
+        }
+        else
+        {
+            if (!node.GetStmt().OfType<AReturnStmt>().Any())
+            {
+                symbolTable.AddNode(node, Symbol.Func);
+            }
+        }
         locations.Clear();
         reported = false;
         indent--;
@@ -281,7 +301,42 @@ public class TypeChecker : exprTypeChecker
                 typedIsOk = false;
         }
         symbolTable = symbolTable.ExitScope();
-        symbolTable.AddNode(node, typedIsOk ? Symbol.Ok : Symbol.NotOk);
+        if (typedIsOk)
+        {
+            PType typedType = node.GetType();
+            switch (typedType)
+            {
+                case AIntType:
+                    symbolTable.AddNode(node, Symbol.Int);
+                    break;
+                case ADecimalType:
+                    symbolTable.AddNode(node, Symbol.Decimal);
+                    break;
+                case ABoolType:
+                    symbolTable.AddNode(node, Symbol.Bool);
+                    break;
+                case ACharType:
+                    symbolTable.AddNode(node, Symbol.Char);
+                    break;
+                case AStringType:
+                    symbolTable.AddNode(node, Symbol.String);
+                    break;
+                case APinType:
+                    symbolTable.AddNode(node, Symbol.Pin);
+                    break;
+                case AVoidType:
+                    symbolTable.AddNode(node, Symbol.Func);
+                    break;
+                case AUnitType:
+                    symbolTable.AddNode(node, Symbol.Ok);
+                    break;
+            }
+        }
+        else
+        {
+            symbolTable.AddNode(node, Symbol.NotOk);
+        }
+
         locations.Clear();
         reported = false;
         indent--;

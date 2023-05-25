@@ -1,0 +1,6 @@
+﻿<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Publish win-x86" type="DotNetFolderPublish" factoryName="Publish to folder">
+    <riderPublish configuration="Release" include_native_libs_for_self_extract="true" platform="Any CPU" produce_single_file="true" runtime="win-x86" self_contained="true" target_folder="$PROJECT_DIR$/Release/win-x86" target_framework="net6.0" trim_unused_assemblies="true" uuid_high="-771026874220789398" uuid_low="-8968400333539368143" />
+    <method v="2" />
+  </configuration>
+</component>

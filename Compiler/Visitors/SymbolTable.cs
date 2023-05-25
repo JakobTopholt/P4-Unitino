@@ -16,14 +16,13 @@ public class SymbolTable
     }
     private readonly SymbolTable? _parent;
     private readonly Dictionary<string, Node> _idToNode = new();
-    private readonly Dictionary<Node, Symbol> _nodeToSymbol = new();
+    public readonly Dictionary<Node, Symbol> _nodeToSymbol = new();
     
     public readonly Dictionary<string, AUnitdeclGlobal> IdToUnitDecl = new();
     public readonly Dictionary<Node, (List<AUnitdeclGlobal> numerator, List<AUnitdeclGlobal> denominator)> NodeToUnit = new();
     
     private readonly Dictionary<string, Node> _funcIdToNode = new();
     private readonly Dictionary<Node, List<PType>> _nodeToArgs = new();
-    private readonly Dictionary<Node, Symbol?> _nodeToReturn = new();
     public int Prog = 0;
     public int Loop = 0;
 
@@ -113,12 +112,6 @@ public class SymbolTable
         bool found = _nodeToArgs.TryGetValue(node, out List<PType>? args);
         return found ? args : _parent?.GetFunctionArgs(node);
     }
-    public void AddReturnSymbol(Node node, Symbol? symbol) => _nodeToReturn.Add(node, symbol);
-    public Symbol? GetReturnFromNode(Node node)
-    {
-        bool found = _nodeToReturn.TryGetValue(node, out Symbol? returnSymbol);
-        return found ? returnSymbol : _parent?.GetReturnFromNode(node);
-    }
 }
 
 public enum Symbol
@@ -129,6 +122,7 @@ public enum Symbol
     Char,
     String,
     Func,
+    Pin,
     Ok, 
     NotOk,
 }

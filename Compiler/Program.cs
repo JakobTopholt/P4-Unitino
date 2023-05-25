@@ -8,7 +8,7 @@ internal static class Program
         //Usage: plug in Arduino board and run the compiler with "Moduino.exe [file]"
         if (args.Length == 0)
         {
-            Console.WriteLine("Usage: Compiler filepath [optional path to bash]");
+            Console.WriteLine("\nUsage: Compiler filepath [optional path to bash]");
             Console.WriteLine("Bash is only needed for downloading Arduino CLI the first time");
             return;
         }
@@ -16,6 +16,12 @@ internal static class Program
         string? bash = args.Length >= 2 ? args[1] : null;
 
         string inputFile = Path.GetFullPath(args[0]);
+        if (!File.Exists(inputFile + ".mino"))
+        {
+            Console.WriteLine("Couldn't find the file:\n" + inputFile + ".mino");
+            return;
+        }
+        
         // Download Arduino CLI while compiling Moduino to Arduino
         Task<bool> downloadCliAsync = ArduinoCompiler.DownloadCliAsync(bash);
         Console.WriteLine("Compiling: " + inputFile + ".mino");
@@ -24,5 +30,6 @@ internal static class Program
             return;
         Console.WriteLine("Compiling Arduino ");
         await ArduinoCompiler.InoToAVROnBoard(folder);
+        //TODO: make a UI as alternative to CLI :D
     }
 }

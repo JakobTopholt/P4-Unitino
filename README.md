@@ -1,15 +1,19 @@
-﻿# Template project for using the C# version of SableCC
+﻿# Unitino - Arduino with units
 
 ## Index
-
-* [Prerequisites](#prerequisites)
-* * [Rider (recommended)](#rider-recommended)
-* * [Visual Studio 2022](#visual-studio-2022)
-* [Building the project](#building-the-project)
-* [Docs for SableCC](#docs-for-sablecc)
+* [Contribute](#contribute)
+  * [Prerequisites](#prerequisites)
+    * [Rider (recommended)](#rider-recommended)
+    * [Visual Studio 2022](#visual-studio-2022)
+  * [Building the project](#building-the-project)
 * [Credits](#credits)
-* [ANTLR?](#antlr)
+# Using the compiler
+Navigate to [Release](Release) and download the Compiler.exe. Now just run the Compiler.exe in the terminal with `./Compiler.exe`
 
+Note that the .pdb file is optional, however if you get a critical error, having this file next to the executeable allows better debugging.
+
+# Contribute
+If you implement a new feature in the grammar, then make sure that both prettyprint and codegen has a test that covers the feature to ensure that the language is stable and no grammar features are meaningless. Creating Typechecking and making a test for it is only required if things accepted in the grammar shouldn't be accepted by the compiler such as assign a string to an integer.
 ## Prerequisites
 
 Hava Java installed and ensure it is in the PATH variable - check this by running `java --version` in any cmd
@@ -31,24 +35,10 @@ The `/.run` folder holds the run configurations
 * The `SableCC` configuration compiles the grammar.sablecc3 in the Compiler project 
 and places the created classes in the `/Compiler/SableCC` folder
 * The `Run` configuration runs the program.cs class as a standard CSharp console app
-* The `SableCC + Run` configuration is a compound of the 2 other configurations
+* The `SableCC2` if the `SableCC` configuration doesn't work
 
-(should be clickable if you open the readme in Rider)
-
-## Docs for SableCC
-
-[SableCC docs](https://sablecc.sourceforge.net/documentation.html)
-
-[SableCC Thesis(also a good doc)](https://sablecc.sourceforge.net/thesis/thesis.html)
-
-[SableCC local docs:](sablecc-3-beta.3.altgen.20041114/doc/) `/sablecc-3-beta.3.altgen.20041114/doc`
-
-
-## Credits
+# Credits
 
 [SableCC](sablecc.org) for the original compiler compiler
 
 [Indrek's Tools](http://www.mare.ee/indrek/sablecc/) for adjusting SableCC to generate a C# parser(this is the one in the project)
-
-## ANTLR?
-Maybe test out and create a project ready to use [ANTLR](https://theantlrguy.atlassian.net/wiki/spaces/ANTLR3/pages/2687262/Antlr+3+CSharp+Target#Antlr3CSharpTarget-GettingStarted)?
