@@ -454,11 +454,13 @@ public class stmtTypeChecker : DepthFirstAdapter
                         }
                         else
                         {
+                            symbolTable.AddIdToNode(node.GetId().ToString(), node);
                             symbolTable.AddNode(node, Symbol.NotOk);
                             tempResult += IndentedString("expression have no unitType associated\n");
                         }
                         break; 
                     default:
+                        symbolTable.AddIdToNode(node.GetId().ToString(), node);
                         symbolTable.AddNode(node, Symbol.NotOk);
                         tempResult += IndentedString("Wrong declaretype\n");
                         break;
@@ -696,6 +698,7 @@ public class stmtTypeChecker : DepthFirstAdapter
     {
         locations.Push(IndentedString($"in IfStmt {node}\n"));
         indent++;
+        symbolTable.EnterScope();
     }
 
     public override void OutAIfStmt(AIfStmt node)
@@ -709,12 +712,14 @@ public class stmtTypeChecker : DepthFirstAdapter
         tempResult += condExpr == Symbol.Bool ? "" : IndentedString("Condition is not a boolean\n");
         PrintError();
         indent--;
+        symbolTable.ExitScope();
     }
 
     public override void InAElseifStmt(AElseifStmt node)
     {
         locations.Push( IndentedString($"in ElseifStmt {node}\n"));
         indent++;
+        symbolTable.EnterScope();
     }
 
     public override void OutAElseifStmt(AElseifStmt node)
@@ -728,12 +733,14 @@ public class stmtTypeChecker : DepthFirstAdapter
         tempResult += condExpr == Symbol.Bool ? "" : IndentedString("Condition is not a boolean\n");
         PrintError();
         indent--;
+        symbolTable.ExitScope();
     }
 
     public override void InAElseStmt(AElseStmt node)
     {
         locations.Push( IndentedString($"in ElseStmt {node}\n"));
         indent++;
+        symbolTable.EnterScope();
     }
 
     public override void OutAElseStmt(AElseStmt node)
@@ -742,12 +749,14 @@ public class stmtTypeChecker : DepthFirstAdapter
         symbolTable.AddNode(node, Symbol.Ok);
         PrintError();
         indent--;
+        symbolTable.ExitScope();
     }
 
     public override void InAForStmt(AForStmt node)
     {
         locations.Push( IndentedString($"in forloop {node}\n"));
         indent++;
+        symbolTable.EnterScope();
     }
 
     public override void OutAForStmt(AForStmt node)
@@ -757,12 +766,14 @@ public class stmtTypeChecker : DepthFirstAdapter
         tempResult += condExpr == Symbol.Bool ? "" : IndentedString("Condition is not a boolean\n");
         PrintError();
         indent--;
+        symbolTable.ExitScope();
     }
 
     public override void InAWhileStmt(AWhileStmt node)
     {
         locations.Push( IndentedString($"in while loop {node}\n"));
         indent++;
+        symbolTable.EnterScope();
     }
 
     public override void OutAWhileStmt(AWhileStmt node)
@@ -777,12 +788,14 @@ public class stmtTypeChecker : DepthFirstAdapter
         tempResult += condExpr == Symbol.Bool ? "" : IndentedString("Condition is not a boolean\n");
         PrintError();
         indent--;
+        symbolTable.ExitScope();
     }
 
     public override void InADowhileStmt(ADowhileStmt node)
     {
         locations.Push(IndentedString($"in do-while loop {node}\n"));
         indent++;
+        symbolTable.EnterScope();
     }
 
     public override void OutADowhileStmt(ADowhileStmt node)
@@ -797,6 +810,7 @@ public class stmtTypeChecker : DepthFirstAdapter
         tempResult += condExpr == Symbol.Bool ? "" : IndentedString("Condition is not a boolean\n");
         PrintError();
         indent--;
+        symbolTable.ExitScope();
     }
 
     public override void InADelayStmt(ADelayStmt node)
