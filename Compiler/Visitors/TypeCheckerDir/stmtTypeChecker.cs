@@ -447,18 +447,20 @@ public class stmtTypeChecker : DepthFirstAdapter
                             }
                             else
                             {
-                                symbolTable.AddNode(node, Symbol.NotOk);
+                                symbolTable.AddIdToNode(node.GetId().ToString(), node);
                                 symbolTable.AddNode(node, Symbol.NotOk);
                                 tempResult += IndentedString("expression is not correct unitType\n");
                             }
                         }
                         else
                         {
+                            symbolTable.AddIdToNode(node.GetId().ToString(), node);
                             symbolTable.AddNode(node, Symbol.NotOk);
                             tempResult += IndentedString("expression have no unitType associated\n");
                         }
                         break; 
                     default:
+                        symbolTable.AddIdToNode(node.GetId().ToString(), node);
                         symbolTable.AddNode(node, Symbol.NotOk);
                         tempResult += IndentedString("Wrong declaretype\n");
                         break;
@@ -607,27 +609,27 @@ public class stmtTypeChecker : DepthFirstAdapter
               switch (typedType)
               {
                   case AIntType:
-                      symbolTable.AddNode(node, returnSymbol == Symbol.Int ? Symbol.Ok : Symbol.NotOk);
+                      symbolTable.AddNode(node, returnSymbol == Symbol.Int ? Symbol.Int : Symbol.NotOk);
                       tempResult += returnSymbol == Symbol.Int ? "" : IndentedString("expression is not an Int\n");
                       break;
                   case ADecimalType:
-                      symbolTable.AddNode(node, returnSymbol == Symbol.Decimal ? Symbol.Ok : Symbol.NotOk);
+                      symbolTable.AddNode(node, returnSymbol == Symbol.Decimal ? Symbol.Decimal : Symbol.NotOk);
                       tempResult += returnSymbol == Symbol.Decimal ? "" : IndentedString("expression is not an Decimal\n");
                       break;
                   case ABoolType:
-                      symbolTable.AddNode(node, returnSymbol == Symbol.Bool ? Symbol.Ok : Symbol.NotOk);
+                      symbolTable.AddNode(node, returnSymbol == Symbol.Bool ? Symbol.Bool : Symbol.NotOk);
                       tempResult += returnSymbol == Symbol.Bool ? "" : IndentedString("expression is not an Bool\n");
                       break;
                   case ACharType:
-                      symbolTable.AddNode(node, returnSymbol == Symbol.Char ? Symbol.Ok : Symbol.NotOk);
+                      symbolTable.AddNode(node, returnSymbol == Symbol.Char ? Symbol.Char : Symbol.NotOk);
                       tempResult += returnSymbol == Symbol.Char ? "" : IndentedString("expression is not an Char\n");
                       break;
                   case AStringType:
-                      symbolTable.AddNode(node, returnSymbol == Symbol.String ? Symbol.Ok : Symbol.NotOk);
+                      symbolTable.AddNode(node, returnSymbol == Symbol.String ? Symbol.String : Symbol.NotOk);
                       tempResult += returnSymbol == Symbol.String ? "" : IndentedString("expression is not an String\n");
                       break;
                   case APinType:
-                      symbolTable.AddNode(node, returnSymbol == Symbol.Pin ? Symbol.Ok : Symbol.NotOk);
+                      symbolTable.AddNode(node, returnSymbol == Symbol.Pin ? Symbol.Pin : Symbol.NotOk);
                       tempResult += returnSymbol == Symbol.Pin ? "" : IndentedString("expression is not a pin\n");
                       break;
                   case AVoidType:
@@ -635,8 +637,8 @@ public class stmtTypeChecker : DepthFirstAdapter
                       tempResult += IndentedString("ReturnStmt should not be in a void function\n");
                       break;
                   case AUnitType:
-                      symbolTable.GetUnit(typedType, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) funcType);
-                      if (symbolTable.GetUnit(returnExp, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) returnType))
+                      symbolTable.GetUnit(typedType, out (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) funcType);
+                      if (symbolTable.GetUnit(returnExp, out (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) returnType))
                       {
                           symbolTable.AddNode(node, symbolTable.CompareUnitTypes(funcType, returnType) ? Symbol.Ok : Symbol.NotOk);
                           tempResult += symbolTable.CompareUnitTypes(funcType, returnType) ? "" : IndentedString("return is not correct unitType\n");
@@ -658,14 +660,14 @@ public class stmtTypeChecker : DepthFirstAdapter
                   symbolTable.GetUnit(returnExp, out var expUnit);
                   symbolTable.AddNode(node, symbolTable.CompareUnitTypes(func, expUnit) ? Symbol.Ok : Symbol.NotOk);
                   tempResult += symbolTable.CompareUnitTypes(func, expUnit) ? "" : IndentedString("return is not correct unitType\n");
-              } else if (symbolTable.GetReturnFromNode(aUntypedFunc) != null && symbolTable.GetReturnFromNode(aUntypedFunc) != Symbol.NotOk)
+              } else if (symbolTable.GetSymbol(aUntypedFunc) != null && symbolTable.GetSymbol(aUntypedFunc) != Symbol.NotOk)
               {
                   Symbol? symbol = symbolTable.GetSymbol(returnExp);
                   if (symbol != null)
                   {
                       Symbol nonNullSymbol = (Symbol)symbol;
-                      symbolTable.AddNode(node, symbolTable.GetReturnFromNode(aUntypedFunc) == nonNullSymbol ? nonNullSymbol : Symbol.NotOk);
-                      tempResult += symbolTable.GetReturnFromNode(aUntypedFunc) == nonNullSymbol ? "" : IndentedString("return is not correct type\n");
+                      symbolTable.AddNode(node, symbolTable.GetSymbol(aUntypedFunc) == nonNullSymbol ? nonNullSymbol : Symbol.NotOk);
+                      tempResult += symbolTable.GetSymbol(aUntypedFunc) == nonNullSymbol ? "" : IndentedString("return is not correct type\n");
                   }
               }
               else
@@ -673,10 +675,12 @@ public class stmtTypeChecker : DepthFirstAdapter
                   if (symbolTable.GetUnit(returnExp, out var expUnit))
                   {
                       symbolTable.AddNodeToUnit(aUntypedFunc, expUnit);
+                      symbolTable.AddNode(aUntypedFunc, Symbol.Ok);
                       symbolTable.AddNode(node, Symbol.Ok);
                   } else if (symbolTable.GetSymbol(returnExp) != null)
                   {
-                      symbolTable.AddReturnSymbol(aUntypedFunc, symbolTable.GetSymbol(returnExp));
+                      //symbolTable.AddReturnSymbol(aUntypedFunc, symbolTable.GetSymbol(returnExp));
+                      symbolTable.AddNode(aUntypedFunc, (Symbol)symbolTable.GetSymbol(returnExp));
                       symbolTable.AddNode(node, (Symbol)symbolTable.GetSymbol(returnExp));
                   }
               }
@@ -694,6 +698,7 @@ public class stmtTypeChecker : DepthFirstAdapter
     {
         locations.Push(IndentedString($"in IfStmt {node}\n"));
         indent++;
+        symbolTable.EnterScope();
     }
 
     public override void OutAIfStmt(AIfStmt node)
@@ -707,12 +712,14 @@ public class stmtTypeChecker : DepthFirstAdapter
         tempResult += condExpr == Symbol.Bool ? "" : IndentedString("Condition is not a boolean\n");
         PrintError();
         indent--;
+        symbolTable.ExitScope();
     }
 
     public override void InAElseifStmt(AElseifStmt node)
     {
         locations.Push( IndentedString($"in ElseifStmt {node}\n"));
         indent++;
+        symbolTable.EnterScope();
     }
 
     public override void OutAElseifStmt(AElseifStmt node)
@@ -726,12 +733,14 @@ public class stmtTypeChecker : DepthFirstAdapter
         tempResult += condExpr == Symbol.Bool ? "" : IndentedString("Condition is not a boolean\n");
         PrintError();
         indent--;
+        symbolTable.ExitScope();
     }
 
     public override void InAElseStmt(AElseStmt node)
     {
         locations.Push( IndentedString($"in ElseStmt {node}\n"));
         indent++;
+        symbolTable.EnterScope();
     }
 
     public override void OutAElseStmt(AElseStmt node)
@@ -740,12 +749,14 @@ public class stmtTypeChecker : DepthFirstAdapter
         symbolTable.AddNode(node, Symbol.Ok);
         PrintError();
         indent--;
+        symbolTable.ExitScope();
     }
 
     public override void InAForStmt(AForStmt node)
     {
         locations.Push( IndentedString($"in forloop {node}\n"));
         indent++;
+        symbolTable.EnterScope();
     }
 
     public override void OutAForStmt(AForStmt node)
@@ -755,12 +766,14 @@ public class stmtTypeChecker : DepthFirstAdapter
         tempResult += condExpr == Symbol.Bool ? "" : IndentedString("Condition is not a boolean\n");
         PrintError();
         indent--;
+        symbolTable.ExitScope();
     }
 
     public override void InAWhileStmt(AWhileStmt node)
     {
         locations.Push( IndentedString($"in while loop {node}\n"));
         indent++;
+        symbolTable.EnterScope();
     }
 
     public override void OutAWhileStmt(AWhileStmt node)
@@ -775,12 +788,14 @@ public class stmtTypeChecker : DepthFirstAdapter
         tempResult += condExpr == Symbol.Bool ? "" : IndentedString("Condition is not a boolean\n");
         PrintError();
         indent--;
+        symbolTable.ExitScope();
     }
 
     public override void InADowhileStmt(ADowhileStmt node)
     {
         locations.Push(IndentedString($"in do-while loop {node}\n"));
         indent++;
+        symbolTable.EnterScope();
     }
 
     public override void OutADowhileStmt(ADowhileStmt node)
@@ -795,6 +810,7 @@ public class stmtTypeChecker : DepthFirstAdapter
         tempResult += condExpr == Symbol.Bool ? "" : IndentedString("Condition is not a boolean\n");
         PrintError();
         indent--;
+        symbolTable.ExitScope();
     }
 
     public override void InADelayStmt(ADelayStmt node)

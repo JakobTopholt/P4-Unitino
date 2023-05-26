@@ -67,7 +67,8 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             case APrefixminusStmt:
             case APrefixplusStmt:
             case ADelayStmt:
-            case ASetpinStmt:    
+            case ASetpinStmt:
+            case AWritepinStmt:
                 writer.WriteLine(";");                    
                 break;
         }
@@ -439,18 +440,47 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         node.GetFalse().Apply(this);
     }
 
-    public override void CaseASetpinStmt(ASetpinStmt node)
+    public override void CaseAWritepinStmt(AWritepinStmt node)
     {
         Indent("digitalWrite(");
         node.GetExp().Apply(this);
         writer.Write(", ");
         node.GetPintoggle().Apply(this);
+        OutAWritepinStmt(node);
+    }
+
+    public override void OutAWritepinStmt(AWritepinStmt node)
+    {
+        writer.Write(")");
+    }
+
+    public override void CaseASetpinStmt(ASetpinStmt node)
+    {
+        Indent("pinMode(");
+        node.GetExp().Apply(this);
+        writer.Write(", ");
+        node.GetPinmode().Apply(this);
         OutASetpinStmt(node);
     }
 
     public override void OutASetpinStmt(ASetpinStmt node)
     {
         writer.Write(")");
+    }
+
+    public override void CaseAInputPinmode(AInputPinmode node)
+    {
+        writer.Write("INPUT");
+    }
+
+    public override void CaseAOutputPinmode(AOutputPinmode node)
+    {
+        writer.Write("OUTPUT");
+    }
+
+    public override void CaseAInputPullupPinmode(AInputPullupPinmode node)
+    {
+        writer.Write("INPUT_PULLUP");
     }
 
     public override void CaseAHighPintoggle(AHighPintoggle node)
@@ -702,6 +732,11 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void CaseALogicalnotExp(ALogicalnotExp node)
     {
         writer.Write($"!{node.GetExp()}");
+    }
+
+    public override void CaseAReadpinExp(AReadpinExp node)
+    {
+        writer.Write($"digitalRead({node.GetExp().ToString().Trim()})");
     }
 
     public override void CaseACastExp(ACastExp node)

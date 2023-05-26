@@ -169,7 +169,7 @@ public class exprTypeChecker : stmtTypeChecker
             if (matches)
             {
                 symbolTable.GetNodeFromId(node.GetId().ToString(), out Node result);
-                var symbol = symbolTable.GetReturnFromNode(result);
+                var symbol = symbolTable.GetSymbol(result);
                 switch (symbol)
                 {
                     case Symbol.Int:
@@ -244,7 +244,7 @@ public class exprTypeChecker : stmtTypeChecker
             default:
                 if (symbolTable.GetUnit(node.GetId().ToString().Trim(), out var unit))
                 {
-                    symbolTable.AddNodeToUnit(node, ((List<AUnitdeclGlobal>, List<AUnitdeclGlobal>))unit);
+                    symbolTable.AddNodeToUnit(node, unit);
                     symbolTable.AddNode(node, Symbol.Ok);
                 }
                 else
@@ -271,9 +271,9 @@ public class exprTypeChecker : stmtTypeChecker
         if (unitType != null)
         {
             // Create a new unit tuple and add the unitnumber as a lone numerator
-            List<AUnitdeclGlobal> nums = new List<AUnitdeclGlobal>();
-            nums.Add(unitType);
-            List<AUnitdeclGlobal> dens = new List<AUnitdeclGlobal>();
+            SortedList<string, AUnitdeclGlobal> nums = new SortedList<string, AUnitdeclGlobal>();
+            nums.Add(unitType.GetId().ToString().Trim(), unitType);
+            SortedList<string, AUnitdeclGlobal> dens = new SortedList<string, AUnitdeclGlobal>();
             var unit = (nums, dens);
             symbolTable.AddNodeToUnit(node, unit);
             symbolTable.AddNode(node, Symbol.Ok);
@@ -301,9 +301,9 @@ public class exprTypeChecker : stmtTypeChecker
         if (unitType != null)
         {
             // Create a new unit tuple and add the unitnumber as a lone numerator
-            List<AUnitdeclGlobal> nums = new List<AUnitdeclGlobal>();
-            nums.Add(unitType);
-            List<AUnitdeclGlobal> dens = new List<AUnitdeclGlobal>();
+            SortedList<string, AUnitdeclGlobal> nums = new SortedList<string, AUnitdeclGlobal>();
+            nums.Add(unitType.GetId().ToString().Trim(), unitType);
+            SortedList<string, AUnitdeclGlobal> dens = new SortedList<string, AUnitdeclGlobal>();
             var unit = (nums, dens);
 
             // Map node to the unit
@@ -366,30 +366,41 @@ public class exprTypeChecker : stmtTypeChecker
                 bool rightContainsUnit = symbolTable.NodeToUnit.ContainsKey(rightExpr);
                 if (symbolTable.NodeToUnit.ContainsKey(leftExpr) && symbolTable.NodeToUnit.ContainsKey(rightExpr))
                 {
-                    if (!(symbolTable.GetUnit(leftExpr, out (List<AUnitdeclGlobal> num, List<AUnitdeclGlobal> den) left) 
-                          && symbolTable.GetUnit(rightExpr, out (List<AUnitdeclGlobal> num, List<AUnitdeclGlobal> den) right)))
+                    if (!(symbolTable.GetUnit(leftExpr, out (SortedList<string, AUnitdeclGlobal> num, SortedList<string, AUnitdeclGlobal> den) left) 
+                          && symbolTable.GetUnit(rightExpr, out (SortedList<string, AUnitdeclGlobal> num, SortedList<string, AUnitdeclGlobal> den) right)))
                         return;
+                    SortedList<string, AUnitdeclGlobal> unitLeftNums = left.num;
+                    SortedList<string, AUnitdeclGlobal> unitLeftDens = left.den;
+                    SortedList<string, AUnitdeclGlobal> unitRightNums = right.num;
+                    SortedList<string, AUnitdeclGlobal> unitRightDens = right.den;
 
-                    List<AUnitdeclGlobal> unitLeftNums = left.num;
-                    List<AUnitdeclGlobal> unitLeftDens = left.den;
-                    List<AUnitdeclGlobal> unitRightNums = right.num;
-                    List<AUnitdeclGlobal> unitRightDens = right.den;
+                    List<AUnitdeclGlobal> numOverlap = unitLeftNums.Values.Intersect(unitRightNums.Values).ToList();
+                    List<AUnitdeclGlobal> denOverlap = unitLeftDens.Values.Intersect(unitRightDens.Values).ToList();
 
-                    List<AUnitdeclGlobal> numOverlap = unitLeftNums.Intersect(unitRightNums).ToList();
-                    List<AUnitdeclGlobal> denOverlap = unitLeftDens.Intersect(unitRightDens).ToList();
-
-                    List<AUnitdeclGlobal> numerators = unitLeftNums.Except(numOverlap).Union(unitRightDens.Except(denOverlap)).ToList();
-                    List<AUnitdeclGlobal> denomerators = unitRightNums.Except(numOverlap).Union(unitLeftDens.Except(denOverlap)).ToList();
-
-                    (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unituse = (numerators, denomerators);
-                    symbolTable.AddNodeToUnit(node, unituse);
-                    symbolTable.AddNode(node, Symbol.Ok);
+                    List<AUnitdeclGlobal> numerators = unitLeftNums.Values.Except(numOverlap).Union(unitRightDens.Values.Except(denOverlap)).ToList();
+                    List<AUnitdeclGlobal> denominators = unitRightNums.Values.Except(numOverlap).Union(unitLeftDens.Values.Except(denOverlap)).ToList();
+                    
+                    SortedList<string, AUnitdeclGlobal> newNums = new SortedList<string, AUnitdeclGlobal>();
+                    SortedList<string, AUnitdeclGlobal> newDens = new SortedList<string, AUnitdeclGlobal>();
+                    
+                    foreach (AUnitdeclGlobal num in numerators)
+                    {
+                        newNums.Add(num.GetId().ToString().Trim(),num);
+                    }
+                    foreach (AUnitdeclGlobal den in denominators)
+                    {
+                        newDens.Add(den.GetId().ToString().Trim(),den);;
+                    }
+                    (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unituse = (newNums, newDens);
+                        symbolTable.AddNodeToUnit(node, unituse);
+                        symbolTable.AddNode(node, Symbol.Ok);
+                    
                 }
                 else if ((leftContainsUnit || rightContainsUnit) && (symbolTable.GetSymbol(leftExpr) == Symbol.Int || symbolTable.GetSymbol(leftExpr) == Symbol.Decimal) 
                          || (symbolTable.GetSymbol(rightExpr) == Symbol.Int || symbolTable.GetSymbol(rightExpr) == Symbol.Decimal))
                 {
                     // Unitnumber + decimal/int eller decimal/int + UnitNumber
-                    (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unit;
+                    (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unit;
                     if (leftContainsUnit ? symbolTable.GetUnit(leftExpr, out unit) : rightContainsUnit && symbolTable.GetUnit(rightExpr, out unit))
                     {
                         symbolTable.AddNodeToUnit(node, unit);
@@ -450,22 +461,35 @@ public class exprTypeChecker : stmtTypeChecker
                 bool rightContainsUnit = symbolTable.NodeToUnit.ContainsKey(rightExpr);
                 if (symbolTable.NodeToUnit.ContainsKey(leftExpr) && symbolTable.NodeToUnit.ContainsKey(rightExpr))
                 {
-                    if (!(symbolTable.GetUnit(leftExpr, out (List<AUnitdeclGlobal> num, List<AUnitdeclGlobal> den) left) 
-                          && symbolTable.GetUnit(rightExpr, out (List<AUnitdeclGlobal> num, List<AUnitdeclGlobal> den) right)))
+                    if (!(symbolTable.GetUnit(leftExpr, out (SortedList<string, AUnitdeclGlobal> num, SortedList<string, AUnitdeclGlobal> den) left) 
+                          && symbolTable.GetUnit(rightExpr, out (SortedList<string, AUnitdeclGlobal> num, SortedList<string, AUnitdeclGlobal> den) right)))
                         return;
 
-                    List<AUnitdeclGlobal> unitLeftNums = left.num;
-                    List<AUnitdeclGlobal> unitLeftDens = left.den;
-                    List<AUnitdeclGlobal> unitRightNums = right.num;
-                    List<AUnitdeclGlobal> unitRightDens = right.den;
+                    SortedList<string, AUnitdeclGlobal> unitLeftNums = left.num;
+                    SortedList<string, AUnitdeclGlobal> unitLeftDens = left.den;
+                    SortedList<string, AUnitdeclGlobal> unitRightNums = right.num;
+                    SortedList<string, AUnitdeclGlobal> unitRightDens = right.den;
 
-                    List<AUnitdeclGlobal> leftNumRightDen = unitLeftNums.Intersect(unitRightDens).ToList();
-                    List<AUnitdeclGlobal> leftDenRightNums = unitLeftDens.Intersect(unitRightNums).ToList();
+                    List<AUnitdeclGlobal> leftNumRightDen = unitLeftNums.Values.Intersect(unitRightDens.Values).ToList();
+                    List<AUnitdeclGlobal> leftDenRightNums = unitLeftDens.Values.Intersect(unitRightNums.Values).ToList();
 
-                    List<AUnitdeclGlobal> numerators = unitLeftNums.Except(leftNumRightDen).Union(unitRightDens.Except(leftDenRightNums)).ToList();
-                    List<AUnitdeclGlobal> denomerators = unitRightNums.Except(leftNumRightDen).Union(unitLeftDens.Except(leftDenRightNums)).ToList();
+                    // fix logic
+                    List<AUnitdeclGlobal> numerators = unitLeftNums.Values.Except(leftNumRightDen).Union(unitRightDens.Values.Except(leftDenRightNums)).ToList();
+                    List<AUnitdeclGlobal> denomerators = unitRightNums.Values.Except(leftNumRightDen).Union(unitLeftDens.Values.Except(leftDenRightNums)).ToList();
+                    
+                    SortedList<string, AUnitdeclGlobal> newNums = new SortedList<string, AUnitdeclGlobal>();
+                    SortedList<string, AUnitdeclGlobal> newDens = new SortedList<string, AUnitdeclGlobal>();
+                    
+                    foreach (AUnitdeclGlobal num in numerators)
+                    {
+                        newNums.Add(num.GetId().ToString().Trim(),num);
+                    }
+                    foreach (AUnitdeclGlobal den in denomerators)
+                    {
+                        newDens.Add(den.GetId().ToString().Trim(),den);;
+                    }
 
-                    (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unituse = (numerators, denomerators);
+                    (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unituse = (newNums, newDens);
                     symbolTable.AddNodeToUnit(node, unituse);
                     symbolTable.AddNode(node, Symbol.Ok);
                 }
@@ -473,7 +497,7 @@ public class exprTypeChecker : stmtTypeChecker
                          || (symbolTable.GetSymbol(rightExpr) == Symbol.Int || symbolTable.GetSymbol(rightExpr) == Symbol.Decimal))
                 {
                     // Unitnumber + decimal/int eller decimal/int + UnitNumber
-                    (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unit;
+                    (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unit;
                     if (leftContainsUnit ? symbolTable.GetUnit(leftExpr, out unit) : rightContainsUnit && symbolTable.GetUnit(rightExpr, out unit))
                     {
                         symbolTable.AddNodeToUnit(node, unit);
@@ -542,75 +566,25 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(node, Symbol.String);
                 break;
             default:
-                bool leftContainsUnit = symbolTable.NodeToUnit.ContainsKey(leftExpr);
-                bool rightContainsUnit = symbolTable.NodeToUnit.ContainsKey(rightExpr);
-                if (leftContainsUnit && rightContainsUnit)
+                // UnitTypes?
+                if (symbolTable.GetUnit(leftExpr, out var unit1) && symbolTable.GetUnit(rightExpr, out var unit2))
                 {
-                    // har burgt noget nullable warning?
-                    if (!(symbolTable.GetUnit(leftExpr, out (List<AUnitdeclGlobal> num, List<AUnitdeclGlobal> den) left) 
-                          && symbolTable.GetUnit(rightExpr, out (List<AUnitdeclGlobal> num, List<AUnitdeclGlobal> den) right)))
-                        return;
-
-                    List<AUnitdeclGlobal> a = left.num;
-                    List<AUnitdeclGlobal> b = left.den;
-                    List<AUnitdeclGlobal> c = right.num;
-                    List<AUnitdeclGlobal> d = right.den;
-
-                    var sortedNums1 = a.OrderBy(x => x).ToList();
-                    bool isEmptyNums1 = sortedNums1.Count == 0;
-                    var sortedNums2 = c.OrderBy(x => x).ToList();
-                    bool isEmptyNums2 = sortedNums2.Count == 0;
-                    var sortedDens1 = b.OrderBy(x => x).ToList();
-                    bool isEmptyDens1 = sortedDens1.Count == 0;
-                    var sortedDens2 = d.OrderBy(x => x).ToList();
-                    bool isEmptyDens2 = sortedDens2.Count == 0;
-
-                    bool dontCompareNums = isEmptyNums1 || isEmptyNums2;
-                    bool dontCompareDens = isEmptyDens1 || isEmptyDens2;
-
-                    if ((dontCompareNums || sortedNums1.SequenceEqual(sortedNums2)) &&
-                        (dontCompareDens || sortedDens1.SequenceEqual(sortedDens2)))
+                    if (symbolTable.CompareUnitTypes(unit1, unit2))
                     {
-                        // Create a new unitTyple and add it to NodeToUnit and return symbol.ok
-                        List<AUnitdeclGlobal> numerators = isEmptyNums1
-                            ? isEmptyNums2 ? new List<AUnitdeclGlobal>() : sortedNums2
-                            : sortedNums1;
-                        List<AUnitdeclGlobal> denomerators = isEmptyDens1
-                            ? isEmptyDens2 ? new List<AUnitdeclGlobal>() : sortedDens2
-                            : sortedDens1;
-
-                        (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unituse = (numerators, denomerators);
-                        symbolTable.AddNodeToUnit(node, unituse);
+                        symbolTable.AddNodeToUnit(node, unit1);
                         symbolTable.AddNode(node, Symbol.Ok);
-                    }
+                    } 
                     else
                     {
                         symbolTable.AddNode(node, Symbol.NotOk);
                         tempResult += IndentedString("Not the same unitTypes used in expression\n");
-
-                    }
-                }
-                else if ((leftContainsUnit || rightContainsUnit) && (symbolTable.GetSymbol(leftExpr) == Symbol.Int || symbolTable.GetSymbol(leftExpr) == Symbol.Decimal) 
-                         || (symbolTable.GetSymbol(rightExpr) == Symbol.Int || symbolTable.GetSymbol(rightExpr) == Symbol.Decimal))
-                {
-                    // Unitnumber + decimal/int eller decimal/int + UnitNumber
-                    (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unit;
-                    if (leftContainsUnit ? symbolTable.GetUnit(leftExpr, out unit) : rightContainsUnit && symbolTable.GetUnit(rightExpr, out unit))
-                    {
-                        symbolTable.AddNodeToUnit(node, unit);
-                        symbolTable.AddNode(node, Symbol.Ok);
-                    }
-                    else
-                    {
-                        symbolTable.AddNode(node, Symbol.NotOk);
-                        tempResult += IndentedString("Not the same unitTypes used in expression!\n");
                     }
                 }
                 else
                 {
                     // not valid input expression
                     symbolTable.AddNode(node, Symbol.NotOk);
-                    tempResult += IndentedString("Not the same Types used in expression!\n");
+                    tempResult += IndentedString("Not valid Types used together in expression!\n");
                 }
                 break;
         }
@@ -650,74 +624,25 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(node, Symbol.Decimal);
                 break;
             default:
-                // Implement logikken for custom units her
-                bool leftContainsUnit = symbolTable.NodeToUnit.ContainsKey(leftExpr);
-                bool rightContainsUnit = symbolTable.NodeToUnit.ContainsKey(rightExpr);
-                if (symbolTable.NodeToUnit.ContainsKey(leftExpr) && symbolTable.NodeToUnit.ContainsKey(rightExpr))
+                // UnitTypes?
+                if (symbolTable.GetUnit(leftExpr, out var unit1) && symbolTable.GetUnit(rightExpr, out var unit2))
                 {
-                    if (!(symbolTable.GetUnit(leftExpr, out (List<AUnitdeclGlobal> num, List<AUnitdeclGlobal> den) left) 
-                          && symbolTable.GetUnit(rightExpr, out (List<AUnitdeclGlobal> num, List<AUnitdeclGlobal> den) right)))
-                        return;
-
-                    List<AUnitdeclGlobal> a = left.num;
-                    List<AUnitdeclGlobal> b = left.den;
-                    List<AUnitdeclGlobal> c = right.num;
-                    List<AUnitdeclGlobal> d = right.den;
-
-                    var sortedNums1 = a.OrderBy(x => x).ToList();
-                    bool isEmptyNums1 = sortedNums1.Count == 0;
-                    var sortedNums2 = c.OrderBy(x => x).ToList();
-                    bool isEmptyNums2 = sortedNums2.Count == 0;
-                    var sortedDens1 = b.OrderBy(x => x).ToList();
-                    bool isEmptyDens1 = sortedDens1.Count == 0;
-                    var sortedDens2 = d.OrderBy(x => x).ToList();
-                    bool isEmptyDens2 = sortedDens2.Count == 0;
-
-                    bool dontCompareNums = isEmptyNums1 || isEmptyNums2;
-                    bool dontCompareDens = isEmptyDens1 || isEmptyDens2;
-
-                    if ((dontCompareNums || sortedNums1.SequenceEqual(sortedNums2)) &&
-                        (dontCompareDens || sortedDens1.SequenceEqual(sortedDens2)))
+                    if (symbolTable.CompareUnitTypes(unit1, unit2))
                     {
-                        // Create a new unitTyple and add it to NodeToUnit and return symbol.ok
-                        List<AUnitdeclGlobal> numerators = isEmptyNums1
-                            ? isEmptyNums2 ? new List<AUnitdeclGlobal>() : sortedNums2
-                            : sortedNums1;
-                        List<AUnitdeclGlobal> denomerators = isEmptyDens1
-                            ? isEmptyDens2 ? new List<AUnitdeclGlobal>() : sortedDens2
-                            : sortedDens1;
-
-                        (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unituse = (numerators, denomerators);
-                        symbolTable.AddNodeToUnit(node, unituse);
+                        symbolTable.AddNodeToUnit(node, unit1);
                         symbolTable.AddNode(node, Symbol.Ok);
-                    }
+                    } 
                     else
                     {
                         symbolTable.AddNode(node, Symbol.NotOk);
-                        tempResult += IndentedString("Not the same unitTypes used in expression!\n");
-                    }
-                }
-                else if ((leftContainsUnit || rightContainsUnit) && (symbolTable.GetSymbol(leftExpr) == Symbol.Int || symbolTable.GetSymbol(leftExpr) == Symbol.Decimal) 
-                         || (symbolTable.GetSymbol(rightExpr) == Symbol.Int || symbolTable.GetSymbol(rightExpr) == Symbol.Decimal))
-                {
-                    // Unitnumber + decimal/int eller decimal/int + UnitNumber
-                    (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unit;
-                    if (leftContainsUnit ? symbolTable.GetUnit(leftExpr, out unit) : rightContainsUnit && symbolTable.GetUnit(rightExpr, out unit))
-                    {
-                        symbolTable.AddNodeToUnit(node, unit);
-                        symbolTable.AddNode(node, Symbol.Ok);
-                    }
-                    else
-                    {
-                        symbolTable.AddNode(node, Symbol.NotOk);
-                        tempResult += IndentedString("Not the same unitTypes used in expression!\n");
+                        tempResult += IndentedString("Not the same unitTypes used in expression\n");
                     }
                 }
                 else
                 {
-                    // not valid input expressions to a multiply expression
+                    // not valid input expression
                     symbolTable.AddNode(node, Symbol.NotOk);
-                    tempResult += IndentedString("Not the same Types used in expression!\n");
+                    tempResult += IndentedString("Not valid Types used together in expression!\n");
                 }
                 break;
         }
