@@ -94,9 +94,9 @@ loop{
    updateMushroom();
    
    # report
-   generateGardenStatistic();
+   # generateGardenStatistic();
    internalTime += 1day; 
-   delay(1day);
+   delay(1day/1ms);
 }
 
 # update methods
