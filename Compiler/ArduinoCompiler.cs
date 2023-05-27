@@ -85,14 +85,26 @@ public static class ArduinoCompiler
     private static readonly Regex InoFilePathRegex = new(@"C:\\.*\.ino");
     public static async Task<bool> Compile(string folder, string? portName, string? boardFqbn)
     {
-        boardFqbn ??= "arduino:avr:uno";
+        string install = boardFqbn ?? "arduino:avr";
+        boardFqbn ??= "arduino:avr:uno"; //arduino-cli.exe  arduino:avr            core install arduino:avr
+        
+        Process downloadCoreProcess = ArduinoCli($"core install {install}", true);
+        downloadCoreProcess.Start();
+        await downloadCoreProcess.WaitForExitAsync();
+        string error = await downloadCoreProcess.StandardError.ReadToEndAsync();
+        if (error.Trim().Length > 0)
+        {
+            Console.WriteLine("error:\n" + error);
+            return false;
+        }
+        
         Process compileProcess = ArduinoCli(portName == null
             ? $"compile --fqbn {boardFqbn} {folder}"
             : $"compile --fqbn {boardFqbn} --port {portName} {folder}", true);
         
         compileProcess.Start();
         await compileProcess.WaitForExitAsync();
-        string error = await compileProcess.StandardError.ReadToEndAsync();
+        error = await compileProcess.StandardError.ReadToEndAsync();
         if (error.Trim().Length <= 0) 
             return true;
         error = InoFilePathRegex.Replace(MainPathRegex.Replace(error, "main.cpp"), "File");
