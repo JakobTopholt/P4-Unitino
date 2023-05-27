@@ -76,6 +76,10 @@ jobs:
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.2
+      
+    # Run SableCC
+    - name: Compile SableCC grammar
+      run: java -jar "sablecc/sablecc.jar" -t csharp Compiler/grammar.sablecc3 -d Compiler/SableCC
 
     # Execute all unit tests in the solution
     - name: Execute unit tests
