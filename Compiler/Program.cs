@@ -30,6 +30,5 @@ internal static class Program
             return;
         Console.WriteLine("Compiling Arduino ");
         await ArduinoCompiler.InoToAVROnBoard(folder);
-        //TODO: make a UI as alternative to CLI :D
     }
 }

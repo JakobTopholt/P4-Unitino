@@ -5,10 +5,6 @@ using Moduino.parser;
 
 namespace Compiler.Visitors;
 
-// TODO:
-// Check thesis part 3 from discord. Best case, prettyprint reprints the program as it was written so that:
-// program.txt --(SableCC)-> Concrete Syntax Tree --(SableCC)-> Abstract Syntax Tree --(PrettyPrint)-> program.txt (don't overwrite program tho ;)) 
-
 public class PrettyPrint : DepthFirstAdapter
 {
     private SymbolTable symbolTable;

@@ -16,7 +16,7 @@ Helpers
     not_star = [all - '*'];
     not_star_slash = [not_star - '/'];
     
-    escaped_chars = '\n'; //TODO: more escaped chars
+    escaped_chars = '\n';
     valid_char = [not_cr_lf - [''' + '"']];
     string_char = [valid_char + '''] | escaped_chars | '\"';
     char_char = [valid_char + '"'] | escaped_chars | '\' + ''';
@@ -104,7 +104,7 @@ Tokens
     number = digit+;
 
     string = '"' string_char+ '"';
-    char = ''' char_char+ '''; //TODO: test if string and char works correctly
+    char = ''' char_char+ ''';
 
     blank = blank;
     comment = short_comment | long_comment;
@@ -169,7 +169,7 @@ Productions
                      | {untyped}  tfunc id l_par args? r_par l_brace stmt_list? return? r_brace      {-> New global.untyped(id, [args.arg], [stmt_list.stmt, return.stmt])}
                      | {typed}    functype id l_par args? r_par l_brace stmt_list? return? r_brace   {-> New global.typed(functype.type, id, [args.arg], [stmt_list.stmt, return.stmt])};
             
-    // params used to declare a function and args when using a function //TODO: we fcked this up xD
+    // params used to declare a function and args when using a function
     params {-> exp*} = {list}   exp comma params   {-> [exp.exp, params.exp]}
                      | {single} exp                 {-> [exp.exp]};
                      
@@ -217,7 +217,7 @@ Productions
                            
     //// Expressions - check precedence table from report
     exp {-> exp}= {ternary}         p8 q_mark [true]:exp colon [false]:exp  {-> New exp.ternary(p8.exp, true.exp, false.exp)}
-                | p8 {-> p8.exp}; //TODO: right to left override case
+                | p8 {-> p8.exp}; //exp: right to left override case
     p8 {-> exp} = {or}              p8 tbarbar p7                           {-> New exp.or(p8.exp, p7.exp)}
                 | p7 {-> p7.exp};
     p7 {-> exp} = {and}             p7 tand p6                              {-> New exp.and(p7.exp, p6.exp)}
@@ -242,7 +242,7 @@ Productions
                 | {unaryminus}      minus p1                                {-> New exp.unaryminus(p1.exp)}
                 | {logicalnot}      not p1                                  {-> New exp.logicalnot(p1.exp)}
                 | {cast}            l_par type r_par p1                     {-> New exp.cast(type.type, p1.exp)}
-                | p1 {-> p1.exp}; //TODO: right to left override case
+                | p1 {-> p1.exp}; //p2: right to left override case
     p1 {-> exp} = {prefixplusplus}  tplusplus p0                            {-> New exp.prefixplusplus(p0.exp)}
                 | {prefixminusminus}tminusminus p0                          {-> New exp.prefixminusminus(p0.exp)}
                 | {funccall}        id l_par params? r_par                  {-> New exp.funccall(id, [params.exp])} // <- array and structaccess goes here
