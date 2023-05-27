@@ -134,7 +134,7 @@ void setup() {
     }
 }
 String b(int b) {
-    String c = ""hello"";
+    String c = ""hello "";
     for(int i = 0; i < b; i++) {
         c += i+"", "";
     }

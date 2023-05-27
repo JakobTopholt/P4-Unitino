@@ -5,9 +5,11 @@ loop {
 }
 prog {
     delay(100);
-    setpin(11, high);
-    pin h = 5;
-    int a = 5;
+    pin h = 11;
+    setpin(11,input);
+    writepin(11,high);
+    decimal a = readpin(11);;
+    int p = 5;
     char c = 'e';
     bool d = true;
     string l = d?"ja":"nej";
@@ -25,9 +27,11 @@ loop {
 }
 prog {
     delay(100);
-    setpin(11, high);
-    pin h = 5;
-    int a = 5;
+    pin h = 11;
+    setpin(11,input);
+    writepin(11,high);
+    decimal a = readpin(11);
+    int p = 5;
     char c = 'e';
     bool d = true;
     string l = d?"ja":"nej";
@@ -45,9 +49,11 @@ void loop() {
 }
 void setup() {
     delay(100);
+    int h = 11;
+    pinMode(11, INPUT);
     digitalWrite(11, HIGH);
-    int h = 5;
-    int a = 5;
+    float a = digitalRead(11);
+    int p = 5;
     char c = 'e';
     bool d = true;
     String l = d?"ja":"nej";

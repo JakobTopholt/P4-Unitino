@@ -94,9 +94,9 @@ loop{
    updateMushroom();
    
    # report
-   generateGardenStatistic();
+   # generateGardenStatistic();
    internalTime += 1day; 
-   delay(1day);
+   delay(1day/1ms);
 }
 
 # update methods
@@ -160,6 +160,6 @@ func activateHumidifier(Humidity dampness){
    Time runTime = humFlow / dampness; 
   
    writepin(humidifier, high);             # humidifier.activate;
-   delay((int)runTime/1ms);
+   delay((int)(runTime/1ms));
    writepin(humidifier, low);
 }
