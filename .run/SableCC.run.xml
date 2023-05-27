@@ -1,6 +1,6 @@
 ﻿<component name="ProjectRunConfigurationManager">
   <configuration default="false" name="SableCC" type="ShConfigurationType">
-    <option name="SCRIPT_TEXT" value="java -jar &quot;sablecc-3-beta.3.altgen.20041114/lib/sablecc.jar&quot; -t csharp Compiler/grammar.sablecc3 -d Compiler/SableCC" />
+    <option name="SCRIPT_TEXT" value="java -jar &quot;sablecc/sablecc.jar&quot; -t csharp Compiler/grammar.sablecc3 -d Compiler/SableCC" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="false" />
     <option name="SCRIPT_PATH" value="$PROJECT_DIR$/Compiler/sablecc.bat" />
     <option name="SCRIPT_OPTIONS" value="" />
