@@ -52,7 +52,11 @@ public class stmtTypeChecker : DepthFirstAdapter
 
     public override void OutAAssignStmt(AAssignStmt node) {
         Symbol? idToType = symbolTable.GetSymbol(node.GetId().ToString().Trim());
-        PExp exp = node.GetExp();
+        Node exp = node.GetExp();
+        if (exp is AIdExp id)
+        {
+            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
+        }
         Symbol? expSymbol = symbolTable.GetSymbol(exp);
         switch (idToType)
         {
@@ -113,7 +117,11 @@ public class stmtTypeChecker : DepthFirstAdapter
     {
         // OVervej om man kan sige += med string, char og bool typer
         Symbol? type = symbolTable.GetSymbol(node.GetId().ToString().Trim());
-        PExp exp = node.GetExp();
+        Node exp = node.GetExp();
+        if (exp is AIdExp id)
+        {
+            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
+        }
         Symbol? expSymbol = symbolTable.GetSymbol(exp);
         switch (type)
         {
@@ -169,7 +177,11 @@ public class stmtTypeChecker : DepthFirstAdapter
     public override void OutAMinusassignStmt(AMinusassignStmt node)
     {
         Symbol? type = symbolTable.GetSymbol("" + node.GetId().ToString().Trim());
-        PExp exp = node.GetExp();
+        Node exp = node.GetExp();
+        if (exp is AIdExp id)
+        {
+            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
+        }
         Symbol? expSymbol = symbolTable.GetSymbol(exp);
         switch (type)
         {
@@ -403,11 +415,12 @@ public class stmtTypeChecker : DepthFirstAdapter
         // Assignment have to be typechecked before Decl should add to symbolTable
         if (!symbolTable.IsInCurrentScope(node.GetId()))
         {
-            Symbol? exprType = symbolTable.GetSymbol(node.GetExp());
-            if (node.GetExp() is AIdExp id)
+            Node expression = node.GetExp();
+            if (expression is AIdExp id)
             {
-                exprType = symbolTable.GetSymbol(id.GetId().ToString().Trim());
+                symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out expression);
             }
+            Symbol? exprType = symbolTable.GetSymbol(expression);
             PType unit = node.GetType();
             switch (unit)
                 {
@@ -437,7 +450,7 @@ public class stmtTypeChecker : DepthFirstAdapter
                         break;
                     case AUnitType customType:
                         if (symbolTable.GetUnit(customType, out var unitType) && 
-                            symbolTable.GetUnit(node.GetExp(), out var expType))
+                            symbolTable.GetUnit(expression, out var expType))
                         {
                             if (symbolTable.CompareUnitTypes(unitType, expType))
                             {

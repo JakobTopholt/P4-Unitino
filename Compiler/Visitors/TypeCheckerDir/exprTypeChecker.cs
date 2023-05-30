@@ -14,7 +14,7 @@ public class exprTypeChecker : stmtTypeChecker
     
     public override void OutAExpExp(AExpExp node)
     {
-        Node? exp = node.GetExp();
+        Node exp = node.GetExp();
         if (exp is AIdExp id)
         {
             symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
@@ -43,13 +43,13 @@ public class exprTypeChecker : stmtTypeChecker
             case Symbol.Pin:
                 symbolTable.AddNode(node, Symbol.Pin);
                 break;
-            case Symbol.Ok:
-                symbolTable.AddNode(node, Symbol.Ok);
+            case Symbol.NotOk:
+                symbolTable.AddNode(node, Symbol.NotOk);
                 break;
             default:
-                symbolTable.AddNode(node, symbolTable.GetUnit(node.GetExp(), out _) ? Symbol.Ok : Symbol.NotOk);
-                // Missing logic, make sure to also save the Customunit to the new node if there is one
-                
+                symbolTable.GetUnit(exp, out var unit);
+                symbolTable.AddNodeToUnit(node, unit);
+                symbolTable.AddNode(node, Symbol.Ok);
                 break;
         }
     }

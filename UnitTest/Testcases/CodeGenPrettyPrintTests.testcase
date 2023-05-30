@@ -1,14 +1,12 @@
 ﻿Unit Testing
 ////
-loop {
-    int b = 69420;
-}
 prog {
     delay(100);
     pin h = 11;
     setpin(11,input);
     writepin(11,high);
-    decimal a = readpin(11);;
+    #int a = readpin(11);
+    int a = 2;
     int p = 5;
     char c = 'e';
     bool d = true;
@@ -17,20 +15,20 @@ prog {
     string b = (string)e;
     argTest(a, b, c, d, e);
 }
+loop {
+  
+}
 int argTest(int a, string b, char c, bool d, decimal e) {
     int f;
     return a;
 }
 ////
-loop {
-    int b = 69420;
-}
 prog {
     delay(100);
     pin h = 11;
     setpin(11,input);
     writepin(11,high);
-    decimal a = readpin(11);
+    int a = 2;
     int p = 5;
     char c = 'e';
     bool d = true;
@@ -39,20 +37,20 @@ prog {
     string b = (string)e;
     argTest(a, b, c, d, e);
 }
+loop {
+
+}
 int argTest(int a, string b, char c, bool d, decimal e) {
     int f;
     return a;
 }
 ////
-void loop() {
-    int b = 69420;
-}
 void setup() {
     delay(100);
     int h = 11;
     pinMode(11, INPUT);
     digitalWrite(11, HIGH);
-    float a = digitalRead(11);
+    int a = 2;
     int p = 5;
     char c = 'e';
     bool d = true;
@@ -60,6 +58,8 @@ void setup() {
     float e = 1.11;
     String b = String(e, 6);
     argTest(a, b, c, d, e);
+}
+void loop() {
 }
 int argTest(int a, String b, char c, bool d, float e) {
     int f;
