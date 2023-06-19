@@ -24,12 +24,12 @@ unit Humidity{
 }
 # setup
 prog{
-    # Pin definition
     pin tomatoSensor = 1;
     pin citrusSensor = 2;
     pin chilliSensor = 3;
     pin mushroomSensor = 4;
     pin dampnessSensor = 5;
+    # Pin definition
     
     pin waterPump1 = 6;
     setpin(waterPump1, output);
@@ -52,9 +52,9 @@ prog{
     Volume/Weight citrustreeWater = 600l/1kg; 
     Volume/Weight chilliWater = 320l/1kg; 
 
-    Time/Volume tomatoPlants = 80day/(tomatoWater * tomatoesWeight);
-    Time/Volume citrusTree = 7month/(citrustreeWater  * citrusTreeWeight);
-    Time/Volume chilliPlants = 150day/(chilliWater  * chillisWeight);
+    Volume/Time tomatoPlants = (tomatoWater * tomatoesWeight)/80day;
+    Volume/Time citrusTree = (citrustreeWater  * citrusTreeWeight)/7month;
+    Volume/Time chilliPlants = (chilliWater  * chillisWeight)/150day;
     Time mushrooms = 6.5week;
 
     Time tomatoWatercycle = 3day;
@@ -73,7 +73,7 @@ prog{
 loop{
    # read sensors
    readWeightSensor();
-   readHumiditySensor();
+   readHumiditySensor(dampness);
 
    # action
    # Tomatoes
@@ -91,12 +91,12 @@ loop{
        updatePlant(waterPump3, chilliPlants, chilliWatercycle);
        chilliTime += chilliWatercycle;
    }
-   updateMushroom();
+   updateMushroom(dampness, mushroomWatercycle);
    
    # report
    # generateGardenStatistic();
    internalTime += 1day; 
-   delay(1day/1ms);
+   delay((int)(1day/1ms));
 }
 
 # update methods
@@ -106,14 +106,14 @@ func readWeightSensor(){
    chillisWeight += 30g;       #readpin(chilliSensor)
    mushroomsWeight += 20g;     #readpin(mushroomSensor)  
 }
-func readHumiditySensor(){
+func readHumiditySensor(Humidity dampness){
    dampness = 80damp;       #readpin(dampnessSensor)
 }
-func updatePlant(pin arduinoSensor, Time/Volume plant, Time sinceLastWater){
-   Volume neededWater = plant / sinceLastWater;
-   activateWaterpump(arduinoSensor, neededwater);
+func updatePlant(pin arduinoSensor, Volume/Time plant, Time sinceLastWater){
+   Volume neededWater = plant * sinceLastWater;
+   activateWaterpump(arduinoSensor, neededWater);
 }
-func updateMushroom(){
+func updateMushroom(Humidity dampness, Humidity mushroomWatercycle){
    if (dampness < mushroomWatercycle){
       activateHumidifier(mushroomWatercycle);
    }
@@ -123,41 +123,18 @@ func updateMushroom(){
 # action methods
 func activateWaterpump(pin arduinoSensor, Volume water){
    # activate a arduino enabled pump
-   Volume / Time pumpFlow = 40ml/1s;
-   Time timePumping = pumpFlow / water; 
-   if(arduinoSensor == tomatoSensor){
-      # pump water for the calculated time
-      writepin(waterPump1, high);
-      int runTime = (int)(timePumping/1ms);
-      delay(runTime);
-      writepin(waterPump1, low);
-   }
-   else if(arduinoSensor == citrusSensor ){
-      # pump water for the calculated time
-      writepin(waterPump2, high);
-      int runTime = (int)(timePumping/1ms);
-      delay(runTime);
-      writepin(waterPump2, low);
-   }
-   else if(arduinoSensor == chilliSensor){
-      # pump water for the calculated time
-      writepin(waterPump3, high);
-      int runTime = (int)(timePumping/1ms);
-      delay(runTime);
-      writepin(waterPump3, low);
-   }
-   else if(arduinoSensor == mushroomSensor){
-      # pump water for the calculated time
-      writepin(waterPump4, high);
-      int runTime = (int)(timePumping/1ms);
-      delay(runTime);
-      writepin(waterPump4, low);
-   } 
+   Time/Volume pumpFlow = 1s/40ml;
+   Time timePumping = pumpFlow * water; 
+   # pump water for the calculated time
+   writepin(arduinoSensor, high);
+   int runTime = (int)(timePumping/1ms);
+   delay(runTime);
+   writepin(arduinoSensor, low);
 }
 func activateHumidifier(Humidity dampness){
    # Har brug for at aktivere read humidifier sensor flere gange tll dampness er opnået.
-   Time/Humidity humFlow = 5damp/1min;
-   Time runTime = humFlow / dampness; 
+   Time/Humidity humFlow = 1min/5damp;
+   Time runTime = humFlow * dampness; 
   
    writepin(humidifier, high);             # humidifier.activate;
    delay((int)(runTime/1ms));
