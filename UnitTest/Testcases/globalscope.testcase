@@ -1,0 +1,53 @@
+﻿Global Declaration illegal double declare
+////
+int a = 7;
+int b;
+int a;
+////
+////
+////
+false
+//////
+Global Declaration
+////
+int a = 7;
+int b;
+////
+////
+////
+true
+//////
+Global Declaration illegal wrong assign
+////
+int a = 7;
+int b;
+int c = false;
+////
+////
+////
+false
+//////
+Global Declaration illegal function call
+////
+int a = 7;
+func f() {
+    return 7;
+}
+int b = f();
+////
+////
+////
+false
+//////
+Illegal use of var a
+////
+prog {
+    int a = 7;
+}
+loop {
+    a += 5;
+}
+////
+////
+////
+false

@@ -121,7 +121,8 @@ Productions
     global_list {-> global*} = global global_list? {-> [global.global, global_list.global]};
     
     global {-> global} = {unitdecl} unitdecl {-> unitdecl.global}
-                       | {func} func {-> func.global};
+                       | {func} func {-> func.global}
+                       | {declstmt} declstmt {-> New global.declstmt(declstmt.stmt)};
     //// Units
     
     // A unit declaration consist of one unit and it's subunits
@@ -182,13 +183,15 @@ Productions
     stmt_list {-> stmt*} = stmt stmt_list?                      {-> [stmt.stmt, stmt_list.stmt]};
     
     stmt {-> stmt} = {assign}   assign semicolon                        {-> assign.stmt}
-                   | {decl}     unittype id semicolon                   {-> New stmt.decl(unittype.type, id)}
-                   | {declass}  unittype id equal exp semicolon         {-> New stmt.declass(unittype.type, id, exp.exp)}
+                   | declstmt                                           {-> declstmt.stmt}
                    | {funccall} id l_par params? r_par semicolon        {-> New stmt.funccall(id, [params.exp])}
                    | {delay} tdelay l_par exp r_par semicolon           {-> New stmt.delay(exp.exp)}
                    | {setpin} tsetpin l_par exp comma pinmode r_par semicolon {-> New stmt.setpin(exp.exp, pinmode.pinmode)}
                    | {writepin} twritepin l_par exp comma pintoggle r_par semicolon {-> New stmt.writepin(exp.exp, pintoggle.pintoggle)}
                    | {scoped}   scoped                                  {-> scoped.stmt};
+                   
+    declstmt {-> stmt} = {decl}     unittype id semicolon                   {-> New stmt.decl(unittype.type, id)}
+                       | {declass}  unittype id equal exp semicolon         {-> New stmt.declass(unittype.type, id, exp.exp)};
                    
     pintoggle {-> pintoggle} = {high} high  {-> New pintoggle.high()}
                              | {low} low    {-> New pintoggle.low()};
@@ -269,7 +272,8 @@ Abstract Syntax Tree
            | {prog} stmt*
            | {loop} stmt*
            | {untyped} id arg* stmt*
-           | {typed} type id arg* stmt*;
+           | {typed} type id arg* stmt*
+           | {declstmt} stmt;
     
     subunit = id exp;
     arg = type id;
