@@ -62,11 +62,42 @@ public class exprTypeChecker : stmtTypeChecker
     public override void OutAStringExp(AStringExp node) => symbolTable.AddNode(node, Symbol.String);
     public override void OutACharExp(ACharExp node) => symbolTable.AddNode(node, Symbol.Char);
 
+    public override void InAValueExp(AValueExp node)
+    {
+        locations.Push(IndentedString($"In value expression\n"));
+        indent++;
+    }
+
     public override void OutAValueExp(AValueExp node)
-    { 
-        symbolTable.AddNode(node, Symbol.Decimal);
-        // ----- Logic missing here---- (tag stilling til hvad det under betød)
-       // symbolTable.AddNode(node, UnitVisitor.StateUnit ? Symbol.Decimal : Symbol.NotOk);
+    {
+        if (symbolTable.currentScope == 1)
+        {
+            symbolTable.AddNode(node, Symbol.NotOk);
+            tempResult += IndentedString("Value expression is not legal in globalscope");
+        }
+        else
+        {
+            symbolTable.AddNode(node, Symbol.Decimal); 
+        }
+        /*
+        Node? parent = node.Parent();
+            while (parent is not AUnitdeclGlobal)
+            {
+                parent = parent.Parent();
+            }
+            if (parent is AUnitdeclGlobal)
+            { 
+                symbolTable.AddNode(node, Symbol.Decimal); 
+            }
+            else
+            {
+                symbolTable.AddNode(node, Symbol.NotOk);
+                tempResult += IndentedString("Value expressions have to be in a unitdeclaration\n");
+            } 
+        }*/
+        PrintError();
+        indent--;
+        
     }
 
     public override void InAFunccallExp(AFunccallExp node)
@@ -83,7 +114,7 @@ public class exprTypeChecker : stmtTypeChecker
         if (symbolTable.currentScope == 0)
         {
             symbolTable.AddNode(node, Symbol.NotOk);
-            tempResult += IndentedString("Funccall is not legal in globalscope");
+            tempResult += IndentedString("Funccall expression is not legal in globalscope");
         }
         else
         {
@@ -274,6 +305,47 @@ public class exprTypeChecker : stmtTypeChecker
                     tempResult += IndentedString($"{node.GetId()} is not a valid id (no value associated with it)\n");
                 }
                 break;
+        }
+        PrintError();
+        indent--;
+    }
+
+    public override void InAReadpinExp(AReadpinExp node)
+    {
+        locations.Push( IndentedString($"in readpin expression: {node}\n"));
+        indent++;
+    }
+
+    public override void OutAReadpinExp(AReadpinExp node)
+    {
+        if (symbolTable.currentScope == 0)
+        {
+            symbolTable.AddNode(node, Symbol.NotOk);
+            tempResult += IndentedString("A readpin expression is not legal in globalscope");
+        }
+        else
+        {
+            Symbol? readpinType = symbolTable.GetSymbol(node.GetExp());
+            if (node.GetExp() is AIdExp id)
+            {
+                readpinType = symbolTable.GetSymbol(id.GetId());
+            }
+            if (readpinType is Symbol.Pin or Symbol.Int)
+            {
+                symbolTable.AddNode(node, Symbol.Pin);
+            }
+            else
+            {
+                symbolTable.AddNode(node, Symbol.NotOk);
+                if (readpinType == null)
+                {
+                    tempResult += IndentedString("The id does not exist in this scope\n");
+                }
+                else
+                {
+                    tempResult += IndentedString("Readpin expression is not Pin or integer type");          
+                }
+            }
         }
         PrintError();
         indent--;
