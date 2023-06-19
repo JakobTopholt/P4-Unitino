@@ -116,14 +116,14 @@ public class stmtTypeChecker : DepthFirstAdapter
     public override void OutAPlusassignStmt(APlusassignStmt node)
     {
         // OVervej om man kan sige += med string, char og bool typer
-        Symbol? type = symbolTable.GetSymbol(node.GetId().ToString().Trim());
+        Symbol? idType = symbolTable.GetSymbol(node.GetId().ToString().Trim());
         Node exp = node.GetExp();
         if (exp is AIdExp id)
         {
             symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
         }
         Symbol? expSymbol = symbolTable.GetSymbol(exp);
-        switch (type)
+        switch (idType)
         {
             case Symbol.Int:
                 symbolTable.AddNode(node, symbolTable.GetSymbol(exp) == Symbol.Int ? Symbol.Ok : Symbol.NotOk);
@@ -160,7 +160,14 @@ public class stmtTypeChecker : DepthFirstAdapter
                 else
                 {
                     symbolTable.AddNode(node, Symbol.NotOk);
-                    tempResult += IndentedString("is not correct Type\n");
+                    if (idType == null)
+                    {
+                        tempResult += IndentedString($"Id: {node.GetId().ToString().Trim()} does not exist in this scope\n");
+                    }
+                    else
+                    {
+                        tempResult += IndentedString($"Id: {node.GetId().ToString().Trim()} is not correct Type\n");
+                    }
                 }
                 break;
         }

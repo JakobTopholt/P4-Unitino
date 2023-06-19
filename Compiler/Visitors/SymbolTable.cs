@@ -8,12 +8,14 @@ public class SymbolTable
 {
     private readonly List<SymbolTable> _allTables;
     private int _currentTable;
-    public SymbolTable(SymbolTable? parent, List<SymbolTable> allTables, int currentTable = 0)
+    public int currentScope;
+    public SymbolTable(SymbolTable? parent, List<SymbolTable> allTables, int currentTable = 0, int scope = 0)
     {
         _parent = parent;
         allTables.Add(this);
         _currentTable = currentTable;
         _allTables = allTables;
+        currentScope = scope;
     }
     private readonly SymbolTable? _parent;
     private readonly Dictionary<string, Node> _idToNode = new();
@@ -32,14 +34,17 @@ public class SymbolTable
     // General methods
     public SymbolTable EnterScope()
     {
-        return ++_currentTable < _allTables.Count ? _allTables[_currentTable] : new SymbolTable(this, _allTables, _currentTable);
+        currentScope++;
+        return ++_currentTable < _allTables.Count ? _allTables[_currentTable] : new SymbolTable(this, _allTables, _currentTable, currentScope);
     }
 
     public SymbolTable ExitScope()
     {
+        currentScope--;
         if (_parent == null) 
             return this;
         _parent._currentTable = _currentTable;
+        _parent.currentScope = currentScope;
         return _parent;
 
     }
