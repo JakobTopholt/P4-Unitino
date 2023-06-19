@@ -34,6 +34,7 @@ Tokens
     tprog = 'prog';
     tloop = 'loop';
     tfunc = 'func';
+    setup = 'setup'; // To disallow naming a function/variable setup
     if = 'if';
     else = 'else';
     for = 'for';
