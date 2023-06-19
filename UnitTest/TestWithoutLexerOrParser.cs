@@ -128,9 +128,9 @@ float Times(float value) {
     return value*1000;
 }
 void setup() {
-    float a = Times(1);
+    float a = 1000;
     if(true) {
-        a = Timems(7.5);
+        a = 7.5;
     }
 }
 String b(int b) {

@@ -843,14 +843,38 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
     {
         AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
-        writer.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
-                                                    + "(" + node.GetDecimal().ToString().Trim() + ")");    
+
+        ExprEvaluator exprEvaluator = new(node.GetDecimal());
+        PExp exp = symbolTable.GetSubUnitExp(node.GetId());
+        try
+        {
+            exp.Apply(exprEvaluator);
+        }
+        catch (NullReferenceException e)
+        {
+            writer.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
+                                                        + "(" + node.GetDecimal().ToString().Trim() + ")");
+            return;
+        }
+        writer.Write(exprEvaluator.GetOutput(exp));
     }
     public override void CaseAUnitnumberExp(AUnitnumberExp node)
     {
         AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
-        writer.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
-                                                    + "(" + node.GetNumber().ToString().Trim() + ")");
+        
+        ExprEvaluator exprEvaluator = new(node.GetNumber());
+        PExp exp = symbolTable.GetSubUnitExp(node.GetId());
+        try
+        {
+            exp.Apply(exprEvaluator);
+        }
+        catch (NullReferenceException e)
+        {
+            writer.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
+                                                        + "(" + node.GetNumber().ToString().Trim() + ")");
+            return;
+        }
+        writer.Write(exprEvaluator.GetOutput(exp));
     }
     public void Dispose()
     {

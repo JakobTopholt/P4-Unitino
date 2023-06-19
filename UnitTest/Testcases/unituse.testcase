@@ -24,11 +24,11 @@ float Times(float value) {
     return value*1000;
 }
 float UnitFunc() {
-    float a = 1/Timems(50);
+    float a = 1/50;
     return a;
 }
 void setup() {
-    float a = 1/Timems(50);
+    float a = 1/50;
 }
 void loop() {
     float c = 200.0;
@@ -68,8 +68,8 @@ float Times(float value) {
 }
 void setup() {
     float e = 3.7;
-    float a = 1/Timems(50.3)+1/Times(5);
-    float b = 1/Timems(50)-1/Times(5);
+    float a = 1/50.3+1/5000;
+    float b = 1/50-1/5000;
 }
 ////
 true
