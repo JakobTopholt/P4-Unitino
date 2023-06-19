@@ -32,7 +32,8 @@ public class TypeChecker : exprTypeChecker
         symbolTable.AddNode(node, grammarIsOk ? Symbol.Ok : Symbol.NotOk);
         symbolTable = symbolTable.ResetScope();
     }
-
+    
+    
     public override void CaseAUnitdeclGlobal(AUnitdeclGlobal node)
     {
         
@@ -360,10 +361,10 @@ public class TypeChecker : exprTypeChecker
                     loopIsOk = false;
             }
             symbolTable.AddNode(node, loopIsOk ? Symbol.Ok : Symbol.NotOk);
-            locations.Clear();
-            reported = false;
-            indent--;
         }
+        locations.Clear();
+        reported = false;
+        indent--;
     }
 
     public override void InAProgGlobal(AProgGlobal node)
@@ -375,6 +376,7 @@ public class TypeChecker : exprTypeChecker
         {
             symbolTable.AddNode(node, Symbol.NotOk);
         }
+        symbolTable = symbolTable.EnterScope();
     }
     public override void OutAProgGlobal(AProgGlobal node)
     {
@@ -388,10 +390,54 @@ public class TypeChecker : exprTypeChecker
                 if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
                     progIsOk = false;
             }
+            symbolTable = symbolTable.ExitScope();
             symbolTable.AddNode(node, progIsOk ? Symbol.Ok : Symbol.NotOk);
-            locations.Clear();
-            reported = false;
-            indent--;
+            
+        }
+        locations.Clear();
+        reported = false;
+        indent--;
+    }
+    public override void InADeclstmtGlobal(ADeclstmtGlobal node)
+    {
+        locations.Push(IndentedString($"In a global declaration: {node.GetStmt()}\n"));
+        indent++;
+        PStmt globalStmt = node.GetStmt();
+
+        if (globalStmt is ADeclStmt decl)
+        {
+            if (symbolTable.IsInCurrentScope(decl.GetId()))
+            {
+                symbolTable.AddNode(node, Symbol.NotOk);
+                tempResult += IndentedString($"The id: {decl.GetId()} has already been declared before");
+            }
+        } else if (globalStmt is ADeclassStmt declass)
+        {
+            if (symbolTable.IsInCurrentScope(declass.GetId()))
+            {
+                symbolTable.AddNode(node, Symbol.NotOk);
+                tempResult += IndentedString($"The id: {declass.GetId()} has already been declared before");
+            }
         }
     }
+    public override void OutADeclstmtGlobal(ADeclstmtGlobal node)
+    {
+        PStmt globalStmt = node.GetStmt();
+        if (symbolTable.GetSymbol(node) == null)
+        {
+            if (globalStmt is ADeclStmt decl)
+            {
+                symbolTable.AddNode(node, symbolTable.GetSymbol(decl) != Symbol.NotOk ? Symbol.Ok : Symbol.NotOk);
+
+            }
+            else if (globalStmt is ADeclassStmt declass)
+            {
+                symbolTable.AddNode(node, symbolTable.GetSymbol(declass) != Symbol.NotOk ? Symbol.Ok : Symbol.NotOk);
+            }
+        }
+        PrintError();
+        indent--;
+        locations.Clear();
+    }
+
 }

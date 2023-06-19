@@ -62,11 +62,42 @@ public class exprTypeChecker : stmtTypeChecker
     public override void OutAStringExp(AStringExp node) => symbolTable.AddNode(node, Symbol.String);
     public override void OutACharExp(ACharExp node) => symbolTable.AddNode(node, Symbol.Char);
 
+    public override void InAValueExp(AValueExp node)
+    {
+        locations.Push(IndentedString($"In value expression\n"));
+        indent++;
+    }
+
     public override void OutAValueExp(AValueExp node)
-    { 
-        symbolTable.AddNode(node, Symbol.Decimal);
-        // ----- Logic missing here---- (tag stilling til hvad det under betød)
-       // symbolTable.AddNode(node, UnitVisitor.StateUnit ? Symbol.Decimal : Symbol.NotOk);
+    {
+        if (symbolTable.currentScope == 1)
+        {
+            symbolTable.AddNode(node, Symbol.NotOk);
+            tempResult += IndentedString("Value expression is not legal in globalscope");
+        }
+        else
+        {
+            symbolTable.AddNode(node, Symbol.Decimal); 
+        }
+        /*
+        Node? parent = node.Parent();
+            while (parent is not AUnitdeclGlobal)
+            {
+                parent = parent.Parent();
+            }
+            if (parent is AUnitdeclGlobal)
+            { 
+                symbolTable.AddNode(node, Symbol.Decimal); 
+            }
+            else
+            {
+                symbolTable.AddNode(node, Symbol.NotOk);
+                tempResult += IndentedString("Value expressions have to be in a unitdeclaration\n");
+            } 
+        }*/
+        PrintError();
+        indent--;
+        
     }
 
     public override void InAFunccallExp(AFunccallExp node)
@@ -79,136 +110,157 @@ public class exprTypeChecker : stmtTypeChecker
     {
         // Funccall som en del af et return udtryk
         // returnvalue har betydning for om det er et correct call
-        symbolTable.GetNodeFromId(node.GetId().ToString(), out Node xxx);
-        List<PType>? args = symbolTable.GetFunctionArgs(xxx);
-        List<PExp>? parameters = node.GetExp().OfType<PExp>().ToList();
 
-        int argAmount = args.Count;
-        int paramAmount = parameters.Count;
-        if (argAmount != paramAmount)
+        if (symbolTable.currentScope == 0)
         {
             symbolTable.AddNode(node, Symbol.NotOk);
-            tempResult += IndentedString("Not same amount of Arguments and Parameters\n");
+            tempResult += IndentedString("Funccall expression is not legal in globalscope");
         }
         else
         {
-           bool matches = true;
-            for (int i = 0; i < args.Count; i++)
+
+            symbolTable.GetNodeFromId(node.GetId().ToString(), out Node xxx);
+            List<PType>? args = symbolTable.GetFunctionArgs(xxx);
+            List<PExp>? parameters = node.GetExp().OfType<PExp>().ToList();
+
+            int argAmount = args.Count;
+            int paramAmount = parameters.Count;
+            if (argAmount != paramAmount)
             {
-                Symbol? paramSymbol; 
-                Node? returnUnit;
-                if (parameters[i] is AIdExp x)
-                {
-                    paramSymbol = symbolTable.GetSymbol(x.GetId().ToString().Trim());
-                    symbolTable.GetNodeFromId(x.GetId().ToString().Trim(), out returnUnit);
-                }
-                else
-                {
-                    paramSymbol = symbolTable.GetSymbol(parameters[i]);
-                    returnUnit  = parameters[i];
-                }
-                switch (args[i])
-                {
-                    case AIntType:
-                        if (paramSymbol != Symbol.Int)
-                        {
-                            matches = false;
-                            tempResult += IndentedString("Parameter should be of type Int\n");
-                        }
-                        break;
-                    case ADecimalType:
-                        if (paramSymbol != Symbol.Decimal)
-                        {
-                            matches = false;
-                            tempResult += IndentedString("Parameter should be of type Decimal\n");
-                        }
-                        break;
-                    case ABoolType:
-                        if (paramSymbol != Symbol.Bool)
-                        {
-                            matches = false;
-                            tempResult += IndentedString("Parameter should be of type Bool\n");
-                        }
-                        break;
-                    case ACharType:
-                        if (paramSymbol != Symbol.Char)
-                        {
-                            matches = false;
-                            tempResult += IndentedString("Parameter should be of type Char\n");
-                        }
-                        break;
-                    case AStringType:
-                        if (paramSymbol != Symbol.String)
-                        {
-                            matches = false;
-                            tempResult += IndentedString("Parameter should be of type String\n");
-                        }
-                        break;
-                    case APinType:
-                        if (paramSymbol != Symbol.Pin)
-                        {
-                            matches = false;
-                            tempResult += IndentedString("Parameter should be of type Pin\n");
-                        }
-                        break;
-                    case AUnitType argType:
-                        if (symbolTable.GetUnit(argType, out var argUnit) && 
-                            symbolTable.GetUnit(returnUnit, out var paramUnit) && 
-                            !symbolTable.CompareUnitTypes(argUnit, paramUnit))
-                        {
-                            matches = false;
-                            tempResult += IndentedString("Parameter is not same unitType as Argument\n");
-                            symbolTable.AddNodeToUnit(node, argUnit);
-                        }
-                        break;
-                    default:
-                        matches = false;
-                        break;
-                }
-            }
-            if (matches)
-            {
-                symbolTable.GetNodeFromId(node.GetId().ToString(), out Node result);
-                var symbol = symbolTable.GetSymbol(result);
-                switch (symbol)
-                {
-                    case Symbol.Int:
-                        symbolTable.AddNode(node, Symbol.Int);
-                        break;
-                    case Symbol.Decimal:
-                        symbolTable.AddNode(node, Symbol.Decimal);
-                        break;
-                    case Symbol.Bool:
-                        symbolTable.AddNode(node, Symbol.Bool);
-                        break;
-                    case Symbol.Char:
-                        symbolTable.AddNode(node, Symbol.Char);
-                        break;
-                    case Symbol.String:
-                        symbolTable.AddNode(node, Symbol.String);
-                        break;
-                    case Symbol.Pin:
-                        symbolTable.AddNode(node, Symbol.Pin);
-                        break;
-                    default:
-                        if (symbolTable.GetUnit(node.GetId().ToString(), out var unit))
-                        {
-                            symbolTable.AddNodeToUnit(node, unit);
-                            symbolTable.AddNode(node, Symbol.Ok);
-                        }
-                        else
-                        {
-                            symbolTable.AddNode(node, Symbol.NotOk);
-                        }
-                        break;
-                }
+                symbolTable.AddNode(node, Symbol.NotOk);
+                tempResult += IndentedString("Not same amount of Arguments and Parameters\n");
             }
             else
             {
-                symbolTable.AddNode(node, Symbol.NotOk);
-                // Allready added error message
-            } 
+                bool matches = true;
+                for (int i = 0; i < args.Count; i++)
+                {
+                    Symbol? paramSymbol;
+                    Node? returnUnit;
+                    if (parameters[i] is AIdExp x)
+                    {
+                        paramSymbol = symbolTable.GetSymbol(x.GetId().ToString().Trim());
+                        symbolTable.GetNodeFromId(x.GetId().ToString().Trim(), out returnUnit);
+                    }
+                    else
+                    {
+                        paramSymbol = symbolTable.GetSymbol(parameters[i]);
+                        returnUnit = parameters[i];
+                    }
+
+                    switch (args[i])
+                    {
+                        case AIntType:
+                            if (paramSymbol != Symbol.Int)
+                            {
+                                matches = false;
+                                tempResult += IndentedString("Parameter should be of type Int\n");
+                            }
+
+                            break;
+                        case ADecimalType:
+                            if (paramSymbol != Symbol.Decimal)
+                            {
+                                matches = false;
+                                tempResult += IndentedString("Parameter should be of type Decimal\n");
+                            }
+
+                            break;
+                        case ABoolType:
+                            if (paramSymbol != Symbol.Bool)
+                            {
+                                matches = false;
+                                tempResult += IndentedString("Parameter should be of type Bool\n");
+                            }
+
+                            break;
+                        case ACharType:
+                            if (paramSymbol != Symbol.Char)
+                            {
+                                matches = false;
+                                tempResult += IndentedString("Parameter should be of type Char\n");
+                            }
+
+                            break;
+                        case AStringType:
+                            if (paramSymbol != Symbol.String)
+                            {
+                                matches = false;
+                                tempResult += IndentedString("Parameter should be of type String\n");
+                            }
+
+                            break;
+                        case APinType:
+                            if (paramSymbol != Symbol.Pin)
+                            {
+                                matches = false;
+                                tempResult += IndentedString("Parameter should be of type Pin\n");
+                            }
+
+                            break;
+                        case AUnitType argType:
+                            if (symbolTable.GetUnit(argType, out var argUnit) &&
+                                symbolTable.GetUnit(returnUnit, out var paramUnit) &&
+                                !symbolTable.CompareUnitTypes(argUnit, paramUnit))
+                            {
+                                matches = false;
+                                tempResult += IndentedString("Parameter is not same unitType as Argument\n");
+                                symbolTable.AddNodeToUnit(node, argUnit);
+                            }
+
+                            break;
+                        default:
+                            matches = false;
+                            break;
+                    }
+                }
+
+                if (matches)
+                {
+                    symbolTable.GetNodeFromId(node.GetId().ToString(), out Node result);
+                    var symbol = symbolTable.GetSymbol(result);
+                    switch (symbol)
+                    {
+                        case Symbol.Int:
+                            symbolTable.AddNode(node, Symbol.Int);
+                            break;
+                        case Symbol.Decimal:
+                            symbolTable.AddNode(node, Symbol.Decimal);
+                            break;
+                        case Symbol.Bool:
+                            symbolTable.AddNode(node, Symbol.Bool);
+                            break;
+                        case Symbol.Char:
+                            symbolTable.AddNode(node, Symbol.Char);
+                            break;
+                        case Symbol.String:
+                            symbolTable.AddNode(node, Symbol.String);
+                            break;
+                        case Symbol.Pin:
+                            symbolTable.AddNode(node, Symbol.Pin);
+                            break;
+                        default:
+                            if (symbolTable.GetUnit(node.GetId().ToString(), out var unit))
+                            {
+                                symbolTable.AddNodeToUnit(node, unit);
+                                symbolTable.AddNode(node, Symbol.Ok);
+                            }
+                            else
+                            {
+                                symbolTable.AddNode(node, Symbol.NotOk);
+                            }
+
+                            break;
+                    }
+                }
+                else
+                {
+                    symbolTable.AddNode(node, Symbol.NotOk);
+                    // Allready added error message
+                }
+            }
         }
+
         PrintError();
         indent--;
     }
@@ -253,6 +305,47 @@ public class exprTypeChecker : stmtTypeChecker
                     tempResult += IndentedString($"{node.GetId()} is not a valid id (no value associated with it)\n");
                 }
                 break;
+        }
+        PrintError();
+        indent--;
+    }
+
+    public override void InAReadpinExp(AReadpinExp node)
+    {
+        locations.Push( IndentedString($"in readpin expression: {node}\n"));
+        indent++;
+    }
+
+    public override void OutAReadpinExp(AReadpinExp node)
+    {
+        if (symbolTable.currentScope == 0)
+        {
+            symbolTable.AddNode(node, Symbol.NotOk);
+            tempResult += IndentedString("A readpin expression is not legal in globalscope");
+        }
+        else
+        {
+            Symbol? readpinType = symbolTable.GetSymbol(node.GetExp());
+            if (node.GetExp() is AIdExp id)
+            {
+                readpinType = symbolTable.GetSymbol(id.GetId());
+            }
+            if (readpinType is Symbol.Pin or Symbol.Int)
+            {
+                symbolTable.AddNode(node, Symbol.Pin);
+            }
+            else
+            {
+                symbolTable.AddNode(node, Symbol.NotOk);
+                if (readpinType == null)
+                {
+                    tempResult += IndentedString("The id does not exist in this scope\n");
+                }
+                else
+                {
+                    tempResult += IndentedString("Readpin expression is not Pin or integer type");          
+                }
+            }
         }
         PrintError();
         indent--;
