@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Threading.Tasks.Dataflow;
 using Moduino.node;
 
 namespace Compiler.Visitors;
@@ -7,37 +8,43 @@ public class SymbolTable
 {
     private readonly List<SymbolTable> _allTables;
     private int _currentTable;
-    public SymbolTable(SymbolTable? parent, List<SymbolTable> allTables, int currentTable = 0)
+    public int currentScope;
+    public SymbolTable(SymbolTable? parent, List<SymbolTable> allTables, int currentTable = 0, int scope = 0)
     {
         _parent = parent;
         allTables.Add(this);
         _currentTable = currentTable;
         _allTables = allTables;
+        currentScope = scope;
     }
     private readonly SymbolTable? _parent;
     private readonly Dictionary<string, Node> _idToNode = new();
-    private readonly Dictionary<Node, Symbol> _nodeToSymbol = new();
+    public readonly Dictionary<Node, Symbol> _nodeToSymbol = new();
     
     public readonly Dictionary<string, AUnitdeclGlobal> IdToUnitDecl = new();
-    public readonly Dictionary<Node, (List<AUnitdeclGlobal> numerator, List<AUnitdeclGlobal> denominator)> NodeToUnit = new();
+    public readonly Dictionary<Node, (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>)> NodeToUnit = new();
     
     private readonly Dictionary<string, Node> _funcIdToNode = new();
     private readonly Dictionary<Node, List<PType>> _nodeToArgs = new();
-    private readonly Dictionary<Node, Symbol?> _nodeToReturn = new();
     public int Prog = 0;
     public int Loop = 0;
 
+    
+    
     // General methods
     public SymbolTable EnterScope()
     {
-        return ++_currentTable < _allTables.Count ? _allTables[_currentTable] : new SymbolTable(this, _allTables, _currentTable);
+        currentScope++;
+        return ++_currentTable < _allTables.Count ? _allTables[_currentTable] : new SymbolTable(this, _allTables, _currentTable, currentScope);
     }
 
     public SymbolTable ExitScope()
     {
+        currentScope--;
         if (_parent == null) 
             return this;
         _parent._currentTable = _currentTable;
+        _parent.currentScope = currentScope;
         return _parent;
 
     }
@@ -79,24 +86,28 @@ public class SymbolTable
     
     // Unit methods
     public void AddIdToNode(string identifier, Node node) => _idToNode.Add(identifier.Trim(), node);
-    public bool GetUnit(string identifier, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unit)
+    public bool GetUnit(string identifier, out (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unit)
     {
         unit = (null, null);
         return _idToNode.TryGetValue(identifier.Trim(), out Node? node) && GetUnit(node, out unit);
     }
-    public bool GetUnit(Node expression, out (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unit) => NodeToUnit.TryGetValue(expression, out unit);
-    public void AddNodeToUnit(Node node, (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unit) => NodeToUnit.Add(node, unit);
+    public bool GetUnit(Node expression, out (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unit)
+    {
+        return NodeToUnit.TryGetValue(expression, out unit)
+               || (_parent != null && _parent.GetUnit(expression, out unit));
+    }
+    
+    public void AddNodeToUnit(Node node, (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unit)
+    {
+        NodeToUnit.Add(node, unit);
+    }
+
     public void AddIdToUnitdecl(string identifier, AUnitdeclGlobal node) => IdToUnitDecl.Add(identifier.Trim(), node);
     public AUnitdeclGlobal? GetUnitdeclFromId(string identifier) => IdToUnitDecl.TryGetValue(identifier.Trim(), out AUnitdeclGlobal? result)
             ? result : _parent?.GetUnitdeclFromId(identifier);
-    public bool CompareUnitTypes((List<AUnitdeclGlobal> nums, List<AUnitdeclGlobal> dens) unit1, (List<AUnitdeclGlobal> nums, List<AUnitdeclGlobal> dens) unit2)
+    public bool CompareUnitTypes((SortedList<string, AUnitdeclGlobal> nums, SortedList<string, AUnitdeclGlobal> dens) unit1, (SortedList<string, AUnitdeclGlobal> nums, SortedList<string, AUnitdeclGlobal> dens) unit2)
     {
-        var sortedUnit1Nums = unit1.nums.OrderBy(x => x).ToList();
-        var sortedUnit2Nums = unit2.nums.OrderBy(x => x).ToList();
-        var sortedUnit1Dens = unit1.dens.OrderBy(x => x).ToList();
-        var sortedUnit2Dens = unit2.dens.OrderBy(x => x).ToList();
-
-        return sortedUnit1Nums.SequenceEqual(sortedUnit2Nums) && sortedUnit1Dens.SequenceEqual(sortedUnit2Dens);
+        return unit1.nums.SequenceEqual(unit2.nums) && unit1.dens.SequenceEqual(unit2.dens);
     }
     
     
@@ -112,12 +123,6 @@ public class SymbolTable
     {
         bool found = _nodeToArgs.TryGetValue(node, out List<PType>? args);
         return found ? args : _parent?.GetFunctionArgs(node);
-    }
-    public void AddReturnSymbol(Node node, Symbol? symbol) => _nodeToReturn.Add(node, symbol);
-    public Symbol? GetReturnFromNode(Node node)
-    {
-        bool found = _nodeToReturn.TryGetValue(node, out Symbol? returnSymbol);
-        return found ? returnSymbol : _parent?.GetReturnFromNode(node);
     }
 }
 

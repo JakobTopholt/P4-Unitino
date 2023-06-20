@@ -1,2 +1,0 @@
-$ param ident = {2}
-$ print {sablecc:toxml(., $ident)}

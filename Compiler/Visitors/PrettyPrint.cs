@@ -5,10 +5,6 @@ using Moduino.parser;
 
 namespace Compiler.Visitors;
 
-// TODO:
-// Check thesis part 3 from discord. Best case, prettyprint reprints the program as it was written so that:
-// program.txt --(SableCC)-> Concrete Syntax Tree --(SableCC)-> Abstract Syntax Tree --(PrettyPrint)-> program.txt (don't overwrite program tho ;)) 
-
 public class PrettyPrint : DepthFirstAdapter
 {
     private SymbolTable symbolTable;
@@ -60,6 +56,7 @@ public class PrettyPrint : DepthFirstAdapter
             case APrefixplusStmt:
             case ADelayStmt:
             case ASetpinStmt: 
+            case AWritepinStmt:    
                 output.WriteLine(";");                    
                 break;
         }
@@ -401,6 +398,35 @@ public class PrettyPrint : DepthFirstAdapter
         output.Write(":");
         node.GetFalse().Apply(this);
     }
+
+    public override void CaseASetpinStmt(ASetpinStmt node)
+    {
+        Indent("setpin(");
+        node.GetExp().Apply(this);
+        output.Write(", ");
+        node.GetPinmode().Apply(this);
+        OutASetpinStmt(node);
+    }
+
+    public override void OutASetpinStmt(ASetpinStmt node)
+    {
+        output.Write(")");
+    }
+
+    public override void CaseAInputPinmode(AInputPinmode node)
+    {
+        output.Write("input");
+    }
+
+    public override void CaseAOutputPinmode(AOutputPinmode node)
+    {
+        output.Write("output");
+    }
+
+    public override void CaseAInputPullupPinmode(AInputPullupPinmode node)
+    {
+        output.Write("input_pullup");
+    }
     public override void CaseAAssignStmt(AAssignStmt node)
     {
         Indent("");
@@ -631,6 +657,10 @@ public class PrettyPrint : DepthFirstAdapter
     {
         output.Write($"!{node.GetExp()}");
     }
+    public override void CaseAReadpinExp(AReadpinExp node)
+    {
+        output.Write($"readpin({node.GetExp().ToString().Trim()})");
+    }
     
     public override void CaseACastExp(ACastExp node)
     {
@@ -658,16 +688,17 @@ public class PrettyPrint : DepthFirstAdapter
                 break;
         }
     }
-    public override void CaseASetpinStmt(ASetpinStmt node)
+
+    public override void CaseAWritepinStmt(AWritepinStmt node)
     {
-        Indent("setpin(");
+        Indent("writepin(");
         node.GetExp().Apply(this);
         output.Write(", ");
         node.GetPintoggle().Apply(this);
-        OutASetpinStmt(node);
+        OutAWritepinStmt(node);
     }
 
-    public override void OutASetpinStmt(ASetpinStmt node)
+    public override void OutAWritepinStmt(AWritepinStmt node)
     {
         output.Write(")");
     }

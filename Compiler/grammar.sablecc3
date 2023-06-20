@@ -16,7 +16,7 @@ Helpers
     not_star = [all - '*'];
     not_star_slash = [not_star - '/'];
     
-    escaped_chars = '\n'; //TODO: more escaped chars
+    escaped_chars = '\n';
     valid_char = [not_cr_lf - [''' + '"']];
     string_char = [valid_char + '''] | escaped_chars | '\"';
     char_char = [valid_char + '"'] | escaped_chars | '\' + ''';
@@ -34,6 +34,7 @@ Tokens
     tprog = 'prog';
     tloop = 'loop';
     tfunc = 'func';
+    setup = 'setup'; // To disallow naming a function/variable setup
     if = 'if';
     else = 'else';
     for = 'for';
@@ -44,8 +45,14 @@ Tokens
     
     tdelay = 'delay';
     tsetpin = 'setpin';
+    treadpin = 'readpin';
+    twritepin = 'writepin';
+    
     low = 'low';
     high = 'high';
+    tinput = 'input';
+    toutput = 'output';
+    tinput_pullup = 'input_pullup';
     
     tint = 'int';
     tdecimal = 'decimal';
@@ -98,7 +105,7 @@ Tokens
     number = digit+;
 
     string = '"' string_char+ '"';
-    char = ''' char_char+ '''; //TODO: test if string and char works correctly
+    char = ''' char_char+ ''';
 
     blank = blank;
     comment = short_comment | long_comment;
@@ -115,7 +122,8 @@ Productions
     global_list {-> global*} = global global_list? {-> [global.global, global_list.global]};
     
     global {-> global} = {unitdecl} unitdecl {-> unitdecl.global}
-                       | {func} func {-> func.global};
+                       | {func} func {-> func.global}
+                       | {declstmt} declstmt {-> New global.declstmt(declstmt.stmt)};
     //// Units
     
     // A unit declaration consist of one unit and it's subunits
@@ -163,7 +171,7 @@ Productions
                      | {untyped}  tfunc id l_par args? r_par l_brace stmt_list? return? r_brace      {-> New global.untyped(id, [args.arg], [stmt_list.stmt, return.stmt])}
                      | {typed}    functype id l_par args? r_par l_brace stmt_list? return? r_brace   {-> New global.typed(functype.type, id, [args.arg], [stmt_list.stmt, return.stmt])};
             
-    // params used to declare a function and args when using a function //TODO: we fcked this up xD
+    // params used to declare a function and args when using a function
     params {-> exp*} = {list}   exp comma params   {-> [exp.exp, params.exp]}
                      | {single} exp                 {-> [exp.exp]};
                      
@@ -176,15 +184,22 @@ Productions
     stmt_list {-> stmt*} = stmt stmt_list?                      {-> [stmt.stmt, stmt_list.stmt]};
     
     stmt {-> stmt} = {assign}   assign semicolon                        {-> assign.stmt}
-                   | {decl}     unittype id semicolon                   {-> New stmt.decl(unittype.type, id)}
-                   | {declass}  unittype id equal exp semicolon         {-> New stmt.declass(unittype.type, id, exp.exp)}
+                   | declstmt                                           {-> declstmt.stmt}
                    | {funccall} id l_par params? r_par semicolon        {-> New stmt.funccall(id, [params.exp])}
                    | {delay} tdelay l_par exp r_par semicolon           {-> New stmt.delay(exp.exp)}
-                   | {setpin} tsetpin l_par exp comma pintoggle r_par semicolon {-> New stmt.setpin(exp.exp, pintoggle.pintoggle)}
+                   | {setpin} tsetpin l_par exp comma pinmode r_par semicolon {-> New stmt.setpin(exp.exp, pinmode.pinmode)}
+                   | {writepin} twritepin l_par exp comma pintoggle r_par semicolon {-> New stmt.writepin(exp.exp, pintoggle.pintoggle)}
                    | {scoped}   scoped                                  {-> scoped.stmt};
+                   
+    declstmt {-> stmt} = {decl}     unittype id semicolon                   {-> New stmt.decl(unittype.type, id)}
+                       | {declass}  unittype id equal exp semicolon         {-> New stmt.declass(unittype.type, id, exp.exp)};
                    
     pintoggle {-> pintoggle} = {high} high  {-> New pintoggle.high()}
                              | {low} low    {-> New pintoggle.low()};
+    
+    pinmode {-> pinmode} = {input} tinput   {-> New pinmode.input()}
+                         | {output} toutput {-> New pinmode.output()}
+                         | {input_pullup} tinput_pullup {-> New pinmode.input_pullup()};
                    
     return {-> stmt} = treturn exp? semicolon               {-> New stmt.return(exp.exp)};
     
@@ -206,7 +221,7 @@ Productions
                            
     //// Expressions - check precedence table from report
     exp {-> exp}= {ternary}         p8 q_mark [true]:exp colon [false]:exp  {-> New exp.ternary(p8.exp, true.exp, false.exp)}
-                | p8 {-> p8.exp}; //TODO: right to left override case
+                | p8 {-> p8.exp}; //exp: right to left override case
     p8 {-> exp} = {or}              p8 tbarbar p7                           {-> New exp.or(p8.exp, p7.exp)}
                 | p7 {-> p7.exp};
     p7 {-> exp} = {and}             p7 tand p6                              {-> New exp.and(p7.exp, p6.exp)}
@@ -231,12 +246,13 @@ Productions
                 | {unaryminus}      minus p1                                {-> New exp.unaryminus(p1.exp)}
                 | {logicalnot}      not p1                                  {-> New exp.logicalnot(p1.exp)}
                 | {cast}            l_par type r_par p1                     {-> New exp.cast(type.type, p1.exp)}
-                | p1 {-> p1.exp}; //TODO: right to left override case
+                | p1 {-> p1.exp}; //p2: right to left override case
     p1 {-> exp} = {prefixplusplus}  tplusplus p0                            {-> New exp.prefixplusplus(p0.exp)}
                 | {prefixminusminus}tminusminus p0                          {-> New exp.prefixminusminus(p0.exp)}
                 | {funccall}        id l_par params? r_par                  {-> New exp.funccall(id, [params.exp])} // <- array and structaccess goes here
                 | p0 {-> p0.exp};
     p0 {-> exp} = {id}              id {-> New exp.id(id)}
+                | {readpin} treadpin l_par exp r_par                        {-> New exp.readpin(exp.exp)}
                 | {decimal}         decimal                                 {-> New exp.decimal(decimal)}
                 | {unit}            unitnumber                              {-> unitnumber.exp}
                 | {value}           tvalue                                  {-> New exp.value()}
@@ -257,7 +273,8 @@ Abstract Syntax Tree
            | {prog} stmt*
            | {loop} stmt*
            | {untyped} id arg* stmt*
-           | {typed} type id arg* stmt*;
+           | {typed} type id arg* stmt*
+           | {declstmt} stmt;
     
     subunit = id exp;
     arg = type id;
@@ -280,9 +297,11 @@ Abstract Syntax Tree
          | {while} exp stmt+
          | {dowhile} stmt+ exp
          | {delay} exp
-         | {setpin} exp pintoggle;
+         | {setpin} exp pinmode
+         | {writepin} exp pintoggle;
          
     pintoggle = {high} | {low};
+    pinmode = {input} | {output} | {input_pullup};
               
     type = {int} 
          | {decimal}
@@ -320,6 +339,7 @@ Abstract Syntax Tree
         | {prefixminusminus}exp
         | {funccall}        id exp*
         | {id}              id
+        | {readpin}         exp
         | {unitnumber}      number id
         | {unitdecimal}     decimal id
         | {decimal}         decimal
@@ -332,5 +352,3 @@ Abstract Syntax Tree
         
     boolean = {true} | {false};
     
-// TODO: Arrays
-// TODO: Switch

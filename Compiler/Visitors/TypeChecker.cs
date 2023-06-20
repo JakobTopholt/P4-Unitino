@@ -32,7 +32,8 @@ public class TypeChecker : exprTypeChecker
         symbolTable.AddNode(node, grammarIsOk ? Symbol.Ok : Symbol.NotOk);
         symbolTable = symbolTable.ResetScope();
     }
-
+    
+    
     public override void CaseAUnitdeclGlobal(AUnitdeclGlobal node)
     {
         
@@ -80,8 +81,10 @@ public class TypeChecker : exprTypeChecker
         // KOM HERTIL
         List<ANumUnituse> nums = node.GetUnituse().OfType<ANumUnituse>().ToList();
         List<ADenUnituse> dens = node.GetUnituse().OfType<ADenUnituse>().ToList();
-        List<AUnitdeclGlobal> newNums = new List<AUnitdeclGlobal>();
-        List<AUnitdeclGlobal> newDens = new List<AUnitdeclGlobal>();
+        //List<AUnitdeclGlobal> newNums = new List<AUnitdeclGlobal>();
+        //List<AUnitdeclGlobal> newDens = new List<AUnitdeclGlobal>();
+        SortedList<string, AUnitdeclGlobal> newNums = new SortedList<string, AUnitdeclGlobal>();
+        SortedList<string, AUnitdeclGlobal> newDens = new SortedList<string, AUnitdeclGlobal>();
 
         bool aunittypeIsOk = true;
         foreach (ANumUnituse num in nums)
@@ -89,7 +92,7 @@ public class TypeChecker : exprTypeChecker
             AUnitdeclGlobal? newNum = symbolTable.GetUnitdeclFromId(num.GetId().ToString());
             if (newNum != null)
             {
-                newNums.Add(newNum);
+                newNums.Add(newNum.GetId().ToString().Trim(),newNum);
             }
             else
             {
@@ -103,7 +106,7 @@ public class TypeChecker : exprTypeChecker
             AUnitdeclGlobal? newDen = symbolTable.GetUnitdeclFromId(den.GetId().ToString());
             if (newDen != null)
             {
-                newDens.Add(newDen);
+                newDens.Add(newDen.GetId().ToString().Trim(),newDen);;
             }
             else
             {
@@ -114,7 +117,7 @@ public class TypeChecker : exprTypeChecker
         }
         if (aunittypeIsOk)
         {
-            (List<AUnitdeclGlobal>, List<AUnitdeclGlobal>) unituse = (newNums, newDens);
+            (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unituse = (newNums, newDens);
             symbolTable.AddNodeToUnit(node, unituse);
             symbolTable.AddNode(node, Symbol.Ok);
         }
@@ -181,6 +184,9 @@ public class TypeChecker : exprTypeChecker
             case AStringType:
                 symbolTable.AddNode(node, Symbol.String);
                 break;
+            case APinType:
+                symbolTable.AddNode(node, Symbol.Pin);
+                break;
             case AUnitType customType:
             {
                 symbolTable.GetUnit(customType, out var unit);
@@ -206,20 +212,11 @@ public class TypeChecker : exprTypeChecker
             switch (type)
             {
                 case AIntType:
-                    symbolTable.AddIdToNode(id, arg);
-                    break;
                 case ADecimalType:
-                    symbolTable.AddIdToNode(id, arg);
-                    break;
                 case ABoolType:
-                    symbolTable.AddIdToNode(id, arg);
-                    break;
                 case ACharType:
-                    symbolTable.AddIdToNode(id, arg);
-                    break;
                 case AStringType:
-                    symbolTable.AddIdToNode(id, arg);
-                    break;
+                case APinType:
                 case AUnitType:
                     symbolTable.AddIdToNode(id, arg);
                     break;
@@ -256,7 +253,22 @@ public class TypeChecker : exprTypeChecker
                 untypedIsOk = false;
         }
         symbolTable = symbolTable.ExitScope();
-        symbolTable.AddNode(node, untypedIsOk ? Symbol.Ok : Symbol.NotOk);
+        if (!untypedIsOk)
+        {
+            // Overwrite the saved type with notOk
+            if (symbolTable._nodeToSymbol.ContainsKey(node))
+            {
+                symbolTable._nodeToSymbol.Remove(node);
+            }
+            symbolTable.AddNode(node, Symbol.NotOk);
+        }
+        else
+        {
+            if (!node.GetStmt().OfType<AReturnStmt>().Any())
+            {
+                symbolTable.AddNode(node, Symbol.Func);
+            }
+        }
         locations.Clear();
         reported = false;
         indent--;
@@ -286,7 +298,42 @@ public class TypeChecker : exprTypeChecker
                 typedIsOk = false;
         }
         symbolTable = symbolTable.ExitScope();
-        symbolTable.AddNode(node, typedIsOk ? Symbol.Ok : Symbol.NotOk);
+        if (typedIsOk)
+        {
+            PType typedType = node.GetType();
+            switch (typedType)
+            {
+                case AIntType:
+                    symbolTable.AddNode(node, Symbol.Int);
+                    break;
+                case ADecimalType:
+                    symbolTable.AddNode(node, Symbol.Decimal);
+                    break;
+                case ABoolType:
+                    symbolTable.AddNode(node, Symbol.Bool);
+                    break;
+                case ACharType:
+                    symbolTable.AddNode(node, Symbol.Char);
+                    break;
+                case AStringType:
+                    symbolTable.AddNode(node, Symbol.String);
+                    break;
+                case APinType:
+                    symbolTable.AddNode(node, Symbol.Pin);
+                    break;
+                case AVoidType:
+                    symbolTable.AddNode(node, Symbol.Func);
+                    break;
+                case AUnitType:
+                    symbolTable.AddNode(node, Symbol.Ok);
+                    break;
+            }
+        }
+        else
+        {
+            symbolTable.AddNode(node, Symbol.NotOk);
+        }
+
         locations.Clear();
         reported = false;
         indent--;
@@ -300,8 +347,6 @@ public class TypeChecker : exprTypeChecker
         {
             symbolTable.AddNode(node, Symbol.NotOk);
         }
-        symbolTable = symbolTable.EnterScope();
-        
     }
 
     public override void OutALoopGlobal(ALoopGlobal node)
@@ -315,12 +360,11 @@ public class TypeChecker : exprTypeChecker
                 if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
                     loopIsOk = false;
             }
-            symbolTable = symbolTable.ExitScope();
             symbolTable.AddNode(node, loopIsOk ? Symbol.Ok : Symbol.NotOk);
-            locations.Clear();
-            reported = false;
-            indent--;
         }
+        locations.Clear();
+        reported = false;
+        indent--;
     }
 
     public override void InAProgGlobal(AProgGlobal node)
@@ -348,9 +392,52 @@ public class TypeChecker : exprTypeChecker
             }
             symbolTable = symbolTable.ExitScope();
             symbolTable.AddNode(node, progIsOk ? Symbol.Ok : Symbol.NotOk);
-            locations.Clear();
-            reported = false;
-            indent--;
+            
+        }
+        locations.Clear();
+        reported = false;
+        indent--;
+    }
+    public override void InADeclstmtGlobal(ADeclstmtGlobal node)
+    {
+        locations.Push(IndentedString($"In a global declaration: {node.GetStmt()}\n"));
+        indent++;
+        PStmt globalStmt = node.GetStmt();
+
+        if (globalStmt is ADeclStmt decl)
+        {
+            if (symbolTable.IsInCurrentScope(decl.GetId()))
+            {
+                symbolTable.AddNode(node, Symbol.NotOk);
+                tempResult += IndentedString($"The id: {decl.GetId()} has already been declared before");
+            }
+        } else if (globalStmt is ADeclassStmt declass)
+        {
+            if (symbolTable.IsInCurrentScope(declass.GetId()))
+            {
+                symbolTable.AddNode(node, Symbol.NotOk);
+                tempResult += IndentedString($"The id: {declass.GetId()} has already been declared before");
+            }
         }
     }
+    public override void OutADeclstmtGlobal(ADeclstmtGlobal node)
+    {
+        PStmt globalStmt = node.GetStmt();
+        if (symbolTable.GetSymbol(node) == null)
+        {
+            if (globalStmt is ADeclStmt decl)
+            {
+                symbolTable.AddNode(node, symbolTable.GetSymbol(decl) != Symbol.NotOk ? Symbol.Ok : Symbol.NotOk);
+
+            }
+            else if (globalStmt is ADeclassStmt declass)
+            {
+                symbolTable.AddNode(node, symbolTable.GetSymbol(declass) != Symbol.NotOk ? Symbol.Ok : Symbol.NotOk);
+            }
+        }
+        PrintError();
+        indent--;
+        locations.Clear();
+    }
+
 }

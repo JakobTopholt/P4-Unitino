@@ -31,6 +31,7 @@ public class CodegenChecker
         string[] rows = boardsTable.Split( '\n', StringSplitOptions.RemoveEmptyEntries);
         foreach (string row in rows)
         {
+            // If a board is plugged in, test towards that
             string[] columns = row.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (columns.Length != 9 || columns[2] != "Serial") 
                 continue;
@@ -38,6 +39,7 @@ public class CodegenChecker
             Assert.That(await ArduinoCompiler.Compile(folder, null, boardFqbn), Is.True);
             return;
         }
+        // Else test toward a generic version
         Assert.That(await ArduinoCompiler.Compile(folder, null, null), Is.True);
     }
 }

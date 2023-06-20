@@ -1,6 +1,8 @@
 ﻿# Unitino - Arduino with units
+![Current status](https://github.com/JakobTopholt/P4-Unitino/actions/workflows/dotnet-desktop.yml/badge.svg)
 
 ## Index
+* [Using the compiler](#using-the-compiler)
 * [Contribute](#contribute)
   * [Prerequisites](#prerequisites)
     * [Rider (recommended)](#rider-recommended)

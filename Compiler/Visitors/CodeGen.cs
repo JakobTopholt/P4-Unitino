@@ -3,19 +3,6 @@ using System;
 using System.IO;
 using Moduino.analysis;
 using Moduino.node;
-// TODO: Check grammar.sablecc3 AST for how the tree will look.
-// On lowest level such as id and number there is no concrete value, but rather only the string
-// Another branch will fix this, so ignore this for now. Until then just use the value in the .toString method as shown
-// in CaseANumberExp. Now adjust So that if it is the Func.prog node parse it as the Arduino setup() method 
-// or if it is Func.new it is a function with the Func.new.id as it's name. In this branch we don't check anything for
-// id. a function contains a list of statements. Create a start curly bracket and then for each statement parse it seperated
-// by a semicolon. Note a statement can either be:
-//   stmt.exp (from previous example and this is actually meaningless, so ignore this)
-//   stmt.assign
-//   stmt.decl
-//   stmt.funccall
-// for exp consider removing all the parenthesis and check if they match the associativity and precedence laws we
-// have specified in Overleaf
 
 namespace Compiler.Visitors;
 
@@ -67,7 +54,8 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             case APrefixminusStmt:
             case APrefixplusStmt:
             case ADelayStmt:
-            case ASetpinStmt:    
+            case ASetpinStmt:
+            case AWritepinStmt:
                 writer.WriteLine(";");                    
                 break;
         }
@@ -439,18 +427,47 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         node.GetFalse().Apply(this);
     }
 
-    public override void CaseASetpinStmt(ASetpinStmt node)
+    public override void CaseAWritepinStmt(AWritepinStmt node)
     {
         Indent("digitalWrite(");
         node.GetExp().Apply(this);
         writer.Write(", ");
         node.GetPintoggle().Apply(this);
+        OutAWritepinStmt(node);
+    }
+
+    public override void OutAWritepinStmt(AWritepinStmt node)
+    {
+        writer.Write(")");
+    }
+
+    public override void CaseASetpinStmt(ASetpinStmt node)
+    {
+        Indent("pinMode(");
+        node.GetExp().Apply(this);
+        writer.Write(", ");
+        node.GetPinmode().Apply(this);
         OutASetpinStmt(node);
     }
 
     public override void OutASetpinStmt(ASetpinStmt node)
     {
         writer.Write(")");
+    }
+
+    public override void CaseAInputPinmode(AInputPinmode node)
+    {
+        writer.Write("INPUT");
+    }
+
+    public override void CaseAOutputPinmode(AOutputPinmode node)
+    {
+        writer.Write("OUTPUT");
+    }
+
+    public override void CaseAInputPullupPinmode(AInputPullupPinmode node)
+    {
+        writer.Write("INPUT_PULLUP");
     }
 
     public override void CaseAHighPintoggle(AHighPintoggle node)
@@ -704,6 +721,11 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         writer.Write($"!{node.GetExp()}");
     }
 
+    public override void CaseAReadpinExp(AReadpinExp node)
+    {
+        writer.Write($"digitalRead({node.GetExp().ToString().Trim()})");
+    }
+
     public override void CaseACastExp(ACastExp node)
     {
         PExp expression = node.GetExp();
@@ -793,7 +815,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         }
     }
 
-    public override void CaseASubunit(ASubunit node) //TODO: prefix ALL units with U, prefix ALL function with F and all variables with V
+    public override void CaseASubunit(ASubunit node)
     {
         string? unitId = whiteSpace.Replace(((AUnitdeclGlobal)node.Parent()).GetId().ToString(),"");
         Indent($"float {unitId}");
@@ -830,6 +852,12 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         writer.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
                                                     + "(" + node.GetNumber().ToString().Trim() + ")");
     }
+
+    public override void OutADeclstmtGlobal(ADeclstmtGlobal node)
+    {
+        writer.WriteLine(";");
+    }
+
     public void Dispose()
     {
         writer.Dispose();

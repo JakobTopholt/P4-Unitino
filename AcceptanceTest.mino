@@ -1,0 +1,142 @@
+# Arduino-compatible smart garden
+
+unit Volume{
+    ml => value;
+    dl => value/100;
+    l => value/1000;
+}
+unit Time{
+    ms => value;
+    s => value/1000;
+    min => value/1000/60;
+    h => value/1000/60/60;
+    day => value/1000/60/60/24;
+    week => value/1000/60/60/24/7;
+    month => value/1000/60/60/24/7/30;
+}
+unit Weight{
+    g => value;
+    kg => value/1000;
+}
+unit Humidity{
+    #percentage
+    damp => value;
+}
+# setup
+prog{
+    pin tomatoSensor = 1;
+    pin citrusSensor = 2;
+    pin chilliSensor = 3;
+    pin mushroomSensor = 4;
+    pin dampnessSensor = 5;
+    # Pin definition
+    
+    pin waterPump1 = 6;
+    setpin(waterPump1, output);
+    pin waterPump2 = 7;
+    setpin(waterPump2, output);
+    pin waterPump3 = 8;
+    setpin(waterPump3, output);
+    pin waterPump4 = 9;
+    setpin(waterPump4, output);
+    pin humidifier = 10;
+    setpin(humidifier, output);
+
+    Weight tomatoesWeight = 500g;    #readpin(tomatoSensor)
+    Weight citrusTreeWeight = 2kg;   #readpin(citrusSensor)
+    Weight chillisWeight = 100g;     #readpin(chilliSensor)
+    Weight mushroomsWeight = 200g;   #readpin(mushroomSensor)
+    Humidity dampness = 80damp;          #readpin(dampnessSensor)
+
+    Volume/Weight tomatoWater = 210l/1kg; 
+    Volume/Weight citrustreeWater = 600l/1kg; 
+    Volume/Weight chilliWater = 320l/1kg; 
+
+    Volume/Time tomatoPlants = (tomatoWater * tomatoesWeight)/80day;
+    Volume/Time citrusTree = (citrustreeWater  * citrusTreeWeight)/7month;
+    Volume/Time chilliPlants = (chilliWater  * chillisWeight)/150day;
+    Time mushrooms = 6.5week;
+
+    Time tomatoWatercycle = 3day;
+    Time citrusWatercycle = 1week;
+    Time chilliWatercycle = 2week;
+    Humidity mushroomWatercycle = 85damp;
+    
+    
+    Time internalTime = 0day;
+    Time tomatoTime = 0day;
+    Time citrusTime = 0day;
+    Time chilliTime = 0day;
+}
+
+# update
+loop{
+   # read sensors
+   readWeightSensor();
+   readHumiditySensor(dampness);
+
+   # action
+   # Tomatoes
+   if (tomatoTime < internalTime){
+       updatePlant(waterPump1, tomatoPlants, tomatoWatercycle);
+       tomatoTime += tomatoWatercycle;
+   }
+   # Citrus
+   if (citrusTime < internalTime) {
+       updatePlant(waterPump2, citrusTree, citrusWatercycle);
+       citrusTime += citrusWatercycle;
+   }
+   # Chilli
+   if (chilliTime < internalTime ) {
+       updatePlant(waterPump3, chilliPlants, chilliWatercycle);
+       chilliTime += chilliWatercycle;
+   }
+   updateMushroom(dampness, mushroomWatercycle);
+   
+   # report
+   # generateGardenStatistic();
+   internalTime += 1day; 
+   delay((int)(1day/1ms));
+}
+
+# update methods
+func readWeightSensor(){
+   tomatoesWeight += 50g;      #readpin(tomatoSensor)
+   citrusTreeWeight += 100g;   #readpin(citrusSensor)
+   chillisWeight += 30g;       #readpin(chilliSensor)
+   mushroomsWeight += 20g;     #readpin(mushroomSensor)  
+}
+func readHumiditySensor(Humidity dampness){
+   dampness = 80damp;       #readpin(dampnessSensor)
+}
+func updatePlant(pin arduinoSensor, Volume/Time plant, Time sinceLastWater){
+   Volume neededWater = plant * sinceLastWater;
+   activateWaterpump(arduinoSensor, neededWater);
+}
+func updateMushroom(Humidity dampness, Humidity mushroomWatercycle){
+   if (dampness < mushroomWatercycle){
+      activateHumidifier(mushroomWatercycle);
+   }
+   mushrooms -= 1day;
+}
+
+# action methods
+func activateWaterpump(pin arduinoSensor, Volume water){
+   # activate a arduino enabled pump
+   Time/Volume pumpFlow = 1s/40ml;
+   Time timePumping = pumpFlow * water; 
+   # pump water for the calculated time
+   writepin(arduinoSensor, high);
+   int runTime = (int)(timePumping/1ms);
+   delay(runTime);
+   writepin(arduinoSensor, low);
+}
+func activateHumidifier(Humidity dampness){
+   # Har brug for at aktivere read humidifier sensor flere gange tll dampness er opnået.
+   Time/Humidity humFlow = 1min/5damp;
+   Time runTime = humFlow * dampness; 
+  
+   writepin(humidifier, high);             # humidifier.activate;
+   delay((int)(runTime/1ms));
+   writepin(humidifier, low);
+}

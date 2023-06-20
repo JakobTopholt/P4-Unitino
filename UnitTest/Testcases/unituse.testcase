@@ -12,7 +12,7 @@ prog {
     Time a = 1/50ms;
 }
 loop {
-    int a;
+    decimal c = 200.0;
 }
 ////
 
@@ -31,7 +31,7 @@ void setup() {
     float a = 1/Timems(50);
 }
 void loop() {
-    int a;
+    float c = 200.0;
 }
 ////
 true
@@ -54,8 +54,8 @@ unit Time {
 }
 prog {
     decimal e = 3.7;
-    Time a = 1/Timems(50.3)+1/Times(5);
-    Time b = 1/Timems(50)-1/Times(5);
+    Time a = 1/50.3ms + 1/5s;
+    Time b = 1/50ms - 1/5s;
 }
 ////
 void loop() {
