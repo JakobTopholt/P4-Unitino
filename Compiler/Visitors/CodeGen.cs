@@ -588,7 +588,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseAFunccallExp(AFunccallExp node)
     {
-        writer.Write("");
+        writer.Write("F");
         node.GetId().Apply(this);
         writer.Write("(");
         var list = node.GetExp();
@@ -605,7 +605,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseAFunccallStmt(AFunccallStmt node)
     {
-        Indent("");
+        Indent("F");
         node.GetId().Apply(this);
         writer.Write("(");
         var list = node.GetParams();
@@ -845,14 +845,14 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
     {
         AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
-        writer.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
-                                                    + "(" + node.GetDecimal().ToString().Trim() + ")");    
+        writer.Write("U" + test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
+                     + "(" + node.GetDecimal().ToString().Trim() + ")");    
     }
     public override void CaseAUnitnumberExp(AUnitnumberExp node)
     {
         AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
-        writer.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
-                                                    + "(" + node.GetNumber().ToString().Trim() + ")");
+        writer.Write("U" + test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
+                     + "(" + node.GetNumber().ToString().Trim() + ")");
     }
     public void Dispose()
     {
