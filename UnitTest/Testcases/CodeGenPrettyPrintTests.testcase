@@ -57,11 +57,11 @@ void setup() {
     String l = d?"ja":"nej";
     float e = 1.11;
     String b = String(e, 6);
-    argTest(a, b, c, d, e);
+    FargTest(a, b, c, d, e);
 }
 void loop() {
 }
-int argTest(int a, String b, char c, bool d, float e) {
+int FargTest(int a, String b, char c, bool d, float e) {
     int f;
     return a;
 }

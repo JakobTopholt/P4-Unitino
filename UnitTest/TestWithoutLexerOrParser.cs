@@ -121,19 +121,19 @@ func b(int b) {
 ";
         _codeGen = @"void loop() {
 }
-float Timems(float value) {
+float UTimems(float value) {
     return value;
 }
-float Times(float value) {
+float UTimes(float value) {
     return value*1000;
 }
 void setup() {
-    float a = Times(1);
+    float a = UTimes(1);
     if(true) {
-        a = Timems(7.5);
+        a = UTimems(7.5);
     }
 }
-String b(int b) {
+String Fb(int b) {
     String c = ""hello "";
     for(int i = 0; i < b; i++) {
         c += i+"", "";
