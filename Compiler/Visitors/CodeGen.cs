@@ -146,6 +146,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         {
             Indent($"float ");
         }
+        writer.Write("F");
         node.GetId().Apply(this);
         writer.Write("(");
 
@@ -206,6 +207,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 Indent("String ");
                 break;
         }
+        writer.Write("F");
         node.GetId().Apply(this);
         writer.Write("(");
         _indent++;
@@ -818,7 +820,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void CaseASubunit(ASubunit node)
     {
         string? unitId = whiteSpace.Replace(((AUnitdeclGlobal)node.Parent()).GetId().ToString(),"");
-        Indent($"float {unitId}");
+        Indent($"float U{unitId}");
         node.GetId().Apply(this);
         writer.Write("(float value) {\n    return ");
         node.GetExp().Apply(this);
