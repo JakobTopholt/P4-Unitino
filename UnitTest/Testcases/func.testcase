@@ -54,30 +54,30 @@ decimal function4(int i){
     return d;
 }
 ////
-void NormalFunc(int b, int a) {
+void FNormalFunc(int b, int a) {
     int i = 0;
 }
 void setup() {
     int i = 0;
-    NormalFunc(5, 7);
+    FNormalFunc(5, 7);
 }
 void loop() {
     int f = 0;
 }
-String ImplicitTypedFunc() {
+String FImplicitTypedFunc() {
     String i = "0";
     return i;
 }
-char function3(char a, char b, char c) {
+char Ffunction3(char a, char b, char c) {
     char d = a;
     return d;
 }
-float function4(int i) {
+float Ffunction4(int i) {
     float d = 3.5+i;
     char a = 'a';
     char b = 'b';
     char c = 'c';
-    function3(a, b, c);
+    Ffunction3(a, b, c);
     return d;
 }
 ////
