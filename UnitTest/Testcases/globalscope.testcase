@@ -5,6 +5,12 @@ int a = 7;
 int b;
 ////
 ////
+void setup() {
+}
+void loop() {
+}
+int a = 7;
+int b;
 ////
 true
 //////
