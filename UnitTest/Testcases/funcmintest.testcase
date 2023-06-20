@@ -19,16 +19,16 @@ void setup() {
 }
 void loop() {
 }
-String function3(char a, char b, char c) {
+String Ffunction3(char a, char b, char c) {
     String d = String(a);
     return d;
 }
-float function4(int a) {
+float Ffunction4(int a) {
     float d = 3.5+a;
     char g = 'o';
     char b = 'b';
     char c = 'c';
-    String test = function3(g, b, c);
+    String test = Ffunction3(g, b, c);
     return d;
 }
 ////

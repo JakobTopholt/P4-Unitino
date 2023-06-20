@@ -146,6 +146,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         {
             Indent($"float ");
         }
+        writer.Write("F");
         node.GetId().Apply(this);
         writer.Write("(");
 
@@ -206,6 +207,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                 Indent("String ");
                 break;
         }
+        writer.Write("F");
         node.GetId().Apply(this);
         writer.Write("(");
         _indent++;
@@ -586,7 +588,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseAFunccallExp(AFunccallExp node)
     {
-        writer.Write("");
+        writer.Write("F");
         node.GetId().Apply(this);
         writer.Write("(");
         var list = node.GetExp();
@@ -603,7 +605,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseAFunccallStmt(AFunccallStmt node)
     {
-        Indent("");
+        Indent("F");
         node.GetId().Apply(this);
         writer.Write("(");
         var list = node.GetParams();
@@ -818,7 +820,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void CaseASubunit(ASubunit node)
     {
         string? unitId = whiteSpace.Replace(((AUnitdeclGlobal)node.Parent()).GetId().ToString(),"");
-        Indent($"float {unitId}");
+        Indent($"float U{unitId}");
         node.GetId().Apply(this);
         writer.Write("(float value) {\n    return ");
         node.GetExp().Apply(this);
@@ -852,8 +854,8 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         }
         catch (NullReferenceException e)
         {
-            writer.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
-                                                        + "(" + node.GetDecimal().ToString().Trim() + ")");
+            writer.Write("U" + test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
+                         + "(" + node.GetDecimal().ToString().Trim() + ")");
             return;
         }
         writer.Write(exprEvaluator.GetOutput(exp));
@@ -870,12 +872,18 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         }
         catch (NullReferenceException e)
         {
-            writer.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
-                                                        + "(" + node.GetNumber().ToString().Trim() + ")");
+            writer.Write("U" + test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
+                         + "(" + node.GetNumber().ToString().Trim() + ")");
             return;
         }
         writer.Write(exprEvaluator.GetOutput(exp));
     }
+
+    public override void OutADeclstmtGlobal(ADeclstmtGlobal node)
+    {
+        writer.WriteLine(";");
+    }
+
     public void Dispose()
     {
         writer.Dispose();

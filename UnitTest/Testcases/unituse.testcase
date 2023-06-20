@@ -17,18 +17,18 @@ loop {
 ////
 
 ////
-float Timems(float value) {
+float UTimems(float value) {
     return value;
 }
-float Times(float value) {
+float UTimes(float value) {
     return value*1000;
 }
-float UnitFunc() {
-    float a = 1/50;
+float FUnitFunc() {
+    float a = 1/UTimems(50);
     return a;
 }
 void setup() {
-    float a = 1/50;
+    float a = 1/UTimems(50);
 }
 void loop() {
     float c = 200.0;
@@ -60,16 +60,16 @@ prog {
 ////
 void loop() {
 }
-float Timems(float value) {
+float UTimems(float value) {
     return value;
 }
-float Times(float value) {
+float UTimes(float value) {
     return value*1000;
 }
 void setup() {
     float e = 3.7;
-    float a = 1/50.3+1/5000;
-    float b = 1/50-1/5000;
+    float a = 1/UTimems(50.3)+1/UTimes(5);
+    float b = 1/UTimems(50)-1/UTimes(5);
 }
 ////
 true
