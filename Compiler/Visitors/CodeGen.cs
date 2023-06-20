@@ -852,6 +852,12 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         writer.Write(test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
                                                     + "(" + node.GetNumber().ToString().Trim() + ")");
     }
+
+    public override void OutADeclstmtGlobal(ADeclstmtGlobal node)
+    {
+        writer.WriteLine(";");
+    }
+
     public void Dispose()
     {
         writer.Dispose();
