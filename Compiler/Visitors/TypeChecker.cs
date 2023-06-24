@@ -13,7 +13,7 @@ public class TypeChecker : exprTypeChecker
     public TypeChecker(SymbolTable symbolTable) : base(symbolTable)
     {
     }
-
+    
     public override void OutAGrammar(AGrammar node)
     {
         string symbols = "";
@@ -29,8 +29,9 @@ public class TypeChecker : exprTypeChecker
         {
             Console.WriteLine(error);
         }
-        symbolTable.AddNode(node, grammarIsOk ? Symbol.Ok : Symbol.NotOk);
+
         symbolTable = symbolTable.ResetScope();
+        symbolTable.AddNode(node, grammarIsOk ? Symbol.Ok : Symbol.NotOk);
     }
     
     
@@ -117,9 +118,11 @@ public class TypeChecker : exprTypeChecker
         }
         if (aunittypeIsOk)
         {
+            symbolTable = symbolTable.ExitScope();
             (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unituse = (newNums, newDens);
             symbolTable.AddNodeToUnit(node, unituse);
             symbolTable.AddNode(node, Symbol.Ok);
+            symbolTable = symbolTable.EnterScope();
         }
         else
         {
@@ -324,7 +327,10 @@ public class TypeChecker : exprTypeChecker
                 case AVoidType:
                     symbolTable.AddNode(node, Symbol.Func);
                     break;
-                case AUnitType:
+                case AUnitType a:
+                    // Missing a reference from this node to the unitType
+                    symbolTable.GetUnit(a, out var unit);
+                    symbolTable.AddNodeToUnit(node, unit);
                     symbolTable.AddNode(node, Symbol.Ok);
                     break;
             }

@@ -1,0 +1,32 @@
+
+Temp TARGET_TEMP = 20C;
+
+unit Temp {
+    K => value;
+    C => value + 273.15;
+    F => (value - 32) / 1.8 + 273.15;
+}
+
+unit Dist {
+    mm => value / 100;
+    cm => value;
+    m => value * 100;
+}
+
+Temp useSensor() {
+    return 40F;
+}
+
+Temp measurement1 = 0F;
+Temp measurement2 = 0F;
+Temp measurement3 = 0F;
+
+prog {
+    
+}
+
+loop {
+    Temp cur = useSensor();
+    
+}
+

@@ -91,3 +91,29 @@ float Uunit5ms(float value) {
 }
 ////
 true
+//////
+Legal unitTyped function
+////
+unit Time {
+    ms => value;
+    s => value * 1000;
+}
+
+int testValue;
+Time testUnit;
+
+prog {
+    testValue = 0;
+}
+loop {
+    functionTest();
+}
+
+Time functionTest(){
+    testValue++;
+    return 10s;
+}
+////
+////
+////
+true

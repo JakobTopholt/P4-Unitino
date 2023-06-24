@@ -111,13 +111,18 @@ public class exprTypeChecker : stmtTypeChecker
         // Funccall som en del af et return udtryk
         // returnvalue har betydning for om det er et correct call
 
-        if (symbolTable.currentScope == 0)
+        /* if (symbolTable.currentScope == )
         {
             symbolTable.AddNode(node, Symbol.NotOk);
             tempResult += IndentedString("Funccall expression is not legal in globalscope");
         }
         else
-        {
+        { */
+        /* 
+         * The issue is somthing with the symboltables current scope, and its attempt to get a nodeToSymbol or nodeToUnit call
+         * on a functionDefinition which was declared in a larger scope
+         * 
+         */
 
             symbolTable.GetNodeFromId(node.GetId().ToString(), out Node xxx);
             List<PType>? args = symbolTable.GetFunctionArgs(xxx);
@@ -218,6 +223,7 @@ public class exprTypeChecker : stmtTypeChecker
                 if (matches)
                 {
                     symbolTable.GetNodeFromId(node.GetId().ToString(), out Node result);
+                    //symbolTable = symbolTable.ResetScope();
                     var symbol = symbolTable.GetSymbol(result);
                     switch (symbol)
                     {
@@ -249,7 +255,6 @@ public class exprTypeChecker : stmtTypeChecker
                             {
                                 symbolTable.AddNode(node, Symbol.NotOk);
                             }
-
                             break;
                     }
                 }
@@ -259,9 +264,7 @@ public class exprTypeChecker : stmtTypeChecker
                     // Allready added error message
                 }
             }
-        }
-
-        PrintError();
+            PrintError();
         indent--;
     }
 

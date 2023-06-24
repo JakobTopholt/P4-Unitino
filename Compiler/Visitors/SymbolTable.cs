@@ -55,7 +55,7 @@ public class SymbolTable
         {
             table = table._parent;
         }
-
+        currentScope = 0;
         _currentTable = 0;
         return table;
     }
