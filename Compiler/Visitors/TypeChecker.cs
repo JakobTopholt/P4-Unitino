@@ -138,73 +138,90 @@ public class TypeChecker : exprTypeChecker
 
     public override void OutAArg(AArg node)
     {
-        // Skal nok også ind i tredje pass ad typechecker (det lokale)
-        switch (node.GetType())
-        {
-            case AIntType:
-                symbolTable.AddNode(node, Symbol.Int);
-                break;
-            case ADecimalType:
-                symbolTable.AddNode(node, Symbol.Decimal);
-                break;
-            case ABoolType:
-                symbolTable.AddNode(node, Symbol.Bool);
-                break;
-            case ACharType:
-                symbolTable.AddNode(node, Symbol.Char);
-                break;
-            case AStringType:
-                symbolTable.AddNode(node, Symbol.String);
-                break;
-            case APinType:
-                symbolTable.AddNode(node, Symbol.Pin);
-                break;
-            case AUnitType customType:
+        string id = node.GetId().Text;
+            switch (node.GetType())
             {
-                symbolTable.GetUnit(customType, out var unit);
-                symbolTable.AddNodeToUnit(node, unit);
-                symbolTable.AddNode(node, Symbol.Ok);
-                break; 
+                case AIntType:
+                    symbolTable.AddIdToNode(id, node);
+                    symbolTable.AddNode(node, Symbol.Int);
+                    break;
+                case ADecimalType:
+                    symbolTable.AddIdToNode(id, node);
+                    symbolTable.AddNode(node, Symbol.Decimal);
+                    break;
+                case ABoolType:
+                    symbolTable.AddIdToNode(id, node);
+                    symbolTable.AddNode(node, Symbol.Bool);
+                    break;
+                case ACharType:
+                    symbolTable.AddIdToNode(id, node);
+                    symbolTable.AddNode(node, Symbol.Char);
+                    break;
+                case AStringType:
+                    symbolTable.AddIdToNode(id, node);
+                    symbolTable.AddNode(node, Symbol.String);
+                    break;
+                case APinType:
+                    symbolTable.AddIdToNode(id, node);
+                    symbolTable.AddNode(node, Symbol.Pin);
+                    break;
+                case AUnitType customType:
+                {
+                    symbolTable.GetUnit(customType, out var unit);
+                    symbolTable.AddNodeToUnit(node, unit);
+                    symbolTable.AddNode(node, Symbol.Ok);
+                    symbolTable.AddIdToNode(id, node);
+                    break;
+                }
+                default:
+                    symbolTable.AddNode(node, Symbol.NotOk);
+                    symbolTable.AddIdToNode(id, node);
+                    tempResult += IndentedString("Is not a valid type\n");
+                    break;
             }
-            default:
-                symbolTable.AddNode(node, Symbol.NotOk);
-                tempResult += IndentedString("Is not a valid type\n");
-                break;
-        }
-        PrintError();
+            PrintError();
         indent--;
     }
 
-    public void AddArgsToScope(Node node, IList args)
+    public override void CaseAUntypedGlobal(AUntypedGlobal node)
     {
-        foreach (AArg arg in args)
+        if (symbolTable.currentScope == 0)
         {
-            string id = arg.GetId().ToString().Trim();
-            PType type = arg.GetType();
-            switch (type)
+
+        }
+        else
+        {
+            InAUntypedGlobal(node);
+            if(node.GetId() != null)
             {
-                case AIntType:
-                case ADecimalType:
-                case ABoolType:
-                case ACharType:
-                case AStringType:
-                case APinType:
-                case AUnitType:
-                    symbolTable.AddIdToNode(id, arg);
-                    break;
-                default:
-                    symbolTable.AddNode(node, Symbol.NotOk);
-                    tempResult += IndentedString($"{arg.GetId()} is not a valid Type\n");
-                    break;
+                node.GetId().Apply(this);
             }
+            {
+                Object[] temp = new Object[node.GetArg().Count];
+                node.GetArg().CopyTo(temp, 0);
+                for(int i = 0; i < temp.Length; i++)
+                {
+                    ((PArg) temp[i]).Apply(this);
+                }
+            }
+            {
+                Object[] temp = new Object[node.GetStmt().Count];
+                node.GetStmt().CopyTo(temp, 0);
+                for(int i = 0; i < temp.Length; i++)
+                {
+                    ((PStmt) temp[i]).Apply(this);
+                }
+            }
+            OutAUntypedGlobal(node);
         }
     }
+
     public override void InAUntypedGlobal(AUntypedGlobal node)
     {
         locations.Push($"In function {node.GetId()}\n");
         indent++;
         symbolTable = symbolTable.EnterScope();
-        AddArgsToScope(node, node.GetArg());
+        //symbolTable.AddArgsToScope(node, node.GetArg());
     }
 
     public override void OutAUntypedGlobal(AUntypedGlobal node)
@@ -245,12 +262,50 @@ public class TypeChecker : exprTypeChecker
         reported = false;
         indent--;
     }
+
+    public override void CaseATypedGlobal(ATypedGlobal node)
+    {
+        if (symbolTable.currentScope == 0)
+        {
+
+        }
+        else
+        {
+            InATypedGlobal(node);
+            if(node.GetType() != null)
+            {
+                node.GetType().Apply(this);
+            }
+            if(node.GetId() != null)
+            {
+                node.GetId().Apply(this);
+            }
+            {
+                Object[] temp = new Object[node.GetArg().Count];
+                node.GetArg().CopyTo(temp, 0);
+                for(int i = 0; i < temp.Length; i++)
+                {
+                    ((PArg) temp[i]).Apply(this);
+                }
+            }
+            {
+                Object[] temp = new Object[node.GetStmt().Count];
+                node.GetStmt().CopyTo(temp, 0);
+                for(int i = 0; i < temp.Length; i++)
+                {
+                    ((PStmt) temp[i]).Apply(this);
+                }
+            }
+            OutATypedGlobal(node);
+        }
+    }
+
     public override void InATypedGlobal(ATypedGlobal node)
     {
         locations.Push($"In function {node.GetId()}\n");
         indent++;
         symbolTable = symbolTable.EnterScope();
-        AddArgsToScope(node, node.GetArg());
+        //symbolTable.AddArgsToScope(node, node.GetArg());
     }
     public override void OutATypedGlobal(ATypedGlobal node)
     {

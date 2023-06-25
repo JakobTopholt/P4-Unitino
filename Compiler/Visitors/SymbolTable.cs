@@ -119,6 +119,29 @@ public class SymbolTable
         bool found = _funcIdToNode.TryGetValue(identifier, out Node? func);
         return found ? func : null;
     }
+    public void AddArgsToScope(Node node, IList args)
+    {
+        foreach (AArg arg in args)
+        {
+            string id = arg.GetId().Text;
+            PType type = arg.GetType();
+            switch (type)
+            {
+                case AIntType:
+                case ADecimalType:
+                case ABoolType:
+                case ACharType:
+                case AStringType:
+                case APinType:
+                case AUnitType:
+                    AddIdToNode(id, arg);
+                    break;
+                default:
+                    AddNode(node, Symbol.NotOk);
+                    break;
+            }
+        }
+    }
     public void AddFunctionArgs(Node node, List<PType> args) => _nodeToArgs.Add(node, args);
     public List<PType>? GetFunctionArgs(Node node)
     {

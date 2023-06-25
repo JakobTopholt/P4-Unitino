@@ -48,9 +48,11 @@ internal static class ModuinoCompiler
 
         SymbolTable symbolTable = new(null, AllTables);
         TypeChecker subunitsExprCheck = new (symbolTable);
+        TypeChecker globalFunctionCheck = new (symbolTable);
         
+        // Tilføj visitor for global scope, så de bliver tilføjet til symboltable før funktionerne gør
         start.Apply(new UnitVisitor(symbolTable, subunitsExprCheck));
-        start.Apply(new FunctionVisitor(symbolTable));
+        start.Apply(new FunctionVisitor(symbolTable, globalFunctionCheck));
         start.Apply(new TypeChecker(symbolTable));
 
         // Codegen Visitor

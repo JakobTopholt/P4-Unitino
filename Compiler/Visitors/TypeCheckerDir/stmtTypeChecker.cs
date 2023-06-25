@@ -6,7 +6,7 @@ namespace Compiler.Visitors.TypeCheckerDir;
 
 public class stmtTypeChecker : DepthFirstAdapter
 {
-    protected SymbolTable symbolTable;
+    public SymbolTable symbolTable;
     public stmtTypeChecker(SymbolTable symbolTable)
     {
         this.symbolTable = symbolTable;
