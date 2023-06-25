@@ -301,13 +301,13 @@ public class TypeChecker : exprTypeChecker
             if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
                 typedIsOk = false;
         }
-        symbolTable = symbolTable.ExitScope();
         if (typedIsOk)
         {
             PType typedType = node.GetType();
             switch (typedType)
             {
                 case AIntType:
+                    //symbolTable = symbolTable.ExitScope();
                     symbolTable.AddNode(node, Symbol.Int);
                     break;
                 case ADecimalType:
@@ -331,6 +331,7 @@ public class TypeChecker : exprTypeChecker
                 case AUnitType a:
                     // Missing a reference from this node to the unitType
                     symbolTable.GetUnit(a, out var unit);
+                    symbolTable = symbolTable.ExitScope();
                     symbolTable.AddNodeToUnit(node, unit);
                     symbolTable.AddNode(node, Symbol.Ok);
                     break;
@@ -338,6 +339,7 @@ public class TypeChecker : exprTypeChecker
         }
         else
         {
+            symbolTable = symbolTable.ExitScope();
             symbolTable.AddNode(node, Symbol.NotOk);
         }
 

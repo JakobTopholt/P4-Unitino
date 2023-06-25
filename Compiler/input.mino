@@ -27,6 +27,5 @@ prog {
 
 loop {
     Temp cur = useSensor();
-    
 }
 

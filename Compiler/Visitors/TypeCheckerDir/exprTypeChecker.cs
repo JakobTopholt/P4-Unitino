@@ -209,7 +209,7 @@ public class exprTypeChecker : stmtTypeChecker
                                 !symbolTable.CompareUnitTypes(argUnit, paramUnit))
                             {
                                 matches = false;
-                                tempResult += IndentedString("Parameter is not same unitType as Argument\n");
+                                tempResult += IndentedString($"Parameter nr{i}: is not same unitType as Argument\n");
                                 symbolTable.AddNodeToUnit(node, argUnit);
                             }
 
@@ -246,7 +246,7 @@ public class exprTypeChecker : stmtTypeChecker
                             symbolTable.AddNode(node, Symbol.Pin);
                             break;
                         default:
-                            if (symbolTable.GetUnit(node.GetId().ToString(), out var unit))
+                            if (symbolTable.GetUnit(result, out var unit))
                             {
                                 symbolTable.AddNodeToUnit(node, unit);
                                 symbolTable.AddNode(node, Symbol.Ok);
@@ -436,7 +436,7 @@ public class exprTypeChecker : stmtTypeChecker
         }
         Symbol? leftSymbol = symbolTable.GetSymbol(leftExpr);
         Symbol? rightSymbol = symbolTable.GetSymbol(rightExpr);
-        if (leftExpr is ANumberExp or ADecimalExp && rightExpr is AIdExp id)
+        /* if (leftExpr is ANumberExp or ADecimalExp && rightExpr is AIdExp id)
         {
             AUnitdeclGlobal? unitDecl = symbolTable.GetUnitdeclFromId(id.GetId().ToString().Trim());
             if (unitDecl is null || !symbolTable.GetUnit(unitDecl, out var tuple)) 
@@ -444,7 +444,7 @@ public class exprTypeChecker : stmtTypeChecker
             symbolTable.AddNodeToUnit(node, tuple);
             symbolTable.AddNode(node, Symbol.Ok);
         }
-        else
+        else */
         {
           switch (leftSymbol)
             {
