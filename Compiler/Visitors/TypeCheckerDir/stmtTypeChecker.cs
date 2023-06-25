@@ -503,7 +503,7 @@ public class stmtTypeChecker : DepthFirstAdapter
                         {
                             if (symbolTable.CompareUnitTypes(unitType, expType))
                             {
-                                symbolTable.AddIdToNode(node.GetId().ToString(), node);
+                                symbolTable.AddIdToNode(node.GetId().Text, node);
                                 symbolTable.AddNodeToUnit(node, unitType);
                                 symbolTable.AddNode(node, Symbol.Ok); 
                             }

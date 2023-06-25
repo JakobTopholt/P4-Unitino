@@ -89,7 +89,8 @@ public class SymbolTable
     public bool GetUnit(string identifier, out (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unit)
     {
         unit = (null, null);
-        return _idToNode.TryGetValue(identifier.Trim(), out Node? node) && GetUnit(node, out unit);
+        GetNodeFromId(identifier.Trim(), out Node? node);
+        return GetUnit(node, out unit);
     }
     public bool GetUnit(Node expression, out (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unit)
     {
