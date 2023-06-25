@@ -118,11 +118,12 @@ public class TypeChecker : exprTypeChecker
         }
         if (aunittypeIsOk)
         {
-            symbolTable = symbolTable.ExitScope();
+            // Still problems with scope checking
+            // symbolTable = symbolTable.ExitScope();
             (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unituse = (newNums, newDens);
             symbolTable.AddNodeToUnit(node, unituse);
             symbolTable.AddNode(node, Symbol.Ok);
-            symbolTable = symbolTable.EnterScope();
+            // symbolTable = symbolTable.EnterScope();
         }
         else
         {
