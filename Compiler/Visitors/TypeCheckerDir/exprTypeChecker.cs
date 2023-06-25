@@ -471,16 +471,16 @@ public class exprTypeChecker : stmtTypeChecker
                     List<AUnitdeclGlobal> numOverlap = unitLeftNums.Values.Intersect(unitRightNums.Values).ToList();
                     List<AUnitdeclGlobal> denOverlap = unitLeftDens.Values.Intersect(unitRightDens.Values).ToList();
 
-                    List<AUnitdeclGlobal> numerators = unitLeftNums.Values.Except(numOverlap).Union(unitRightDens.Values.Except(denOverlap)).ToList();
-                    List<AUnitdeclGlobal> denominators = unitRightNums.Values.Except(numOverlap).Union(unitLeftDens.Values.Except(denOverlap)).ToList();
+                    List<AUnitdeclGlobal> numerators = unitLeftNums.Values.Where(x => !numOverlap.Contains(x)).Concat(unitRightDens.Values.Where(x => !denOverlap.Contains(x))).ToList();
+                    List<AUnitdeclGlobal> denominators = unitRightNums.Values.Where(x => !numOverlap.Contains(x)).Concat(unitLeftDens.Values.Where(x => !denOverlap.Contains(x))).ToList();
                     if (numerators.Count == 0 && denominators.Count == 0)
                     {
                         symbolTable.AddNode(node, Symbol.Decimal);
                     }
                     else
                     {
-                        SortedList<string, AUnitdeclGlobal> newNums = new SortedList<string, AUnitdeclGlobal>();
-                        SortedList<string, AUnitdeclGlobal> newDens = new SortedList<string, AUnitdeclGlobal>();
+                        SortedList<string, AUnitdeclGlobal> newNums = new SortedList<string, AUnitdeclGlobal>(new DuplicateKeyComparer<string>());
+                        SortedList<string, AUnitdeclGlobal> newDens = new SortedList<string, AUnitdeclGlobal>(new DuplicateKeyComparer<string>());
                         
                         foreach (AUnitdeclGlobal num in numerators)
                         {
@@ -571,10 +571,9 @@ public class exprTypeChecker : stmtTypeChecker
 // (Volume / weight) * weight = Volume
                     List<AUnitdeclGlobal> numOverlap = leftNums.Values.Intersect(rightDens.Values).ToList();
                     List<AUnitdeclGlobal> denOverlap = leftDens.Values.Intersect(rightNums.Values).ToList();
-
-                    // fix logic
-                    List<AUnitdeclGlobal> numerators = leftNums.Values.Except(numOverlap).Union(rightNums.Values.Except(denOverlap)).ToList();
-                    List<AUnitdeclGlobal> denomerators = rightDens.Values.Except(numOverlap).Union(leftDens.Values.Except(denOverlap)).ToList();
+                    
+                    List<AUnitdeclGlobal> numerators = leftNums.Values.Where(x => !numOverlap.Contains(x)).Concat(rightNums.Values.Where(x => !denOverlap.Contains(x))).ToList();
+                    List<AUnitdeclGlobal> denomerators = rightDens.Values.Where(x => !numOverlap.Contains(x)).Concat(leftDens.Values.Where(x => !denOverlap.Contains(x))).ToList();
                     
                     if (numerators.Count == 0 && denomerators.Count == 0)
                     {
@@ -582,8 +581,8 @@ public class exprTypeChecker : stmtTypeChecker
                     }
                     else
                     {
-                        SortedList<string, AUnitdeclGlobal> newNums = new SortedList<string, AUnitdeclGlobal>();
-                        SortedList<string, AUnitdeclGlobal> newDens = new SortedList<string, AUnitdeclGlobal>();
+                        SortedList<string, AUnitdeclGlobal> newNums = new SortedList<string, AUnitdeclGlobal>(new DuplicateKeyComparer<string>());
+                        SortedList<string, AUnitdeclGlobal> newDens = new SortedList<string, AUnitdeclGlobal>(new DuplicateKeyComparer<string>());
                         foreach (AUnitdeclGlobal num in numerators)
                         {
                             newNums.Add(num.GetId().ToString().Trim(),num);
@@ -837,10 +836,10 @@ public class exprTypeChecker : stmtTypeChecker
     public override void OutATernaryExp(ATernaryExp node)
     {
         Node condExp = node.GetCond();
-        if (condExp is AIdExp id)
+        /* if (condExp is AIdExp id)
         {
             symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out condExp);
-        }
+        } */
         Symbol? condition = symbolTable.GetSymbol(condExp);
         if (condition == Symbol.Bool)
         {

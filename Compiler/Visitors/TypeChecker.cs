@@ -13,6 +13,8 @@ public class TypeChecker : exprTypeChecker
     public TypeChecker(SymbolTable symbolTable) : base(symbolTable)
     {
     }
+    SortedList<string, AUnitdeclGlobal> unitUseNums = new SortedList<string, AUnitdeclGlobal>(new DuplicateKeyComparer<string>());
+    SortedList<string, AUnitdeclGlobal> unitUseDens = new SortedList<string, AUnitdeclGlobal>(new DuplicateKeyComparer<string>());
     
     public override void OutAGrammar(AGrammar node)
     {
@@ -48,10 +50,12 @@ public class TypeChecker : exprTypeChecker
 
     public override void OutANumUnituse(ANumUnituse node)
     {
-        // Does id to Unit exist?
-        symbolTable.AddNode(node,
-            symbolTable.GetUnitdeclFromId(node.GetId().ToString()) != null ? Symbol.Ok : Symbol.NotOk);
-        tempResult += symbolTable.GetUnitdeclFromId(node.GetId().ToString()) != null ? "" : IndentedString($"{node.GetId()} not a valid subunit\n");
+        string id = node.GetId().Text;
+        AUnitdeclGlobal? unitDecl = symbolTable.GetUnitdeclFromId(id);
+        
+        symbolTable.AddNode(node, unitDecl != null ? Symbol.Ok : Symbol.NotOk);
+        tempResult += unitDecl != null ? "" : IndentedString($"{id} is not a valid unitType\n");
+        unitUseNums.Add(id, unitDecl);
         PrintError();
         indent--;
     }
@@ -64,9 +68,12 @@ public class TypeChecker : exprTypeChecker
 
     public override void OutADenUnituse(ADenUnituse node)
     {
-        symbolTable.AddNode(node,
-            symbolTable.GetUnitdeclFromId(node.GetId().ToString()) != null ? Symbol.Ok : Symbol.NotOk);
-        tempResult += symbolTable.GetUnitdeclFromId(node.GetId().ToString()) != null ? "" : IndentedString($"{node.GetId()} not a valid subunit\n");
+        string id = node.GetId().Text;
+        AUnitdeclGlobal? unitDecl = symbolTable.GetUnitdeclFromId(id);
+        
+        symbolTable.AddNode(node, unitDecl != null ? Symbol.Ok : Symbol.NotOk);
+        tempResult += unitDecl != null ? "" : IndentedString($"{id} is not a valid unitType\n");
+        unitUseNums.Add(id, unitDecl);
         PrintError();
         indent--;
     }
@@ -75,60 +82,21 @@ public class TypeChecker : exprTypeChecker
     {
         locations.Push( IndentedString($"in a Unittype: {node.GetUnituse()}\n"));
         indent++;
+        unitUseNums = new SortedList<string, AUnitdeclGlobal>(new DuplicateKeyComparer<string>());
+        unitUseDens = new SortedList<string, AUnitdeclGlobal>(new DuplicateKeyComparer<string>());
+        
     }
 
     public override void OutAUnitType(AUnitType node)
     {
-        // KOM HERTIL
-        List<ANumUnituse> nums = node.GetUnituse().OfType<ANumUnituse>().ToList();
-        List<ADenUnituse> dens = node.GetUnituse().OfType<ADenUnituse>().ToList();
-        //List<AUnitdeclGlobal> newNums = new List<AUnitdeclGlobal>();
-        //List<AUnitdeclGlobal> newDens = new List<AUnitdeclGlobal>();
-        SortedList<string, AUnitdeclGlobal> newNums = new SortedList<string, AUnitdeclGlobal>();
-        SortedList<string, AUnitdeclGlobal> newDens = new SortedList<string, AUnitdeclGlobal>();
-
-        bool aunittypeIsOk = true;
-        foreach (ANumUnituse num in nums)
-        {
-            AUnitdeclGlobal? newNum = symbolTable.GetUnitdeclFromId(num.GetId().ToString());
-            if (newNum != null)
-            {
-                newNums.Add(newNum.GetId().ToString().Trim(),newNum);
-            }
-            else
-            {
-                // Not a recognized unit
-                aunittypeIsOk = false;
-                tempResult += IndentedString($"{num.GetId()} is not a valid unitType\n");
-            }
-        }
-        foreach (ADenUnituse den in dens)
-        {
-            AUnitdeclGlobal? newDen = symbolTable.GetUnitdeclFromId(den.GetId().ToString());
-            if (newDen != null)
-            {
-                newDens.Add(newDen.GetId().ToString().Trim(),newDen);;
-            }
-            else
-            {
-                // Not a recognized unit
-                aunittypeIsOk = false;
-                tempResult += IndentedString($"{den.GetId()} is not a valid unitType\n");
-            }
-        }
-        if (aunittypeIsOk)
-        {
-            // Still problems with scope checking
-            // symbolTable = symbolTable.ExitScope();
-            (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unituse = (newNums, newDens);
-            symbolTable.AddNodeToUnit(node, unituse);
-            symbolTable.AddNode(node, Symbol.Ok);
-            // symbolTable = symbolTable.EnterScope();
-        }
-        else
-        {
-            symbolTable.AddNode(node, Symbol.NotOk);
-        }
+        // Still problems with scope checking
+        // symbolTable = symbolTable.ExitScope();
+        (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unituse = (unitUseNums, unitUseDens);
+        symbolTable.AddNodeToUnit(node, unituse);
+        symbolTable.AddNode(node, Symbol.Ok);
+        unitUseNums = new SortedList<string, AUnitdeclGlobal>(new DuplicateKeyComparer<string>());
+        unitUseDens = new SortedList<string, AUnitdeclGlobal>(new DuplicateKeyComparer<string>());
+        // symbolTable = symbolTable.EnterScope();
         PrintError();
         indent--;
     }

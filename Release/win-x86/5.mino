@@ -7,12 +7,19 @@ unit Length {
     m => value;
     km => value*1000;
     cm => value / 100;
-    weird => weirdBool ? value+5 : value-5;
+    weird => value+5;
 }
 bool weirdBool = false;
 
 Time blinkDelay = 1s;
 pin builtin = 13;
+
+func calculate(int first, int second, bool add) {
+    return add ? first + second : first;
+}
+func calculate2(Length first, Length second, bool add) {
+    return add ? first + second : first;
+}
 
 prog {
     Time*Time*Time blinkDelaySquared = 1s*1s*1s;
@@ -27,7 +34,7 @@ prog {
 loop {
     weirdBool = !weirdBool;
     int d = 5;
-    Length magicLength = (5weird * 5.2) / builtin * 2 + --d++;
+    Length magicLength = (5weird * 5.2) / builtin * (2 + --d++);
     magicLength = 2 * magicLength;
     magicLength += 5km;
     if (weirdBool || 5-2==3 && magicLength > 5km) {
@@ -36,17 +43,11 @@ loop {
         } while(magicLength > 5km)
     }
     pin f = 5;
-    float g = readPin(f);
-    Length h = calculate2(2m, 2cm, false);
-    int i = calculate(5, 2, true);
+    #float g = readPin(f);
+    #Length h = calculate2(2m, 2cm, false);
+    #int i = calculate(5, 2, true);
 }
 
 func flipIt() {
     weirdBool = !weirdBool;
-}
-func calculate(int first, int second, bool add) {
-    return add ? first + second : first;
-}
-func calculate2(Length first, Length second, bool add) {
-    return add ? first + second : first;
 }
