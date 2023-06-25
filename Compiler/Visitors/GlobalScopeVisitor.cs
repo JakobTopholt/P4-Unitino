@@ -1,6 +1,22 @@
-﻿namespace Compiler.Visitors;
+﻿using System.Collections;
+using Compiler.Visitors.TypeCheckerDir;
+using Moduino.analysis;
+using Moduino.node;
 
-public class GlobalScopeVisitor
+namespace Compiler.Visitors;
+
+public class GlobalScopeVisitor : DepthFirstAdapter
 {
+    private SymbolTable symbolTable;
+    private TypeChecker typeChecker;
+    public GlobalScopeVisitor(SymbolTable symbolTable, TypeChecker typeChecker)
+    {
+        this.symbolTable = symbolTable;
+        this.typeChecker = typeChecker;
+    }
+    
+    // implement globalscope
+    
+    
     
 }

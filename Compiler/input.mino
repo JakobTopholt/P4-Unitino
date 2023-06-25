@@ -43,8 +43,8 @@ loop {
         } while(magicLength > 5km)
     }
     pin f = 5;
-    #float g = readPin(f);
-    #Length h = calculate2(2m, 2cm, false);
+    float g = readPin(f);
+    Length h = calculate2(2m, 2cm, false);
     int i = calculate(5, 2, true);
 }
 
