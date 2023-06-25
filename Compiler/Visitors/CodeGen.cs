@@ -630,7 +630,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseAPlusExp(APlusExp node)
     {
-        Precedence(node.GetL(),node.GetR(),"+");
+        Precedence(node.GetL(),node.GetR()," + ");
     }
 
     public override void CaseAMinusExp(AMinusExp node)
@@ -698,27 +698,27 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseASuffixplusplusExp(ASuffixplusplusExp node)
     {
-        Indent("++" + node.GetExp().ToString().Trim());
+      writer.Write( node.GetExp().ToString().Trim()+ "++");
     }
 
     public override void CaseAPrefixplusplusExp(APrefixplusplusExp node)
     {
-        Indent(node.GetExp().ToString().Trim() + "++");
+        writer.Write("++"+ node.GetExp().ToString().Trim());
     }
 
     public override void CaseASuffixminusminusExp(ASuffixminusminusExp node)
     {
-        Indent(node.GetExp().ToString().Trim() + "--");
+        writer.Write(node.GetExp().ToString().Trim() + "--");
     }
 
     public override void CaseAPrefixminusminusExp(APrefixminusminusExp node)
     {
-        Indent("--" + node.GetExp().ToString().Trim());
+        writer.Write("--" + node.GetExp().ToString().Trim());
     }
 
     public override void CaseALogicalnotExp(ALogicalnotExp node)
     {
-        writer.Write($"!{node.GetExp()}");
+        writer.Write($"!{node.GetExp().ToString().Trim()}");
     }
 
     public override void CaseAReadpinExp(AReadpinExp node)

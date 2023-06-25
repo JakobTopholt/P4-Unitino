@@ -24,7 +24,7 @@ String function3(char a, char b, char c) {
     return d;
 }
 float function4(int a) {
-    float d = 3.5+a;
+    float d = 3.5 + a;
     char g = 'o';
     char b = 'b';
     char c = 'c';
