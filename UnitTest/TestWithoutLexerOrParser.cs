@@ -11,7 +11,6 @@ namespace UnitTest;
 
 public class TestWithoutLexerOrParser
 {
-    private static readonly Regex WhiteSpace = new(@"\s+");
     private Start _ast;
     private string _prettyPrint;
     private string _codeGen;
@@ -102,11 +101,12 @@ public class TestWithoutLexerOrParser
                         })
                 }), 
             new EOF());
-        _prettyPrint = @"unit Time {ms => value;
-s => value*1000;
+        _prettyPrint = @"unit Time {
+    ms => value;
+    s => value * 1000;
 }
 prog {
-    Timea = 1s;
+    Time a = 1s;
     if(true) {
         a = 7.5ms;
     }
@@ -114,7 +114,7 @@ prog {
 func b(int b) {
     string c = ""hello "";
     for(int i = 0; i < b; i++) {
-        c+= i+"", "";
+        c += i + "", "";
     }
     return c;
 }

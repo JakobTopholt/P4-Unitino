@@ -9,8 +9,6 @@ namespace UnitTest;
 
 public class VisitorTests
 {
-    private static readonly Regex WhiteSpace = new(@"\s+");
-
     [TestCaseSource(typeof(FilesToTestsConverter), nameof(FilesToTestsConverter.PrettyPrintData))]
     public void PrettyPrint(Start ast, string prettyPrint)
     {
@@ -27,8 +25,7 @@ public class VisitorTests
         StringBuilder sb = new();
         TextWriter output = new StringWriter(sb);
         ast.Apply(new PrettyPrint(symbolTable, output));
-        Assert.That(WhiteSpace.Replace(sb.ToString(), ""), 
-            Is.EqualTo(prettyPrint));
+        Assert.That(sb.ToString(), Is.EqualTo(prettyPrint));
     }
     
     [TestCaseSource(typeof(FilesToTestsConverter), nameof(FilesToTestsConverter.TypeVisitorData))]

@@ -6,6 +6,17 @@ func NormalFunc(int b, int a) {
 prog {
     int i = 0;
     NormalFunc(5, 7);
+    bool b = false;
+    bool c = (bool)b;
+    decimal a = (decimal)i;
+    int b = (int)a;
+    char c = (char)i;
+    int d;
+    bool e;
+    char f;
+    decimal g;
+    string h;
+    pin i;
 }
 loop {
     int f = 0;
@@ -33,6 +44,17 @@ func NormalFunc(int b, int a) {
 prog {
     int i = 0;
     NormalFunc(5, 7);
+    bool b = false;
+    bool c = (bool)b;
+    decimal a = (decimal)i;
+    int b = (int)a;
+    char c = (char)i;
+    int d;
+    bool e;
+    char f;
+    decimal g;
+    string h;
+    pin i;
 }
 loop {
     int f = 0;
@@ -41,11 +63,11 @@ string ImplicitTypedFunc() {
     string i = "0";
     return i;
 }
-char function3(char a, char b, char c){
+char function3(char a, char b, char c) {
     char d = a;
     return d;
 }
-decimal function4(int i){
+decimal function4(int i) {
     decimal d = 3.5 + i;
     char a = 'a';
     char b = 'b';

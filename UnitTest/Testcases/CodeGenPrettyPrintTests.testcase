@@ -3,20 +3,70 @@
 prog {
     delay(100);
     pin h = 11;
-    setpin(11,input);
-    writepin(11,high);
-    #int a = readpin(11);
-    int a = 2;
+    setpin(11, input);
+    setpin(11, output);
+    setpin(11, input_pullup);
+    writepin(11, high);
+    writepin(11, low);
+    int a = readpin(11);
     int p = 5;
+    a = p;
+    p = 4;
+    p += 1;
+    p -= 2;
+    ++p;
+    p--;
+    --p;
+    p = --p;
+    p = ++p;
+    p = p--;
+    p = p++;
+    p = -p;
     char c = 'e';
     bool d = true;
     string l = d?"ja":"nej";
     decimal e = 1.11;
     string b = (string)e;
+    bool t = boolTest(d, a);
+    Time j = 50ms;
+    pintTest(1, h, j);
+    unitTest(1);
+    Time m;
     argTest(a, b, c, d, e);
+    if(a < 5) {
+        for(int i = 0; i < 6; i++) {
+            a++;
+        }
+    }
+    else if(a > 5 && p >= 6) {
+        do {
+            a++;
+        } while(a < 10 || p <= 5)
+    }
+    else {
+        while(a > 2) {
+            a++;
+            if(d == true && d != false) {
+                d = false;
+                a = a % p;
+                d = !d;
+            }
+        }
+    }
 }
 loop {
-  
+}
+unit Time {
+    ms => value;
+}
+bool boolTest(bool p, int a) {
+    return p;
+}
+pin pinTest(int a, pin h, Time j) {
+    return a;
+}
+Time unitTest(int a) {
+    return a;
 }
 int argTest(int a, string b, char c, bool d, decimal e) {
     int f;
@@ -26,25 +76,79 @@ int argTest(int a, string b, char c, bool d, decimal e) {
 prog {
     delay(100);
     pin h = 11;
-    setpin(11,input);
-    writepin(11,high);
-    int a = 2;
+    setpin(11, input);
+    setpin(11, output);
+    setpin(11, input_pullup);
+    writepin(11, high);
+    writepin(11, low);
+    int a = readpin(11);
     int p = 5;
+    a = p;
+    p = 4;
+    p += 1;
+    p -= 2;
+    ++p;
+    p--;
+    --p;
+    p = --p;
+    p = ++p;
+    p = p--;
+    p = p++;
+    p = -p;
     char c = 'e';
     bool d = true;
-    string l = d?"ja":"nej";
+    string l = d ? "ja" : "nej";
     decimal e = 1.11;
     string b = (string)e;
+    bool t = boolTest(d, a);
+    Time j = 50ms;
+    pintTest(1, h, j);
+    unitTest(1);
+    Time m;
     argTest(a, b, c, d, e);
+    if(a < 5) {
+        for(int i = 0; i < 6; i++) {
+            a++;
+        }
+    }
+    else if(a > 5 && p >= 6) {
+        do {
+            a++;
+        } while(a < 10 || p <= 5)
+    }
+    else {
+        while(a > 2) {
+            a++;
+            if(d == true && d != false) {
+                d = false;
+                a = a % p;
+                d = !d;
+            }
+        }
+    }
 }
 loop {
-
+}
+unit Time {
+    ms => value;
+}
+bool boolTest(bool p, int a) {
+    return p;
+}
+pin pinTest(int a, pin h, Time j) {
+    return a;
+}
+Time unitTest(int a) {
+    return a;
 }
 int argTest(int a, string b, char c, bool d, decimal e) {
     int f;
     return a;
 }
 ////
+float Timems(float value) {
+    return value;
+}
 void setup() {
     delay(100);
     int h = 11;
@@ -58,8 +162,20 @@ void setup() {
     float e = 1.11;
     String b = String(e, 6);
     FargTest(a, b, c, d, e);
+    boolTest(d);
+    pintTest(1);
+    unitTest(1);
 }
-void loop() {
+void loop {
+}
+bool boolTest(bool p) {
+    return p;
+}
+int pinTest(int a) {
+    return a;
+}
+float unitTest(int a) {
+    return a;
 }
 int FargTest(int a, String b, char c, bool d, float e) {
     int f;

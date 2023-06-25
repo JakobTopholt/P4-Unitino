@@ -22,12 +22,12 @@ Test 2 subunits
 ////
 unit unit2 {
     ms => value;
-    s => value*1000;
+    s => value * 1000;
 }
 ////
 unit unit2 {
     ms => value;
-    s => value*1000;
+    s => value * 1000;
 }
 ////
 void setup() {
@@ -49,14 +49,14 @@ unit unit3 {
     ms => value;
 }
 unit unit4 {
-    s => value*1000;
+    s => value * 1000;
 }
 ////
 unit unit3 {
     ms => value;
 }
 unit unit4 {
-    s => value*1000;
+    s => value * 1000;
 }
 ////
 void setup() {

@@ -700,12 +700,12 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseASuffixplusplusExp(ASuffixplusplusExp node)
     {
-        Indent("++" + node.GetExp().ToString().Trim());
+        Indent(node.GetExp().ToString().Trim() + "++");
     }
 
     public override void CaseAPrefixplusplusExp(APrefixplusplusExp node)
     {
-        Indent(node.GetExp().ToString().Trim() + "++");
+        Indent("++" + node.GetExp().ToString().Trim());
     }
 
     public override void CaseASuffixminusminusExp(ASuffixminusminusExp node)
@@ -720,7 +720,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseALogicalnotExp(ALogicalnotExp node)
     {
-        writer.Write($"!{node.GetExp()}");
+        writer.Write($"!{node.GetExp().ToString().Trim()}");
     }
 
     public override void CaseAReadpinExp(AReadpinExp node)
