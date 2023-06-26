@@ -68,7 +68,7 @@ float UTimes(float value) {
 }
 void setup() {
     float e = 3.7;
-    float a = 1/50.3+1/5000;
+    float a = 1/50.3 + 1/5000;
     float b = 1/50-1/5000;
 }
 ////

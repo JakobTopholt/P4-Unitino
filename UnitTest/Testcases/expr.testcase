@@ -26,11 +26,11 @@ void Ffunexpr(int a) {
     float d = 3.5;
     float e = 6.5 + d;
     d = d + a;
-    String s = "lmao";
-    String t = "xD";
-    s = s + a;
+    String s = String("lmao");
+    String t = String("xD");
+    s = s + String(a);
     t = t + s;
-    t = t + d;
+    t = t + String(d);
 }
 ////
 true
@@ -125,7 +125,6 @@ void Funtypedlmao() {
     float d = 6.5;
     d = d*cd;
     cd = cd/b;
-    float x = d % b;
 }
 ////
 true
