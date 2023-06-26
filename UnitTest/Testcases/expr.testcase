@@ -109,7 +109,6 @@ func untypedlmao(){
     decimal d = 6.5;
     d = d * cd;
     cd = cd / b;
-    decimal x = d % b; 
 }
 ////
  

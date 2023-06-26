@@ -128,15 +128,15 @@ float UTimes(float value) {
     return value*1000;
 }
 void setup() {
-    float a = UTimes(1);
+    float a = 1000;
     if(true) {
-        a = UTimems(7.5);
+        a = 7.5;
     }
 }
 String Fb(int b) {
-    String c = ""hello "";
+    String c = String(""hello "");
     for(int i = 0; i < b; i++) {
-        c += i+"", "";
+        c += String(i)+String("", "");
     }
     return c;
 }";

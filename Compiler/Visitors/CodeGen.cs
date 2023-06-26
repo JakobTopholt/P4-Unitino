@@ -19,6 +19,26 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     void Precedence(Node L, Node R, string ope)
     {
+        Symbol? LSymbol = symbolTable.GetSymbol(L);
+        Symbol? RSymbol = symbolTable.GetSymbol(R);
+        if (LSymbol == Symbol.String && RSymbol is Symbol.Decimal or Symbol.Int)
+        {
+            L.Apply(this);
+            writer.Write(ope);
+            writer.Write("String(");
+            R.Apply(this);
+            writer.Write(")");
+            return;
+        }
+        if (RSymbol == Symbol.String && LSymbol is Symbol.Decimal or Symbol.Int)
+        {
+            writer.Write("String(");
+            L.Apply(this);
+            writer.Write(")");
+            writer.Write(ope);
+            R.Apply(this);
+            return;
+        }
         L.Apply(this);
         writer.Write(ope);
         R.Apply(this);
@@ -649,8 +669,10 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void CaseAUnaryminusExp(AUnaryminusExp node)
     {
         node.GetExp();
-        if (node.Parent() is not ATypedGlobal or AUntypedGlobal)
-            writer.Write("-" + node.GetExp().ToString().Trim());
+        if (node.Parent() is not (not ATypedGlobal or AUntypedGlobal)) 
+            return;
+        writer.Write("-");
+        node.GetExp().Apply(this);
     }
 
     public override void CaseAOrExp(AOrExp node)
@@ -700,32 +722,40 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseASuffixplusplusExp(ASuffixplusplusExp node)
     {
-      writer.Write( node.GetExp().ToString().Trim()+ "++");
+        node.GetExp().Apply(this);
+        writer.Write("++");
     }
 
     public override void CaseAPrefixplusplusExp(APrefixplusplusExp node)
     {
-        writer.Write("++"+ node.GetExp().ToString().Trim());
+        writer.Write("++");
+        node.GetExp().Apply(this);
     }
 
     public override void CaseASuffixminusminusExp(ASuffixminusminusExp node)
     {
-        writer.Write(node.GetExp().ToString().Trim() + "--");
+        node.GetExp().Apply(this);
+        writer.Write("--");
     }
 
     public override void CaseAPrefixminusminusExp(APrefixminusminusExp node)
     {
-        writer.Write("--" + node.GetExp().ToString().Trim());
+
+        writer.Write("--");
+        node.GetExp().Apply(this);
     }
 
     public override void CaseALogicalnotExp(ALogicalnotExp node)
     {
-        writer.Write($"!{node.GetExp().ToString().Trim()}");
+        writer.Write("!");
+        node.GetExp().Apply(this);
     }
 
     public override void CaseAReadpinExp(AReadpinExp node)
     {
-        writer.Write($"digitalRead({node.GetExp().ToString().Trim()})");
+        writer.Write("digitalRead(");
+        node.GetExp().Apply(this);
+        writer.Write(")");
     }
 
     public override void CaseACastExp(ACastExp node)
@@ -791,17 +821,18 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         writer.Write("value");
     }
 
-    public override void CaseABooleanExp(ABooleanExp node)
+    public override void CaseATrueBoolean(ATrueBoolean node)
     {
-        if (node.GetBoolean() is ATrueBoolean)
-            writer.Write("true");
-        else if (node.GetBoolean() is AFalseBoolean)
-            writer.Write("false");
+        writer.Write("true");
     }
 
+    public override void CaseAFalseBoolean(AFalseBoolean node)
+    {
+        writer.Write("false");
+    }
     public override void CaseAStringExp(AStringExp node)
     {
-        writer.Write(node.GetString().ToString().Trim());
+        writer.Write("String(" + node.GetString().ToString().Trim() + ")");
     }
 
     public override void CaseACharExp(ACharExp node)
@@ -845,20 +876,53 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
     {
         AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
-        writer.Write("U" + test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
-                     + "(" + node.GetDecimal().ToString().Trim() + ")");    
+
+        PExp exp = symbolTable.GetSubUnitExp(node.GetId());
+        ExprEvaluator exprEvaluator = new(node, exp);
+        try
+        {
+            exp.Apply(exprEvaluator);
+        }
+        catch (NullReferenceException e)
+        {
+            writer.Write("U" + test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
+                         + "(" + node.GetDecimal().ToString().Trim() + ")");
+            return;
+        }
+        writer.Write(exprEvaluator.GetOutput());
     }
     public override void CaseAUnitnumberExp(AUnitnumberExp node)
     {
         AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
-        writer.Write("U" + test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
-                     + "(" + node.GetNumber().ToString().Trim() + ")");
+        
+        PExp exp = symbolTable.GetSubUnitExp(node.GetId());
+        ExprEvaluator exprEvaluator = new(node, exp);
+        try
+        {
+            exp.Apply(exprEvaluator);
+        }
+        catch (NullReferenceException e)
+        {
+            writer.Write("U" + test.GetId().ToString().Trim() + node.GetId().ToString().Trim()
+                         + "(" + node.GetNumber().ToString().Trim() + ")");
+            return;
+        }
+        writer.Write(exprEvaluator.GetOutput());
     }
 
     public override void OutADeclstmtGlobal(ADeclstmtGlobal node)
     {
         writer.WriteLine(";");
     }
+
+    public override void CaseAParenthesisExp(AParenthesisExp node)
+    {
+        writer.Write("(");
+        node.GetExp().Apply(this);
+        writer.Write(")");
+    }
+
+    
 
     public void Dispose()
     {
