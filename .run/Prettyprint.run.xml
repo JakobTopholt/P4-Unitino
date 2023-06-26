@@ -1,7 +1,7 @@
 ﻿<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run" type="DotNetProject" factoryName=".NET Project">
+  <configuration default="false" name="Prettyprint" type="DotNetProject" factoryName=".NET Project">
     <option name="EXE_PATH" value="$PROJECT_DIR$/Compiler/bin/Debug/net6.0/Compiler.exe" />
-    <option name="PROGRAM_PARAMETERS" value="../../../input" />
+    <option name="PROGRAM_PARAMETERS" value="../../../input -pretty" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Compiler/bin/Debug/net6.0" />
     <option name="PASS_PARENT_ENVS" value="1" />
     <option name="USE_EXTERNAL_CONSOLE" value="0" />

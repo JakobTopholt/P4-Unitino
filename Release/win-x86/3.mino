@@ -1,4 +1,4 @@
-# a not declared
+// a not declared
 prog {
 	pin builtin = 13;
 	for (int i = 0; i < a; i++) {
