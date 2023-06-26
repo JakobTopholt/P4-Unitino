@@ -25,7 +25,6 @@ String Ffunction3(char a, char b, char c) {
 }
 float Ffunction4(int a) {
     float d = 3.5 + a;
-
     char g = 'o';
     char b = 'b';
     char c = 'c';

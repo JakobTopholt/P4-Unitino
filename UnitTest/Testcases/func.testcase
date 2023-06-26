@@ -74,7 +74,6 @@ char Ffunction3(char a, char b, char c) {
 }
 float Ffunction4(int i) {
     float d = 3.5 + i;
-
     char a = 'a';
     char b = 'b';
     char c = 'c';

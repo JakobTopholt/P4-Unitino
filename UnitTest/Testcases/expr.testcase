@@ -20,7 +20,7 @@ void setup() {
 }
 void loop() {
 }
-void funexpr(int a) {
+void Ffunexpr(int a) {
     int b = 5;
     b = b + a;
     float d = 3.5;
@@ -69,7 +69,7 @@ void setup() {
 }
 void loop() {
 }
-void untyped(int a) {
+void Funtyped(int a) {
     int b = 5;
     b = b-a;
     float c = 3.5;
@@ -118,7 +118,7 @@ void setup() {
 }
 void loop() {
 }
-void untypedlmao() {
+void Funtypedlmao() {
     int a = 3;
     int b = 5;
     float cd = 3.5;
@@ -133,7 +133,7 @@ true
 //////
 expr div mult mod false
 ////
-func untypedlmao(){
+func Funtypedlmao(){
     int a = 3;
     string b = "xD";
     decimal cd = 3.5;
@@ -168,7 +168,7 @@ void setup() {
 }
 void loop() {
 }
-void untypedlmao() {
+void Funtypedlmao() {
     bool b = true;
     int c = 5;
     int d = 4;
@@ -208,7 +208,7 @@ void setup() {
 }
 void loop() {
 }
-void untypedlmao() {
+void Funtypedlmao() {
     bool b = true;
     bool a = false;
     bool c = true;
@@ -250,7 +250,7 @@ void setup() {
 }
 void loop() {
 }
-void untypedlmao(int a) {
+void Funtypedlmao(int a) {
     a = 5;
     int b = 2;
     int c = 7;
@@ -307,7 +307,7 @@ void setup() {
 }
 void loop() {
 }
-void untypedlmao() {
+void Funtypedlmao() {
     int a = 5;
     int b = 2;
     float d = 3.5;
@@ -318,7 +318,7 @@ void untypedlmao() {
     bool rigtige = true;
     bool falsk = !rigtige;
 }
-void untypedlomo(int a) {
+void Funtypedlomo(int a) {
     a = 5;
     int b = 2;
     float d = 3.5;
