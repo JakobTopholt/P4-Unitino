@@ -12,7 +12,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     }
     
-    public override void OutAExpExp(AExpExp node)
+    public override void OutAParenthesisExp(AParenthesisExp node)
     {
         Node exp = node.GetExp();
         if (exp is AIdExp id)

@@ -904,7 +904,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         writer.WriteLine(";");
     }
 
-    public override void CaseAExpExp(AExpExp node)
+    public override void CaseAParenthesisExp(AParenthesisExp node)
     {
         writer.Write("(");
         node.GetExp().Apply(this);
