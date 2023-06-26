@@ -1,0 +1,11 @@
+# Blinking Light
+prog {
+	int a = 7;
+	pin builtin = 13;
+	for (int i = 0; i < a; i++) {
+		writepin(builtin, high);
+		delay(50);
+		writepin(builtin, low);
+		delay(50);
+	}
+}
