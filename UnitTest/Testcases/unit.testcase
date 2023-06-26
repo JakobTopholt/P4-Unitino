@@ -12,7 +12,7 @@ void setup() {
 }
 void loop() {
 }
-float unit1ms(float value) {
+float Uunit1ms(float value) {
     return value;
 }
 ////
@@ -34,10 +34,10 @@ void setup() {
 }
 void loop() {
 }
-float unit2ms(float value) {
+float Uunit2ms(float value) {
     return value;
 }
-float unit2s(float value) {
+float Uunit2s(float value) {
     return value*1000;
 }
 ////
@@ -63,10 +63,10 @@ void setup() {
 }
 void loop() {
 }
-float unit3ms(float value) {
+float Uunit3ms(float value) {
     return value;
 }
-float unit4s(float value) {
+float Uunit4s(float value) {
     return value*1000;
 }
 ////
@@ -86,7 +86,7 @@ void setup() {
 }
 void loop() {
 }
-float unit5ms(float value) {
+float Uunit5ms(float value) {
     return value;
 }
 ////
