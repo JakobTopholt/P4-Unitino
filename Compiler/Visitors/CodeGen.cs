@@ -74,7 +74,6 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             case APrefixplusStmt:
             case ADelayStmt:
             case ASetpinStmt:
-            case ADowhileStmt:    
             case AWritepinStmt:
             case ADowhileStmt:
                 writer.WriteLine(";");                    
