@@ -154,8 +154,10 @@ String Fb(int b) {
         List<SymbolTable> list = new();
         SymbolTable symbolTable = new(null, list);
         TypeChecker subunitsExprCheck = new(symbolTable);
+        TypeChecker globalFunctionCheck = new (symbolTable);
+        
         UnitVisitor a = new(symbolTable, subunitsExprCheck);
-        FunctionVisitor b = new(symbolTable);
+        FunctionVisitor b = new(symbolTable, globalFunctionCheck);
         TypeChecker c = new(symbolTable);
         ast.Apply(a);
         ast.Apply(b);
@@ -180,9 +182,10 @@ String Fb(int b) {
         List<SymbolTable> list = new();
         SymbolTable symbolTable = new(null, list);
         TypeChecker subunitsExprCheck = new TypeChecker(symbolTable);
+        TypeChecker globalFunctionCheck = new (symbolTable);
         
         UnitVisitor a = new(symbolTable, subunitsExprCheck);
-        FunctionVisitor b = new(symbolTable);
+        FunctionVisitor b = new(symbolTable, globalFunctionCheck);
         TypeChecker c = new(symbolTable);
         ast.Apply(a);
         ast.Apply(b);
@@ -203,8 +206,10 @@ String Fb(int b) {
         List<SymbolTable> list = new();
         SymbolTable symbolTable = new(null, list);
         TypeChecker subunitsExprCheck = new TypeChecker(symbolTable);
+        TypeChecker globalFunctionCheck = new (symbolTable);
+        
         UnitVisitor a = new(symbolTable, subunitsExprCheck);
-        FunctionVisitor b = new(symbolTable);
+        FunctionVisitor b = new(symbolTable, globalFunctionCheck);
         TypeChecker c = new(symbolTable);
         ast.Apply(a);
         ast.Apply(b);

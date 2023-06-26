@@ -108,22 +108,13 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutAFunccallExp(AFunccallExp node)
     {
-        // Funccall som en del af et return udtryk
-        // returnvalue har betydning for om det er et correct call
-
-        /* if (symbolTable.currentScope == )
+        if (symbolTable._parent == null)
         {
             symbolTable.AddNode(node, Symbol.NotOk);
-            tempResult += IndentedString("Funccall expression is not legal in globalscope");
+            tempResult += IndentedString("funccall expression is not legal in globalscope");
         }
         else
-        { */
-        /* 
-         * The issue is somthing with the symboltables current scope, and its attempt to get a nodeToSymbol or nodeToUnit call
-         * on a functionDefinition which was declared in a larger scope
-         * 
-         */
-
+        {
             symbolTable.GetNodeFromId(node.GetId().ToString(), out Node xxx);
             List<PType>? args = symbolTable.GetFunctionArgs(xxx);
             List<PExp>? parameters = node.GetExp().OfType<PExp>().ToList();
@@ -255,6 +246,7 @@ public class exprTypeChecker : stmtTypeChecker
                             {
                                 symbolTable.AddNode(node, Symbol.NotOk);
                             }
+
                             break;
                     }
                 }
@@ -264,7 +256,8 @@ public class exprTypeChecker : stmtTypeChecker
                     // Allready added error message
                 }
             }
-            PrintError();
+        }
+        PrintError();
         indent--;
     }
 
@@ -321,7 +314,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     public override void OutAReadpinExp(AReadpinExp node)
     {
-        if (symbolTable.currentScope == 0)
+        if (symbolTable._parent == null)
         {
             symbolTable.AddNode(node, Symbol.NotOk);
             tempResult += IndentedString("A readpin expression is not legal in globalscope");
@@ -329,10 +322,6 @@ public class exprTypeChecker : stmtTypeChecker
         else
         {
             Symbol? readpinType = symbolTable.GetSymbol(node.GetExp());
-            if (node.GetExp() is AIdExp id)
-            {
-                readpinType = symbolTable.GetSymbol(id.GetId());
-            }
             if (readpinType is Symbol.Pin or Symbol.Int)
             {
                 symbolTable.AddNode(node, Symbol.Pin);
@@ -928,10 +917,6 @@ public class exprTypeChecker : stmtTypeChecker
     public override void OutALogicalnotExp(ALogicalnotExp node)
     {
         Node exp = node.GetExp();
-        if (exp is AIdExp id)
-        {
-            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
-        }
         if (exp == null)
         {
             symbolTable.AddNode(node, Symbol.NotOk);
@@ -957,10 +942,6 @@ public class exprTypeChecker : stmtTypeChecker
     {
         Symbol? targetExpr = symbolTable.GetSymbol(node.GetType());
         Node exp = node.GetExp();
-        if (exp is AIdExp id)
-        {
-            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
-        }
         Symbol? expr = symbolTable.GetSymbol(exp);
         switch (targetExpr, expr)
         {
@@ -992,6 +973,9 @@ public class exprTypeChecker : stmtTypeChecker
                 symbolTable.AddNode(node, Symbol.Int);
                 break;
             case (Symbol.Decimal, Symbol.Int):
+                symbolTable.AddNode(node, Symbol.Decimal);
+                break;
+            case (Symbol.Decimal, Symbol.Pin):
                 symbolTable.AddNode(node, Symbol.Decimal);
                 break;
             case (Symbol.Int, Symbol.Decimal):
@@ -1370,15 +1354,8 @@ public class exprTypeChecker : stmtTypeChecker
     private void AddBinaryNumberToSymbolTable(Node Parent, Node L, Node R)
     {
         Node leftExpr = L;
-        if (leftExpr is AIdExp idLeft)
-        {
-            symbolTable.GetNodeFromId(idLeft.GetId().ToString().Trim(), out leftExpr);
-        }
         Node rightExpr = R;
-        if (rightExpr is AIdExp idRight)
-        {
-            symbolTable.GetNodeFromId(idRight.GetId().ToString().Trim(), out rightExpr);
-        }
+        
         Symbol? left = symbolTable.GetSymbol(leftExpr);
         switch (left)
         {

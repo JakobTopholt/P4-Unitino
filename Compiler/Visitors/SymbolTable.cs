@@ -7,7 +7,7 @@ namespace Compiler.Visitors;
 public class SymbolTable
 {
     private readonly List<SymbolTable> _allTables;
-    private int _currentTable;
+    public int _currentTable;
     public int currentScope;
     public SymbolTable(SymbolTable? parent, List<SymbolTable> allTables, int currentTable = 0, int scope = 0)
     {
@@ -17,7 +17,7 @@ public class SymbolTable
         _allTables = allTables;
         currentScope = scope;
     }
-    private readonly SymbolTable? _parent;
+    public readonly SymbolTable? _parent;
     private readonly Dictionary<string, Node> _idToNode = new();
     public readonly Dictionary<Node, Symbol> _nodeToSymbol = new();
     
@@ -90,7 +90,14 @@ public class SymbolTable
     {
         unit = (null, null);
         GetNodeFromId(identifier.Trim(), out Node? node);
-        return GetUnit(node, out unit);
+        if (node == null)
+        {
+            return false;
+        }
+        else
+        {
+            return GetUnit(node, out unit);  
+        }
     }
     public bool GetUnit(Node expression, out (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unit)
     {

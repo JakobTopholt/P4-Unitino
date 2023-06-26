@@ -125,10 +125,7 @@ public class stmtTypeChecker : DepthFirstAdapter
         // OVervej om man kan sige += med string, char og bool typer
         Symbol? idType = symbolTable.GetSymbol(node.GetId().ToString().Trim());
         Node exp = node.GetExp();
-        if (exp is AIdExp id)
-        {
-            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
-        }
+     
         Symbol? expSymbol = symbolTable.GetSymbol(exp);
         switch (idType)
         {
@@ -649,10 +646,6 @@ public class stmtTypeChecker : DepthFirstAdapter
           parent = parent.Parent();
       }
       Node? returnExp = node.GetExp();
-      if (returnExp is AIdExp id)
-      {
-          symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out returnExp);
-      }
       Symbol? returnSymbol = symbolTable.GetSymbol(returnExp);
       switch (parent)
       {
@@ -722,7 +715,8 @@ public class stmtTypeChecker : DepthFirstAdapter
                   symbolTable.GetUnit(returnExp, out var expUnit);
                   symbolTable.AddNode(node, symbolTable.CompareUnitTypes(func, expUnit) ? Symbol.Ok : Symbol.NotOk);
                   tempResult += symbolTable.CompareUnitTypes(func, expUnit) ? "" : IndentedString("return is not correct unitType\n");
-              } else if (symbolTable.GetSymbol(aUntypedFunc) != null && symbolTable.GetSymbol(aUntypedFunc) != Symbol.NotOk)
+              } 
+              else if (symbolTable.GetSymbol(aUntypedFunc) != null && symbolTable.GetSymbol(aUntypedFunc) != Symbol.NotOk)
               {
                   Symbol? symbol = symbolTable.GetSymbol(returnExp);
                   if (symbol != null)
@@ -736,13 +730,10 @@ public class stmtTypeChecker : DepthFirstAdapter
               {
                   if (symbolTable.GetUnit(returnExp, out var expUnit))
                   {
-                      symbolTable.AddNodeToUnit(aUntypedFunc, expUnit);
-                      symbolTable.AddNode(aUntypedFunc, Symbol.Ok);
+                      symbolTable.AddNodeToUnit(node, expUnit);
                       symbolTable.AddNode(node, Symbol.Ok);
                   } else if (symbolTable.GetSymbol(returnExp) != null)
                   {
-                      //symbolTable.AddReturnSymbol(aUntypedFunc, symbolTable.GetSymbol(returnExp));
-                      symbolTable.AddNode(aUntypedFunc, (Symbol)symbolTable.GetSymbol(returnExp));
                       symbolTable.AddNode(node, (Symbol)symbolTable.GetSymbol(returnExp));
                   }
               }

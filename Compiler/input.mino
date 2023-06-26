@@ -13,6 +13,7 @@ bool weirdBool = false;
 
 Time blinkDelay = 1s;
 pin builtin = 13;
+decimal test;
 
 func calculate(int first, int second, bool add) {
     return add ? first + second : first;
@@ -43,7 +44,7 @@ loop {
         } while(magicLength > 5km)
     }
     pin f = 5;
-    float g = readPin(f);
+    test = (decimal)(readpin(f));
     Length h = calculate2(2m, 2cm, false);
     int i = calculate(5, 2, true);
 }

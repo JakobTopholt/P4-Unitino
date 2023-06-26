@@ -15,7 +15,10 @@ public class GlobalScopeVisitor : DepthFirstAdapter
         this.typeChecker = typeChecker;
     }
     
-    // implement globalscope
+    // implement globalscope uden for typechecker visitor
+    
+    
+    
     
     
     

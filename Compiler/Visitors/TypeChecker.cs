@@ -73,7 +73,7 @@ public class TypeChecker : exprTypeChecker
         
         symbolTable.AddNode(node, unitDecl != null ? Symbol.Ok : Symbol.NotOk);
         tempResult += unitDecl != null ? "" : IndentedString($"{id} is not a valid unitType\n");
-        unitUseNums.Add(id, unitDecl);
+        unitUseDens.Add(id, unitDecl);
         PrintError();
         indent--;
     }
@@ -185,7 +185,7 @@ public class TypeChecker : exprTypeChecker
 
     public override void CaseAUntypedGlobal(AUntypedGlobal node)
     {
-        if (symbolTable.currentScope == 0)
+        if (symbolTable._parent == null)
         {
 
         }
@@ -226,37 +226,15 @@ public class TypeChecker : exprTypeChecker
 
     public override void OutAUntypedGlobal(AUntypedGlobal node)
     {
-        // Check om args er ok
-        // Check om stmts er ok
-        bool untypedIsOk = true;
-        List<AArg> args = node.GetArg().OfType<AArg>().ToList();
-        foreach (AArg arg in args)
+        // no returnstmts
+        if (!node.GetStmt().OfType<AReturnStmt>().Any())
         {
-            if (symbolTable.GetSymbol(arg) == Symbol.NotOk)
-                untypedIsOk = false;
-        }
-        List<PStmt> stmts = node.GetStmt().OfType<PStmt>().ToList();
-        foreach (PStmt stmt in stmts)
-        {
-            if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
-                untypedIsOk = false;
-        }
-        symbolTable = symbolTable.ExitScope();
-        if (!untypedIsOk)
-        {
-            // Overwrite the saved type with notOk
-            if (symbolTable._nodeToSymbol.ContainsKey(node))
-            {
-                symbolTable._nodeToSymbol.Remove(node);
-            }
-            symbolTable.AddNode(node, Symbol.NotOk);
+            symbolTable = symbolTable.ExitScope();
+            symbolTable.AddNode(node, Symbol.Func);
         }
         else
         {
-            if (!node.GetStmt().OfType<AReturnStmt>().Any())
-            {
-                symbolTable.AddNode(node, Symbol.Func);
-            }
+            symbolTable = symbolTable.ExitScope();
         }
         locations.Clear();
         reported = false;
@@ -265,7 +243,7 @@ public class TypeChecker : exprTypeChecker
 
     public override void CaseATypedGlobal(ATypedGlobal node)
     {
-        if (symbolTable.currentScope == 0)
+        if (symbolTable._parent == null)
         {
 
         }
@@ -311,44 +289,35 @@ public class TypeChecker : exprTypeChecker
     {
         // Check om args er ok
         // Check om stmts er ok
-        bool typedIsOk = true;
-        List<AArg> args = node.GetArg().OfType<AArg>().ToList();
-        foreach (AArg arg in args)
+        PType typedType = node.GetType();
+        switch (typedType)
         {
-            if (symbolTable.GetSymbol(arg) == Symbol.NotOk)
-                typedIsOk = false;
-        }
-        List<PStmt> stmts = node.GetStmt().OfType<PStmt>().ToList();
-        foreach (PStmt stmt in stmts)
-        {
-            if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
-                typedIsOk = false;
-        }
-        if (typedIsOk)
-        {
-            PType typedType = node.GetType();
-            switch (typedType)
-            {
                 case AIntType:
-                    //symbolTable = symbolTable.ExitScope();
+                    symbolTable = symbolTable.ExitScope();
                     symbolTable.AddNode(node, Symbol.Int);
                     break;
                 case ADecimalType:
+                    symbolTable = symbolTable.ExitScope();
                     symbolTable.AddNode(node, Symbol.Decimal);
                     break;
                 case ABoolType:
+                    symbolTable = symbolTable.ExitScope();
                     symbolTable.AddNode(node, Symbol.Bool);
                     break;
                 case ACharType:
+                    symbolTable = symbolTable.ExitScope();
                     symbolTable.AddNode(node, Symbol.Char);
                     break;
                 case AStringType:
+                    symbolTable = symbolTable.ExitScope();
                     symbolTable.AddNode(node, Symbol.String);
                     break;
                 case APinType:
+                    symbolTable = symbolTable.ExitScope();
                     symbolTable.AddNode(node, Symbol.Pin);
                     break;
                 case AVoidType:
+                    symbolTable = symbolTable.ExitScope();
                     symbolTable.AddNode(node, Symbol.Func);
                     break;
                 case AUnitType a:
@@ -358,14 +327,7 @@ public class TypeChecker : exprTypeChecker
                     symbolTable.AddNodeToUnit(node, unit);
                     symbolTable.AddNode(node, Symbol.Ok);
                     break;
-            }
         }
-        else
-        {
-            symbolTable = symbolTable.ExitScope();
-            symbolTable.AddNode(node, Symbol.NotOk);
-        }
-
         locations.Clear();
         reported = false;
         indent--;
@@ -379,21 +341,23 @@ public class TypeChecker : exprTypeChecker
         {
             symbolTable.AddNode(node, Symbol.NotOk);
         }
+        symbolTable = symbolTable.EnterScope();
     }
 
     public override void OutALoopGlobal(ALoopGlobal node)
     {
+        bool loopIsOk = true;
         if (symbolTable.GetSymbol(node) == null)
         {
-            bool loopIsOk = true;
             List<PStmt> stmts = node.GetStmt().OfType<PStmt>().ToList();
             foreach (PStmt stmt in stmts)
             {
                 if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
                     loopIsOk = false;
             }
-            symbolTable.AddNode(node, loopIsOk ? Symbol.Ok : Symbol.NotOk);
         }
+        symbolTable = symbolTable.ExitScope();
+        symbolTable.AddNode(node, loopIsOk ? Symbol.Ok : Symbol.NotOk);
         locations.Clear();
         reported = false;
         indent--;

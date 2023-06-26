@@ -128,30 +128,38 @@ public class FunctionVisitor : DepthFirstAdapter
         foreach (PStmt stmt in stmts)
         {
             stmt.Apply(typeChecker);
-            /*if (stmt is AReturnStmt returnStmt)
-            {
-                Symbol? symbol = symbolTable.GetSymbol(returnStmt);
-                if (symbol != Symbol.NotOk)
-                {
-                    if (symbol != Symbol.Ok)
-                    {
-                        symbolTable.AddNode(node, (Symbol)symbol);
-                    }
-                    else
-                    {
-                        symbolTable.GetUnit(returnStmt, out var unit);
-                        symbolTable.AddNodeToUnit(node, unit);
-                        symbolTable.AddNode(node, Symbol.Ok);
-                    }
-                }
-                else
-                {
-                    symbolTable.AddNode(node, Symbol.NotOk);
-                }
-            } */
         }
 
+        Symbol firstReturn = Symbol.Func;
+        Symbol returnSymbol = Symbol.Func;
+        (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unit = new();
+        List<AReturnStmt> returnStmts = node.GetStmt().OfType<AReturnStmt>().ToList();
+        foreach (AReturnStmt reStmt in returnStmts)
+        {
+            var symbol = symbolTable.GetSymbol(reStmt);
+            if (firstReturn == Symbol.Func && symbol != null)
+            {
+                firstReturn = (Symbol)symbol;
+                returnSymbol = (Symbol)symbol;
+                if (symbol == Symbol.Ok)
+                {
+                    symbolTable.GetUnit(reStmt, out unit);
+                }
+            }
+            else
+            {
+                if (symbol != firstReturn)
+                {
+                    returnSymbol = Symbol.NotOk;
+                }
+            }
+        }
         symbolTable = symbolTable.ExitScope();
+        symbolTable.AddNode(node, returnSymbol);
+        if (returnSymbol == Symbol.Ok)
+        {
+            symbolTable.AddNodeToUnit(node, unit);
+        }
     }
 
 
