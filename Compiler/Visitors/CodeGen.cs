@@ -55,7 +55,6 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         {
             // scoped
             case AWhileStmt:
-            case ADowhileStmt:
             case AForStmt:
             case AIfStmt:
             case AElseStmt:
@@ -75,6 +74,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             case APrefixplusStmt:
             case ADelayStmt:
             case ASetpinStmt:
+            case ADowhileStmt:    
             case AWritepinStmt:
                 writer.WriteLine(";");                    
                 break;
@@ -410,7 +410,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void OutADowhileStmt(ADowhileStmt node)
     {
-        writer.Write(")\n");
+        writer.Write(")");
     }
     /*-------------------------------------Decl-----------------------------------------------------------------------*/
     public override void InADeclStmt(ADeclStmt node)

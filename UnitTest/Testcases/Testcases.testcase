@@ -23,7 +23,7 @@ func scoped() {
         else if(5<=6) {
             do {
                 bool c;
-            } while(5+2&&5+4)
+            } while(5+2&&5+4);
         }
         else {
             decimal d;
@@ -31,8 +31,6 @@ func scoped() {
     }
 }
 ////
-
 ////
-
 ////
 false

@@ -240,7 +240,7 @@ func untypedfour(){
       bool c = true;
       do{
         a++;
-      }while (a!= 10)
+      }while (a!= 10);
 }
 ////
 
@@ -304,14 +304,11 @@ func untypedfour(){
       bool c = true;
       do{
         a++;
-      }while (a!= "10")
+      }while (a!= "10");
         do{
-            }while (a!= 10)
+            }while (a!= 10);
 }
 ////
-
 ////
-
-
 ////
 false
