@@ -27,15 +27,15 @@ prog {
 void loop() {
 }
 void setup() {
-    String n = "\n";
+    String n = String("\n");
     char a = '\a';
-    String b = "\b";
-    String f = "\f";
-    String r = "\r";
-    String t = "\t";
-    String v = "\v";
-    String q = "\?";
-    String slash = "\\";
+    String b = String("\b");
+    String f = String("\f");
+    String r = String("\r");
+    String t = String("\t");
+    String v = String("\v");
+    String q = String("\?");
+    String slash = String("\\");
 }
 ////
 true
