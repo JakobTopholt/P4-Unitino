@@ -54,7 +54,7 @@ void setup() {
     int p = 5;
     char c = 'e';
     bool d = true;
-    String l = d?"ja":"nej";
+    String l = d?String("ja"):String("nej");
     float e = 1.11;
     String b = String(e, 6);
     FargTest(a, b, c, d, e);

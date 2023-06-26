@@ -19,6 +19,26 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     void Precedence(Node L, Node R, string ope)
     {
+        Symbol? LSymbol = symbolTable.GetSymbol(L);
+        Symbol? RSymbol = symbolTable.GetSymbol(R);
+        if (LSymbol == Symbol.String && RSymbol is Symbol.Decimal or Symbol.Int)
+        {
+            L.Apply(this);
+            writer.Write(ope);
+            writer.Write("String(");
+            R.Apply(this);
+            writer.Write(")");
+            return;
+        }
+        if (RSymbol == Symbol.String && LSymbol is Symbol.Decimal or Symbol.Int)
+        {
+            writer.Write("String(");
+            L.Apply(this);
+            writer.Write(")");
+            writer.Write(ope);
+            R.Apply(this);
+            return;
+        }
         L.Apply(this);
         writer.Write(ope);
         R.Apply(this);
@@ -801,7 +821,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseAStringExp(AStringExp node)
     {
-        writer.Write(node.GetString().ToString().Trim());
+        writer.Write("String(" + node.GetString().ToString().Trim() + ")");
     }
 
     public override void CaseACharExp(ACharExp node)
@@ -846,8 +866,8 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     {
         AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
 
-        ExprEvaluator exprEvaluator = new(node.GetDecimal());
         PExp exp = symbolTable.GetSubUnitExp(node.GetId());
+        ExprEvaluator exprEvaluator = new(node, exp);
         try
         {
             exp.Apply(exprEvaluator);
@@ -858,14 +878,14 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                          + "(" + node.GetDecimal().ToString().Trim() + ")");
             return;
         }
-        writer.Write(exprEvaluator.GetOutput(exp));
+        writer.Write(exprEvaluator.GetOutput());
     }
     public override void CaseAUnitnumberExp(AUnitnumberExp node)
     {
         AUnitdeclGlobal? test = symbolTable.GetUnitdeclFromId(node.GetId().ToString().Trim());
         
-        ExprEvaluator exprEvaluator = new(node.GetNumber());
         PExp exp = symbolTable.GetSubUnitExp(node.GetId());
+        ExprEvaluator exprEvaluator = new(node, exp);
         try
         {
             exp.Apply(exprEvaluator);
@@ -876,12 +896,19 @@ public class CodeGen : DepthFirstAdapter, IDisposable
                          + "(" + node.GetNumber().ToString().Trim() + ")");
             return;
         }
-        writer.Write(exprEvaluator.GetOutput(exp));
+        writer.Write(exprEvaluator.GetOutput());
     }
 
     public override void OutADeclstmtGlobal(ADeclstmtGlobal node)
     {
         writer.WriteLine(";");
+    }
+
+    public override void CaseAExpExp(AExpExp node)
+    {
+        writer.Write("(");
+        node.GetExp().Apply(this);
+        writer.Write(")");
     }
 
     public void Dispose()

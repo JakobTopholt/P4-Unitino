@@ -1,0 +1,263 @@
+﻿Parenthesis
+////
+prog {
+    Time a = 50ms;
+}
+
+unit Time {
+    ms => (value);
+}
+////
+////
+void loop() {
+}
+void setup() {
+    float a = 50;
+}
+float UTimems(float value) {
+    return (value);
+}
+//////
+Multiply
+////
+prog {
+    Time a = 50ms;
+}
+
+unit Time {
+    ms => (value * 50) * ((5*5) * 50.2);
+}
+////
+////
+void loop() {
+}
+void setup() {
+    float a = 31375000;
+}
+float UTimems(float value) {
+    return (value*50)*((5*5)*50.2);
+}
+//////
+Plus
+////
+prog {
+    Time a = 50ms;
+}
+
+unit Time {
+    ms => (value + 50) + ((5+5) + 50.2);
+}
+////
+////
+void loop() {
+}
+void setup() {
+    float a = 612;
+}
+float UTimems(float value) {
+    return (value+50)+((5+5)+50.2);
+}
+//////
+Plus3
+////
+prog {
+    Time a = 50ms;
+}
+
+unit Time {
+    ms => 2+("hej"+1)+("alo"+1.2)+(1.1+"aye") == "hej"?50*value:5*value;
+}
+////
+////
+void loop() {
+}
+void setup() {
+    float a = 250;
+}
+float UTimems(float value) {
+    return String(2)+(String("hej")+String(1))+(String("alo")+String(1.2))+(String(1.1)+String("aye")) == String("hej")?50*value:5*value;
+}
+//////
+Equals
+////
+prog {
+    Time a = 50ms;
+    Time b = 1s;
+    Time c = 1h;
+}
+
+unit Time {
+    ms => 5 == 5 || true ? value : value*5;
+    s => 2.2 == 2.2 && 2.0 == 2 || 2 == 2.0 || "hey" == 5 && "5" == 5 && "2.2" == 2.2 && 2.2 == "2.2" ? value : value*5;
+    h => true == false ? value : value-2;
+}
+////
+////
+void loop() {
+}
+void setup() {
+    float a = 50;
+    float b = 5;
+    float c = -1;
+}
+float UTimems(float value) {
+    return 5 == 5 || true?value:value*5;
+}
+float UTimes(float value) {
+    return 2.2 == 2.2 && 2.0 == 2 || 2 == 2.0 || String("hey") == String(5) && String("5") == String(5) && String("2.2") == String(2.2) && String(2.2) == String("2.2")?value:value*5;
+}
+float UTimeh(float value) {
+    return true == false?value:value-2;
+}
+//////
+Equals2
+////
+prog {
+    Time a = 50ms;
+}
+
+unit Time {
+    ms => 5 == "5" || 2.5 == "2.5" || "2.5" == 2.5 ? value : value*2;
+}
+////
+////
+void loop() {
+}
+void setup() {
+    float a = 100;
+}
+float UTimems(float value) {
+    return String(5) == String("5") || String(2.5) == String("2.5") || String("2.5") == String(2.5)?value:value*2;
+}
+//////
+Minus
+////
+prog {
+    Time a = 50ms;
+}
+
+unit Time {
+    ms => 2.1 - ((2 - 1) - 1.2 - (1 - 0.5)) * value;
+}
+////
+////
+void loop() {
+}
+void setup() {
+    float a = 371;
+}
+float UTimems(float value) {
+    return 2.1-((2-1)-1.2-(1-0.5))*value;
+}
+//////
+Divide
+////
+prog {
+    Time a = 50ms;
+}
+
+unit Time {
+    ms => (value / (2 / 2)) / (2 / -1.0) + 1.2/1 + -2;
+}
+////
+////
+void loop() {
+}
+void setup() {
+    float a = -240;
+}
+float UTimems(float value) {
+    return (value/(2/2))/(2/-1.0)+1.2/1+-2;
+}
+//////
+NotEquals
+////
+prog {
+    Time a = 50ms;
+    Time b = 1s;
+    Time c = 1h;
+}
+
+unit Time {
+    ms => 5 != 5 && true ? value : value*5;
+    s => 2.2 != 2.2 && 2.0 != 2 && 2 != 2.0 && "hey" != 5 && "5" != 5 && "2.2" != 2.2 && 2.2 != "2.2" ? value : value*5;
+    h => true != false ? value : value-2;
+}
+////
+////
+void loop() {
+}
+void setup() {
+    float a = 250;
+    float b = 5;
+    float c = 1;
+}
+float UTimems(float value) {
+    return 5 != 5 && true?value:value*5;
+}
+float UTimes(float value) {
+    return 2.2 != 2.2 && 2.0 != 2 && 2 != 2.0 && String("hey") != String(5) && String("5") != String(5) && String("2.2") != String(2.2) && String(2.2) != String("2.2")?value:value*5;
+}
+float UTimeh(float value) {
+    return true != false?value:value-2;
+}
+//////
+NotEquals2
+////
+prog {
+    Time a = 50ms;
+}
+
+unit Time {
+    ms => 5 != "5" && 2.5 != "2.5" && "2.5" != 2.5 ? value : value*2;
+}
+////
+////
+void loop() {
+}
+void setup() {
+    float a = 50;
+}
+float UTimems(float value) {
+    return String(5) != String("5") && String(2.5) != String("2.5") && String("2.5") != String(2.5)?value:value*2;
+}
+//////
+NotEquals3
+////
+prog {
+    Time a = 50ms;
+}
+
+unit Time {
+    ms => "a" != "b" && "2" != 1 && 1.2 != 1 && 1 != 1.0 ? value : value*5;
+}
+////
+////
+void loop() {
+}
+void setup() {
+    float a = 50;
+}
+float UTimems(float value) {
+    return String("a") != String("b") && String("2") != String(1) && 1.2 != 1 && 1 != 1.0?value:value*5;
+}
+//////
+Remainder
+////
+prog {
+    Time a = 50ms;
+}
+
+unit Time {
+    ms => value + 5 % 3;
+}
+////
+////
+void loop() {
+}
+void setup() {
+    float a = 52;
+}
+float UTimems(float value) {
+    return value+5 % 3;
+}

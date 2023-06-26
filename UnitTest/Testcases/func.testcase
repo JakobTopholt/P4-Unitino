@@ -65,7 +65,7 @@ void loop() {
     int f = 0;
 }
 String FImplicitTypedFunc() {
-    String i = "0";
+    String i = String("0");
     return i;
 }
 char Ffunction3(char a, char b, char c) {
