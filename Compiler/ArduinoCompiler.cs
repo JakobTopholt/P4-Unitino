@@ -62,6 +62,8 @@ public static class ArduinoCompiler
                 continue;
             string portName = column[0];
             string boardFqbn = column[7];
+            
+            Console.WriteLine($"compiling to board - fqbn: \"{boardFqbn}\" port: \"{portName}\"");
 
             bool success = await Compile(folder, portName, boardFqbn);
             if (!success)
@@ -99,8 +101,8 @@ public static class ArduinoCompiler
         }
         
         Process compileProcess = ArduinoCli(portName == null
-            ? $"compile --fqbn {boardFqbn} {folder}"
-            : $"compile --fqbn {boardFqbn} --port {portName} {folder}", true);
+            ? $"compile -b {boardFqbn} {folder}"
+            : $"compile -b {boardFqbn} -p {portName} {folder}", true);
         
         compileProcess.Start();
         await compileProcess.WaitForExitAsync();
@@ -114,7 +116,7 @@ public static class ArduinoCompiler
 
     private static async Task<Process> Monitor(string portName, string boardFqbn)
     {
-        Process compileProcess = ArduinoCli($"monitor --fqbn {boardFqbn} --port {portName}", false);
+        Process compileProcess = ArduinoCli($"monitor -b {boardFqbn} -p {portName}", false);
         compileProcess.Start();
         await compileProcess.WaitForExitAsync();
         return compileProcess;
