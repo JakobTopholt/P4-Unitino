@@ -187,7 +187,7 @@ public class TypeChecker : exprTypeChecker
     {
         if (symbolTable._parent == null)
         {
-
+            symbolTable = symbolTable.EnterScope().ExitScope();
         }
         else
         {
@@ -245,7 +245,7 @@ public class TypeChecker : exprTypeChecker
     {
         if (symbolTable._parent == null)
         {
-
+            symbolTable = symbolTable.EnterScope().ExitScope();
         }
         else
         {

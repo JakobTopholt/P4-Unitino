@@ -174,6 +174,10 @@ public class FunctionVisitor : DepthFirstAdapter
                 ((PArg) temp[i]).Apply(this);
             }
         }
+        if(node.GetType() != null)
+        {
+            node.GetType().Apply(typeChecker);
+        }
         OutATypedGlobal(node);
     }
     public override void InATypedGlobal(ATypedGlobal node)
@@ -206,15 +210,52 @@ public class FunctionVisitor : DepthFirstAdapter
         {
             stmt.Apply(typeChecker);
         }
-        symbolTable = symbolTable.ExitScope();
+        switch (node.GetType())
+        {
+            case AIntType:
+                symbolTable = symbolTable.ExitScope();
+                symbolTable.AddNode(node, Symbol.Int);
+                break;
+            case ADecimalType:
+                symbolTable = symbolTable.ExitScope();
+                symbolTable.AddNode(node, Symbol.Decimal);
+                break;
+            case ABoolType:
+                symbolTable = symbolTable.ExitScope();
+                symbolTable.AddNode(node, Symbol.Bool);
+                break;
+            case ACharType:
+                symbolTable = symbolTable.ExitScope();
+                symbolTable.AddNode(node, Symbol.Char);
+                break;
+            case AStringType:
+                symbolTable = symbolTable.ExitScope();
+                symbolTable.AddNode(node, Symbol.String);
+                break;
+            case APinType:
+                symbolTable = symbolTable.ExitScope();
+                symbolTable.AddNode(node, Symbol.Pin);
+                break;
+            case AVoidType:
+                symbolTable = symbolTable.ExitScope();
+                symbolTable.AddNode(node, Symbol.Func);
+                break;
+            case AUnitType a:
+                // Missing a reference from this node to the unitType
+                symbolTable.GetUnit(a, out var unit);
+                symbolTable = symbolTable.ExitScope();
+                symbolTable.AddNodeToUnit(node, unit);
+                symbolTable.AddNode(node, Symbol.Ok);
+                break;
+        }
     }
 
     public override void CaseALoopGlobal(ALoopGlobal node)
     {
-     
+        symbolTable = symbolTable.EnterScope().ExitScope();
     }
     public override void CaseAProgGlobal(AProgGlobal node)
     {
-  
+        symbolTable = symbolTable.EnterScope().ExitScope();
     }
 }

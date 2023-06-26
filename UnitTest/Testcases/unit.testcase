@@ -100,7 +100,7 @@ unit Time {
 }
 
 int testValue;
-Time testUnit;
+#Time testUnit;
 
 Time functionTest(int a, string b){
     testValue++;
@@ -111,6 +111,7 @@ prog {
     testValue = 0;
 }
 loop {
+   Time testUnit;
    testUnit = functionTest(5, "10");
 }
 
