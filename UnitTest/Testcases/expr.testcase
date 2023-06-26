@@ -4,7 +4,7 @@ func funexpr(int a){
     int b = 5;
     b = b + a;
     decimal d = 3.5;
-    decimal e = 6.5+d;
+    decimal e = 6.5 + d;
     d = d + a;
     
     string s = "lmao";
@@ -16,7 +16,22 @@ func funexpr(int a){
 ////
 
 ////
-
+void setup() {
+}
+void loop() {
+}
+void Ffunexpr(int a) {
+    int b = 5;
+    b = b + a;
+    float d = 3.5;
+    float e = 6.5 + d;
+    d = d + a;
+    String s = String("lmao");
+    String t = String("xD");
+    s = s + String(a);
+    t = t + s;
+    t = t + String(d);
+}
 ////
 true
 //////
@@ -50,7 +65,18 @@ func untyped(int a){
 ////
 
 ////
-
+void setup() {
+}
+void loop() {
+}
+void Funtyped(int a) {
+    int b = 5;
+    b = b-a;
+    float c = 3.5;
+    float d = 6.5;
+    d = d-c;
+    c = c-b;
+}
 ////
 true
 
@@ -87,14 +113,25 @@ func untypedlmao(){
 ////
  
 ////
-
-
+void setup() {
+}
+void loop() {
+}
+void Funtypedlmao() {
+    int a = 3;
+    int b = 5;
+    float cd = 3.5;
+    b = b*a;
+    float d = 6.5;
+    d = d*cd;
+    cd = cd/b;
+}
 ////
 true
 //////
 expr div mult mod false
 ////
-func untypedlmao(){
+func Funtypedlmao(){
     int a = 3;
     string b = "xD";
     decimal cd = 3.5;
@@ -119,13 +156,22 @@ func untypedlmao(){
     bool b = true;
     int c = 5;
     int d = 4;
-    d = b ? c : d;
+    d = b? c : d;
     
 }
 ////
 
 ////
-
+void setup() {
+}
+void loop() {
+}
+void Funtypedlmao() {
+    bool b = true;
+    int c = 5;
+    int d = 4;
+    d = b?c:d;
+}
 ////
 true
 //////
@@ -144,24 +190,31 @@ func untypedlmao(int a){
 
 ////
 false
-
 //////
 logical AND OR expr
 ////
-func untypedlmao(){
+func untypedlmao() {
     bool b = true;
     bool a = false;
     bool c = true;
-    bool d = a || b && a || c;
-    
+    bool d = a||b&&a||c;
 }
 ////
 
 ////
-
+void setup() {
+}
+void loop() {
+}
+void Funtypedlmao() {
+    bool b = true;
+    bool a = false;
+    bool c = true;
+    bool d = a || b && a || c;
+}
 ////
 true
-/////
+//////
 logical AND OR expr false
 ////
 func untypedlmao(int a){
@@ -191,7 +244,18 @@ func untypedlmao(int a){
 ////
 
 ////
-
+void setup() {
+}
+void loop() {
+}
+void Funtypedlmao(int a) {
+    a = 5;
+    int b = 2;
+    int c = 7;
+    bool d = a == b || b < 7;
+    bool e = a != b && c > 5;
+    d = a >= 2 || b >= 3;
+}
 ////
 true
 //////
@@ -237,7 +301,29 @@ func untypedlomo(int a){
 ////
 
 ////
-
+void setup() {
+}
+void loop() {
+}
+void Funtypedlmao() {
+    int a = 5;
+    int b = 2;
+    float d = 3.5;
+    int c;
+    c = ++b + a;
+    b = b++ + a;
+    a = -a + b;
+    bool rigtige = true;
+    bool falsk = !rigtige;
+}
+void Funtypedlomo(int a) {
+    a = 5;
+    int b = 2;
+    float d = 3.5;
+    int c;
+    c = --b + a;
+    b = b-- + a;
+}
 ////
 true
 //////

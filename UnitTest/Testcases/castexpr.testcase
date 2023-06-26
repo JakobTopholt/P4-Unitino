@@ -1,30 +1,46 @@
 ﻿casting expr
 ////
-func untypedlmao(){
+
+prog{
     bool a = true;
     int b = 5;
     decimal c = 3.5;
     string d = "lmao";
     char e = 'xD';
+     bool ab = (bool)a;
     /* self casts */
-    bool ab =(bool) a;
-    int ba = (int) b;
+    int ba = (int)b;
     decimal cd = (decimal)c;
-    string de = (string)d;
     char ef = (char)e;
     
     /*rigtige typecasts */
-    c = (decimal)b;
-    d = (string)ef;
-    d = (string)b;
-    de =(string) c;
-    ef =(char)b;
-    
+       c = (decimal)b;
+       d = (string)ef;
+       d =(string)c;
+       ef =(char)b;
+}
+loop{
 }
 ////
 
 ////
-
+void setup() {
+    bool a = true;
+    int b = 5;
+    float c = 3.5;
+    String d = String("lmao");
+    char e = 'xD';
+    bool ab = (bool)a;
+    int ba = (int)b;
+    float cd = (float)c;
+    char ef = (char)e;
+    c = (float)b;
+    d = String(ef);
+    d = String(c, 6);
+    ef = (char)b;
+}
+void loop() {
+}
 ////
 true
 //////

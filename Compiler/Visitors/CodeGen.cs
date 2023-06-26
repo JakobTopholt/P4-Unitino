@@ -74,6 +74,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             case APrefixplusStmt:
             case ADelayStmt:
             case ASetpinStmt:
+            case ADowhileStmt:    
             case AWritepinStmt:
             case ADowhileStmt:
                 writer.WriteLine(";");                    
@@ -416,7 +417,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void OutADowhileStmt(ADowhileStmt node)
     {
-        writer.Write(")\n");
+        writer.Write(")");
     }
     /*-------------------------------------Decl-----------------------------------------------------------------------*/
     public override void InADeclStmt(ADeclStmt node)
@@ -748,6 +749,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseAPrefixminusminusExp(APrefixminusminusExp node)
     {
+
         writer.Write("--");
         node.GetExp().Apply(this);
     }
