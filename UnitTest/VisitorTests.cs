@@ -17,12 +17,15 @@ public class VisitorTests
         List<SymbolTable> list = new();
         SymbolTable symbolTable = new(null, list);
         TypeChecker subunitsExprCheck = new TypeChecker(symbolTable);
+        TypeChecker globalDeclCheck = new(symbolTable);
         TypeChecker globalFunctionCheck = new (symbolTable);
         
         UnitVisitor a = new(symbolTable, subunitsExprCheck);
+        GlobalScopeVisitor e = new(symbolTable, globalDeclCheck);
         FunctionVisitor b = new(symbolTable, globalFunctionCheck);
         TypeChecker c = new(symbolTable);
         ast.Apply(a);
+        ast.Apply(e);
         ast.Apply(b);
         ast.Apply(c);
         
@@ -39,12 +42,15 @@ public class VisitorTests
         List<SymbolTable> list = new();
         SymbolTable symbolTable = new(null, list);
         TypeChecker subunitsExprCheck = new TypeChecker(symbolTable);
+        TypeChecker globalDeclCheck = new(symbolTable);
         TypeChecker globalFunctionCheck = new (symbolTable);
         
         UnitVisitor a = new(symbolTable, subunitsExprCheck);
+        GlobalScopeVisitor e = new(symbolTable, globalDeclCheck);
         FunctionVisitor b = new(symbolTable, globalFunctionCheck);
         TypeChecker c = new(symbolTable);
         ast.Apply(a);
+        ast.Apply(e);
         ast.Apply(b);
         ast.Apply(c);
         Assert.That(symbolTable.GetSymbol(ast.GetPGrammar()), Is.EqualTo(correct ? Symbol.Ok : Symbol.NotOk));
@@ -56,12 +62,15 @@ public class VisitorTests
         List<SymbolTable> list = new();
         SymbolTable symbolTable = new(null, list);
         TypeChecker subunitsExprCheck = new TypeChecker(symbolTable);
+        TypeChecker globalDeclCheck = new(symbolTable);
         TypeChecker globalFunctionCheck = new (symbolTable);
         
         UnitVisitor a = new(symbolTable, subunitsExprCheck);
+        GlobalScopeVisitor e = new(symbolTable, globalDeclCheck);
         FunctionVisitor b = new(symbolTable, globalFunctionCheck);
         TypeChecker c = new(symbolTable);
         ast.Apply(a);
+        ast.Apply(e);
         ast.Apply(b);
         ast.Apply(c);
         using MemoryStream stream = new();

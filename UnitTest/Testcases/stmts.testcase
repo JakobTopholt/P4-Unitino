@@ -197,7 +197,7 @@ func untypedthree(){
       int b = 3;
       int a = 4;
       bool c = true;
-      while (a!= 10){
+      while (a != 10){
         a++;
       } 
 }
@@ -207,7 +207,7 @@ func untypedfour(){
       bool c = true;
       do{
         a++;
-      }while (a!= 10)
+      }while (a != 10)
 }
 
 ////

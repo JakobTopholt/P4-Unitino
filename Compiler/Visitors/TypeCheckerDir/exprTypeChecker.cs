@@ -1276,7 +1276,7 @@ public class exprTypeChecker : stmtTypeChecker
             default:
                 output = SameUnits(Parent, leftExpr, rightExpr) ? Symbol.Bool : Symbol.NotOk;
                 break;
-        };
+        }
         symbolTable.AddNode(Parent, output);
         tempResult += output != Symbol.NotOk ? "" : IndentedString("Types does not match\n");
         PrintError();

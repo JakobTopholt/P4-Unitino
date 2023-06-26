@@ -48,10 +48,11 @@ internal static class ModuinoCompiler
 
         SymbolTable symbolTable = new(null, AllTables);
         TypeChecker subunitsExprCheck = new (symbolTable);
+        TypeChecker globalDeclCheck = new(symbolTable);
         TypeChecker globalFunctionCheck = new (symbolTable);
 
         start.Apply(new UnitVisitor(symbolTable, subunitsExprCheck));
-        // PASS FOR GLOBAL HER
+        start.Apply(new GlobalScopeVisitor(symbolTable, globalDeclCheck));
         start.Apply(new FunctionVisitor(symbolTable, globalFunctionCheck));
         start.Apply(new TypeChecker(symbolTable));
         

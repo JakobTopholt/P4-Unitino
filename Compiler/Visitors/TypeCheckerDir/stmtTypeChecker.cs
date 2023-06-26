@@ -43,7 +43,6 @@ public class stmtTypeChecker : DepthFirstAdapter
         }
     }
     
-    
     public override void InAAssignStmt(AAssignStmt node)
     {
         locations.Push(IndentedString($"in Assignment {node}\n"));
@@ -398,6 +397,27 @@ public class stmtTypeChecker : DepthFirstAdapter
         indent--;
     }
 
+    public override void CaseADeclStmt(ADeclStmt node)
+    {
+        if (symbolTable._parent == null)
+        {
+           
+        }
+        else
+        {
+            InADeclStmt(node);
+            if(node.GetType() != null)
+            {
+                node.GetType().Apply(this);
+            }
+            if(node.GetId() != null)
+            {
+                node.GetId().Apply(this);
+            }
+            OutADeclStmt(node);
+        }
+    }
+
     public override void InADeclStmt(ADeclStmt node)
     {
         locations.Push( IndentedString($"in Declaration {node}\n"));
@@ -449,15 +469,40 @@ public class stmtTypeChecker : DepthFirstAdapter
         PrintError();
         indent--;
     }
+    public override void CaseADeclassStmt(ADeclassStmt node)
+    {
+        if (symbolTable._parent == null)
+        {
+           
+        }
+        else
+        {
+            InADeclassStmt(node);
+            if (node.GetExp() != null)
+            {
+                node.GetExp().Apply(this);
+            }
 
+            if (node.GetId() != null)
+            {
+                node.GetId().Apply(this);
+            }
+
+            if (node.GetType() != null)
+            {
+                node.GetType().Apply(this);
+            }
+
+            OutADeclassStmt(node);
+        }
+    }
     public override void InADeclassStmt(ADeclassStmt node)
     {
         locations.Push(IndentedString($"in DeclarationAssignment {node}\n"));
         indent++;
     }
-
     public override void OutADeclassStmt(ADeclassStmt node)
-    { 
+    {
         // Assignment have to be typechecked before Decl should add to symbolTable
         if (!symbolTable.IsInCurrentScope(node.GetId()))
         {
@@ -849,8 +894,8 @@ public class stmtTypeChecker : DepthFirstAdapter
     public override void OutAWhileStmt(AWhileStmt node)
     {
         Node? exp = node.GetExp();
-        symbolTable = symbolTable.ExitScope();
         Symbol? condExpr = symbolTable.GetSymbol(exp);
+        symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
         if (condExpr == null)
         {
@@ -875,8 +920,8 @@ public class stmtTypeChecker : DepthFirstAdapter
     public override void OutADowhileStmt(ADowhileStmt node)
     {
         Node? exp = node.GetExp();
-        symbolTable = symbolTable.ExitScope();
         Symbol? condExpr = symbolTable.GetSymbol(exp);
+        symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
         if (condExpr == null)
         {

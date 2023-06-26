@@ -1,4 +1,4 @@
-Test1
+Test1 false
 ////
 prog {
     int test = "hej";

@@ -273,12 +273,76 @@ public class FunctionVisitor : DepthFirstAdapter
         
     }
 
+    public override void InAIfStmt(AIfStmt node)
+    {
+        symbolTable = symbolTable.EnterScope();
+    }
+
+    public override void OutAIfStmt(AIfStmt node)
+    {
+        symbolTable = symbolTable.ExitScope();
+    }
+
+    public override void InAElseifStmt(AElseifStmt node)
+    {
+        symbolTable = symbolTable.EnterScope();
+    }
+
+    public override void OutAElseifStmt(AElseifStmt node)
+    {
+        symbolTable = symbolTable.ExitScope();
+    }
+
+    public override void InAElseStmt(AElseStmt node)
+    {
+        symbolTable = symbolTable.EnterScope();
+    }
+
+    public override void OutAElseStmt(AElseStmt node)
+    {
+        symbolTable = symbolTable.ExitScope();
+    }
+    
+    public override void InAForStmt(AForStmt node)
+    {
+        symbolTable = symbolTable.EnterScope();
+    }
+
+    public override void OutAForStmt(AForStmt node)
+    {
+        symbolTable = symbolTable.ExitScope();
+    }
+    
+
+    public override void InAWhileStmt(AWhileStmt node)
+    {
+        symbolTable = symbolTable.EnterScope();
+    }
+
+    public override void OutAWhileStmt(AWhileStmt node)
+    {
+        symbolTable = symbolTable.ExitScope();
+    }
+    
+
+    public override void InADowhileStmt(ADowhileStmt node)
+    {
+        symbolTable = symbolTable.EnterScope();
+    }
+
+    public override void OutADowhileStmt(ADowhileStmt node)
+    {
+        symbolTable = symbolTable.ExitScope();
+    }
+
     public override void CaseALoopGlobal(ALoopGlobal node)
     {
         symbolTable = symbolTable.EnterScope().ExitScope();
+        symbolTable = symbolTable.ResetScope();
     }
     public override void CaseAProgGlobal(AProgGlobal node)
     {
         symbolTable = symbolTable.EnterScope().ExitScope();
-    }
+        symbolTable = symbolTable.ResetScope();
+    } 
 }

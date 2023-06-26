@@ -16,6 +16,22 @@ public class TypeChecker : exprTypeChecker
     SortedList<string, AUnitdeclGlobal> unitUseNums = new SortedList<string, AUnitdeclGlobal>(new DuplicateKeyComparer<string>());
     SortedList<string, AUnitdeclGlobal> unitUseDens = new SortedList<string, AUnitdeclGlobal>(new DuplicateKeyComparer<string>());
     
+    public override void CaseAGrammar(AGrammar node)
+    {
+        InAGrammar(node);
+        {
+            Object[] temp = new Object[node.GetGlobal().Count];
+            node.GetGlobal().CopyTo(temp, 0);
+            for(int i = 0; i < temp.Length; i++)
+            {
+                if (temp[i] is AProgGlobal or ALoopGlobal or AUntypedGlobal or ATypedGlobal or AUnitdeclGlobal)
+                {
+                    ((PGlobal) temp[i]).Apply(this);
+                }
+            }
+        }
+        OutAGrammar(node);
+    }
     public override void OutAGrammar(AGrammar node)
     {
         string symbols = "";
@@ -39,7 +55,8 @@ public class TypeChecker : exprTypeChecker
     
     public override void CaseAUnitdeclGlobal(AUnitdeclGlobal node)
     {
-        
+        //symbolTable = symbolTable.EnterScope().ExitScope();
+        //symbolTable = symbolTable.ResetScope();
     }
 
     public override void InANumUnituse(ANumUnituse node)
@@ -396,6 +413,5 @@ public class TypeChecker : exprTypeChecker
         reported = false;
         indent--;
     }
-    
 
 }
