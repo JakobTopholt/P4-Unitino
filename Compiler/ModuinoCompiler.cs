@@ -49,10 +49,9 @@ internal static class ModuinoCompiler
         SymbolTable symbolTable = new(null, AllTables);
         TypeChecker subunitsExprCheck = new (symbolTable);
         TypeChecker globalFunctionCheck = new (symbolTable);
-        
-        // Få fat på glovalscope decl og assign igennem UnitVisitor
-        
+
         start.Apply(new UnitVisitor(symbolTable, subunitsExprCheck));
+        // pass for global declarations
         start.Apply(new FunctionVisitor(symbolTable, globalFunctionCheck));
         start.Apply(new TypeChecker(symbolTable));
 
