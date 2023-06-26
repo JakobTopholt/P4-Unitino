@@ -1,0 +1,41 @@
+﻿escaped chars
+////
+prog {
+    string n = "\n";
+    char a = '\a';
+    string b = "\b";
+    string f = "\f";
+    string r = "\r";
+    string t = "\t";
+    string v = "\v";
+    string q = "\?";
+    string slash = "\\";
+}
+////
+prog {
+    string n = "\n";
+    char a = '\a';
+    string b = "\b";
+    string f = "\f";
+    string r = "\r";
+    string t = "\t";
+    string v = "\v";
+    string q = "\?";
+    string slash = "\\";
+}
+////
+void loop() {
+}
+void setup() {
+    String n = "\n";
+    char a = '\a';
+    String b = "\b";
+    String f = "\f";
+    String r = "\r";
+    String t = "\t";
+    String v = "\v";
+    String q = "\?";
+    String slash = "\\";
+}
+////
+true

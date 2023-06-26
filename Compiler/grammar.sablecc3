@@ -16,8 +16,8 @@ Helpers
     not_star = [all - '*'];
     not_star_slash = [not_star - '/'];
     
-    escaped_chars = '\n';
-    valid_char = [not_cr_lf - [''' + '"']];
+    escaped_chars = '\n' | '\a' | '\b' | '\f' | '\r' | '\t' | '\v' | '\?' | '\\';
+    valid_char = [not_cr_lf - [''' + ['"' + '\']]];
     string_char = [valid_char + '''] | escaped_chars | '\"';
     char_char = [valid_char + '"'] | escaped_chars | '\' + ''';
 
