@@ -1247,15 +1247,8 @@ public class exprTypeChecker : stmtTypeChecker
     private void AddBinaryToSymbolTable(Node Parent, Node L, Node R)
     {
         Node leftExpr = L;
-        if (leftExpr is AIdExp idLeft)
-        {
-            symbolTable.GetNodeFromId(idLeft.GetId().ToString().Trim(), out leftExpr);
-        }
         Node rightExpr = R;
-        if (rightExpr is AIdExp idRight)
-        {
-            symbolTable.GetNodeFromId(idRight.GetId().ToString().Trim(), out rightExpr);
-        }
+        
         Symbol? left = symbolTable.GetSymbol(leftExpr);
         Symbol? right = symbolTable.GetSymbol(rightExpr);
         Symbol output;

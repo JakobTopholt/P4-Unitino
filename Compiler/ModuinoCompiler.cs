@@ -51,7 +51,7 @@ internal static class ModuinoCompiler
         TypeChecker globalFunctionCheck = new (symbolTable);
 
         start.Apply(new UnitVisitor(symbolTable, subunitsExprCheck));
-        // pass for global declarations
+        // PASS FOR GLOBAL HER
         start.Apply(new FunctionVisitor(symbolTable, globalFunctionCheck));
         start.Apply(new TypeChecker(symbolTable));
         

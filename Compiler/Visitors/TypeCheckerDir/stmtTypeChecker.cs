@@ -751,16 +751,13 @@ public class stmtTypeChecker : DepthFirstAdapter
     {
         locations.Push(IndentedString($"in IfStmt {node}\n"));
         indent++;
-        symbolTable.EnterScope();
+        symbolTable = symbolTable.EnterScope();
     }
 
     public override void OutAIfStmt(AIfStmt node)
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetExp());
-        if (node.GetExp() is AIdExp id)
-        {
-            condExpr = symbolTable.GetSymbol(id.ToString().Trim());
-        }
+        symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
         if (condExpr == null)
         {
@@ -773,23 +770,20 @@ public class stmtTypeChecker : DepthFirstAdapter
         
         PrintError();
         indent--;
-        symbolTable.ExitScope();
+        
     }
 
     public override void InAElseifStmt(AElseifStmt node)
     {
         locations.Push( IndentedString($"in ElseifStmt {node}\n"));
         indent++;
-        symbolTable.EnterScope();
+        symbolTable = symbolTable.EnterScope();
     }
 
     public override void OutAElseifStmt(AElseifStmt node)
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetExp());
-        if (node.GetExp() is AIdExp id)
-        {
-            condExpr = symbolTable.GetSymbol(id.ToString().Trim());
-        }
+        symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
         if (condExpr == null)
         {
@@ -801,35 +795,36 @@ public class stmtTypeChecker : DepthFirstAdapter
         }
         PrintError();
         indent--;
-        symbolTable.ExitScope();
+        
     }
 
     public override void InAElseStmt(AElseStmt node)
     {
         locations.Push( IndentedString($"in ElseStmt {node}\n"));
         indent++;
-        symbolTable.EnterScope();
+        symbolTable = symbolTable.EnterScope();
     }
 
     public override void OutAElseStmt(AElseStmt node)
     {
         // Check om der er en if eller else if inden
+        symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, Symbol.Ok);
         PrintError();
         indent--;
-        symbolTable.ExitScope();
     }
 
     public override void InAForStmt(AForStmt node)
     {
         locations.Push( IndentedString($"in forloop {node}\n"));
         indent++;
-        symbolTable.EnterScope();
+        symbolTable = symbolTable.EnterScope();
     }
 
     public override void OutAForStmt(AForStmt node)
     {
         Symbol? condExpr = symbolTable.GetSymbol(node.GetCond());
+        symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
         if (condExpr == null)
         {
@@ -841,23 +836,20 @@ public class stmtTypeChecker : DepthFirstAdapter
         }
         PrintError();
         indent--;
-        symbolTable.ExitScope();
+        
     }
 
     public override void InAWhileStmt(AWhileStmt node)
     {
         locations.Push( IndentedString($"in while loop {node}\n"));
         indent++;
-        symbolTable.EnterScope();
+        symbolTable = symbolTable.EnterScope();
     }
 
     public override void OutAWhileStmt(AWhileStmt node)
     {
         Node? exp = node.GetExp();
-        if (exp is AIdExp id)
-        {
-            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
-        }
+        symbolTable = symbolTable.ExitScope();
         Symbol? condExpr = symbolTable.GetSymbol(exp);
         symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
         if (condExpr == null)
@@ -870,23 +862,20 @@ public class stmtTypeChecker : DepthFirstAdapter
         }
         PrintError();
         indent--;
-        symbolTable.ExitScope();
+      
     }
 
     public override void InADowhileStmt(ADowhileStmt node)
     {
         locations.Push(IndentedString($"in do-while loop {node}\n"));
         indent++;
-        symbolTable.EnterScope();
+        symbolTable = symbolTable.EnterScope();
     }
 
     public override void OutADowhileStmt(ADowhileStmt node)
     {
         Node? exp = node.GetExp();
-        if (exp is AIdExp id)
-        {
-            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
-        }
+        symbolTable = symbolTable.ExitScope();
         Symbol? condExpr = symbolTable.GetSymbol(exp);
         symbolTable.AddNode(node, condExpr == Symbol.Bool ? Symbol.Bool: Symbol.NotOk);
         if (condExpr == null)
@@ -899,7 +888,6 @@ public class stmtTypeChecker : DepthFirstAdapter
         }
         PrintError();
         indent--;
-        symbolTable.ExitScope();
     }
 
     public override void InADelayStmt(ADelayStmt node)

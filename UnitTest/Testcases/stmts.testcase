@@ -202,13 +202,14 @@ func untypedthree(){
       } 
 }
 func untypedfour(){
-      int b = 3;
+      int b = 7;
       int a = 4;
       bool c = true;
       do{
         a++;
       }while (a!= 10)
 }
+
 ////
 
 ////

@@ -172,6 +172,7 @@ public class FunctionVisitor : DepthFirstAdapter
                 symbolTable.AddNodeToUnit(node, unit);
             }
         }
+        
     }
 
 
@@ -269,6 +270,7 @@ public class FunctionVisitor : DepthFirstAdapter
                     break;
             }
         }
+        
     }
 
     public override void CaseALoopGlobal(ALoopGlobal node)

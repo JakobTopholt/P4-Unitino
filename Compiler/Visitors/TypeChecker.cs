@@ -188,6 +188,7 @@ public class TypeChecker : exprTypeChecker
         if (symbolTable._parent == null)
         {
             symbolTable = symbolTable.EnterScope().ExitScope();
+            symbolTable = symbolTable.ResetScope();
         }
         else
         {
@@ -246,6 +247,7 @@ public class TypeChecker : exprTypeChecker
         if (symbolTable._parent == null)
         {
             symbolTable = symbolTable.EnterScope().ExitScope();
+            symbolTable = symbolTable.ResetScope();
         }
         else
         {
@@ -394,46 +396,6 @@ public class TypeChecker : exprTypeChecker
         reported = false;
         indent--;
     }
-    public override void InADeclstmtGlobal(ADeclstmtGlobal node)
-    {
-        locations.Push(IndentedString($"In a global declaration: {node.GetStmt()}\n"));
-        indent++;
-        PStmt globalStmt = node.GetStmt();
-
-        if (globalStmt is ADeclStmt decl)
-        {
-            if (symbolTable.IsInCurrentScope(decl.GetId()))
-            {
-                symbolTable.AddNode(node, Symbol.NotOk);
-                tempResult += IndentedString($"The id: {decl.GetId()} has already been declared before");
-            }
-        } else if (globalStmt is ADeclassStmt declass)
-        {
-            if (symbolTable.IsInCurrentScope(declass.GetId()))
-            {
-                symbolTable.AddNode(node, Symbol.NotOk);
-                tempResult += IndentedString($"The id: {declass.GetId()} has already been declared before");
-            }
-        }
-    }
-    public override void OutADeclstmtGlobal(ADeclstmtGlobal node)
-    {
-        PStmt globalStmt = node.GetStmt();
-        if (symbolTable.GetSymbol(node) == null)
-        {
-            if (globalStmt is ADeclStmt decl)
-            {
-                symbolTable.AddNode(node, symbolTable.GetSymbol(decl) != Symbol.NotOk ? Symbol.Ok : Symbol.NotOk);
-
-            }
-            else if (globalStmt is ADeclassStmt declass)
-            {
-                symbolTable.AddNode(node, symbolTable.GetSymbol(declass) != Symbol.NotOk ? Symbol.Ok : Symbol.NotOk);
-            }
-        }
-        PrintError();
-        indent--;
-        locations.Clear();
-    }
+    
 
 }
