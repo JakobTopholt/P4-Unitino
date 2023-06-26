@@ -309,9 +309,6 @@ func untypedfour(){
             }while (a!= 10)
 }
 ////
-
 ////
-
-
 ////
 false
