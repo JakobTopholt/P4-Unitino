@@ -125,7 +125,7 @@ float UTimems(float value) {
     return value;
 }
 float UTimes(float value) {
-    return value*1000;
+    return value * 1000;
 }
 void setup() {
     float a = 1000;
@@ -136,7 +136,7 @@ void setup() {
 String Fb(int b) {
     String c = String(""hello "");
     for(int i = 0; i < b; i++) {
-        c += String(i)+String("", "");
+        c += String(i) + String("", "");
     }
     return c;
 }";

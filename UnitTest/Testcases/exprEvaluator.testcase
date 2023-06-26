@@ -25,7 +25,7 @@ prog {
 }
 
 unit Time {
-    ms => (value * 50) * ((5*5) * 50.2);
+    ms => (value * 50) * ((5 * 5) * 50.2);
 }
 ////
 ////
@@ -35,7 +35,7 @@ void setup() {
     float a = 3137500;
 }
 float UTimems(float value) {
-    return (value*50)*((5*5)*50.2);
+    return (value * 50) * ((5 * 5) * 50.2);
 }
 //////
 Plus
@@ -45,7 +45,7 @@ prog {
 }
 
 unit Time {
-    ms => (value + 50) + ((5+5) + 50.2);
+    ms => (value + 50) + ((5 + 5) + 50.2);
 }
 ////
 ////
@@ -55,7 +55,7 @@ void setup() {
     float a = 160.2;
 }
 float UTimems(float value) {
-    return (value+50)+((5+5)+50.2);
+    return (value + 50) + ((5 + 5) + 50.2);
 }
 //////
 Plus3
@@ -65,7 +65,7 @@ prog {
 }
 
 unit Time {
-    ms => 2+("hej"+1)+("alo"+1.2)+(1.1+"aye") == "hej"?50*value:5*value;
+    ms => 2 + ("hej" + 1) + ("alo" + 1.2) + (1.1 + "aye") == "hej" ? 50 * value : 5 * value;
 }
 ////
 ////
@@ -75,7 +75,7 @@ void setup() {
     float a = 250;
 }
 float UTimems(float value) {
-    return String(2)+(String("hej")+String(1))+(String("alo")+String(1.2))+(String(1.1)+String("aye")) == String("hej")?50*value:5*value;
+    return String(2) + (String("hej") + String(1)) + (String("alo") + String(1.2)) + (String(1.1) + String("aye")) == String("hej") ? 50 * value : 5 * value;
 }
 //////
 Equals
@@ -87,9 +87,9 @@ prog {
 }
 
 unit Time {
-    ms => 5 == 5 || true ? value : value*5;
-    s => 2.2 == 2.2 && 2.0 == 2 || 2 == 2.0 || "hey" == 5 && "5" == 5 && "2.2" == 2.2 && 2.2 == "2.2" ? value : value*5;
-    h => true == false ? value : value-2;
+    ms => 5 == 5 || true ? value : value * 5;
+    s => 2.2 == 2.2 && 2.0 == 2 || 2 == 2.0 || "hey" == 5 && "5" == 5 && "2.2" == 2.2 && 2.2 == "2.2" ? value : value * 5;
+    h => true == false ? value : value - 2;
 }
 ////
 ////
@@ -101,13 +101,13 @@ void setup() {
     float c = -1;
 }
 float UTimems(float value) {
-    return 5 == 5 || true?value:value*5;
+    return 5 == 5 || true ? value : value * 5;
 }
 float UTimes(float value) {
-    return 2.2 == 2.2 && 2.0 == 2 || 2 == 2.0 || String("hey") == String(5) && String("5") == String(5) && String("2.2") == String(2.2) && String(2.2) == String("2.2")?value:value*5;
+    return 2.2 == 2.2 && 2.0 == 2 || 2 == 2.0 || String("hey") == String(5) && String("5") == String(5) && String("2.2") == String(2.2) && String(2.2) == String("2.2") ? value : value * 5;
 }
 float UTimeh(float value) {
-    return true == false?value:value-2;
+    return true == false ? value : value - 2;
 }
 //////
 Equals2
@@ -127,7 +127,7 @@ void setup() {
     float a = 100;
 }
 float UTimems(float value) {
-    return String(5) == String("5") || String(2.5) == String("2.5") || String("2.5") == String(2.5)?value:value*2;
+    return String(5) == String("5") || String(2.5) == String("2.5") || String("2.5") == String(2.5) ? value : value * 2;
 }
 //////
 Equals3
@@ -137,7 +137,7 @@ prog {
 }
 
 unit Time {
-    ms => 5 == 5.0 && "5" == 5 ? value : value*2;
+    ms => 5 == 5.0 && "5" == 5 ? value : value * 2;
 }
 ////
 ////
@@ -147,7 +147,7 @@ void setup() {
     float a = 100;
 }
 float UTimems(float value) {
-    return 5 == 5.0 && String("5") == String(5)?value:value*2;
+    return 5 == 5.0 && String("5") == String(5) ? value : value * 2;
 }
 //////
 Minus
@@ -167,7 +167,7 @@ void setup() {
     float a = 37.100002;
 }
 float UTimems(float value) {
-    return 2.1-((2-1)-1.2-(1-0.5))*value;
+    return 2.1 - ((2 - 1) - 1.2 - (1 - 0.5)) * value;
 }
 //////
 Divide
@@ -187,7 +187,7 @@ void setup() {
     float a = -25.8;
 }
 float UTimems(float value) {
-    return (value/(2/2))/(2/-1.0)+1.2/1+-2;
+    return (value / (2 / 2)) / (2 / -1.0) + 1.2 / 1 + -2;
 }
 //////
 NotEquals
@@ -199,8 +199,8 @@ prog {
 }
 
 unit Time {
-    ms => 5 != 5 && true ? value : value*5;
-    s => 2.2 != 2.2 && 2.0 != 2 && 2 != 2.0 && "hey" != 5 && "5" != 5 && "2.2" != 2.2 && 2.2 != "2.2" ? value : value*5;
+    ms => 5 != 5 && true ? value : value * 5;
+    s => 2.2 != 2.2 && 2.0 != 2 && 2 != 2.0 && "hey" != 5 && "5" != 5 && "2.2" != 2.2 && 2.2 != "2.2" ? value : value  *5;
     h => true != false ? value : value-2;
 }
 ////
@@ -213,13 +213,13 @@ void setup() {
     float c = 1;
 }
 float UTimems(float value) {
-    return 5 != 5 && true?value:value*5;
+    return 5 != 5 && true ? value : value * 5;
 }
 float UTimes(float value) {
-    return 2.2 != 2.2 && 2.0 != 2 && 2 != 2.0 && String("hey") != String(5) && String("5") != String(5) && String("2.2") != String(2.2) && String(2.2) != String("2.2")?value:value*5;
+    return 2.2 != 2.2 && 2.0 != 2 && 2 != 2.0 && String("hey") != String(5) && String("5") != String(5) && String("2.2") != String(2.2) && String(2.2) != String("2.2") ? value : value * 5;
 }
 float UTimeh(float value) {
-    return true != false?value:value-2;
+    return true != false ? value : value - 2;
 }
 //////
 NotEquals2
@@ -229,7 +229,7 @@ prog {
 }
 
 unit Time {
-    ms => 5 != "5" && 2.5 != "2.5" && "2.5" != 2.5 ? value : value*2;
+    ms => 5 != "5" && 2.5 != "2.5" && "2.5" != 2.5 ? value : value * 2;
 }
 ////
 ////
@@ -239,7 +239,7 @@ void setup() {
     float a = 50;
 }
 float UTimems(float value) {
-    return String(5) != String("5") && String(2.5) != String("2.5") && String("2.5") != String(2.5)?value:value*2;
+    return String(5) != String("5") && String(2.5) != String("2.5") && String("2.5") != String(2.5) ? value : value * 2;
 }
 //////
 NotEquals3
@@ -249,7 +249,7 @@ prog {
 }
 
 unit Time {
-    ms => "a" != "b" && "2" != 1 && 1.2 != 1 && 1 != 1.0 ? value : value*5;
+    ms => "a" != "b" && "2" != 1 && 1.2 != 1 && 1 != 1.0 ? value : value * 5;
 }
 ////
 ////
@@ -259,7 +259,7 @@ void setup() {
     float a = 250;
 }
 float UTimems(float value) {
-    return String("a") != String("b") && String("2") != String(1) && 1.2 != 1 && 1 != 1.0?value:value*5;
+    return String("a") != String("b") && String("2") != String(1) && 1.2 != 1 && 1 != 1.0 ? value : value * 5;
 }
 //////
 Remainder
@@ -279,7 +279,7 @@ void setup() {
     float a = 52;
 }
 float UTimems(float value) {
-    return value+5 % 3;
+    return value + 5 % 3;
 }
 //////
 LessGreater
@@ -292,10 +292,10 @@ prog {
 }
 
 unit Time {
-    ms => 7 < 5 || 7 <= 5 || 5 >= 7 || 3 > 6 ? value : value+2;
-    s => 7.0 < 5.0 || 7.0 <= 5.0 || 5.0 >= 7.0 || 3.0 > 6.0 ? value : value+2;
-    h => 7.0 < 5 || 7.0 <= 5 || 5.0 >= 7 || 3.0 > 6 ? value : value+2;
-    d => 7 < 5.0 || 7 <= 5.0 || 5 >= 7.0 || 3 > 6.0 ? value : value+2;
+    ms => 7 < 5 || 7 <= 5 || 5 >= 7 || 3 > 6 ? value : value + 2;
+    s => 7.0 < 5.0 || 7.0 <= 5.0 || 5.0 >= 7.0 || 3.0 > 6.0 ? value : value + 2;
+    h => 7.0 < 5 || 7.0 <= 5 || 5.0 >= 7 || 3.0 > 6 ? value : value + 2;
+    d => 7 < 5.0 || 7 <= 5.0 || 5 >= 7.0 || 3 > 6.0 ? value : value + 2;
 }
 ////
 ////
@@ -308,16 +308,16 @@ void setup() {
     float d = 7;
 }
 float UTimems(float value) {
-    return 7 < 5 || 7 <= 5 || 5 >= 7 || 3 > 6?value:value+2;
+    return 7 < 5 || 7 <= 5 || 5 >= 7 || 3 > 6 ? value : value + 2;
 }
 float UTimes(float value) {
-    return 7.0 < 5.0 || 7.0 <= 5.0 || 5.0 >= 7.0 || 3.0 > 6.0?value:value+2;
+    return 7.0 < 5.0 || 7.0 <= 5.0 || 5.0 >= 7.0 || 3.0 > 6.0 ? value : value + 2;
 }
 float UTimeh(float value) {
-    return 7.0 < 5 || 7.0 <= 5 || 5.0 >= 7 || 3.0 > 6?value:value+2;
+    return 7.0 < 5 || 7.0 <= 5 || 5.0 >= 7 || 3.0 > 6 ? value : value + 2;
 }
 float UTimed(float value) {
-    return 7 < 5.0 || 7 <= 5.0 || 5 >= 7.0 || 3 > 6.0?value:value+2;
+    return 7 < 5.0 || 7 <= 5.0 || 5 >= 7.0 || 3 > 6.0 ? value : value + 2;
 }
 //////
 LogicalNot
@@ -327,7 +327,7 @@ prog {
 }
 
 unit Time {
-    ms => !true || !false ? value : value*2;
+    ms => !true || !false ? value : value * 2;
 }
 ////
 ////
@@ -337,5 +337,5 @@ void setup() {
     float a = 50;
 }
 float UTimems(float value) {
-    return !true || !false?value:value*2;
+    return !true || !false ? value : value * 2;
 }

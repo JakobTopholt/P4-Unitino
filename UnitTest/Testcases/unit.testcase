@@ -38,7 +38,7 @@ float Uunit2ms(float value) {
     return value;
 }
 float Uunit2s(float value) {
-    return value*1000;
+    return value * 1000;
 }
 ////
 true
@@ -67,7 +67,7 @@ float Uunit3ms(float value) {
     return value;
 }
 float Uunit4s(float value) {
-    return value*1000;
+    return value * 1000;
 }
 ////
 true

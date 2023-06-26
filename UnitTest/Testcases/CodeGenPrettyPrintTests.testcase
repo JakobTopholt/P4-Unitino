@@ -15,6 +15,7 @@ prog {
     p += 1;
     p -= 2;
     ++p;
+    p++;
     p--;
     --p;
     p = --p;
@@ -24,21 +25,46 @@ prog {
     p = -p;
     char c = 'e';
     bool d = true;
-    string l = d?"ja":"nej";
+    string l = d ? "ja" : "nej";
     decimal e = 1.11;
     string b = (string)e;
     bool t = boolTest(d, a);
     Time j = 50ms;
-    pintTest(1, h, j);
+    pinTest(1, h, j);
     unitTest(1);
+    Time s = 50ms / 5s;
+    s = 50ms / 5;
+    s = 50 / 5;
+    s = 50ms * 5s;
+    s = 50 * 5;
+    s = 50ms * 5;
+    s = 5 / 50ms;
+    s = 5 * 50ms;
+    s = 5 + 50;
+    s = 5 - 50;
+    s = 5 % 50;
+    s = -5;
+    a = (int)e;
     Time m;
+    char y;
+    y = 'c';
+    charTest(y);
+    y = charTest(y);
+    if(y == 'c') {
+        y = y;
+    }
     argTest(a, b, c, d, e);
     if(a < 5) {
-        for(int i = 0; i < 6; i++) {
+        for(int i = 0; i > 6; i++) {
+            for(int j = 0; j < 6; j++) {
+            }
             a++;
         }
     }
     else if(a > 5 && p >= 6) {
+        for(int j = 0; j < 6; j++) {
+            a++;
+        }
         do {
             a++;
         } while(a < 10 || p <= 5)
@@ -56,8 +82,14 @@ prog {
 }
 loop {
 }
+func untypedTest() {
+}
+char charTest(char y) {
+    return 'g';
+}
 unit Time {
     ms => value;
+    s => value * 10;
 }
 bool boolTest(bool p, int a) {
     return p;
@@ -71,6 +103,9 @@ Time unitTest(int a) {
 int argTest(int a, string b, char c, bool d, decimal e) {
     int f;
     return a;
+}
+decimal decimalTest(int a) {
+    return 3.7;
 }
 ////
 prog {
@@ -88,6 +123,7 @@ prog {
     p += 1;
     p -= 2;
     ++p;
+    p++;
     p--;
     --p;
     p = --p;
@@ -102,16 +138,41 @@ prog {
     string b = (string)e;
     bool t = boolTest(d, a);
     Time j = 50ms;
-    pintTest(1, h, j);
+    pinTest(1, h, j);
     unitTest(1);
+    Time s = 50ms / 5s;
+    s = 50ms / 5;
+    s = 50 / 5;
+    s = 50ms * 5s;
+    s = 50 * 5;
+    s = 50ms * 5;
+    s = 5 / 50ms;
+    s = 5 * 50ms;
+    s = 5 + 50;
+    s = 5 - 50;
+    s = 5 % 50;
+    s = -5;
+    a = (int)e;
     Time m;
+    char y;
+    y = 'c';
+    charTest(y);
+    y = charTest(y);
+    if(y == 'c') {
+        y = y;
+    }
     argTest(a, b, c, d, e);
     if(a < 5) {
-        for(int i = 0; i < 6; i++) {
+        for(int i = 0; i > 6; i++) {
+            for(int j = 0; j < 6; j++) {
+            }
             a++;
         }
     }
     else if(a > 5 && p >= 6) {
+        for(int j = 0; j < 6; j++) {
+            a++;
+        }
         do {
             a++;
         } while(a < 10 || p <= 5)
@@ -129,8 +190,14 @@ prog {
 }
 loop {
 }
+func untypedTest() {
+}
+char charTest(char y) {
+    return 'g';
+}
 unit Time {
     ms => value;
+    s => value * 10;
 }
 bool boolTest(bool p, int a) {
     return p;
@@ -145,41 +212,119 @@ int argTest(int a, string b, char c, bool d, decimal e) {
     int f;
     return a;
 }
-////
-float Timems(float value) {
-    return value;
+decimal decimalTest(int a) {
+    return 3.7;
 }
+////
 void setup() {
     delay(100);
     int h = 11;
     pinMode(11, INPUT);
+    pinMode(11, OUTPUT);
+    pinMode(11, INPUT_PULLUP);
     digitalWrite(11, HIGH);
-    int a = 2;
+    digitalWrite(11, LOW);
+    int a = digitalRead(11);
     int p = 5;
+    a = p;
+    p = 4;
+    p += 1;
+    p -= 2;
+    ++p;
+    p++;
+    p--;
+    --p;
+    p = --p;
+    p = ++p;
+    p = p--;
+    p = p++;
+    p = -p;
     char c = 'e';
     bool d = true;
-    String l = d?String("ja"):String("nej");
+    String l = d ? String("ja") : String("nej");
     float e = 1.11;
     String b = String(e, 6);
+    bool t = FboolTest(d, a);
+    float j = 50;
+    FpinTest(1, h, j);
+    FunitTest(1);
+    float s = 50 / 50;
+    s = 50 / 5;
+    s = 50 / 5;
+    s = 50 * 50;
+    s = 50 * 5;
+    s = 50 * 5;
+    s = 5 / 50;
+    s = 5 * 50;
+    s = 5 + 50;
+    s = 5 - 50;
+    s = 5 % 50;
+    s = -5;
+    a = (int)e;
+    float m;
+    char y;
+    y = 'c';
+    FcharTest(y);
+    y = FcharTest(y);
+    if(y == 'c') {
+        y = y;
+    }
     FargTest(a, b, c, d, e);
-    boolTest(d);
-    pintTest(1);
-    unitTest(1);
+    if(a < 5) {
+        for(int i = 0; i > 6; i++) {
+            for(int j = 0; j < 6; j++) {
+            }
+            a++;
+        }
+    }
+    else if(a > 5 && p >= 6) {
+        for(int j = 0; j < 6; j++) {
+            a++;
+        }
+        do {
+            a++;
+        } while(a < 10 || p <= 5);
+    }
+    else {
+        while(a > 2) {
+            a++;
+            if(d == true && d != false) {
+                d = false;
+                a = a % p;
+                d = !d;
+            }
+        }
+    }
+    int z = 1;
 }
-void loop {
+void loop() {
 }
-bool boolTest(bool p) {
+void FuntypedTest() {
+}
+char FcharTest(char y) {
+    return 'g';
+}
+float UTimems(float value) {
+    return value;
+}
+float UTimes(float value) {
+    return value * 10;
+}
+bool FboolTest(bool p, int a) {
     return p;
 }
-int pinTest(int a) {
+int FpinTest(int a, int h, float j) {
     return a;
 }
-float unitTest(int a) {
+float FunitTest(int a) {
     return a;
 }
 int FargTest(int a, String b, char c, bool d, float e) {
     int f;
     return a;
+}
+float FdecimalTest(int a) {
+    return 3.7;
 }
 ////
 true

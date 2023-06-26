@@ -1,11 +1,15 @@
 ﻿lmao xD
 ////
+prog {
+}
+loop {
+}
 string function3(char a, char b, char c) {
     string d = (string)a;
     return d;
 }
 decimal function4(int a) {
-    decimal d = 3.5 + a ;
+    decimal d = 3.5 + a;
     char g = 'o';
     char b = 'b';
     char c = 'c';
@@ -13,7 +17,22 @@ decimal function4(int a) {
     return d;
 }
 ////
-
+prog {
+}
+loop {
+}
+string function3(char a, char b, char c) {
+    string d = (string)a;
+    return d;
+}
+decimal function4(int a) {
+    decimal d = 3.5 + a;
+    char g = 'o';
+    char b = 'b';
+    char c = 'c';
+    string test = function3(g, b, c);
+    return d;
+}
 ////
 void setup() {
 }
@@ -24,7 +43,7 @@ String Ffunction3(char a, char b, char c) {
     return d;
 }
 float Ffunction4(int a) {
-    float d = 3.5+a;
+    float d = 3.5 + a;
     char g = 'o';
     char b = 'b';
     char c = 'c';

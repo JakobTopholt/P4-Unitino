@@ -55,7 +55,6 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         {
             // scoped
             case AWhileStmt:
-            case ADowhileStmt:
             case AForStmt:
             case AIfStmt:
             case AElseStmt:
@@ -76,6 +75,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             case ADelayStmt:
             case ASetpinStmt:
             case AWritepinStmt:
+            case ADowhileStmt:
                 writer.WriteLine(";");                    
                 break;
         }
@@ -145,7 +145,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         InATypedGlobal(node);
         switch (node.GetType())
         {
-            case AIntType:
+            case AIntType or APinType:
                 Indent("int ");
                 break;
             case ADecimalType:
@@ -220,7 +220,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             case Symbol.Func:
                 Indent("void ");
                 break;
-            case Symbol.Int:
+            case Symbol.Int or Symbol.Pin:
                 Indent("int ");
                 break;
             case Symbol.String:
@@ -283,6 +283,12 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             case APinType:
                 Indent("int ");
                 break;
+        }
+        if (node.GetType() is AUnitType customType)
+        {
+            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
+            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
+            Indent(($"float "));
         }
         node.GetId().Apply(this);
     }
@@ -432,20 +438,22 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             case AStringType:
                 Indent("String ");
                 break;
-            case APinType:
-                Indent("int ");
-                break;
         }
     }
-    
+
+    public override void CaseAPinType(APinType node)
+    {
+        Indent("int ");
+    }
+
     /*---------------------------------------------ExpStmt------------------------------------------------------------*/
     public override void CaseATernaryExp(ATernaryExp node)
     {
         writer.Write("");
         node.GetCond().Apply(this);
-        writer.Write("?");
+        writer.Write(" ? ");
         node.GetTrue().Apply(this);
-        writer.Write(":");
+        writer.Write(" : ");
         node.GetFalse().Apply(this);
     }
 
@@ -642,22 +650,22 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     /*--------------------------------- CaseExp ----------------------------------------------------------------------*/
     public override void CaseADivideExp(ADivideExp node)
     {
-        Precedence(node.GetL(),node.GetR(),"/");
+        Precedence(node.GetL(),node.GetR()," / ");
     }
 
     public override void CaseAMultiplyExp(AMultiplyExp node)
     {
-        Precedence(node.GetL(),node.GetR(),"*");
+        Precedence(node.GetL(),node.GetR()," * ");
     }
 
     public override void CaseAPlusExp(APlusExp node)
     {
-        Precedence(node.GetL(),node.GetR(),"+");
+        Precedence(node.GetL(),node.GetR()," + ");
     }
 
     public override void CaseAMinusExp(AMinusExp node)
     {
-        Precedence(node.GetL(),node.GetR(),"-");
+        Precedence(node.GetL(),node.GetR()," - ");
     }
 
     public override void CaseANumberExp(ANumberExp node)
@@ -861,15 +869,10 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     {
         writer.WriteLine("}");
     }
-
-    public override void CaseADenUnituse(ADenUnituse node)
+    
+    public override void CaseAUnitType(AUnitType node)
     {
-        Indent("0" + node.GetId());
-    }
-
-    public override void CaseANumUnituse(ANumUnituse node)
-    {
-        Indent("1" + node.GetId());
+        Indent("float ");
     }
 
     public override void CaseAUnitdecimalExp(AUnitdecimalExp node)

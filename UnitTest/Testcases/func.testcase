@@ -4,13 +4,13 @@ func NormalFunc(int b, int a) {
     int i = 0;
 }
 prog {
-    int i = 0;
+    int l = 0;
     NormalFunc(5, 7);
-    bool b = false;
-    bool c = (bool)b;
-    decimal a = (decimal)i;
+    bool k = false;
+    bool j = (bool)k;
+    decimal a = (decimal)l;
     int b = (int)a;
-    char c = (char)i;
+    char c = (char)l;
     int d;
     bool e;
     char f;
@@ -42,13 +42,13 @@ func NormalFunc(int b, int a) {
     int i = 0;
 }
 prog {
-    int i = 0;
+    int l = 0;
     NormalFunc(5, 7);
-    bool b = false;
-    bool c = (bool)b;
-    decimal a = (decimal)i;
+    bool k = false;
+    bool j = (bool)k;
+    decimal a = (decimal)l;
     int b = (int)a;
-    char c = (char)i;
+    char c = (char)l;
     int d;
     bool e;
     char f;
@@ -80,8 +80,19 @@ void FNormalFunc(int b, int a) {
     int i = 0;
 }
 void setup() {
-    int i = 0;
+    int l = 0;
     FNormalFunc(5, 7);
+    bool k = false;
+    bool j = (bool)k;
+    float a = (float)l;
+    int b = (int)a;
+    char c = (char)l;
+    int d;
+    bool e;
+    char f;
+    float g;
+    String h;
+    int i;
 }
 void loop() {
     int f = 0;
@@ -95,7 +106,7 @@ char Ffunction3(char a, char b, char c) {
     return d;
 }
 float Ffunction4(int i) {
-    float d = 3.5+i;
+    float d = 3.5 + i;
     char a = 'a';
     char b = 'b';
     char c = 'c';
