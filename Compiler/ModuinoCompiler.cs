@@ -54,7 +54,8 @@ internal static class ModuinoCompiler
         // pass for global declarations
         start.Apply(new FunctionVisitor(symbolTable, globalFunctionCheck));
         start.Apply(new TypeChecker(symbolTable));
-
+        
+        
         // Codegen Visitor
         await using FileStream stream = File.Create(outPath);
         await using StreamWriter writer = new(stream);
