@@ -39,7 +39,13 @@ public class SymbolTable
     public SymbolTable EnterScope()
     {
         currentScope++;
-        return ++_currentTable < _allTables.Count ? _allTables[_currentTable] : new SymbolTable(this, _allTables, _currentTable, currentScope);
+        if (++_currentTable < _allTables.Count)
+        {
+            _allTables[_currentTable]._currentTable = _currentTable;
+            return _allTables[_currentTable];
+        }
+        else
+            return new SymbolTable(this, _allTables, _currentTable, currentScope);
     }
 
     public SymbolTable ExitScope()
@@ -59,8 +65,8 @@ public class SymbolTable
         {
             table = table._parent;
         }
-        currentScope = 0;
-        _currentTable = 0;
+        table.currentScope = 0;
+        table._currentTable = 0;
         return table;
     }
     public bool IsInCurrentScope(TId id) => _idToNode.ContainsKey(id.ToString().Trim());
