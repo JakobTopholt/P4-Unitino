@@ -32,7 +32,7 @@ unit Time {
 void loop() {
 }
 void setup() {
-    float a = 31375000;
+    float a = 3137500;
 }
 float UTimems(float value) {
     return (value*50)*((5*5)*50.2);
@@ -52,7 +52,7 @@ unit Time {
 void loop() {
 }
 void setup() {
-    float a = 612;
+    float a = 160.2;
 }
 float UTimems(float value) {
     return (value+50)+((5+5)+50.2);
@@ -97,7 +97,7 @@ void loop() {
 }
 void setup() {
     float a = 50;
-    float b = 5;
+    float b = 1;
     float c = -1;
 }
 float UTimems(float value) {
@@ -130,6 +130,26 @@ float UTimems(float value) {
     return String(5) == String("5") || String(2.5) == String("2.5") || String("2.5") == String(2.5)?value:value*2;
 }
 //////
+Equals3
+////
+prog {
+    Time a = 50ms;
+}
+
+unit Time {
+    ms => 5 == 5.0 && "5" == 5 ? value : value*2;
+}
+////
+////
+void loop() {
+}
+void setup() {
+    float a = 100;
+}
+float UTimems(float value) {
+    return 5 == 5.0 && String("5") == String(5)?value:value*2;
+}
+//////
 Minus
 ////
 prog {
@@ -144,7 +164,7 @@ unit Time {
 void loop() {
 }
 void setup() {
-    float a = 371;
+    float a = 37.100002;
 }
 float UTimems(float value) {
     return 2.1-((2-1)-1.2-(1-0.5))*value;
@@ -164,7 +184,7 @@ unit Time {
 void loop() {
 }
 void setup() {
-    float a = -240;
+    float a = -25.8;
 }
 float UTimems(float value) {
     return (value/(2/2))/(2/-1.0)+1.2/1+-2;
@@ -236,7 +256,7 @@ unit Time {
 void loop() {
 }
 void setup() {
-    float a = 50;
+    float a = 250;
 }
 float UTimems(float value) {
     return String("a") != String("b") && String("2") != String(1) && 1.2 != 1 && 1 != 1.0?value:value*5;
@@ -260,4 +280,62 @@ void setup() {
 }
 float UTimems(float value) {
     return value+5 % 3;
+}
+//////
+LessGreater
+////
+prog {
+    Time a = 50ms;
+    Time b = 1s;
+    Time c = 3h;
+    Time d = 5d;
+}
+
+unit Time {
+    ms => 7 < 5 || 7 <= 5 || 5 >= 7 || 3 > 6 ? value : value+2;
+    s => 7.0 < 5.0 || 7.0 <= 5.0 || 5.0 >= 7.0 || 3.0 > 6.0 ? value : value+2;
+    h => 7.0 < 5 || 7.0 <= 5 || 5.0 >= 7 || 3.0 > 6 ? value : value+2;
+    d => 7 < 5.0 || 7 <= 5.0 || 5 >= 7.0 || 3 > 6.0 ? value : value+2;
+}
+////
+////
+void loop() {
+}
+void setup() {
+    float a = 52;
+    float b = 3;
+    float c = 5;
+    float d = 7;
+}
+float UTimems(float value) {
+    return 7 < 5 || 7 <= 5 || 5 >= 7 || 3 > 6?value:value+2;
+}
+float UTimes(float value) {
+    return 7.0 < 5.0 || 7.0 <= 5.0 || 5.0 >= 7.0 || 3.0 > 6.0?value:value+2;
+}
+float UTimeh(float value) {
+    return 7.0 < 5 || 7.0 <= 5 || 5.0 >= 7 || 3.0 > 6?value:value+2;
+}
+float UTimed(float value) {
+    return 7 < 5.0 || 7 <= 5.0 || 5 >= 7.0 || 3 > 6.0?value:value+2;
+}
+//////
+LogicalNot
+////
+prog {
+    Time a = 50ms;
+}
+
+unit Time {
+    ms => !true || !false ? value : value*2;
+}
+////
+////
+void loop() {
+}
+void setup() {
+    float a = 50;
+}
+float UTimems(float value) {
+    return !true || !false?value:value*2;
 }

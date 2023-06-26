@@ -59,7 +59,7 @@ public class ExprEvaluator : DepthFirstAdapter
 
     public override void OutADecimalExp(ADecimalExp node)
     {
-        values.Add(node, float.Parse(node.GetDecimal().ToString()));
+        values.Add(node, float.Parse(node.GetDecimal().ToString(), CultureInfo.InvariantCulture));
     }
 
     public override void OutAMinusExp(AMinusExp node)
