@@ -85,8 +85,8 @@ public static class ArduinoCompiler
     private static readonly Regex InoFilePathRegex = new(@"C:\\.*\.ino");
     public static async Task<bool> Compile(string folder, string? portName, string? boardFqbn)
     {
-        string install = boardFqbn ?? "arduino:avr";
         boardFqbn ??= "arduino:avr:uno"; //arduino-cli.exe  arduino:avr            core install arduino:avr
+        string install = boardFqbn.Remove(boardFqbn.LastIndexOf(":", StringComparison.Ordinal));
         
         Process downloadCoreProcess = ArduinoCli($"core install {install}", true);
         downloadCoreProcess.Start();
