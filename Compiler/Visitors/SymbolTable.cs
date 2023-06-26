@@ -20,16 +20,20 @@ public class SymbolTable
     public readonly SymbolTable? _parent;
     private readonly Dictionary<string, Node> _idToNode = new();
     public readonly Dictionary<Node, Symbol> _nodeToSymbol = new();
-    
-    public readonly Dictionary<string, AUnitdeclGlobal> IdToUnitDecl = new();
+
+    private readonly Dictionary<string, AUnitdeclGlobal> IdToUnitDecl = new();
     public readonly Dictionary<Node, (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>)> NodeToUnit = new();
-    
+
     private readonly Dictionary<string, Node> _funcIdToNode = new();
     private readonly Dictionary<Node, List<PType>> _nodeToArgs = new();
     public int Prog = 0;
     public int Loop = 0;
 
-    
+    // ms -> it's exp. Used by codegen to evaluate the unit at compiletime
+    private readonly Dictionary<string, PExp> idToSubUnit = new();
+    public void AddSubUnitExp(ASubunit unit) => _allTables[0].idToSubUnit.Add(unit.GetId().Text.Trim(), unit.GetExp());
+    public PExp GetSubUnitExp(TId key) => _allTables[0].idToSubUnit[key.Text.Trim()];
+
     
     // General methods
     public SymbolTable EnterScope()

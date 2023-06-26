@@ -24,11 +24,11 @@ float UTimes(float value) {
     return value*1000;
 }
 float FUnitFunc() {
-    float a = 1/UTimems(50);
+    float a = 1/50;
     return a;
 }
 void setup() {
-    float a = 1/UTimems(50);
+    float a = 1/50;
 }
 void loop() {
     float c = 200.0;
@@ -68,8 +68,8 @@ float UTimes(float value) {
 }
 void setup() {
     float e = 3.7;
-    float a = 1/UTimems(50.3)+1/UTimes(5);
-    float b = 1/UTimems(50)-1/UTimes(5);
+    float a = 1/50.3+1/5000;
+    float b = 1/50-1/5000;
 }
 ////
 true

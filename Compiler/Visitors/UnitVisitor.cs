@@ -100,6 +100,7 @@ public class UnitVisitor : DepthFirstAdapter
             }
             symbolTable.AddNode(node, Symbol.Decimal);
             symbolTable.AddIdToUnitdecl(node.GetId().ToString().Trim(), (AUnitdeclGlobal) node.Parent());
+            symbolTable.AddSubUnitExp(node);
         }
         else
         {

@@ -252,7 +252,7 @@ Productions
                 | {funccall}        id l_par params? r_par                  {-> New exp.funccall(id, [params.exp])} // <- array and structaccess goes here
                 | p0 {-> p0.exp};
     p0 {-> exp} = {id}              id {-> New exp.id(id)}
-                | {readpin} treadpin l_par exp r_par                        {-> New exp.readpin(exp.exp)}
+                | {readpin}         treadpin l_par exp r_par                {-> New exp.readpin(exp.exp)}
                 | {decimal}         decimal                                 {-> New exp.decimal(decimal)}
                 | {unit}            unitnumber                              {-> unitnumber.exp}
                 | {value}           tvalue                                  {-> New exp.value()}
@@ -260,7 +260,7 @@ Productions
                 | {boolean}         boolean                                 {-> New exp.boolean(boolean.boolean)}
                 | {string}          string                                  {-> New exp.string(string)}
                 | {char}            char                                    {-> New exp.char(char)}
-                | {exp}             l_par exp r_par                         {-> New exp.exp(exp.exp)};
+                | {pexp}             l_par exp r_par                         {-> New exp.parenthesis(exp.exp)};
                 
     //// Miscellaneous    
     boolean {-> boolean} = {true} ttrue {-> New boolean.true()}
@@ -348,7 +348,7 @@ Abstract Syntax Tree
         | {boolean}         boolean
         | {string}          string
         | {char}            char
-        | {exp}             exp;  
+        | {parenthesis}     exp;  
         
     boolean = {true} | {false};
     

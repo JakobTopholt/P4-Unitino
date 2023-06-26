@@ -12,7 +12,7 @@ public class exprTypeChecker : stmtTypeChecker
 
     }
     
-    public override void OutAExpExp(AExpExp node)
+    public override void OutAParenthesisExp(AParenthesisExp node)
     {
         Node exp = node.GetExp();
         if (exp is AIdExp id)
@@ -634,56 +634,43 @@ public class exprTypeChecker : stmtTypeChecker
         {
             symbolTable.GetNodeFromId(idRight.GetId().ToString().Trim(), out rightExpr);
         }
-        Symbol? leftSymbol = symbolTable.GetSymbol(leftExpr);
-        Symbol? rightSymbol = symbolTable.GetSymbol(rightExpr);
-        switch (leftSymbol)
+        symbolTable.AddNode(node, (symbolTable.GetSymbol(leftExpr), symbolTable.GetSymbol(rightExpr)) switch
         {
-            case Symbol.Int or Symbol.Pin when rightSymbol is Symbol.Int or Symbol.Pin:
-                symbolTable.AddNode(node, Symbol.Int);
-                break;
-            case Symbol.Decimal or Symbol.Int when rightSymbol is Symbol.Decimal or Symbol.Int:
-                symbolTable.AddNode(node, Symbol.Decimal);
-                break;
-            case Symbol.Int or Symbol.Decimal when rightSymbol is Symbol.Decimal:
-                symbolTable.AddNode(node, Symbol.Decimal);
-                break;
-            case Symbol.String when rightSymbol is Symbol.Int or Symbol.String:
-                symbolTable.AddNode(node, Symbol.String);
-                break;
-            case Symbol.Int or Symbol.String when rightSymbol is Symbol.String:
-                symbolTable.AddNode(node, Symbol.String);
-                break;
-            case Symbol.Decimal or Symbol.String when rightSymbol is Symbol.Decimal:
-                symbolTable.AddNode(node, Symbol.String);
-                break;
-            case Symbol.String when rightSymbol is Symbol.String or Symbol.Decimal:
-                symbolTable.AddNode(node, Symbol.String);
-                break;
-            default:
-                // UnitTypes?
-                if (symbolTable.GetUnit(leftExpr, out var unit1) && symbolTable.GetUnit(rightExpr, out var unit2))
-                {
-                    if (symbolTable.CompareUnitTypes(unit1, unit2))
-                    {
-                        symbolTable.AddNodeToUnit(node, unit1);
-                        symbolTable.AddNode(node, Symbol.Ok);
-                    } 
-                    else
-                    {
-                        symbolTable.AddNode(node, Symbol.NotOk);
-                        tempResult += IndentedString("Not the same unitTypes used in expression\n");
-                    }
-                }
-                else
-                {
-                    // not valid input expression
-                    symbolTable.AddNode(node, Symbol.NotOk);
-                    tempResult += IndentedString("Not valid Types used together in expression!\n");
-                }
-                break;
-        }
+            (Symbol.Int, Symbol.Int) => Symbol.Int,
+            (Symbol.Pin, Symbol.Int) => Symbol.Int,
+            (Symbol.Int, Symbol.Pin) => Symbol.Int,
+            (Symbol.Pin, Symbol.Pin) => Symbol.Int,
+            
+            (Symbol.Decimal, Symbol.Decimal) => Symbol.Decimal,
+            (Symbol.Decimal, Symbol.Int) => Symbol.Decimal,
+            (Symbol.Int, Symbol.Decimal) => Symbol.Decimal,
+            
+            (Symbol.String, Symbol.String) => Symbol.String,
+            (Symbol.String, Symbol.Decimal) => Symbol.String,
+            (Symbol.Decimal, Symbol.String) => Symbol.String,
+            (Symbol.String, Symbol.Int) => Symbol.String,
+            (Symbol.Int, Symbol.String) => Symbol.String,
+            _ => SameUnits(node, leftExpr, rightExpr) ? Symbol.Ok : Symbol.NotOk
+        });
         PrintError();
         indent--;
+    }
+
+    private bool SameUnits(Node node, Node leftExpr, Node rightExpr)
+    {
+        if (symbolTable.GetUnit(leftExpr, out var unit1) && symbolTable.GetUnit(rightExpr, out var unit2))
+        {
+            if (symbolTable.CompareUnitTypes(unit1, unit2))
+            {
+                symbolTable.AddNodeToUnit(node, unit1);
+                return true;
+            }
+            tempResult += IndentedString("Not the same unitTypes used in expression\n");
+            return false;
+        }
+        // not valid input expression
+        tempResult += IndentedString("Not valid Types used together in expression!\n");
+        return false;
     }
 
     public override void InAMinusExp(AMinusExp node)
@@ -764,54 +751,21 @@ public class exprTypeChecker : stmtTypeChecker
         }
         Symbol? left = symbolTable.GetSymbol(leftExpr);
         Symbol? right = symbolTable.GetSymbol(rightExpr);
-        switch (left)
+        Symbol output;
+        switch (left, right)
         {
-            case Symbol.Int or Symbol.Pin:
-                if (right is Symbol.Int or Symbol.Pin)
-                {
-                    symbolTable.AddNode(node, Symbol.Int);
-                } else if (right == Symbol.Decimal)
-                {
-                    symbolTable.AddNode(node, Symbol.Decimal);
-                }
-                else
-                { 
-                    symbolTable.AddNode(node, Symbol.NotOk);  
-                    tempResult += IndentedString("Only int and decimals are allowed in remainder expression\n");
-                }
-                break;
-            case Symbol.Decimal:
-                if (right == Symbol.Int || right == Symbol.Decimal)
-                {
-                    symbolTable.AddNode(node, Symbol.Decimal);
-                }
-                else
-                { 
-                    symbolTable.AddNode(node, Symbol.NotOk);  
-                    tempResult += IndentedString("Only decimals are allowed in remainder expression\n");
-                }
+            case (Symbol.Int, Symbol.Int):
+            case (Symbol.Pin, Symbol.Int):
+            case (Symbol.Int, Symbol.Pin):
+                output = Symbol.Int;
                 break;
             default:
-                if (symbolTable.GetUnit(leftExpr, out var unit1) && symbolTable.GetUnit(rightExpr, out var unit2))
-                {
-                    if (symbolTable.CompareUnitTypes(unit1, unit2))
-                    {
-                        symbolTable.AddNodeToUnit(node, unit1);
-                        symbolTable.AddNode(node, Symbol.Ok);
-                    }
-                    else
-                    {
-                        symbolTable.AddNode(node, Symbol.NotOk);
-                        tempResult += IndentedString("Not same unitTypes\n");
-                    } 
-                }
-                else
-                {
-                    symbolTable.AddNode(node, Symbol.NotOk);
-                    tempResult += IndentedString("Remainder expressions is only allowed with ints, decimals and units\n");
-                }
+                output = Symbol.NotOk;
                 break;
         }
+        
+        symbolTable.AddNode(node, output);
+        tempResult += output != Symbol.NotOk ? "" : IndentedString("Only integers allowed in remainder expression\n");
         PrintError();
         indent--;
     }
@@ -1303,49 +1257,35 @@ public class exprTypeChecker : stmtTypeChecker
             symbolTable.GetNodeFromId(idRight.GetId().ToString().Trim(), out rightExpr);
         }
         Symbol? left = symbolTable.GetSymbol(leftExpr);
-        switch (left)
-        {
-            case Symbol.Int:
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Int ? Symbol.Bool : Symbol.NotOk);
-                tempResult += symbolTable.GetSymbol(rightExpr) == Symbol.Int ? "" : IndentedString("Types does not match\n");
-                break;
-            case (Symbol.Decimal):
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Decimal ? Symbol.Bool : Symbol.NotOk);
-                tempResult += symbolTable.GetSymbol(rightExpr) == Symbol.Decimal ? "" : IndentedString("Types does not match\n");
-                break;
-            case Symbol.Bool:
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Bool ? Symbol.Bool : Symbol.NotOk);
-                tempResult += symbolTable.GetSymbol(rightExpr) == Symbol.Bool ? "" : IndentedString("Types does not match\n");
-                break;
-            case Symbol.String:
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.String ? Symbol.Bool : Symbol.NotOk);
-                tempResult += symbolTable.GetSymbol(rightExpr) == Symbol.String ? "" : IndentedString("Types does not match\n");
-                break;
-            case Symbol.Char:
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Char ? Symbol.Bool : Symbol.NotOk);
-                tempResult += symbolTable.GetSymbol(rightExpr) == Symbol.Char ? "" : IndentedString("Types does not match\n");
-                break;
-            case Symbol.Pin:
-                symbolTable.AddNode(Parent, symbolTable.GetSymbol(rightExpr) == Symbol.Pin ? Symbol.Bool : Symbol.NotOk);
-                tempResult += symbolTable.GetSymbol(rightExpr) == Symbol.Pin ? "" : IndentedString("Types does not match\n");
+        Symbol? right = symbolTable.GetSymbol(rightExpr);
+        Symbol output;
+        switch (left, right) {
+            //int, decimal, string, bool, char, pin
+            case (Symbol.Int, Symbol.Int):
+            case (Symbol.Decimal, Symbol.Decimal):
+            case (Symbol.String, Symbol.String):
+            case (Symbol.Bool, Symbol.Bool):
+            case (Symbol.Char, Symbol.Char):
+            case (Symbol.Pin, Symbol.Pin):
+            //decimal
+            case (Symbol.Int, Symbol.Decimal):
+            case (Symbol.Decimal, Symbol.Int):
+            //string
+            case (Symbol.String, Symbol.Int):
+            case (Symbol.Int, Symbol.String):
+            case (Symbol.String, Symbol.Decimal):
+            case (Symbol.Decimal, Symbol.String):
+            //char
+            case (Symbol.Char, Symbol.String):
+            case (Symbol.String, Symbol.Char):
+                output = Symbol.Bool;
                 break;
             default:
-                bool leftContainsUnit = symbolTable.NodeToUnit.ContainsKey(leftExpr);
-                bool rightContainsUnit = symbolTable.NodeToUnit.ContainsKey(rightExpr);
-                if (leftContainsUnit && rightContainsUnit)
-                {
-                    symbolTable.GetUnit(leftExpr, out var unit1);
-                    symbolTable.GetUnit(rightExpr, out var unit2);
-                    symbolTable.AddNode(Parent, symbolTable.CompareUnitTypes(unit1, unit2) ? Symbol.Bool : Symbol.NotOk);
-                    tempResult += symbolTable.CompareUnitTypes(unit1, unit2) ? "" : IndentedString("unitTypes does not match\n");
-                }
-                else
-                {
-                    symbolTable.AddNode(Parent, Symbol.NotOk);
-                    tempResult += IndentedString("types does not match\n");
-                }
+                output = SameUnits(Parent, leftExpr, rightExpr) ? Symbol.Bool : Symbol.NotOk;
                 break;
-        }
+        };
+        symbolTable.AddNode(Parent, output);
+        tempResult += output != Symbol.NotOk ? "" : IndentedString("Types does not match\n");
         PrintError();
         indent--;
     }
