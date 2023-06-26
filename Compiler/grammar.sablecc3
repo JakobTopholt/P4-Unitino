@@ -217,7 +217,7 @@ Productions
                      | {elseif}   else if l_par exp r_par l_brace stmt_list? return? r_brace                                         {-> New stmt.elseif(exp.exp, [stmt_list.stmt, return.stmt])}
                      | {for}      for l_par [init]:stmt [cond]:exp semicolon [incre]:assign r_par l_brace stmt_list? return? r_brace {-> New stmt.for(init.stmt, cond.exp, incre.stmt, [stmt_list.stmt, return.stmt])}
                      | {while}    while l_par exp r_par l_brace stmt_list? return? r_brace                                           {-> New stmt.while(exp.exp, [stmt_list.stmt, return.stmt])}
-                     | {dowhile}  do l_brace stmt_list? return? r_brace while l_par exp r_par                                  {-> New stmt.dowhile([stmt_list.stmt, return.stmt], exp.exp)};
+                     | {dowhile}  do l_brace stmt_list? return? r_brace while l_par exp r_par                                        {-> New stmt.dowhile([stmt_list.stmt, return.stmt], exp.exp)};
                            
     //// Expressions - check precedence table from report
     exp {-> exp}= {ternary}         p8 q_mark [true]:exp colon [false]:exp  {-> New exp.ternary(p8.exp, true.exp, false.exp)}
