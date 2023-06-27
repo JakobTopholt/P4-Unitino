@@ -1,56 +1,11 @@
-# Everything
-unit Time {
-	ms => value;
-	s => value*1000;
-}
-unit Length {
-    m => value;
-    km => value*1000;
-    cm => value / 100;
-    weird => value+5;
-}
-bool weirdBool = false;
-
-Time blinkDelay = 1s;
-pin builtin = 13;
-
-func calculate(int first, int second, bool add) {
-    return add ? first + second : first;
-}
-func calculate2(Length first, Length second, bool add) {
-    return add ? first + second : first;
-}
-
+// Blinking Light
 prog {
-    Time*Time*Time blinkDelaySquared = 1s*1s*1s;
 	int a = 7;
-	if(true){
-	    a++;
-	}
+	pin builtin = 13;
 	for (int i = 0; i < a; i++) {
 		writepin(builtin, high);
-		delay((int)(blinkDelay / 1ms));
+		delay(50);
 		writepin(builtin, low);
-		delay((int)(blinkDelay / 1ms));
+		delay(50);
 	}
-}
-loop {
-    weirdBool = !weirdBool;
-    int d = 5;
-    Length magicLength = (5weird * 5.2) / builtin * (2 + --d++);
-    magicLength = 2 * magicLength;
-    magicLength += 5km;
-    if (weirdBool || 5-2==3 && magicLength > 5km) {
-        do {
-            magicLength -= 1km;
-        } while(magicLength > 5km)
-    }
-    pin f = 5;
-    float g = readpin(f);
-    Length h = calculate2(2m, 2cm, false);
-    int i = calculate(5, 2, true);
-}
-
-func flipIt() {
-    weirdBool = !weirdBool;
 }
