@@ -39,7 +39,7 @@ public class SymbolTable
     public SymbolTable EnterScope()
     {
         currentScope++;
-        Console.Write(" " + (_currentTable + 1));
+        //Console.Write(" " + (_currentTable + 1));
         if (++_currentTable < _allTables.Count)
         {
             _allTables[_currentTable]._currentTable = _currentTable;
@@ -54,7 +54,7 @@ public class SymbolTable
         currentScope--;
         if (_parent == null) 
             return this;
-        Console.Write(" /"+_currentTable + "(->" + _allTables.IndexOf(_parent) + ")");
+        //Console.Write(" /"+_currentTable + "(->" + _allTables.IndexOf(_parent) + ")");
         _parent._currentTable = _currentTable;
         _parent.currentScope = currentScope;
         return _parent;
@@ -62,7 +62,7 @@ public class SymbolTable
     }
     public SymbolTable ResetScope()
     {
-        Console.WriteLine();
+        //Console.WriteLine();
         SymbolTable table = this;
         while (table._parent != null)
         {
