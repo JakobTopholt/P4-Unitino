@@ -3,6 +3,9 @@
 	<s:String x:Key="/Default/Environment/Hierarchy/Build/BuildTool/DotNetX86CliExePath/@EntryValue">C:\Program Files\dotnet\dotnet.exe</s:String>
 	<s:Boolean x:Key="/Default/Environment/Hierarchy/Build/BuildTool/RecentDotNetX86CliExePaths/=C_003A_005CProgram_0020Files_005Cdotnet_005Cdotnet_002Eexe/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/Environment/Highlighting/HighlightingSourceSnapshotLocation/@EntryValue">C:\Users\ander\AppData\Local\JetBrains\Rider2023.1\resharper-host\temp\Rider\vAny\CoverageData\_P4-Modular-Arduino.146131915\Snapshot\snapshot.utdcvr</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=14abb8e3_002D1282_002D48c6_002D82bd_002Dcecde690890f/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Solution /&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=259c2e53_002Daaf6_002D4e18_002Db8f5_002Ddfb0c74b83b0/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="VisitorTests #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests&lt;/TestId&gt;&#xD;
@@ -10,29 +13,13 @@
     &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.TestWithoutLexerOrParser&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=44dd977e_002D0cf4_002D4152_002D8868_002Df0f5cc4cd832/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="All tests from Solution #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;Solution /&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=4b2e5266_002D910e_002D489f_002D99c7_002D470acf92c625/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="VisitorTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.CodegenChecker&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.TestWithoutLexerOrParser&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
 	
 	
 	
 	
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=8120cdb2_002Dc6b6_002D4d2f_002D83b7_002Dbff958db9e80/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;Solution /&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=df5c6da2_002De094_002D47d3_002Dac49_002D17541fc8b70f/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="VisitorTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.VisitorTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::176ED460-4DCB-4CEA-9D60-811AE4932D42::net6.0::UnitTest.TestWithoutLexerOrParser&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
+	
+	
+	
 	
 	
 	
