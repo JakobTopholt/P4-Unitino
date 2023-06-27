@@ -49,11 +49,15 @@ internal static class ModuinoCompiler
 
         SymbolTable symbolTable = new(null, AllTables);
         TypeChecker subunitsExprCheck = new (symbolTable);
-        
-        start.Apply(new UnitVisitor(symbolTable, subunitsExprCheck));
-        start.Apply(new FunctionVisitor(symbolTable));
-        start.Apply(new TypeChecker(symbolTable));
+        TypeChecker globalDeclCheck = new(symbolTable);
+        TypeChecker globalFunctionCheck = new (symbolTable);
 
+        start.Apply(new UnitVisitor(symbolTable, subunitsExprCheck));
+        start.Apply(new GlobalScopeVisitor(symbolTable, globalDeclCheck));
+        start.Apply(new FunctionVisitor(symbolTable, globalFunctionCheck));
+        start.Apply(new TypeChecker(symbolTable));
+        
+        
         // Codegen Visitor
         await using FileStream stream = File.Create(outPath);
         await using StreamWriter writer = new(stream);
@@ -94,9 +98,10 @@ internal static class ModuinoCompiler
 
             SymbolTable symbolTable = new(null, AllTables);
             TypeChecker subunitsExprCheck = new (symbolTable);
-            
+            TypeChecker globalFunctionCheck = new (symbolTable);
+
             start.Apply(new UnitVisitor(symbolTable, subunitsExprCheck));
-            start.Apply(new FunctionVisitor(symbolTable));
+            start.Apply(new FunctionVisitor(symbolTable, globalFunctionCheck));
             start.Apply(new TypeChecker(symbolTable));
             
             TextWriter output = new StringWriter(sb);

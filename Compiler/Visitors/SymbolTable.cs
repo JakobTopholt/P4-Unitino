@@ -7,7 +7,7 @@ namespace Compiler.Visitors;
 public class SymbolTable
 {
     private readonly List<SymbolTable> _allTables;
-    private int _currentTable;
+    public int _currentTable;
     public int currentScope;
     public SymbolTable(SymbolTable? parent, List<SymbolTable> allTables, int currentTable = 0, int scope = 0)
     {
@@ -17,7 +17,7 @@ public class SymbolTable
         _allTables = allTables;
         currentScope = scope;
     }
-    private readonly SymbolTable? _parent;
+    public readonly SymbolTable? _parent;
     private readonly Dictionary<string, Node> _idToNode = new();
     public readonly Dictionary<Node, Symbol> _nodeToSymbol = new();
 
@@ -39,7 +39,14 @@ public class SymbolTable
     public SymbolTable EnterScope()
     {
         currentScope++;
-        return ++_currentTable < _allTables.Count ? _allTables[_currentTable] : new SymbolTable(this, _allTables, _currentTable, currentScope);
+        //Console.Write(" " + (_currentTable + 1));
+        if (++_currentTable < _allTables.Count)
+        {
+            _allTables[_currentTable]._currentTable = _currentTable;
+            return _allTables[_currentTable];
+        }
+        else
+            return new SymbolTable(this, _allTables, _currentTable, currentScope);
     }
 
     public SymbolTable ExitScope()
@@ -47,6 +54,7 @@ public class SymbolTable
         currentScope--;
         if (_parent == null) 
             return this;
+        //Console.Write(" /"+_currentTable + "(->" + _allTables.IndexOf(_parent) + ")");
         _parent._currentTable = _currentTable;
         _parent.currentScope = currentScope;
         return _parent;
@@ -54,13 +62,14 @@ public class SymbolTable
     }
     public SymbolTable ResetScope()
     {
+        //Console.WriteLine();
         SymbolTable table = this;
         while (table._parent != null)
         {
             table = table._parent;
         }
-
-        _currentTable = 0;
+        table.currentScope = 0;
+        table._currentTable = 0;
         return table;
     }
     public bool IsInCurrentScope(TId id) => _idToNode.ContainsKey(id.ToString().Trim());
@@ -93,7 +102,15 @@ public class SymbolTable
     public bool GetUnit(string identifier, out (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unit)
     {
         unit = (null, null);
-        return _idToNode.TryGetValue(identifier.Trim(), out Node? node) && GetUnit(node, out unit);
+        GetNodeFromId(identifier.Trim(), out Node? node);
+        if (node == null)
+        {
+            return false;
+        }
+        else
+        {
+            return GetUnit(node, out unit);  
+        }
     }
     public bool GetUnit(Node expression, out (SortedList<string, AUnitdeclGlobal>, SortedList<string, AUnitdeclGlobal>) unit)
     {
@@ -121,6 +138,29 @@ public class SymbolTable
     {
         bool found = _funcIdToNode.TryGetValue(identifier, out Node? func);
         return found ? func : null;
+    }
+    public void AddArgsToScope(Node node, IList args)
+    {
+        foreach (AArg arg in args)
+        {
+            string id = arg.GetId().Text;
+            PType type = arg.GetType();
+            switch (type)
+            {
+                case AIntType:
+                case ADecimalType:
+                case ABoolType:
+                case ACharType:
+                case AStringType:
+                case APinType:
+                case AUnitType:
+                    AddIdToNode(id, arg);
+                    break;
+                default:
+                    AddNode(node, Symbol.NotOk);
+                    break;
+            }
+        }
     }
     public void AddFunctionArgs(Node node, List<PType> args) => _nodeToArgs.Add(node, args);
     public List<PType>? GetFunctionArgs(Node node)

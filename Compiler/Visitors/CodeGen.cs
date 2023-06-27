@@ -296,6 +296,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     /*-------------------------------------Control Structures---------------------------------------------------------*/
     public override void CaseAIfStmt(AIfStmt node)
     {
+        symbolTable = symbolTable.EnterScope();
         Indent("if(");
         node.GetExp().Apply(this);
         writer.WriteLine(") {");
@@ -312,10 +313,12 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void OutAIfStmt(AIfStmt node)
     {
         Indent("}\n");
+        symbolTable = symbolTable.ExitScope();
     }
 
     public override void CaseAForStmt(AForStmt node)
     {
+        symbolTable = symbolTable.EnterScope();
         int _indentholder = _indent;
         Indent("for(");
         _indent = 0;
@@ -339,10 +342,12 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void OutAForStmt(AForStmt node)
     {
         Indent("}\n");
+        symbolTable = symbolTable.ExitScope();
     }
 
     public override void CaseAWhileStmt(AWhileStmt node)
     {
+        symbolTable = symbolTable.EnterScope();
         Indent("while(");
         node.GetExp().Apply(this);
         writer.WriteLine(") {");
@@ -359,10 +364,12 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void OutAWhileStmt(AWhileStmt node)
     {
         Indent("}\n");
+        symbolTable = symbolTable.ExitScope();
     }
 
     public override void CaseAElseifStmt(AElseifStmt node)
     {
+        symbolTable = symbolTable.EnterScope();
         Indent("else if(");
         node.GetExp().Apply(this);
         writer.WriteLine(") {");
@@ -379,10 +386,12 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void OutAElseifStmt(AElseifStmt node)
     {
         Indent("}\n");
+        symbolTable = symbolTable.ExitScope();
     }
 
     public override void CaseAElseStmt(AElseStmt node)
     {
+        symbolTable = symbolTable.EnterScope();
         Indent("else {\n");
         _indent++;
         foreach (PStmt child in node.GetStmt())
@@ -397,10 +406,12 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void OutAElseStmt(AElseStmt node)
     {
         Indent("}\n");
+        symbolTable = symbolTable.ExitScope();
     }
 
     public override void CaseADowhileStmt(ADowhileStmt node)
     {
+        symbolTable = symbolTable.EnterScope();
         Indent("do {\n");
         _indent++;
         foreach (PStmt child in node.GetStmt())
@@ -417,6 +428,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
     public override void OutADowhileStmt(ADowhileStmt node)
     {
         writer.Write(")");
+        symbolTable = symbolTable.ExitScope();
     }
     /*-------------------------------------Decl-----------------------------------------------------------------------*/
     public override void InADeclStmt(ADeclStmt node)

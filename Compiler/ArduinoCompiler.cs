@@ -62,6 +62,8 @@ public static class ArduinoCompiler
                 continue;
             string portName = column[0];
             string boardFqbn = column[7];
+            
+            Console.WriteLine($"compiling to board - fqbn: \"{boardFqbn}\" port: \"{portName}\"");
 
             bool success = await Compile(folder, portName, boardFqbn);
             if (!success)
@@ -85,8 +87,8 @@ public static class ArduinoCompiler
     private static readonly Regex InoFilePathRegex = new(@"C:\\.*\.ino");
     public static async Task<bool> Compile(string folder, string? portName, string? boardFqbn)
     {
-        string install = boardFqbn ?? "arduino:avr";
         boardFqbn ??= "arduino:avr:uno"; //arduino-cli.exe  arduino:avr            core install arduino:avr
+        string install = boardFqbn.Remove(boardFqbn.LastIndexOf(":", StringComparison.Ordinal));
         
         Process downloadCoreProcess = ArduinoCli($"core install {install}", true);
         downloadCoreProcess.Start();
@@ -99,8 +101,8 @@ public static class ArduinoCompiler
         }
         
         Process compileProcess = ArduinoCli(portName == null
-            ? $"compile --fqbn {boardFqbn} {folder}"
-            : $"compile --fqbn {boardFqbn} --port {portName} {folder}", true);
+            ? $"compile -b {boardFqbn} {folder}"
+            : $"upload -b {boardFqbn} -p {portName} {folder}", true);
         
         compileProcess.Start();
         await compileProcess.WaitForExitAsync();
@@ -114,7 +116,7 @@ public static class ArduinoCompiler
 
     private static async Task<Process> Monitor(string portName, string boardFqbn)
     {
-        Process compileProcess = ArduinoCli($"monitor --fqbn {boardFqbn} --port {portName}", false);
+        Process compileProcess = ArduinoCli($"monitor -b {boardFqbn} -p {portName}", false);
         compileProcess.Start();
         await compileProcess.WaitForExitAsync();
         return compileProcess;
