@@ -24,15 +24,18 @@ public class FunctionVisitor : DepthFirstAdapter
 
     public override void CaseAArg(AArg node)
     {
-        typeChecker.symbolTable = symbolTable;
         InAArg(node);
         if(node.GetType() != null)
         {
+            typeChecker.symbolTable = symbolTable;
             node.GetType().Apply(typeChecker);
+            symbolTable = typeChecker.symbolTable;
         }
         if(node.GetId() != null)
         {
+            typeChecker.symbolTable = symbolTable;
             node.GetId().Apply(typeChecker);
+            symbolTable = typeChecker.symbolTable;
         }
         OutAArg(node);
     }
@@ -124,11 +127,13 @@ public class FunctionVisitor : DepthFirstAdapter
     public override void OutAUntypedGlobal(AUntypedGlobal node)
     {
         IList stmts = node.GetStmt();
-        typeChecker.symbolTable = symbolTable;
+        
         bool untypedIsOk = true;
         foreach (PStmt stmt in stmts)
         {
+            typeChecker.symbolTable = symbolTable;
             stmt.Apply(typeChecker);
+            symbolTable = typeChecker.symbolTable;
             if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
             {
                 untypedIsOk = false;
@@ -189,7 +194,9 @@ public class FunctionVisitor : DepthFirstAdapter
         }
         if(node.GetType() != null)
         {
+            typeChecker.symbolTable = symbolTable;
             node.GetType().Apply(typeChecker);
+            symbolTable = typeChecker.symbolTable;
         }
         OutATypedGlobal(node);
     }
@@ -219,10 +226,11 @@ public class FunctionVisitor : DepthFirstAdapter
     {
         IList stmts = node.GetStmt();
         bool typedIsOk = true;
-        typeChecker.symbolTable = symbolTable;
         foreach (PStmt stmt in stmts)
         {
+            typeChecker.symbolTable = symbolTable;
             stmt.Apply(typeChecker);
+            symbolTable = typeChecker.symbolTable;
         }
         if (!typedIsOk)
         {
@@ -338,11 +346,9 @@ public class FunctionVisitor : DepthFirstAdapter
     public override void CaseALoopGlobal(ALoopGlobal node)
     {
         symbolTable = symbolTable.EnterScope().ExitScope();
-        symbolTable = symbolTable.ResetScope();
     }
     public override void CaseAProgGlobal(AProgGlobal node)
     {
         symbolTable = symbolTable.EnterScope().ExitScope();
-        symbolTable = symbolTable.ResetScope();
     } 
 }

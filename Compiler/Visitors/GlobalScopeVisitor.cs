@@ -131,11 +131,12 @@ public class GlobalScopeVisitor : DepthFirstAdapter
     }
     public override void OutADeclassStmt(ADeclassStmt node)
     {
-        typeChecker.symbolTable = symbolTable;
         if (!symbolTable.IsInCurrentScope(node.GetId()))
         {
             Node expression = node.GetExp();
+            typeChecker.symbolTable = symbolTable;
             expression.Apply(typeChecker);
+            symbolTable = typeChecker.symbolTable;
             Symbol? exprType = symbolTable.GetSymbol(expression);
             PType unit = node.GetType();
             switch (unit)

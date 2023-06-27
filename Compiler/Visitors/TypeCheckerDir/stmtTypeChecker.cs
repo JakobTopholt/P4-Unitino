@@ -507,10 +507,6 @@ public class stmtTypeChecker : DepthFirstAdapter
         if (!symbolTable.IsInCurrentScope(node.GetId()))
         {
             Node expression = node.GetExp();
-            if (expression is AIdExp id)
-            {
-                symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out expression);
-            }
             Symbol? exprType = symbolTable.GetSymbol(expression);
             PType unit = node.GetType();
             switch (unit)
