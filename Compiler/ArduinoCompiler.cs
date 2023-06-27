@@ -102,7 +102,7 @@ public static class ArduinoCompiler
         
         Process compileProcess = ArduinoCli(portName == null
             ? $"compile -b {boardFqbn} {folder}"
-            : $"compile -b {boardFqbn} -p {portName} {folder}", true);
+            : $"upload -b {boardFqbn} -p {portName} {folder}", true);
         
         compileProcess.Start();
         await compileProcess.WaitForExitAsync();
