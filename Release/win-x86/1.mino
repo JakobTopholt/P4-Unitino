@@ -1,4 +1,4 @@
-# Blinking Light
+// Blinking Light
 
 pin builtin = 13;
 

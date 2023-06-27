@@ -1,4 +1,4 @@
-﻿# Everything
+﻿// Everything
 unit Time {
 	ms => value;
 	s => value*1000;

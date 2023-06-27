@@ -71,11 +71,11 @@ void loop() {
 }
 void Funtyped(int a) {
     int b = 5;
-    b = b-a;
+    b = b - a;
     float c = 3.5;
     float d = 6.5;
-    d = d-c;
-    c = c-b;
+    d = d - c;
+    c = c - b;
 }
 ////
 true
@@ -121,10 +121,10 @@ void Funtypedlmao() {
     int a = 3;
     int b = 5;
     float cd = 3.5;
-    b = b*a;
+    b = b * a;
     float d = 6.5;
-    d = d*cd;
-    cd = cd/b;
+    d = d * cd;
+    cd = cd / b;
 }
 ////
 true
@@ -170,7 +170,7 @@ void Funtypedlmao() {
     bool b = true;
     int c = 5;
     int d = 4;
-    d = b?c:d;
+    d = b ? c : d;
 }
 ////
 true

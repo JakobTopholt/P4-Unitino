@@ -9,8 +9,6 @@ public class PrettyPrint : DepthFirstAdapter
 {
     private SymbolTable symbolTable;
     private TextWriter output;
-    private static readonly Regex whiteSpace = new(@"\s+");
-
     public PrettyPrint(SymbolTable symbolTable, TextWriter? output = null)
     {
         this.output = output;
@@ -77,12 +75,12 @@ public class PrettyPrint : DepthFirstAdapter
     public override void OutAProgGlobal(AProgGlobal node)
     {
         _indent--;
-        Indent("}\n");
+        Indent("}\r\n");
     }
     
     public override void CaseALoopGlobal(ALoopGlobal node)
     {
-        Indent("loop {\n");
+        Indent("loop {\r\n");
         _indent++;
         foreach (PStmt child in node.GetStmt())
         {
@@ -95,7 +93,7 @@ public class PrettyPrint : DepthFirstAdapter
     public override void OutALoopGlobal(ALoopGlobal node)
     {
         _indent--;
-        Indent("}\n");
+        Indent("}\r\n");
     }
 
     public override void CaseATypedGlobal(ATypedGlobal node)
@@ -124,7 +122,8 @@ public class PrettyPrint : DepthFirstAdapter
         var customType = node.GetType() as AUnitType;
         if (customType != null)
         {
-            Indent($"float ");
+            Indent(customType.ToString().Trim());
+            output.Write(" ");
         }
         node.GetId().Apply(this);
         output.Write("(");
@@ -138,7 +137,7 @@ public class PrettyPrint : DepthFirstAdapter
             if(i != arg.Count)
                 output.Write(", ");
         }
-        output.Write(") {\n");
+        output.Write(") {\r\n");
         _indent++;
         foreach (PStmt child in node.GetStmt())
         {
@@ -151,7 +150,7 @@ public class PrettyPrint : DepthFirstAdapter
     public override void OutATypedGlobal(ATypedGlobal node)
     {
         _indent--;
-        Indent("}\n");    
+        Indent("}\r\n");    
     }
 
     public override void CaseAUntypedGlobal(AUntypedGlobal node)
@@ -168,7 +167,6 @@ public class PrettyPrint : DepthFirstAdapter
             if(i != arg.Count-1)
                 output.Write(", ");
         }
-
         output.Write(") {\r\n");
         foreach (PStmt child in node.GetStmt())
         {
@@ -181,7 +179,7 @@ public class PrettyPrint : DepthFirstAdapter
     public override void OutAUntypedGlobal(AUntypedGlobal node)
     {
         _indent--;
-        Indent("}\n");
+        Indent("}\r\n");
     }
     
     public override void CaseAArg(AArg node)
@@ -209,7 +207,8 @@ public class PrettyPrint : DepthFirstAdapter
         }
         if (node.GetType() is AUnitType customType)
         {
-            Indent($"float ");
+            Indent(customType.ToString().Trim());
+            output.Write(" ");
         }
         node.GetId().Apply(this);
     }
@@ -217,11 +216,13 @@ public class PrettyPrint : DepthFirstAdapter
     public override void CaseAUnitdeclGlobal(AUnitdeclGlobal node)
     {
         Indent($"unit {node.GetId()}");
-        output.Write("{");
+        output.WriteLine("{");
+        _indent++;
         foreach (PSubunit child in node.GetSubunit())
         {
             child.Apply(this);
         }
+        _indent--;
         OutAUnitdeclGlobal(node);
     }
 
@@ -232,7 +233,7 @@ public class PrettyPrint : DepthFirstAdapter
 
     public override void CaseASubunit(ASubunit node)
     {
-        node.GetId().Apply(this);
+        Indent(node.GetId().Text);
         output.Write(" => ");
         node.GetExp().Apply(this);
         output.WriteLine(";");
@@ -255,7 +256,7 @@ public class PrettyPrint : DepthFirstAdapter
 
     public override void OutAIfStmt(AIfStmt node)
     {
-        Indent("}\n");
+        Indent("}\r\n");
     }
     public override void CaseAForStmt(AForStmt node)
     {
@@ -281,7 +282,7 @@ public class PrettyPrint : DepthFirstAdapter
     
     public override void OutAForStmt(AForStmt node)
     {
-        Indent("}\n");
+        Indent("}\r\n");
     }
 
     public override void CaseAWhileStmt(AWhileStmt node)
@@ -301,7 +302,7 @@ public class PrettyPrint : DepthFirstAdapter
 
     public override void OutAWhileStmt(AWhileStmt node)
     {
-        Indent("}\n");
+        Indent("}\r\n");
     }
     
     public override void CaseAElseifStmt(AElseifStmt node)
@@ -321,12 +322,12 @@ public class PrettyPrint : DepthFirstAdapter
 
     public override void OutAElseifStmt(AElseifStmt node)
     {
-        Indent("}\n");
+        Indent("}\r\n");
     }
     
     public override void CaseAElseStmt(AElseStmt node)
     {
-        Indent("else {\n");
+        Indent("else {\r\n");
         _indent++;
         foreach (PStmt child in node.GetStmt())
         {
@@ -339,11 +340,11 @@ public class PrettyPrint : DepthFirstAdapter
 
     public override void OutAElseStmt(AElseStmt node)
     {
-        Indent("}\n");
+        Indent("}\r\n");
     }
     public override void CaseADowhileStmt(ADowhileStmt node)
     {
-        Indent("do {\n");
+        Indent("do {\r\n");
         _indent++;
         foreach (PStmt child in node.GetStmt())
         {
@@ -353,17 +354,17 @@ public class PrettyPrint : DepthFirstAdapter
         _indent--;
         Indent("} while(");
         node.GetExp().Apply(this);
-        output.Write(")\n");
+        OutADowhileStmt(node);
     }
 
     public override void OutADowhileStmt(ADowhileStmt node)
     {
-        Indent(")\n");
+        output.Write(")\r\n");
     }
     
     /*----------------------------------------------------------------------------------------------*/
 
-    public override void InADeclStmt(ADeclStmt node)
+    public override void CaseADeclStmt(ADeclStmt node)
     {
         switch (node.GetType())
         {
@@ -386,6 +387,14 @@ public class PrettyPrint : DepthFirstAdapter
                 Indent("pin ");
                 break;
         }
+        if (node.GetType() is AUnitType customType)
+        {
+            IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
+            IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
+            Indent(customType.ToString().Trim());
+            output.Write(" ");
+        }
+        node.GetId().Apply(this);
     }
     
     /*---------------------------------------------------------------------------------------------*/
@@ -393,9 +402,9 @@ public class PrettyPrint : DepthFirstAdapter
     {
         output.Write("");
         node.GetCond().Apply(this);
-        output.Write("?");
+        output.Write(" ? ");
         node.GetTrue().Apply(this);
-        output.Write(":");
+        output.Write(" : ");
         node.GetFalse().Apply(this);
     }
 
@@ -439,7 +448,7 @@ public class PrettyPrint : DepthFirstAdapter
     {
         Indent("");
         node.GetId().Apply(this);
-        output.Write("+= ");
+        output.Write(" += ");
         node.GetExp().Apply(this);
     }
 
@@ -447,7 +456,7 @@ public class PrettyPrint : DepthFirstAdapter
     {
         Indent("");
         node.GetId().Apply(this);
-        output.Write("-= ");
+        output.Write(" -= ");
         node.GetExp().Apply(this);
     }
 
@@ -514,6 +523,7 @@ public class PrettyPrint : DepthFirstAdapter
             IEnumerable<ANumUnituse> numerator = customType.GetUnituse().OfType<ANumUnituse>();
             IEnumerable<ADenUnituse> denomerator = customType.GetUnituse().OfType<ADenUnituse>();
             Indent(customType.ToString().Trim());
+            output.Write(" ");
         }
         node.GetId().Apply(this);
         output.Write(" = ");
@@ -557,22 +567,22 @@ public class PrettyPrint : DepthFirstAdapter
     /*--------------------------------------------------------------------------------------*/
     public override void CaseADivideExp(ADivideExp node)
     {
-        PrintPrecedence(node.GetL(),node.GetR(),"/");
+        PrintPrecedence(node.GetL(),node.GetR()," / ");
     }
     
     public override void CaseAMultiplyExp(AMultiplyExp node)
     {
-        PrintPrecedence(node.GetL(),node.GetR(),"*");
+        PrintPrecedence(node.GetL(),node.GetR()," * ");
     }
 
     public override void CaseAPlusExp(APlusExp node)
     {
-        PrintPrecedence(node.GetL(), node.GetR(), "+");
+        PrintPrecedence(node.GetL(), node.GetR(), " + ");
     }
     
     public override void CaseAMinusExp(AMinusExp node)
     {
-        PrintPrecedence(node.GetL(),node.GetR(),"-");
+        PrintPrecedence(node.GetL(),node.GetR()," - ");
     }
     
     public override void CaseANumberExp(ANumberExp node)
@@ -635,27 +645,27 @@ public class PrettyPrint : DepthFirstAdapter
 
     public override void CaseASuffixplusplusExp(ASuffixplusplusExp node)
     {
-        Indent("++" + node.GetExp().ToString().Trim());
+        output.Write(node.GetExp().ToString().Trim() + "++");
     }
     
     public override void CaseAPrefixplusplusExp(APrefixplusplusExp node)
     {
-        Indent(node.GetExp().ToString().Trim() + "++");
+        output.Write( "++"+ node.GetExp().ToString().Trim());
     }
 
     public override void CaseASuffixminusminusExp(ASuffixminusminusExp node)
     {
-        Indent(node.GetExp().ToString().Trim() + "--");
+        output.Write(node.GetExp().ToString().Trim() + "--");
     }
 
     public override void CaseAPrefixminusminusExp(APrefixminusminusExp node)
     {
-        Indent("--" + node.GetExp().ToString().Trim());
+        output.Write("--" + node.GetExp().ToString().Trim());
     }
 
     public override void CaseALogicalnotExp(ALogicalnotExp node)
     {
-        output.Write($"!{node.GetExp()}");
+        output.Write($"!{node.GetExp().ToString().Trim()}");
     }
     public override void CaseAReadpinExp(AReadpinExp node)
     {
@@ -671,7 +681,7 @@ public class PrettyPrint : DepthFirstAdapter
                 node.GetExp().Apply(this);
                 break;
             case ADecimalType:
-                output.Write("(float)");
+                output.Write("(decimal)");
                 node.GetExp().Apply(this);
                 break;
             case ABoolType:
@@ -724,7 +734,7 @@ public class PrettyPrint : DepthFirstAdapter
     }
     public override void CaseTId(TId node)
     {
-        output.Write(node.ToString().Trim());
+        output.Write(node.Text);
     }
 
     public override void CaseTDecimal(TDecimal node)
@@ -747,22 +757,22 @@ public class PrettyPrint : DepthFirstAdapter
     
     public override void CaseAStringExp(AStringExp node)
     {
-        output.Write(node.GetString().ToString().Trim());
+        output.Write(node.GetString().Text);
     }
 
     public override void CaseACharExp(ACharExp node)
     {
-        output.Write(node.GetChar().ToString().Trim());
+        output.Write(node.GetChar().Text);
     }
     
     public override void CaseAUnitdecimalExp(AUnitdecimalExp node)
     {
-        output.Write(node.GetDecimal().ToString().Trim());
+        output.Write(node.GetDecimal().Text);
         node.GetId().Apply(this);   
     }
     public override void CaseAUnitnumberExp(AUnitnumberExp node)
     {
-        output.Write(node.GetNumber().ToString().Trim());
+        output.Write(node.GetNumber().Text);
         node.GetId().Apply(this);
     }
 }

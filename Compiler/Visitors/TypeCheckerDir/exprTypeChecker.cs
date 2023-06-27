@@ -322,9 +322,13 @@ public class exprTypeChecker : stmtTypeChecker
         else
         {
             Symbol? readpinType = symbolTable.GetSymbol(node.GetExp());
-            if (readpinType is Symbol.Pin or Symbol.Int)
+            if (node.GetExp() is AIdExp id)
             {
-                symbolTable.AddNode(node, Symbol.Pin);
+                readpinType = symbolTable.GetSymbol(id.GetId());
+            }
+            if (readpinType is Symbol.Pin)
+            {
+                symbolTable.AddNode(node, Symbol.Int);
             }
             else
             {
@@ -335,7 +339,7 @@ public class exprTypeChecker : stmtTypeChecker
                 }
                 else
                 {
-                    tempResult += IndentedString("Readpin expression is not Pin or integer type");          
+                    tempResult += IndentedString("Readpin expression is not Pin");          
                 }
             }
         }
