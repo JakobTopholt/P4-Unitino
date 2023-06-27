@@ -1,4 +1,4 @@
-# Solve with units
+// Solve with units
 unit Time {
 	ms => value;
 	s => value*1000;

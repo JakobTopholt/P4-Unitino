@@ -1,4 +1,4 @@
-# Blinking Light
+// Blinking Light
 prog {
 	int a = 7;
 	pin builtin = 13;

@@ -5,7 +5,6 @@ namespace UnitTest;
 
 public class Data
 {
-    private static readonly Regex WhiteSpace = new(@"\s+");
     public readonly Start? Ast;
     public readonly string PrettyPrint;
     public readonly string CodeGen;
@@ -16,7 +15,7 @@ public class Data
     {
         Ast = ast;
         Error = error;
-        PrettyPrint = WhiteSpace.Replace(prettyPrint, "");
+        PrettyPrint = prettyPrint;
         CodeGen = codeGen.TrimStart().ReplaceLineEndings();
         Name = name;
         ShouldFail = shouldFail;
@@ -25,7 +24,7 @@ public class Data
     {
         Ast = ast;
         Error = error;
-        PrettyPrint = WhiteSpace.Replace(prettyPrint, "");
+        PrettyPrint = prettyPrint;
         CodeGen = codeGen.TrimStart().ReplaceLineEndings();
         Name = name;
         ShouldFail = null;
@@ -34,7 +33,7 @@ public class Data
     {
         Ast = ast;
         Error = error;
-        PrettyPrint = WhiteSpace.Replace(prettyPrint, "");
+        PrettyPrint = prettyPrint;
         CodeGen = "";
         Name = name;
         ShouldFail = null;

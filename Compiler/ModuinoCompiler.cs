@@ -1,4 +1,5 @@
-﻿using Compiler.Visitors;
+﻿using System.Text;
+using Compiler.Visitors;
 using Moduino.lexer;
 using Moduino.node;
 using Moduino.parser;
@@ -61,5 +62,50 @@ internal static class ModuinoCompiler
         await writer.FlushAsync();
 
         return folder;
+    }
+
+    public static async Task PrettyPrint(string path)
+    {
+        StringBuilder sb = new();
+        
+        await using (FileStream readStream = File.Open(path, FileMode.Open))
+        {
+            Start start;
+            using TextReader textReader = new StreamReader(readStream);
+            try
+            {
+                Lexer lexer = new(textReader);
+                Parser parser = new(lexer);
+                start = parser.Parse();
+            }
+            catch (LexerException e)
+            {
+                Console.WriteLine(e.Message);
+                return;
+            }
+            catch (ParserException e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("    got: " + e.Token);
+                return;
+            }
+            
+            List<SymbolTable> AllTables = new();
+
+            SymbolTable symbolTable = new(null, AllTables);
+            TypeChecker subunitsExprCheck = new (symbolTable);
+            
+            start.Apply(new UnitVisitor(symbolTable, subunitsExprCheck));
+            start.Apply(new FunctionVisitor(symbolTable));
+            start.Apply(new TypeChecker(symbolTable));
+            
+            TextWriter output = new StringWriter(sb);
+            
+            start.Apply(new PrettyPrint(symbolTable, output));
+            
+        }
+
+        await File.WriteAllTextAsync(path, sb.ToString());
+
     }
 }
