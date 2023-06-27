@@ -122,8 +122,31 @@ public class GlobalScopeVisitor : DepthFirstAdapter
         indent--;
         locations.Clear();
     }
-    
-    
+
+    public override void CaseADeclassStmt(ADeclassStmt node)
+    {
+        InADeclassStmt(node);
+        if(node.GetType() != null)
+        {
+            typeChecker.symbolTable = symbolTable;
+            node.GetType().Apply(typeChecker);
+            symbolTable = typeChecker.symbolTable;
+        }
+        if(node.GetId() != null)
+        {
+            typeChecker.symbolTable = symbolTable;
+            node.GetId().Apply(typeChecker);
+            symbolTable = typeChecker.symbolTable;
+        }
+        if(node.GetExp() != null)
+        {
+            typeChecker.symbolTable = symbolTable;
+            node.GetExp().Apply(typeChecker);
+            symbolTable = typeChecker.symbolTable;
+        }
+        OutADeclassStmt(node);
+    }
+
     public override void InADeclassStmt(ADeclassStmt node)
     {
         locations.Push(IndentedString($"in DeclarationAssignment {node}\n"));
@@ -134,9 +157,9 @@ public class GlobalScopeVisitor : DepthFirstAdapter
         if (!symbolTable.IsInCurrentScope(node.GetId()))
         {
             Node expression = node.GetExp();
-            typeChecker.symbolTable = symbolTable;
+            /*typeChecker.symbolTable = symbolTable;
             expression.Apply(typeChecker);
-            symbolTable = typeChecker.symbolTable;
+            symbolTable = typeChecker.symbolTable; */
             Symbol? exprType = symbolTable.GetSymbol(expression);
             PType unit = node.GetType();
             switch (unit)

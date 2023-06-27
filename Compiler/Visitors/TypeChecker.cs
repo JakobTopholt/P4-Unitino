@@ -394,20 +394,18 @@ public class TypeChecker : exprTypeChecker
     }
     public override void OutAProgGlobal(AProgGlobal node)
     {
+        bool progIsOk = true;
         if (symbolTable.GetSymbol(node) == null)
         {
-            bool progIsOk = true;
-
             List<PStmt> stmts = node.GetStmt().OfType<PStmt>().ToList();
             foreach (PStmt stmt in stmts)
             {
                 if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
                     progIsOk = false;
             }
-            symbolTable = symbolTable.ExitScope();
-            symbolTable.AddNode(node, progIsOk ? Symbol.Ok : Symbol.NotOk);
-            
         }
+        symbolTable = symbolTable.ExitScope();
+        symbolTable.AddNode(node, progIsOk ? Symbol.Ok : Symbol.NotOk);
         locations.Clear();
         reported = false;
         indent--;
