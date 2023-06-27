@@ -10,7 +10,17 @@ func untyped(int a, decimal b, string c, char d, bool e){
 ////
  
 ////
-
+void setup() {
+}
+void loop() {
+}
+void Funtyped(int a, float b, String c, char d, bool e) {
+    int ab = a;
+    float ba = b;
+    String ca = c;
+    char da = d;
+    bool ea = e;
+} 
 ////
 true
 //////
@@ -100,7 +110,27 @@ func untyped(int a, decimal b, string c, char d, bool e){
 ////
 
 ////
-
+void setup() {
+}
+void loop() {
+}
+void Funtyped(int a, float b, String c, char d, bool e) {
+    int ab = a;
+    float ba = b;
+    char da = d;
+    ab++;
+    ba++;
+    da++;
+    ++ab;
+    ++ba;
+    ++da;
+    ab--;
+    ba--;
+    da--;
+    --ab;
+    --ba;
+    --da;
+}
 ////
 true
 //////
@@ -144,14 +174,28 @@ func untypedtwo(int a, decimal b, string c, char d, bool e){
     string h = "lmao";
     char i = 'a';
     bool j = true;
-   
 }
-
 ////
 
 ////
-
-
+void setup() {
+}
+void loop() {
+}
+void Funtyped(int a, float b, String c, char d, bool e) {
+    int f;
+    float g;
+    String h;
+    char i;
+    bool j;
+}
+void Funtypedtwo(int a, float b, String c, char d, bool e) {
+    int f = 1;
+    float g = 1.5;
+    String h = String("lmao");
+    char i = 'a';
+    bool j = true;
+}
 ////
 true
 //////
@@ -175,17 +219,6 @@ false
 //////
 control statemetns test
 ////
-func untyped(){
-    bool e;    
-    if(5 == 5){
-        decimal d = 7+5;
-    }else if(5 != 5) {
-        int a = 1 +2;
-    }
-    else {
-        string s = "lmao";
-    }
-}
 func untypedtwo(){
     int b = 3;
     int a = 4;
@@ -213,8 +246,33 @@ func untypedfour(){
 ////
 
 ////
-
-
+void setup() {
+}
+void loop() {
+}
+void Funtypedtwo() {
+    int b = 3;
+    int a = 4;
+    for(int i = 0; b < a; i++) {
+        b++;
+    }
+}
+void Funtypedthree() {
+    int b = 3;
+    int a = 4;
+    bool c = true;
+    while(a != 10) {
+        a++;
+    }
+}
+void Funtypedfour() {
+    int b = 3;
+    int a = 4;
+    bool c = true;
+    do {
+        a++;
+    } while(a != 10);
+}
 ////
 true
 //////
@@ -252,9 +310,6 @@ func untypedfour(){
             }while (a!= 10)
 }
 ////
-
 ////
-
-
 ////
 false

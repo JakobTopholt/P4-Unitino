@@ -55,7 +55,7 @@ void setup() {
     float a = 160.2;
 }
 float UTimems(float value) {
-    return (value+50)+((5+5)+50.2);
+    return (value + 50) + ((5 + 5) + 50.2);
 }
 //////
 Plus3
@@ -65,7 +65,7 @@ prog {
 }
 
 unit Time {
-    ms => 2+("hej"+1)+("alo"+1.2)+(1.1+"aye") == "hej"?50*value:5*value;
+    ms => 2 + ("hej" + 1) + ("alo" + 1.2) + (1.1 + "aye") == "hej"?50*value:5*value;
 }
 ////
 ////
@@ -75,7 +75,7 @@ void setup() {
     float a = 250;
 }
 float UTimems(float value) {
-    return String(2)+(String("hej")+String(1))+(String("alo")+String(1.2))+(String(1.1)+String("aye")) == String("hej")?50*value:5*value;
+    return String(2) + (String("hej") + String(1)) + (String("alo") + String(1.2)) + (String(1.1) + String("aye")) == String("hej")?50*value:5*value;
 }
 //////
 Equals
@@ -187,7 +187,7 @@ void setup() {
     float a = -25.8;
 }
 float UTimems(float value) {
-    return (value/(2/2))/(2/-1.0)+1.2/1+-2;
+    return (value/(2/2))/(2/-1.0) + 1.2/1 + -2;
 }
 //////
 NotEquals
@@ -279,7 +279,7 @@ void setup() {
     float a = 52;
 }
 float UTimems(float value) {
-    return value+5 % 3;
+    return value + 5 % 3;
 }
 //////
 LessGreater
@@ -292,10 +292,10 @@ prog {
 }
 
 unit Time {
-    ms => 7 < 5 || 7 <= 5 || 5 >= 7 || 3 > 6 ? value : value+2;
-    s => 7.0 < 5.0 || 7.0 <= 5.0 || 5.0 >= 7.0 || 3.0 > 6.0 ? value : value+2;
-    h => 7.0 < 5 || 7.0 <= 5 || 5.0 >= 7 || 3.0 > 6 ? value : value+2;
-    d => 7 < 5.0 || 7 <= 5.0 || 5 >= 7.0 || 3 > 6.0 ? value : value+2;
+    ms => 7 < 5 || 7 <= 5 || 5 >= 7 || 3 > 6 ? value : value + 2;
+    s => 7.0 < 5.0 || 7.0 <= 5.0 || 5.0 >= 7.0 || 3.0 > 6.0 ? value : value + 2;
+    h => 7.0 < 5 || 7.0 <= 5 || 5.0 >= 7 || 3.0 > 6 ? value : value + 2;
+    d => 7 < 5.0 || 7 <= 5.0 || 5 >= 7.0 || 3 > 6.0 ? value : value + 2;
 }
 ////
 ////
@@ -308,16 +308,16 @@ void setup() {
     float d = 7;
 }
 float UTimems(float value) {
-    return 7 < 5 || 7 <= 5 || 5 >= 7 || 3 > 6?value:value+2;
+    return 7 < 5 || 7 <= 5 || 5 >= 7 || 3 > 6?value:value + 2;
 }
 float UTimes(float value) {
-    return 7.0 < 5.0 || 7.0 <= 5.0 || 5.0 >= 7.0 || 3.0 > 6.0?value:value+2;
+    return 7.0 < 5.0 || 7.0 <= 5.0 || 5.0 >= 7.0 || 3.0 > 6.0?value:value + 2;
 }
 float UTimeh(float value) {
-    return 7.0 < 5 || 7.0 <= 5 || 5.0 >= 7 || 3.0 > 6?value:value+2;
+    return 7.0 < 5 || 7.0 <= 5 || 5.0 >= 7 || 3.0 > 6?value:value + 2;
 }
 float UTimed(float value) {
-    return 7 < 5.0 || 7 <= 5.0 || 5 >= 7.0 || 3 > 6.0?value:value+2;
+    return 7 < 5.0 || 7 <= 5.0 || 5 >= 7.0 || 3 > 6.0?value:value + 2;
 }
 //////
 LogicalNot

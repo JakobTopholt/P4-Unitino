@@ -73,7 +73,7 @@ char Ffunction3(char a, char b, char c) {
     return d;
 }
 float Ffunction4(int i) {
-    float d = 3.5+i;
+    float d = 3.5 + i;
     char a = 'a';
     char b = 'b';
     char c = 'c';

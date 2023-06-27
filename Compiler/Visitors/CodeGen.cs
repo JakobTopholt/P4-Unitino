@@ -55,7 +55,6 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         {
             // scoped
             case AWhileStmt:
-            case ADowhileStmt:
             case AForStmt:
             case AIfStmt:
             case AElseStmt:
@@ -75,6 +74,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
             case APrefixplusStmt:
             case ADelayStmt:
             case ASetpinStmt:
+            case ADowhileStmt:    
             case AWritepinStmt:
                 writer.WriteLine(";");                    
                 break;
@@ -421,7 +421,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void OutADowhileStmt(ADowhileStmt node)
     {
-        writer.Write(")\n");
+        writer.Write(")");
         symbolTable = symbolTable.ExitScope();
     }
     /*-------------------------------------Decl-----------------------------------------------------------------------*/
@@ -664,7 +664,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseAPlusExp(APlusExp node)
     {
-        Precedence(node.GetL(),node.GetR(),"+");
+        Precedence(node.GetL(),node.GetR()," + ");
     }
 
     public override void CaseAMinusExp(AMinusExp node)
@@ -752,6 +752,7 @@ public class CodeGen : DepthFirstAdapter, IDisposable
 
     public override void CaseAPrefixminusminusExp(APrefixminusminusExp node)
     {
+
         writer.Write("--");
         node.GetExp().Apply(this);
     }
