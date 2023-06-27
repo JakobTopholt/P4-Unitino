@@ -775,4 +775,9 @@ public class PrettyPrint : DepthFirstAdapter
         output.Write(node.GetNumber().Text);
         node.GetId().Apply(this);
     }
+
+    public override void OutADeclstmtGlobal(ADeclstmtGlobal node)
+    {
+        output.WriteLine(";");
+    }
 }

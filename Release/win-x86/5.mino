@@ -37,7 +37,7 @@ prog {
 loop {
     weirdBool = !weirdBool;
     int d = 5;
-    Length magicLength = (5weird * 5.2) / builtin * (2 + --d++);
+    Length magicLength = (5weird * 5.2) / builtin * (2 + --d);
     magicLength = 2 * magicLength;
     magicLength += 5km;
     if (weirdBool || 5-2==3 && magicLength > 5km) {
