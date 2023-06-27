@@ -235,7 +235,7 @@ func untypedthree(){
       } 
 }
 func untypedfour(){
-      int b = 7;
+      int b = 3;
       int a = 4;
       bool c = true;
       do{

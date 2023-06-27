@@ -52,10 +52,7 @@ public class stmtTypeChecker : DepthFirstAdapter
     public override void OutAAssignStmt(AAssignStmt node) {
         Symbol? idToType = symbolTable.GetSymbol(node.GetId().ToString().Trim());
         Node exp = node.GetExp();
-        if (exp is AIdExp id)
-        {
-            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
-        }
+        
         Symbol? expSymbol = symbolTable.GetSymbol(exp);
         switch (idToType)
         {
@@ -188,10 +185,7 @@ public class stmtTypeChecker : DepthFirstAdapter
     {
         Symbol? type = symbolTable.GetSymbol("" + node.GetId().ToString().Trim());
         Node exp = node.GetExp();
-        if (exp is AIdExp id)
-        {
-            symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out exp);
-        }
+       
         Symbol? expSymbol = symbolTable.GetSymbol(exp);
         switch (type)
         {
@@ -594,11 +588,7 @@ public class stmtTypeChecker : DepthFirstAdapter
            for(int i = 0; i < args.Count(); i++)
            {
                Node? parameter = parameters[i];
-               if (parameters[i] is AIdExp id)
-               {
-                   symbolTable.GetNodeFromId(id.GetId().ToString().Trim(), out parameter);
-               }
-                       
+                   
                switch (args[i])
                {
                    case AIntType:
@@ -940,10 +930,7 @@ public class stmtTypeChecker : DepthFirstAdapter
     public override void OutADelayStmt(ADelayStmt node)
     {
         Symbol? exp = symbolTable.GetSymbol(node.GetExp());
-        if (node.GetExp() is AIdExp id)
-        {
-            exp = symbolTable.GetSymbol(id.GetId());
-        }
+        
         if (exp == Symbol.Int)
         {
             symbolTable.AddNode(node, Symbol.Ok);
@@ -974,10 +961,7 @@ public class stmtTypeChecker : DepthFirstAdapter
     public override void OutASetpinStmt(ASetpinStmt node)
     {
         Symbol? exp = symbolTable.GetSymbol(node.GetExp());
-        if (node.GetExp() is AIdExp id)
-        {
-            exp = symbolTable.GetSymbol(id.GetId());
-        }
+        
         if (exp is Symbol.Int or Symbol.Pin)
         {
             symbolTable.AddNode(node, Symbol.Ok);

@@ -100,7 +100,7 @@ unit Time {
 }
 
 int testValue;
-#Time testUnit;
+Time testUnit;
 
 Time functionTest(int a, string b){
     testValue++;

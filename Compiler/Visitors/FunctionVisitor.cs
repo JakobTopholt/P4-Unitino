@@ -179,7 +179,7 @@ public class FunctionVisitor : DepthFirstAdapter
         }
         
     }
-
+    
 
     public override void CaseATypedGlobal(ATypedGlobal node)
     {
@@ -345,10 +345,31 @@ public class FunctionVisitor : DepthFirstAdapter
 
     public override void CaseALoopGlobal(ALoopGlobal node)
     {
-        symbolTable = symbolTable.EnterScope().ExitScope();
+        symbolTable = symbolTable.EnterScope();
+        IList stmts = node.GetStmt();
+            
+        foreach (PStmt stmt in stmts)
+        {
+            if (stmt is AForStmt or AIfStmt or AElseifStmt or AElseStmt or AWhileStmt or ADowhileStmt)
+            {
+                symbolTable = symbolTable.EnterScope().ExitScope();
+            }
+        }
+        
+        symbolTable = symbolTable.ExitScope();
     }
     public override void CaseAProgGlobal(AProgGlobal node)
     {
-        symbolTable = symbolTable.EnterScope().ExitScope();
+        symbolTable = symbolTable.EnterScope();
+        IList stmts = node.GetStmt();
+            
+        foreach (PStmt stmt in stmts)
+        {
+            if (stmt is AForStmt or AIfStmt or AElseifStmt or AElseStmt or AWhileStmt or ADowhileStmt)
+            {
+                symbolTable = symbolTable.EnterScope().ExitScope();
+            }
+        }
+        symbolTable = symbolTable.ExitScope();
     } 
 }

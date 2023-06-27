@@ -1,4 +1,4 @@
-# Everything
+
 unit Time {
 	ms => value;
 	s => value*1000;
@@ -41,12 +41,13 @@ loop {
     magicLength = 2 * magicLength;
     magicLength += 5km;
     if (weirdBool || 5-2==3 && magicLength > 5km) {
-        do {
-            magicLength -= 1km;
-        } while(magicLength > 5km)
+       d = 7;
     }
+    do {
+       magicLength -= 1km;
+    } while(magicLength > 5km)
     pin f = 5;
-    float g = readpin(f);
+    int g = readpin(f);
     Length h = calculate2(2m, 2cm, false);
     int i = calculate(5, 2, true);
 }

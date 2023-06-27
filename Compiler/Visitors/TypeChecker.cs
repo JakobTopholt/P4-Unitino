@@ -204,7 +204,17 @@ public class TypeChecker : exprTypeChecker
     {
         if (symbolTable._parent == null)
         {
-            symbolTable = symbolTable.EnterScope().ExitScope();
+            symbolTable = symbolTable.EnterScope();
+            IList stmts = node.GetStmt();
+            
+            foreach (PStmt stmt in stmts)
+            {
+                if (stmt is AForStmt or AIfStmt or AElseifStmt or AElseStmt or AWhileStmt or ADowhileStmt)
+                {
+                    symbolTable = symbolTable.EnterScope().ExitScope();
+                }
+            }
+            symbolTable = symbolTable.ExitScope();
         }
         else
         {
