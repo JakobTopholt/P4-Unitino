@@ -24,6 +24,9 @@ func calculate2(Length first, Length second, bool add) {
 prog {
     Time*Time*Time blinkDelaySquared = 1s*1s*1s;
 	int a = 7;
+	if(true){
+	    a++;
+	}
 	for (int i = 0; i < a; i++) {
 		writepin(builtin, high);
 		delay((int)(blinkDelay / 1ms));
@@ -38,12 +41,13 @@ loop {
     magicLength = 2 * magicLength;
     magicLength += 5km;
     if (weirdBool || 5-2==3 && magicLength > 5km) {
-        do {
-            magicLength -= 1km;
-        } while(magicLength > 5km)
+       d = 7;
     }
+    do {
+       magicLength -= 1km;
+    } while(magicLength > 5km)
     pin f = 5;
-    float g = readPin(f);
+    int g = readpin(f);
     Length h = calculate2(2m, 2cm, false);
     int i = calculate(5, 2, true);
 }
