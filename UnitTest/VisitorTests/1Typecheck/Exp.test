@@ -14,25 +14,6 @@ func funexpr(int a){
     t = t+d;
 }
 ////
-
-////
-void setup() {
-}
-void loop() {
-}
-void Ffunexpr(int a) {
-    int b = 5;
-    b = b + a;
-    float d = 3.5;
-    float e = 6.5 + d;
-    d = d + a;
-    String s = String("lmao");
-    String t = String("xD");
-    s = s + String(a);
-    t = t + s;
-    t = t + String(d);
-}
-////
 true
 //////
 expr plus test false
@@ -44,10 +25,6 @@ func funexpr(int a){
     char c = "a";
     d = d + a;
 }
-////
-
-////
-
 ////
 false
 //////
@@ -63,23 +40,7 @@ func untyped(int a){
     
 }
 ////
-
-////
-void setup() {
-}
-void loop() {
-}
-void Funtyped(int a) {
-    int b = 5;
-    b = b - a;
-    float c = 3.5;
-    float d = 6.5;
-    d = d - c;
-    c = c - b;
-}
-////
 true
-
 //////
 expr minus test false
 ////
@@ -92,12 +53,7 @@ func untyped(int a){
     c = c-d;
 }
 ////
-
-////
-
-////
 false
-
 //////
 expr div mult mod
 ////
@@ -107,22 +63,6 @@ func untypedlmao(){
     decimal cd = 3.5;
     b = b * a;
     decimal d = 6.5;
-    d = d * cd;
-    cd = cd / b;
-}
-////
- 
-////
-void setup() {
-}
-void loop() {
-}
-void Funtypedlmao() {
-    int a = 3;
-    int b = 5;
-    float cd = 3.5;
-    b = b * a;
-    float d = 6.5;
     d = d * cd;
     cd = cd / b;
 }
@@ -143,11 +83,6 @@ func Funtypedlmao(){
     a = g % b; 
 }
 ////
-
-////
-
-
-////
 false
 //////
 tern expr
@@ -158,19 +93,6 @@ func untypedlmao(){
     int d = 4;
     d = b? c : d;
     
-}
-////
-
-////
-void setup() {
-}
-void loop() {
-}
-void Funtypedlmao() {
-    bool b = true;
-    int c = 5;
-    int d = 4;
-    d = b ? c : d;
 }
 ////
 true
@@ -185,10 +107,6 @@ func untypedlmao(int a){
     
 }
 ////
-
-////
-
-////
 false
 //////
 logical AND OR expr
@@ -198,19 +116,6 @@ func untypedlmao() {
     bool a = false;
     bool c = true;
     bool d = a||b&&a||c;
-}
-////
-
-////
-void setup() {
-}
-void loop() {
-}
-void Funtypedlmao() {
-    bool b = true;
-    bool a = false;
-    bool c = true;
-    bool d = a || b && a || c;
 }
 ////
 true
@@ -225,10 +130,6 @@ func untypedlmao(int a){
     
 }
 ////
-
-////
-
-////
 false
 //////
 logical compare expr
@@ -238,21 +139,6 @@ func untypedlmao(int a){
     int b = 2;
     int c = 7;
     bool d = a == b || b < 7 ;
-    bool e = a != b && c > 5;
-    d = a >= 2 || b >= 3;
-}
-////
-
-////
-void setup() {
-}
-void loop() {
-}
-void Funtypedlmao(int a) {
-    a = 5;
-    int b = 2;
-    int c = 7;
-    bool d = a == b || b < 7;
     bool e = a != b && c > 5;
     d = a >= 2 || b >= 3;
 }
@@ -269,10 +155,6 @@ func untypedlmao(){
     bool e = a != b && c > 5;
     d = a >= 2 || b >= 3;
 }
-////
-
-////
-
 ////
 false
 //////
@@ -294,32 +176,6 @@ func untypedlomo(int a){
     a = 5;
     int b = 2;
     decimal d = 3.5;
-    int c;
-    c = --b + a;
-    b = b-- + a;
-}
-////
-
-////
-void setup() {
-}
-void loop() {
-}
-void Funtypedlmao() {
-    int a = 5;
-    int b = 2;
-    float d = 3.5;
-    int c;
-    c = ++b + a;
-    b = b++ + a;
-    a = -a + b;
-    bool rigtige = true;
-    bool falsk = !rigtige;
-}
-void Funtypedlomo(int a) {
-    a = 5;
-    int b = 2;
-    float d = 3.5;
     int c;
     c = --b + a;
     b = b-- + a;
@@ -349,12 +205,4 @@ func untypedlomo(){
     b = b-- + a;
 }
 ////
-
-////
-
-////
 false
-
-
-
-

@@ -1,4 +1,4 @@
-Test1 false
+﻿Test1 false
 ////
 prog {
     int test = "hej";
@@ -30,7 +30,5 @@ func scoped() {
         }
     }
 }
-////
-////
 ////
 false

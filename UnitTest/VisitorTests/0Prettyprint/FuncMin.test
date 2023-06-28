@@ -1,4 +1,4 @@
-﻿lmao xD
+﻿????
 ////
 prog {
 }
@@ -33,22 +33,3 @@ decimal function4(int a) {
     string test = function3(g, b, c);
     return d;
 }
-////
-void setup() {
-}
-void loop() {
-}
-String Ffunction3(char a, char b, char c) {
-    String d = String(a);
-    return d;
-}
-float Ffunction4(int a) {
-    float d = 3.5 + a;
-    char g = 'o';
-    char b = 'b';
-    char c = 'c';
-    String test = Ffunction3(g, b, c);
-    return d;
-}
-////
-true

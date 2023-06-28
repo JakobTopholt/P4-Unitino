@@ -1,14 +1,5 @@
-﻿
-Global Declaration
+﻿Global Declaration
 ////
-int a = 7;
-int b;
-////
-////
-void setup() {
-}
-void loop() {
-}
 int a = 7;
 int b;
 ////
@@ -20,8 +11,6 @@ int a = 7;
 int b;
 int a;
 ////
-////
-////
 false
 //////
 Global Declaration illegal wrong assign
@@ -29,8 +18,6 @@ Global Declaration illegal wrong assign
 int a = 7;
 int b;
 int c = false;
-////
-////
 ////
 false
 //////
@@ -42,8 +29,6 @@ func f() {
 }
 int b = f();
 ////
-////
-////
 false
 //////
 Illegal use of var a
@@ -54,7 +39,5 @@ prog {
 loop {
     a += 5;
 }
-////
-////
 ////
 false

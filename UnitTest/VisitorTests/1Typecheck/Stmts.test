@@ -8,20 +8,6 @@ func untyped(int a, decimal b, string c, char d, bool e){
     bool ea = e; 
 }
 ////
- 
-////
-void setup() {
-}
-void loop() {
-}
-void Funtyped(int a, float b, String c, char d, bool e) {
-    int ab = a;
-    float ba = b;
-    String ca = c;
-    char da = d;
-    bool ea = e;
-} 
-////
 true
 //////
 Assign tests false
@@ -48,10 +34,6 @@ func untypedthree(int a, decimal b, string c, char d, bool e){
     char da = d;
     bool ea = true;
 }
-////
-
-////
-
 ////
 false
 //////
@@ -80,10 +62,6 @@ func untyped(int a, decimal b, string c, char d, Distance dist, Distance/Time sp
     avgSpeedWork += speed;
 }
 ////
-
-////
-
-////
 true
 //////
 suffpostfix test
@@ -108,30 +86,6 @@ func untyped(int a, decimal b, string c, char d, bool e){
      --da;  
 }
 ////
-
-////
-void setup() {
-}
-void loop() {
-}
-void Funtyped(int a, float b, String c, char d, bool e) {
-    int ab = a;
-    float ba = b;
-    char da = d;
-    ab++;
-    ba++;
-    da++;
-    ++ab;
-    ++ba;
-    ++da;
-    ab--;
-    ba--;
-    da--;
-    --ab;
-    --ba;
-    --da;
-}
-////
 true
 //////
 suffpostfix test false
@@ -151,11 +105,6 @@ func untyped(int a, decimal b, string c, char d, bool e){
      --ab;
      --ba; 
 }
-
-////
-
-////
-
 ////
 false
 //////
@@ -176,27 +125,6 @@ func untypedtwo(int a, decimal b, string c, char d, bool e){
     bool j = true;
 }
 ////
-
-////
-void setup() {
-}
-void loop() {
-}
-void Funtyped(int a, float b, String c, char d, bool e) {
-    int f;
-    float g;
-    String h;
-    char i;
-    bool j;
-}
-void Funtypedtwo(int a, float b, String c, char d, bool e) {
-    int f = 1;
-    float g = 1.5;
-    String h = String("lmao");
-    char i = 'a';
-    bool j = true;
-}
-////
 true
 //////
 outadecl stmt test false
@@ -210,12 +138,8 @@ func untypedtwo(int a, decimal b, string c, char d, bool e){
    
 }
 ////
-
-////
-
-
-////
 false
+
 //////
 control statemetns test
 ////
@@ -241,37 +165,6 @@ func untypedfour(){
       do{
         a++;
       }while (a != 10)
-}
-
-////
-
-////
-void setup() {
-}
-void loop() {
-}
-void Funtypedtwo() {
-    int b = 3;
-    int a = 4;
-    for(int i = 0; b < a; i++) {
-        b++;
-    }
-}
-void Funtypedthree() {
-    int b = 3;
-    int a = 4;
-    bool c = true;
-    while(a != 10) {
-        a++;
-    }
-}
-void Funtypedfour() {
-    int b = 3;
-    int a = 4;
-    bool c = true;
-    do {
-        a++;
-    } while(a != 10);
 }
 ////
 true
@@ -309,7 +202,5 @@ func untypedfour(){
         do{
             }while (a!= 10)
 }
-////
-////
 ////
 false

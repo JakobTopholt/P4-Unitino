@@ -23,19 +23,3 @@ prog {
     string q = "\?";
     string slash = "\\";
 }
-////
-void loop() {
-}
-void setup() {
-    String n = String("\n");
-    char a = '\a';
-    String b = String("\b");
-    String f = String("\f");
-    String r = String("\r");
-    String t = String("\t");
-    String v = String("\v");
-    String q = String("\?");
-    String slash = String("\\");
-}
-////
-true

@@ -8,7 +8,6 @@ unit Time {
     ms => (value);
 }
 ////
-////
 void loop() {
 }
 void setup() {
@@ -27,7 +26,6 @@ prog {
 unit Time {
     ms => (value * 50) * ((5 * 5) * 50.2);
 }
-////
 ////
 void loop() {
 }
@@ -48,7 +46,6 @@ unit Time {
     ms => (value + 50) + ((5 + 5) + 50.2);
 }
 ////
-////
 void loop() {
 }
 void setup() {
@@ -67,7 +64,6 @@ prog {
 unit Time {
     ms => 2 + ("hej" + 1) + ("alo" + 1.2) + (1.1 + "aye") == "hej" ? 50 * value : 5 * value;
 }
-////
 ////
 void loop() {
 }
@@ -91,7 +87,6 @@ unit Time {
     s => 2.2 == 2.2 && 2.0 == 2 || 2 == 2.0 || "hey" == 5 && "5" == 5 && "2.2" == 2.2 && 2.2 == "2.2" ? value : value * 5;
     h => true == false ? value : value - 2;
 }
-////
 ////
 void loop() {
 }
@@ -120,7 +115,6 @@ unit Time {
     ms => 5 == "5" || 2.5 == "2.5" || "2.5" == 2.5 ? value : value*2;
 }
 ////
-////
 void loop() {
 }
 void setup() {
@@ -139,7 +133,6 @@ prog {
 unit Time {
     ms => 5 == 5.0 && "5" == 5 ? value : value * 2;
 }
-////
 ////
 void loop() {
 }
@@ -160,7 +153,6 @@ unit Time {
     ms => 2.1 - ((2 - 1) - 1.2 - (1 - 0.5)) * value;
 }
 ////
-////
 void loop() {
 }
 void setup() {
@@ -179,7 +171,6 @@ prog {
 unit Time {
     ms => (value / (2 / 2)) / (2 / -1.0) + 1.2/1 + -2;
 }
-////
 ////
 void loop() {
 }
@@ -203,7 +194,6 @@ unit Time {
     s => 2.2 != 2.2 && 2.0 != 2 && 2 != 2.0 && "hey" != 5 && "5" != 5 && "2.2" != 2.2 && 2.2 != "2.2" ? value : value  *5;
     h => true != false ? value : value-2;
 }
-////
 ////
 void loop() {
 }
@@ -232,7 +222,6 @@ unit Time {
     ms => 5 != "5" && 2.5 != "2.5" && "2.5" != 2.5 ? value : value * 2;
 }
 ////
-////
 void loop() {
 }
 void setup() {
@@ -252,7 +241,6 @@ unit Time {
     ms => "a" != "b" && "2" != 1 && 1.2 != 1 && 1 != 1.0 ? value : value * 5;
 }
 ////
-////
 void loop() {
 }
 void setup() {
@@ -271,7 +259,6 @@ prog {
 unit Time {
     ms => value + 5 % 3;
 }
-////
 ////
 void loop() {
 }
@@ -297,7 +284,6 @@ unit Time {
     h => 7.0 < 5 || 7.0 <= 5 || 5.0 >= 7 || 3.0 > 6 ? value : value + 2;
     d => 7 < 5.0 || 7 <= 5.0 || 5 >= 7.0 || 3 > 6.0 ? value : value + 2;
 }
-////
 ////
 void loop() {
 }
@@ -329,7 +315,6 @@ prog {
 unit Time {
     ms => !true || !false ? value : value * 2;
 }
-////
 ////
 void loop() {
 }

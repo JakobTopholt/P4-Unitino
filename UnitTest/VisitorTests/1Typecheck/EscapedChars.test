@@ -1,0 +1,15 @@
+﻿escaped chars
+////
+prog {
+    string n = "\n";
+    char a = '\a';
+    string b = "\b";
+    string f = "\f";
+    string r = "\r";
+    string t = "\t";
+    string v = "\v";
+    string q = "\?";
+    string slash = "\\";
+}
+////
+true

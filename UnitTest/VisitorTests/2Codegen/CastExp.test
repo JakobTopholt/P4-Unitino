@@ -1,6 +1,5 @@
 ﻿casting expr
 ////
-
 prog{
     bool a = true;
     int b = 5;
@@ -22,8 +21,6 @@ prog{
 loop{
 }
 ////
-
-////
 void setup() {
     bool a = true;
     int b = 5;
@@ -41,25 +38,3 @@ void setup() {
 }
 void loop() {
 }
-////
-true
-//////
-casting expr false
-////
-func untypedlmao(){
-    bool a = true;
-    int b = 5;
-    decimal c = 3.5;
-    string d = "lmao";
-    char e = 'D';
-  
-    decimal cd = (decimal)e;
-    string de = (string)a;
-    char ef = (char)e;
-}
-////
-
-////
-
-////
-false

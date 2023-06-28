@@ -15,8 +15,6 @@ loop {
     decimal c = 200.0;
 }
 ////
-
-////
 float UTimems(float value) {
     return value;
 }
@@ -33,8 +31,6 @@ void setup() {
 void loop() {
     float c = 200.0;
 }
-////
-true
 //////
 Check if units work
 ////
@@ -46,16 +42,6 @@ prog {
     decimal e = 3.7;
     Time a = 1/50.3ms + 1/5s;
     Time b = 1/50ms - 1/5s;
-}
-////
-unit Time {
-    ms => value;
-    s => value * 1000;
-}
-prog {
-    decimal e = 3.7;
-    Time a = 1 / 50.3ms + 1 / 5s;
-    Time b = 1 / 50ms - 1 / 5s;
 }
 ////
 void loop() {
@@ -71,6 +57,3 @@ void setup() {
     float a = 1 / 50.3 + 1 / 5000;
     float b = 1 / 50 - 1 / 5000;
 }
-////
-true
-//////

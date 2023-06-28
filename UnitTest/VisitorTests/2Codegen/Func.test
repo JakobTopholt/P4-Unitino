@@ -38,44 +38,6 @@ decimal function4(int i) {
     return d;
 }
 ////
-func NormalFunc(int b, int a) {
-    int i = 0;
-}
-prog {
-    int l = 0;
-    NormalFunc(5, 7);
-    bool k = false;
-    bool j = (bool)k;
-    decimal a = (decimal)l;
-    int b = (int)a;
-    char c = (char)l;
-    int d;
-    bool e;
-    char f;
-    decimal g;
-    string h;
-    pin i;
-}
-loop {
-    int f = 0;
-}
-string ImplicitTypedFunc() {
-    string i = "0";
-    return i;
-}
-char function3(char a, char b, char c) {
-    char d = a;
-    return d;
-}
-decimal function4(int i) {
-    decimal d = 3.5 + i;
-    char a = 'a';
-    char b = 'b';
-    char c = 'c';
-    function3(a, b, c);
-    return d;
-}
-////
 void FNormalFunc(int b, int a) {
     int i = 0;
 }
@@ -113,5 +75,3 @@ float Ffunction4(int i) {
     Ffunction3(a, b, c);
     return d;
 }
-////
-true
