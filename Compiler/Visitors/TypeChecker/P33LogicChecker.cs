@@ -1,5 +1,4 @@
 using System.Collections;
-using Compiler.Visitors.TypeCheckerDir;
 using Moduino.analysis;
 using Moduino.node;
 
@@ -8,13 +7,17 @@ namespace Compiler.Visitors;
 // Dette er tredje og sidste pass af typecheckeren
 // Den bruger symbolTablen vi har populated til at tjekke
 
-public class TypeChecker : exprTypeChecker
+internal partial class P33LogicChecker : DepthFirstAdapter
 {
-    public TypeChecker(SymbolTable symbolTable) : base(symbolTable)
+    public SymbolTable symbolTable;
+    private TextWriter output;
+    public P33LogicChecker(SymbolTable symbolTable, TextWriter output)
     {
+        this.symbolTable = symbolTable;
+        this.output = output;
     }
-    SortedList<string, AUnitdeclGlobal> unitUseNums = new SortedList<string, AUnitdeclGlobal>(new DuplicateKeyComparer<string>());
-    SortedList<string, AUnitdeclGlobal> unitUseDens = new SortedList<string, AUnitdeclGlobal>(new DuplicateKeyComparer<string>());
+    SortedList<string, AUnitdeclGlobal> unitUseNums = new(new DuplicateKeyComparer<string>());
+    SortedList<string, AUnitdeclGlobal> unitUseDens = new(new DuplicateKeyComparer<string>());
     
     public override void CaseAGrammar(AGrammar node)
     {
@@ -45,7 +48,7 @@ public class TypeChecker : exprTypeChecker
         }
         foreach (string error in errorResults)
         {
-            Console.WriteLine(error);
+            output.WriteLine(error);
         }
 
         symbolTable = symbolTable.ResetScope();

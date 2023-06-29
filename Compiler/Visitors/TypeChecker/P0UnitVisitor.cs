@@ -1,5 +1,3 @@
-using System.Collections;
-using Compiler.Visitors.TypeCheckerDir;
 using Moduino.analysis;
 using Moduino.node;
 
@@ -7,15 +5,16 @@ namespace Compiler.Visitors;
 
 // First pass of the typechecker
 
-public class UnitVisitor : DepthFirstAdapter
+internal class P0UnitVisitor : DepthFirstAdapter
 {
     private SymbolTable symbolTable;
-    private TypeChecker typeChecker;
-    public UnitVisitor(SymbolTable symbolTable, TypeChecker typeChecker)
+    private P33LogicChecker _p33LogicChecker;
+    private TextWriter output;
+    public P0UnitVisitor(SymbolTable symbolTable, TextWriter output)
     {
         this.symbolTable = symbolTable;
-        this.typeChecker = typeChecker;
-
+        _p33LogicChecker = new P33LogicChecker(symbolTable, output);
+        this.output = output;
     }
     public static bool StateUnit;
     public string tempLocation = "";
@@ -90,7 +89,7 @@ public class UnitVisitor : DepthFirstAdapter
         if (!symbolTable.IsInExtendedScope(node.GetId().ToString()))
         {
             PExp expression = node.GetExp();
-            expression.Apply(typeChecker);
+            expression.Apply(_p33LogicChecker);
             
             if (symbolTable.GetSymbol(expression) != Symbol.Decimal)
             {

@@ -9,10 +9,16 @@ public class PrettyPrint : DepthFirstAdapter
 {
     private SymbolTable symbolTable;
     private TextWriter output;
-    public PrettyPrint(SymbolTable symbolTable, TextWriter? output = null)
+    private Start ast;
+    private PrettyPrint(SymbolTable symbolTable, Start ast, TextWriter output)
     {
         this.output = output;
         this.symbolTable = symbolTable;
+        this.ast = ast;
+    }
+    public static void Run(SymbolTable symbolTable, Start ast, TextWriter output)
+    {
+        ast.Apply(new PrettyPrint(symbolTable, ast, output));
     }
 
     private void PrintPrecedence(Node L, Node R, string ope)

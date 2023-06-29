@@ -9,13 +9,21 @@ public class SymbolTable
     private readonly List<SymbolTable> _allTables;
     public int _currentTable;
     public int currentScope;
-    public SymbolTable(SymbolTable? parent, List<SymbolTable> allTables, int currentTable = 0, int scope = 0)
+    private SymbolTable(SymbolTable? parent, List<SymbolTable> allTables, int currentTable = 0, int scope = 0)
     {
         _parent = parent;
         allTables.Add(this);
         _currentTable = currentTable;
         _allTables = allTables;
         currentScope = scope;
+    }
+
+    public SymbolTable()
+    {
+        _parent = null;
+        _allTables = new List<SymbolTable> { this };
+        _currentTable = 0;
+        _currentTable = 0;
     }
     public readonly SymbolTable? _parent;
     private readonly Dictionary<string, Node> _idToNode = new();

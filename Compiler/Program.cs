@@ -27,7 +27,7 @@ internal static class Program
             if (args[1] == "-pretty")
             {
                 Console.WriteLine("Prettyprinting:\n" + inputFile);
-                await ModuinoCompiler.PrettyPrint(inputFile);
+                await ModuinoCompiler.CleanUp(inputFile);
                 return;
             }
             bash = args[1];

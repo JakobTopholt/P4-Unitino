@@ -1,16 +1,12 @@
 ﻿using System.Collections;
 using Microsoft.VisualBasic;
 
-namespace Compiler.Visitors.TypeCheckerDir;
+namespace Compiler.Visitors;
 using Moduino.node;
 using Moduino.analysis;
 
-public class exprTypeChecker : stmtTypeChecker
+internal partial class P33LogicChecker
 {
-    public exprTypeChecker(SymbolTable symbolTable) : base(symbolTable)
-    {
-
-    }
     
     public override void OutAParenthesisExp(AParenthesisExp node)
     {

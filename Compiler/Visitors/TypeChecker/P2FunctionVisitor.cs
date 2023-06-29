@@ -1,5 +1,4 @@
 using System.Collections;
-using Compiler.Visitors.TypeCheckerDir;
 using Moduino.analysis;
 using Moduino.node;
 
@@ -7,14 +6,16 @@ namespace Compiler.Visitors;
 
 // This is the second pass of the typechecker
 
-public class FunctionVisitor : DepthFirstAdapter
+internal class P2FunctionVisitor : DepthFirstAdapter
 {
     private SymbolTable symbolTable;
-    private TypeChecker typeChecker;
-    public FunctionVisitor(SymbolTable symbolTable, TypeChecker typeChecker)
+    private P33LogicChecker _p33LogicChecker;
+    private TextWriter output;
+    public P2FunctionVisitor(SymbolTable symbolTable, TextWriter output)
     {
         this.symbolTable = symbolTable;
-        this.typeChecker = typeChecker;
+        _p33LogicChecker = new P33LogicChecker(symbolTable, output);
+        this.output = output;
     }
     
     public override void OutAGrammar(AGrammar node)
@@ -27,15 +28,15 @@ public class FunctionVisitor : DepthFirstAdapter
         InAArg(node);
         if(node.GetType() != null)
         {
-            typeChecker.symbolTable = symbolTable;
-            node.GetType().Apply(typeChecker);
-            symbolTable = typeChecker.symbolTable;
+            _p33LogicChecker.symbolTable = symbolTable;
+            node.GetType().Apply(_p33LogicChecker);
+            symbolTable = _p33LogicChecker.symbolTable;
         }
         if(node.GetId() != null)
         {
-            typeChecker.symbolTable = symbolTable;
-            node.GetId().Apply(typeChecker);
-            symbolTable = typeChecker.symbolTable;
+            _p33LogicChecker.symbolTable = symbolTable;
+            node.GetId().Apply(_p33LogicChecker);
+            symbolTable = _p33LogicChecker.symbolTable;
         }
         OutAArg(node);
     }
@@ -131,9 +132,9 @@ public class FunctionVisitor : DepthFirstAdapter
         bool untypedIsOk = true;
         foreach (PStmt stmt in stmts)
         {
-            typeChecker.symbolTable = symbolTable;
-            stmt.Apply(typeChecker);
-            symbolTable = typeChecker.symbolTable;
+            _p33LogicChecker.symbolTable = symbolTable;
+            stmt.Apply(_p33LogicChecker);
+            symbolTable = _p33LogicChecker.symbolTable;
             if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
             {
                 untypedIsOk = false;
@@ -194,9 +195,9 @@ public class FunctionVisitor : DepthFirstAdapter
         }
         if(node.GetType() != null)
         {
-            typeChecker.symbolTable = symbolTable;
-            node.GetType().Apply(typeChecker);
-            symbolTable = typeChecker.symbolTable;
+            _p33LogicChecker.symbolTable = symbolTable;
+            node.GetType().Apply(_p33LogicChecker);
+            symbolTable = _p33LogicChecker.symbolTable;
         }
         OutATypedGlobal(node);
     }
@@ -228,9 +229,9 @@ public class FunctionVisitor : DepthFirstAdapter
         bool typedIsOk = true;
         foreach (PStmt stmt in stmts)
         {
-            typeChecker.symbolTable = symbolTable;
-            stmt.Apply(typeChecker);
-            symbolTable = typeChecker.symbolTable;
+            _p33LogicChecker.symbolTable = symbolTable;
+            stmt.Apply(_p33LogicChecker);
+            symbolTable = _p33LogicChecker.symbolTable;
         }
         if (!typedIsOk)
         {

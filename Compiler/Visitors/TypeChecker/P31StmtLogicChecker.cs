@@ -1,29 +1,23 @@
 ﻿using Moduino.analysis;
 using Moduino.node;
 
-namespace Compiler.Visitors.TypeCheckerDir;
+namespace Compiler.Visitors;
 
 
-public class stmtTypeChecker : DepthFirstAdapter
+internal partial class P33LogicChecker
 {
-    public SymbolTable symbolTable;
-    public stmtTypeChecker(SymbolTable symbolTable)
-    {
-        this.symbolTable = symbolTable;
-    }
-    
-    public Stack<string> locations = new ();
-    public string tempResult = "";
-    public List<string?> errorResults = new ();
-    public int indent = 0;
-    public bool reported = false;
+    private Stack<string> locations = new ();
+    private string tempResult = "";
+    private List<string?> errorResults = new ();
+    private int indent = 0;
+    private bool reported = false;
 
-    protected string IndentedString(string s)
+    private string IndentedString(string s)
     {
         return new string(' ', indent * 3) + s;
     }
 
-    protected void PrintError()
+    private void PrintError()
     {
         if (tempResult != "" && !reported)
         {

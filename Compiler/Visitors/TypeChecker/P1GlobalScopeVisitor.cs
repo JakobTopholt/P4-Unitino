@@ -1,18 +1,18 @@
-﻿using System.Collections;
-using Compiler.Visitors.TypeCheckerDir;
-using Moduino.analysis;
+﻿using Moduino.analysis;
 using Moduino.node;
 
 namespace Compiler.Visitors;
 
-public class GlobalScopeVisitor : DepthFirstAdapter
+internal class P1GlobalScopeVisitor : DepthFirstAdapter
 {
     private SymbolTable symbolTable;
-    private TypeChecker typeChecker;
-    public GlobalScopeVisitor(SymbolTable symbolTable, TypeChecker typeChecker)
+    private P33LogicChecker _p33LogicChecker;
+    private TextWriter output;
+    public P1GlobalScopeVisitor(SymbolTable symbolTable, TextWriter output)
     {
         this.symbolTable = symbolTable;
-        this.typeChecker = typeChecker;
+        _p33LogicChecker = new P33LogicChecker(symbolTable, output);
+        this.output = output;
     }
     public Stack<string> locations = new ();
     public string tempResult = "";
@@ -128,21 +128,21 @@ public class GlobalScopeVisitor : DepthFirstAdapter
         InADeclassStmt(node);
         if(node.GetType() != null)
         {
-            typeChecker.symbolTable = symbolTable;
-            node.GetType().Apply(typeChecker);
-            symbolTable = typeChecker.symbolTable;
+            _p33LogicChecker.symbolTable = symbolTable;
+            node.GetType().Apply(_p33LogicChecker);
+            symbolTable = _p33LogicChecker.symbolTable;
         }
         if(node.GetId() != null)
         {
-            typeChecker.symbolTable = symbolTable;
-            node.GetId().Apply(typeChecker);
-            symbolTable = typeChecker.symbolTable;
+            _p33LogicChecker.symbolTable = symbolTable;
+            node.GetId().Apply(_p33LogicChecker);
+            symbolTable = _p33LogicChecker.symbolTable;
         }
         if(node.GetExp() != null)
         {
-            typeChecker.symbolTable = symbolTable;
-            node.GetExp().Apply(typeChecker);
-            symbolTable = typeChecker.symbolTable;
+            _p33LogicChecker.symbolTable = symbolTable;
+            node.GetExp().Apply(_p33LogicChecker);
+            symbolTable = _p33LogicChecker.symbolTable;
         }
         OutADeclassStmt(node);
     }

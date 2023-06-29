@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using Compiler;
 using Compiler.Visitors;
+using Compiler.Visitors.TypeChecker;
 using Moduino.node;
 using NUnit.Framework;
 using static UnitTest.TestUtils;
@@ -23,25 +24,13 @@ public class CodeGenTester
     [TestCaseSource(nameof(CodeGenTests))] //Can't call GetTests directly because parameters can't be used in attributes 
     public void CodeGen(Start ast, string expectedOutput)
     {
-        List<SymbolTable> list = new();
-        SymbolTable symbolTable = new(null, list);
-        TypeChecker subunitsExprCheck = new TypeChecker(symbolTable);
-        TypeChecker globalDeclCheck = new(symbolTable);
-        TypeChecker globalFunctionCheck = new (symbolTable);
-        
-        UnitVisitor a = new(symbolTable, subunitsExprCheck);
-        GlobalScopeVisitor e = new(symbolTable, globalDeclCheck);
-        FunctionVisitor b = new(symbolTable, globalFunctionCheck);
-        TypeChecker c = new(symbolTable);
-        ast.Apply(a);
-        ast.Apply(e);
-        ast.Apply(b);
-        ast.Apply(c);
+        SymbolTable symbolTable = new();
+        TypeChecker.Run(symbolTable, ast);
         using MemoryStream stream = new();
         using StreamWriter writer = new(stream);
-        CodeGen codeGen = new(writer, symbolTable);
-        ast.Apply(codeGen);
-        writer.Flush();
+        Compiler.Visitors.CodeGen.Run(writer, symbolTable, ast);
+        
+        writer.Flush(); // Required
         string code = Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int) stream.Length);
         Assert.That(code.Trim().ReplaceLineEndings(), Is.EqualTo(expectedOutput));
     }

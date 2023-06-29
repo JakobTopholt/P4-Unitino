@@ -4,7 +4,7 @@ using Moduino.node;
 
 namespace Compiler.Visitors;
 
-public class ExprEvaluator : DepthFirstAdapter
+internal class ExprEvaluator : DepthFirstAdapter
 {
     private Dictionary<Node, object> values = new();
     private float value;
@@ -127,7 +127,7 @@ public class ExprEvaluator : DepthFirstAdapter
             (AIntType, int a) => a,
             (ADecimalType, float a) => a,
             (ABoolType, bool a) => a, 
-            (ACharType, char a) => a, //TODO: Char everywhere else
+            (ACharType, char a) => a,
             (AStringType, string a) => a,
             (ADecimalType, int a) => (float) a,
             (AIntType, decimal a) => (float) a,

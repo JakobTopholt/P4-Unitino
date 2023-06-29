@@ -6,15 +6,21 @@ using Moduino.node;
 
 namespace Compiler.Visitors;
 
-public class CodeGen : DepthFirstAdapter, IDisposable
+public class CodeGen : DepthFirstAdapter
 {
     private SymbolTable symbolTable;
     private StreamWriter writer;
+    private Start ast;
     private static readonly Regex whiteSpace = new(@"\s+");
-    public CodeGen(StreamWriter writer, SymbolTable symbolTable )
+    private CodeGen(StreamWriter writer, SymbolTable symbolTable, Start ast)
     {
         this.writer = writer;
         this.symbolTable = symbolTable;
+        this.ast = ast;
+    }
+    public static void Run(StreamWriter writer, SymbolTable symbolTable, Start ast)
+    {
+        ast.Apply(new CodeGen(writer, symbolTable, ast));
     }
 
     void Precedence(Node L, Node R, string ope)
@@ -935,12 +941,5 @@ public class CodeGen : DepthFirstAdapter, IDisposable
         writer.Write("(");
         node.GetExp().Apply(this);
         writer.Write(")");
-    }
-
-    
-
-    public void Dispose()
-    {
-        writer.Dispose();
     }
 }
