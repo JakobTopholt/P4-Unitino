@@ -1,0 +1,65 @@
+﻿Test single unit
+////
+unit unit1 {
+    ms => value;
+}
+////
+void setup() {
+}
+void loop() {
+}
+float Uunit1ms(float value) {
+    return value;
+}
+//////
+Test 2 subunits
+////
+unit unit2 {
+    ms => value;
+    s => value * 1000;
+}
+////
+void setup() {
+}
+void loop() {
+}
+float Uunit2ms(float value) {
+    return value;
+}
+float Uunit2s(float value) {
+    return value * 1000;
+}
+//////
+Test 2 units
+////
+unit unit3 {
+    ms => value;
+}
+unit unit4 {
+    s => value * 1000;
+}
+////
+void setup() {
+}
+void loop() {
+}
+float Uunit3ms(float value) {
+    return value;
+}
+float Uunit4s(float value) {
+    return value * 1000;
+}
+//////
+Should succeed with only units
+////
+unit unit5 {
+    ms => value;
+}
+////
+void setup() {
+}
+void loop() {
+}
+float Uunit5ms(float value) {
+    return value;
+}

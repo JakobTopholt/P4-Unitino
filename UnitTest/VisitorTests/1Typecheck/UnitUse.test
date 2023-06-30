@@ -1,0 +1,32 @@
+﻿Check if single unit works
+////
+unit Time {
+    ms => value;
+    s => value * 1000;
+}
+Time UnitFunc() {
+    Time a = 1 / 50ms;
+    return a;
+}
+prog {
+    Time a = 1 / 50ms;
+}
+loop {
+    decimal c = 200.0;
+}
+////
+true
+//////
+Check if units work
+////
+unit Time {
+    ms => value;
+    s => value * 1000;
+}
+prog {
+    decimal e = 3.7;
+    Time a = 1/50.3ms + 1/5s;
+    Time b = 1/50ms - 1/5s;
+}
+////
+true

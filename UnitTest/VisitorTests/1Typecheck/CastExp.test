@@ -1,0 +1,40 @@
+﻿casting expr
+////
+prog{
+    bool a = true;
+    int b = 5;
+    decimal c = 3.5;
+    string d = "lmao";
+    char e = 'xD';
+     bool ab = (bool)a;
+    /* self casts */
+    int ba = (int)b;
+    decimal cd = (decimal)c;
+    char ef = (char)e;
+    
+    /*rigtige typecasts */
+       c = (decimal)b;
+       d = (string)ef;
+       d =(string)c;
+       ef =(char)b;
+}
+loop{
+}
+////
+true
+//////
+casting expr false
+////
+func untypedlmao(){
+    bool a = true;
+    int b = 5;
+    decimal c = 3.5;
+    string d = "lmao";
+    char e = 'D';
+  
+    decimal cd = (decimal)e;
+    string de = (string)a;
+    char ef = (char)e;
+}
+////
+false

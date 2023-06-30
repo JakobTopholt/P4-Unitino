@@ -1,0 +1,156 @@
+﻿Assign tests
+////
+func untyped(int a, decimal b, string c, char d, bool e){
+    int ab = a;
+    decimal ba = b;
+    string ca = c;
+    char da = d;
+    bool ea = e; 
+}
+////
+void setup() {
+}
+void loop() {
+}
+void Funtyped(int a, float b, String c, char d, bool e) {
+    int ab = a;
+    float ba = b;
+    String ca = c;
+    char da = d;
+    bool ea = e;
+}
+//////
+suffpostfix test
+////
+func untyped(int a, decimal b, string c, char d, bool e){
+    int ab = a;
+    decimal ba = b;
+    char da = d;
+    ab++;
+    ba++;
+    da++;
+    
+    ++ab;
+    ++ba;
+    ++da;
+    
+    ab--;
+    ba--;
+    da--;
+     --ab;
+     --ba;
+     --da;  
+}
+////
+void setup() {
+}
+void loop() {
+}
+void Funtyped(int a, float b, String c, char d, bool e) {
+    int ab = a;
+    float ba = b;
+    char da = d;
+    ab++;
+    ba++;
+    da++;
+    ++ab;
+    ++ba;
+    ++da;
+    ab--;
+    ba--;
+    da--;
+    --ab;
+    --ba;
+    --da;
+}
+//////
+outadecl stmt test
+////
+func untyped(int a, decimal b, string c, char d, bool e){
+    int f;
+    decimal g;
+    string h;
+    char i;
+    bool j;    
+}
+func untypedtwo(int a, decimal b, string c, char d, bool e){
+    int f = 1;
+    decimal g = 1.5;
+    string h = "lmao";
+    char i = 'a';
+    bool j = true;
+}
+////
+void setup() {
+}
+void loop() {
+}
+void Funtyped(int a, float b, String c, char d, bool e) {
+    int f;
+    float g;
+    String h;
+    char i;
+    bool j;
+}
+void Funtypedtwo(int a, float b, String c, char d, bool e) {
+    int f = 1;
+    float g = 1.5;
+    String h = String("lmao");
+    char i = 'a';
+    bool j = true;
+}
+
+//////
+control statemetns test
+////
+func untypedtwo(){
+    int b = 3;
+    int a = 4;
+    for(int i = 0; b < a;i++){
+        b++;
+    }
+}
+func untypedthree(){
+      int b = 3;
+      int a = 4;
+      bool c = true;
+      while (a != 10){
+        a++;
+      } 
+}
+func untypedfour(){
+      int b = 3;
+      int a = 4;
+      bool c = true;
+      do{
+        a++;
+      }while (a != 10)
+}
+////
+void setup() {
+}
+void loop() {
+}
+void Funtypedtwo() {
+    int b = 3;
+    int a = 4;
+    for(int i = 0; b < a; i++) {
+        b++;
+    }
+}
+void Funtypedthree() {
+    int b = 3;
+    int a = 4;
+    bool c = true;
+    while(a != 10) {
+        a++;
+    }
+}
+void Funtypedfour() {
+    int b = 3;
+    int a = 4;
+    bool c = true;
+    do {
+        a++;
+    } while(a != 10);
+}
