@@ -219,9 +219,9 @@ public class CodeGen : DepthFirstAdapter
                 Indent("char ");
                 break;
             case Symbol.Decimal:
+            case Symbol.Ok:
                 Indent("float ");
                 break;
-            case Symbol.Ok:
             case Symbol.NotOk:
             case Symbol.Func:
                 Indent("void ");
