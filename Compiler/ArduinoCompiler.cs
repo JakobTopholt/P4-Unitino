@@ -63,8 +63,6 @@ public static class ArduinoCompiler
             string portName = column[0];
             string boardFqbn = column[7];
             
-            Console.WriteLine($"compiling to board - fqbn: \"{boardFqbn}\" port: \"{portName}\"");
-
             bool success = await Compile(folder, portName, boardFqbn);
             if (!success)
                 Console.WriteLine("Failed to compile");
@@ -99,19 +97,42 @@ public static class ArduinoCompiler
             Console.WriteLine("error:\n" + error);
             return false;
         }
-        
-        Process compileProcess = ArduinoCli(portName == null
-            ? $"compile -b {boardFqbn} {folder}"
-            : $"upload -b {boardFqbn} -p {portName} {folder}", true);
-        
-        compileProcess.Start();
-        await compileProcess.WaitForExitAsync();
-        error = await compileProcess.StandardError.ReadToEndAsync();
-        if (error.Trim().Length <= 0) 
-            return true;
-        error = InoFilePathRegex.Replace(MainPathRegex.Replace(error, "main.cpp"), "File");
-        Console.WriteLine("error:\n" + error);
-        return false;
+
+        if (portName == null)
+        {
+            Process compileProcess = ArduinoCli($"compile -b {boardFqbn} {folder}", true);
+            compileProcess.Start();
+            await compileProcess.WaitForExitAsync();
+            error = await compileProcess.StandardError.ReadToEndAsync();
+            if (error.Trim().Length <= 0) 
+                return true;
+            error = InoFilePathRegex.Replace(MainPathRegex.Replace(error, "main.cpp"), "File");
+            Console.WriteLine("error:\n" + error);
+            return false;
+        }
+        else
+        {
+            Process compileProcess = ArduinoCli($"compile {folder} -b {boardFqbn}", true);
+            compileProcess.Start();
+            await compileProcess.WaitForExitAsync();
+            error = await compileProcess.StandardError.ReadToEndAsync();
+            if (error.Trim().Length > 0)
+            {
+                error = InoFilePathRegex.Replace(MainPathRegex.Replace(error, "main.cpp"), "File");
+                Console.WriteLine("error:\n" + error);
+                return false;
+            }
+            Process compileProcess2 = ArduinoCli($"upload {folder} -b {boardFqbn} -p {portName}", true);
+            compileProcess2.Start();
+            await compileProcess2.WaitForExitAsync();
+            error = await compileProcess2.StandardError.ReadToEndAsync();
+            if (error.Trim().Length <= 0) 
+                return true;
+            error = InoFilePathRegex.Replace(MainPathRegex.Replace(error, "main.cpp"), "File");
+            Console.WriteLine("error:\n" + error);
+            return false;
+        }
+        return true;
     }
 
     private static async Task<Process> Monitor(string portName, string boardFqbn)
@@ -135,6 +156,7 @@ public static class ArduinoCompiler
 
     private static Process ArduinoCli(string args, bool redirect)
     {
+        Console.WriteLine("running: bin\\arduino-cli.exe " + args);
         return new Process
         {
             StartInfo = redirect

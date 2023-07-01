@@ -1,0 +1,22 @@
+﻿//////
+Check if units work
+////
+unit Time {
+    ms => value;
+    s => value * 1000;
+}
+prog {
+    decimal e = 3.7;
+    Time a = 1/50.3ms + 1/5s;
+    Time b = 1/50ms - 1/5s;
+}
+////
+unit Time {
+    ms => value;
+    s => value * 1000;
+}
+prog {
+    decimal e = 3.7;
+    Time a = 1 / 50.3ms + 1 / 5s;
+    Time b = 1 / 50ms - 1 / 5s;
+}

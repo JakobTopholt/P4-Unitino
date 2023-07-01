@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Compiler.Visitors;
+using Compiler.Visitors.TypeChecker;
 using Moduino.lexer;
 using Moduino.node;
 using Moduino.parser;
@@ -44,31 +45,20 @@ internal static class ModuinoCompiler
         }
 
         //start.Apply(new PrettyPrint());
-
-        List<SymbolTable> AllTables = new();
-
-        SymbolTable symbolTable = new(null, AllTables);
-        TypeChecker subunitsExprCheck = new (symbolTable);
-        TypeChecker globalDeclCheck = new(symbolTable);
-        TypeChecker globalFunctionCheck = new (symbolTable);
-
-        start.Apply(new UnitVisitor(symbolTable, subunitsExprCheck));
-        start.Apply(new GlobalScopeVisitor(symbolTable, globalDeclCheck));
-        start.Apply(new FunctionVisitor(symbolTable, globalFunctionCheck));
-        start.Apply(new TypeChecker(symbolTable));
         
-        
-        // Codegen Visitor
         await using FileStream stream = File.Create(outPath);
         await using StreamWriter writer = new(stream);
-        using CodeGen codegen = new(writer, symbolTable);
-        start.Apply(codegen);
+        
+        SymbolTable symbolTable = new();
+        TypeChecker.Run(symbolTable, start);
+        CodeGen.Run(writer, symbolTable, start);
+        
         await writer.FlushAsync();
 
         return folder;
     }
 
-    public static async Task PrettyPrint(string path)
+    public static async Task CleanUp(string path)
     {
         StringBuilder sb = new();
         
@@ -94,19 +84,12 @@ internal static class ModuinoCompiler
                 return;
             }
             
-            List<SymbolTable> AllTables = new();
-
-            SymbolTable symbolTable = new(null, AllTables);
-            TypeChecker subunitsExprCheck = new (symbolTable);
-            TypeChecker globalFunctionCheck = new (symbolTable);
-
-            start.Apply(new UnitVisitor(symbolTable, subunitsExprCheck));
-            start.Apply(new FunctionVisitor(symbolTable, globalFunctionCheck));
-            start.Apply(new TypeChecker(symbolTable));
-            
             TextWriter output = new StringWriter(sb);
-            
-            start.Apply(new PrettyPrint(symbolTable, output));
+            SymbolTable symbolTable = new();
+
+            TypeChecker.Run(symbolTable, start);
+
+            PrettyPrint.Run(symbolTable, start, output);
             
         }
 

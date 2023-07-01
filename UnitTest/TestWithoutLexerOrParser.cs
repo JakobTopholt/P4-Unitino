@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using Compiler.Visitors;
+using Compiler.Visitors.TypeChecker;
 using Moduino.node;
 using NUnit.Framework;
 
@@ -149,23 +150,14 @@ String Fb(int b) {
         // Arrange
         // We assume that SableCC's AST might become corrupt (doesn't happen though)
         Start ast = (Start) _ast.Clone();
-
-        // Act
-        List<SymbolTable> list = new();
-        SymbolTable symbolTable = new(null, list);
-        TypeChecker subunitsExprCheck = new(symbolTable);
-        TypeChecker globalFunctionCheck = new (symbolTable);
-        
-        UnitVisitor a = new(symbolTable, subunitsExprCheck);
-        FunctionVisitor b = new(symbolTable, globalFunctionCheck);
-        TypeChecker c = new(symbolTable);
-        ast.Apply(a);
-        ast.Apply(b);
-        ast.Apply(c);
-        
         StringBuilder sb = new();
         TextWriter output = new StringWriter(sb);
-        ast.Apply(new PrettyPrint(symbolTable, output));
+
+        // Act
+        SymbolTable symbolTable = new();
+        TypeChecker.Run(symbolTable, ast, Console.Out);
+        
+        Compiler.Visitors.PrettyPrint.Run(symbolTable, ast, output);
         
         // Assert
         Assert.That(sb.ToString().ReplaceLineEndings(), Is.EqualTo(_prettyPrint));
@@ -179,17 +171,8 @@ String Fb(int b) {
         Start ast = (Start) _ast.Clone();
         
         // Act
-        List<SymbolTable> list = new();
-        SymbolTable symbolTable = new(null, list);
-        TypeChecker subunitsExprCheck = new TypeChecker(symbolTable);
-        TypeChecker globalFunctionCheck = new (symbolTable);
-        
-        UnitVisitor a = new(symbolTable, subunitsExprCheck);
-        FunctionVisitor b = new(symbolTable, globalFunctionCheck);
-        TypeChecker c = new(symbolTable);
-        ast.Apply(a);
-        ast.Apply(b);
-        ast.Apply(c);
+        SymbolTable symbolTable = new();
+        TypeChecker.Run(symbolTable, ast);
         
         // Assert
         Assert.That(symbolTable.GetSymbol(ast.GetPGrammar()), Is.EqualTo(Symbol.Ok));
@@ -201,24 +184,16 @@ String Fb(int b) {
         // Arrange
         // We assume that SableCC's AST might become corrupt (doesn't happen though)
         Start ast = (Start) _ast.Clone();
-        
-        // Act
-        List<SymbolTable> list = new();
-        SymbolTable symbolTable = new(null, list);
-        TypeChecker subunitsExprCheck = new TypeChecker(symbolTable);
-        TypeChecker globalFunctionCheck = new (symbolTable);
-        
-        UnitVisitor a = new(symbolTable, subunitsExprCheck);
-        FunctionVisitor b = new(symbolTable, globalFunctionCheck);
-        TypeChecker c = new(symbolTable);
-        ast.Apply(a);
-        ast.Apply(b);
-        ast.Apply(c);
         using MemoryStream stream = new();
         using StreamWriter writer = new(stream);
-        CodeGen codeGen = new(writer, symbolTable);
-        ast.Apply(codeGen);
-        writer.Flush();
+        
+        // Act
+        SymbolTable symbolTable = new();
+        TypeChecker.Run(symbolTable, ast);
+        Compiler.Visitors.CodeGen.Run(writer, symbolTable, ast);
+        
+        writer.Flush(); // Required
+        
         string code = Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int) stream.Length);
         
         // Assert

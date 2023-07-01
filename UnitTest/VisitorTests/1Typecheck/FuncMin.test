@@ -1,0 +1,20 @@
+﻿????
+////
+prog {
+}
+loop {
+}
+string function3(char a, char b, char c) {
+    string d = (string)a;
+    return d;
+}
+decimal function4(int a) {
+    decimal d = 3.5 + a;
+    char g = 'o';
+    char b = 'b';
+    char c = 'c';
+    string test = function3(g, b, c);
+    return d;
+}
+////
+true
