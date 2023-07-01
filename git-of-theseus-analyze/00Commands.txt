@@ -1,0 +1,61 @@
+// Install
+pip install git-of-theseus
+
+// Analyze (Note, survival.json doesn't care about ignores)
+git-of-theseus-analyze --ignore-whitespace --ignore Compiler/SableCC/** --ignore sablecc-3-beta.3.altgen.20041114/** --ignore sablecc/** --outdir ./git-of-theseus-analyze .
+cd git-of-theseus-analyze
+
+// Extrapolate to charts
+// Chart types: git-of-theseus-stack-plot, git-of-theseus-line-plot, git-of-theseus-survival-plot
+// Input data: cohorts.json, authors.json, survival.json
+// Examples
+git-of-theseus-stack-plot cohorts.json --outfile cohorts
+git-of-theseus-line-plot authors.json --normalize --outfile authors
+git-of-theseus-survival-plot survival.json --outfile survival
+
+git-of-theseus-line-plot dirs.json --outfile dirs
+git-of-theseus-line-plot domains.json --outfile domains
+git-of-theseus-line-plot exts.json --outfile exts
+
+git-of-theseus-stack-plot --help
+
+// More at
+https://github.com/erikbern/git-of-theseus
+
+// Copy pasta (in rootdir of project)
+pip install git-of-theseus
+
+git-of-theseus-analyze --ignore-whitespace --ignore Compiler/SableCC/** --ignore sablecc-3-beta.3.altgen.20041114/** --ignore sablecc/** --outdir ./git-of-theseus-analyze .
+cd git-of-theseus-analyze
+
+git-of-theseus-stack-plot authors.json --outfile authors-stack-1
+git-of-theseus-stack-plot authors.json --normalize --outfile authors-stack-2
+git-of-theseus-line-plot authors.json --outfile authors-line-1
+git-of-theseus-line-plot authors.json --normalize --outfile authors-line-2
+
+git-of-theseus-stack-plot cohorts.json --outfile cohorts-stack-1
+git-of-theseus-line-plot cohorts.json --outfile cohorts-line-1
+
+git-of-theseus-survival-plot survival.json --outfile survival-survival-1
+
+git-of-theseus-line-plot dirs.json --outfile dirs
+git-of-theseus-line-plot domains.json --outfile domains
+git-of-theseus-line-plot exts.json --outfile exts
+
+///////////////////////////////
+//Senseless
+git-of-theseus-line-plot cohorts.json --normalize --outfile cohorts-line-2
+git-of-theseus-stack-plot cohorts.json --normalize --outfile cohorts-stack-2
+
+// Doesn't work
+git-of-theseus-survival-plot authors.json --outfile authors-survival-1
+git-of-theseus-survival-plot authors.json --normalize --outfile authors-survival-1
+
+git-of-theseus-survival-plot cohorts.json --outfile cohorts-survival-1
+git-of-theseus-survival-plot cohorts.json --normalize --outfile cohorts-survival-1
+
+git-of-theseus-stack-plot survival.json --outfile survival-stack-1
+git-of-theseus-stack-plot survival.json --normalize --outfile survival-stack-2
+git-of-theseus-line-plot survival.json --outfile survival-line-1
+git-of-theseus-line-plot survival.json --normalize --outfile survival-line-2
+git-of-theseus-survival-plot survival.json --normalize --outfile survival-survival-1
