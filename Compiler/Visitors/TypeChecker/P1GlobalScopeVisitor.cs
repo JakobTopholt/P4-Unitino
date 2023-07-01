@@ -1,50 +1,30 @@
-﻿using Moduino.analysis;
+﻿using Compiler.Visitors.TypeChecker.Utils;
+using Moduino.analysis;
 using Moduino.node;
 
-namespace Compiler.Visitors;
+namespace Compiler.Visitors.TypeChecker;
 
 internal class P1GlobalScopeVisitor : DepthFirstAdapter
 {
     private SymbolTable symbolTable;
-    private P33LogicChecker _p33LogicChecker;
-    private TextWriter output;
-    public P1GlobalScopeVisitor(SymbolTable symbolTable, TextWriter output)
+    private P3LogicChecker _p3LogicCheckerGlobal;
+    private Logger _logger;
+    public P1GlobalScopeVisitor(SymbolTable symbolTable, Logger output)
     {
         this.symbolTable = symbolTable;
-        _p33LogicChecker = new P33LogicChecker(symbolTable, output);
-        this.output = output;
-    }
-    public Stack<string> locations = new ();
-    public string tempResult = "";
-    public List<string?> errorResults = new ();
-    public int indent = 0;
-    public bool reported = false;
-
-    protected string IndentedString(string s)
-    {
-        return new string(' ', indent * 3) + s;
-    }
-
-    protected void PrintError()
-    {
-        if (tempResult != "" && !reported)
-        {
-            string error = "";
-            error += tempResult;
-            foreach(string location in locations)
-            {
-                error += location;
-            }
-            errorResults.Add(error);
-            locations.Pop();
-            reported = true;
-        }
-        else
-        {
-            locations.Pop();
-        }
+        _p3LogicCheckerGlobal = new P3LogicChecker(symbolTable, output);
+        _logger = output;
     }
     // implement globalscope declarations
+    public override void DefaultIn(Node node)
+    {
+        _logger.EnterNode(node);
+    }
+
+    public override void DefaultOut(Node node)
+    {
+        _logger.ExitNode(node);
+    }
 
     public override void CaseAGrammar(AGrammar node)
     {
@@ -73,54 +53,35 @@ internal class P1GlobalScopeVisitor : DepthFirstAdapter
             if (symbolTable.GetSymbol(global) == Symbol.NotOk)
                 grammarIsOk = false;
         }
-        foreach (string error in errorResults)
-        {
-            Console.WriteLine(error);
-        }
+        
+        _logger.PrintAllErrors();
 
         symbolTable = symbolTable.ResetScope();
        // symbolTable.AddNode(node, grammarIsOk ? Symbol.Ok : Symbol.NotOk);
     }
     public override void InADeclstmtGlobal(ADeclstmtGlobal node)
     {
-        locations.Push(IndentedString($"In a global declaration: {node.GetStmt()}\n"));
-        indent++;
+        DefaultIn(node);
         PStmt globalStmt = node.GetStmt();
-
-        if (globalStmt is ADeclStmt decl)
+        switch (globalStmt)
         {
-            if (symbolTable.IsInCurrentScope(decl.GetId()))
-            {
-                symbolTable.AddNode(node, Symbol.NotOk);
-                tempResult += IndentedString($"The id: {decl.GetId()} has already been declared before");
-            }
-        } else if (globalStmt is ADeclassStmt declass)
-        {
-            if (symbolTable.IsInCurrentScope(declass.GetId()))
-            {
-                symbolTable.AddNode(node, Symbol.NotOk);
-                tempResult += IndentedString($"The id: {declass.GetId()} has already been declared before");
-            }
+            case ADeclStmt decl when !symbolTable.IsInCurrentScope(decl.GetId()):
+            case ADeclassStmt declass when !symbolTable.IsInCurrentScope(declass.GetId()):
+                return;
+            case ADeclStmt decl:
+                _logger.ThrowError($"The id: {decl.GetId()} has already been declared before");
+                break;
+            case ADeclassStmt declass:
+                _logger.ThrowError($"The id: {declass.GetId()} has already been declared before");
+                break;
         }
+        symbolTable.AddNode(node, Symbol.NotOk);
     }
     public override void OutADeclstmtGlobal(ADeclstmtGlobal node)
     {
-        PStmt globalStmt = node.GetStmt();
         if (symbolTable.GetSymbol(node) == null)
-        {
-            if (globalStmt is ADeclStmt decl)
-            {
-                symbolTable.AddNode(node, symbolTable.GetSymbol(decl) != Symbol.NotOk ? Symbol.Ok : Symbol.NotOk);
-
-            }
-            else if (globalStmt is ADeclassStmt declass)
-            {
-                symbolTable.AddNode(node, symbolTable.GetSymbol(declass) != Symbol.NotOk ? Symbol.Ok : Symbol.NotOk);
-            }
-        }
-        PrintError();
-        indent--;
-        locations.Clear();
+            symbolTable.AddNode(node, symbolTable.GetSymbol(node.GetStmt()) != Symbol.NotOk ? Symbol.Ok : Symbol.NotOk);
+        DefaultOut(node);
     }
 
     public override void CaseADeclassStmt(ADeclassStmt node)
@@ -128,29 +89,28 @@ internal class P1GlobalScopeVisitor : DepthFirstAdapter
         InADeclassStmt(node);
         if(node.GetType() != null)
         {
-            _p33LogicChecker.symbolTable = symbolTable;
-            node.GetType().Apply(_p33LogicChecker);
-            symbolTable = _p33LogicChecker.symbolTable;
+            _p3LogicCheckerGlobal.symbolTable = symbolTable;
+            node.GetType().Apply(_p3LogicCheckerGlobal);
+            symbolTable = _p3LogicCheckerGlobal.symbolTable;
         }
         if(node.GetId() != null)
         {
-            _p33LogicChecker.symbolTable = symbolTable;
-            node.GetId().Apply(_p33LogicChecker);
-            symbolTable = _p33LogicChecker.symbolTable;
+            _p3LogicCheckerGlobal.symbolTable = symbolTable;
+            node.GetId().Apply(_p3LogicCheckerGlobal);
+            symbolTable = _p3LogicCheckerGlobal.symbolTable;
         }
         if(node.GetExp() != null)
         {
-            _p33LogicChecker.symbolTable = symbolTable;
-            node.GetExp().Apply(_p33LogicChecker);
-            symbolTable = _p33LogicChecker.symbolTable;
+            _p3LogicCheckerGlobal.symbolTable = symbolTable;
+            node.GetExp().Apply(_p3LogicCheckerGlobal);
+            symbolTable = _p3LogicCheckerGlobal.symbolTable;
         }
         OutADeclassStmt(node);
     }
 
     public override void InADeclassStmt(ADeclassStmt node)
     {
-        locations.Push(IndentedString($"in DeclarationAssignment {node}\n"));
-        indent++;
+        DefaultIn(node);
     }
     public override void OutADeclassStmt(ADeclassStmt node)
     {
@@ -164,29 +124,35 @@ internal class P1GlobalScopeVisitor : DepthFirstAdapter
             PType unit = node.GetType();
             switch (unit)
                 {
-                    case AIntType a:
+                    case AIntType:
                         symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Int ? Symbol.Int : Symbol.NotOk);
-                        tempResult += exprType == Symbol.Int ? "" : IndentedString("expression is not an Int\n");
+                        if (exprType != Symbol.Int)
+                            _logger.ThrowError("expression is not an Int");
                         break;
-                    case ADecimalType b:
+                    case ADecimalType:
                         symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Decimal ? Symbol.Decimal : Symbol.NotOk);
-                        tempResult += exprType == Symbol.Decimal ? "" : IndentedString("expression is not an Decimal\n");
+                        if (exprType != Symbol.Decimal)
+                            _logger.ThrowError("expression is not an Decimal");
                         break;
-                    case ABoolType c:
+                    case ABoolType:
                         symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Bool ? Symbol.Bool : Symbol.NotOk);
-                        tempResult += exprType == Symbol.Bool ? "" : IndentedString("expression is not an Bool\n");
+                        if (exprType != Symbol.Bool)
+                            _logger.ThrowError("expression is not an Bool");
                         break;
-                    case ACharType d:
+                    case ACharType:
                         symbolTable.AddId(node.GetId().ToString(), node, exprType == Symbol.Char ? Symbol.Char : Symbol.NotOk);
-                        tempResult += exprType == Symbol.Char ? "" : IndentedString("expression is not an Char\n");
+                        if (exprType != Symbol.Char)
+                            _logger.ThrowError("expression is not an Char");
                         break;
-                    case AStringType e:
+                    case AStringType:
                         symbolTable.AddId(node.GetId().ToString(), node, exprType is Symbol.String or Symbol.Char ? Symbol.String : Symbol.NotOk);
-                        tempResult += exprType == Symbol.String ? "" : IndentedString("expression is not a string or char\n");
+                        if (exprType != Symbol.String)
+                            _logger.ThrowError("expression is not a string or char");
                         break;
                     case APinType:
                         symbolTable.AddId(node.GetId().ToString(), node, exprType is Symbol.Int or Symbol.Pin ? Symbol.Int : Symbol.NotOk);
-                        tempResult += exprType is Symbol.Int or Symbol.Pin ? "" : IndentedString("expression is not an an pin or integer\n");
+                        if (exprType is not (Symbol.Int or Symbol.Pin))
+                            _logger.ThrowError("expression is not an an pin or integer");
                         break;
                     case AUnitType customType:
                         if (symbolTable.GetUnit(customType, out var unitType) && 
@@ -202,37 +168,35 @@ internal class P1GlobalScopeVisitor : DepthFirstAdapter
                             {
                                 symbolTable.AddIdToNode(node.GetId().ToString(), node);
                                 symbolTable.AddNode(node, Symbol.NotOk);
-                                tempResult += IndentedString("expression is not correct unitType\n");
+                                _logger.ThrowError("expression is not correct unitType");
                             }
                         }
                         else
                         {
                             symbolTable.AddIdToNode(node.GetId().ToString(), node);
                             symbolTable.AddNode(node, Symbol.NotOk);
-                            tempResult += IndentedString("expression have no unitType associated\n");
+                            _logger.ThrowError("expression have no unitType associated\n");
                         }
                         break; 
                     default:
                         symbolTable.AddIdToNode(node.GetId().ToString(), node);
                         symbolTable.AddNode(node, Symbol.NotOk);
-                        tempResult += IndentedString("Wrong declaretype\n");
+                        _logger.ThrowError("Wrong declaretype\n");
                         break;
                 }
         }
         else
         {
             symbolTable.AddNode(node, Symbol.NotOk);
-            tempResult += IndentedString("id is allready declared in this scope\n");
+            _logger.ThrowError("id is already declared in this scope");
         }
-        PrintError();
-        indent--;
+        DefaultOut(node);
     }
     
     
     public override void InADeclStmt(ADeclStmt node)
     {
-        locations.Push( IndentedString($"in Declaration {node}\n"));
-        indent++;
+        DefaultIn(node);
     }
 
     public override void OutADeclStmt(ADeclStmt node)
@@ -267,48 +231,16 @@ internal class P1GlobalScopeVisitor : DepthFirstAdapter
                     break; 
                 default:
                     symbolTable.AddNode(node, Symbol.NotOk);
-                    tempResult += IndentedString("Type not recognized\n");
+                    _logger.ThrowError("Type not recognized");
                     break;
             }
         }
         else
         {
             symbolTable.AddNode(node, Symbol.NotOk);
-            tempResult += IndentedString("id is allready declared in this scope\n");
+            _logger.ThrowError("id is already declared in this scope");
 
         }
-        PrintError();
-        indent--;
+        DefaultOut(node);
     }
-    
-    
-    /*
-    public override void CaseAUnitdeclGlobal(AUnitdeclGlobal node)
-    {
-        symbolTable = symbolTable.EnterScope().ExitScope();
-        symbolTable = symbolTable.ResetScope();
-    }
-
-    public override void CaseAUntypedGlobal(AUntypedGlobal node)
-    {
-        symbolTable = symbolTable.EnterScope().ExitScope();
-        symbolTable = symbolTable.ResetScope();
-    }
-
-    public override void CaseATypedGlobal(ATypedGlobal node)
-    {
-        symbolTable = symbolTable.EnterScope().ExitScope();
-        symbolTable = symbolTable.ResetScope();
-    }
-
-    public override void CaseALoopGlobal(ALoopGlobal node)
-    {
-        symbolTable = symbolTable.EnterScope().ExitScope();
-        symbolTable = symbolTable.ResetScope();
-    }
-    public override void CaseAProgGlobal(AProgGlobal node)
-    {
-        symbolTable = symbolTable.EnterScope().ExitScope();
-        symbolTable = symbolTable.ResetScope();
-    } */
 }

@@ -1,8 +1,7 @@
 using System.Collections;
-using System.Threading.Tasks.Dataflow;
 using Moduino.node;
 
-namespace Compiler.Visitors;
+namespace Compiler.Visitors.TypeChecker.Utils;
 
 public class SymbolTable
 {

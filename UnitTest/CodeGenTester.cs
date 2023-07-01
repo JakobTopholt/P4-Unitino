@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Compiler;
 using Compiler.Visitors;
 using Compiler.Visitors.TypeChecker;
+using Compiler.Visitors.TypeChecker.Utils;
 using Moduino.node;
 using NUnit.Framework;
 using static UnitTest.TestUtils;
@@ -28,7 +29,7 @@ public class CodeGenTester
         TypeChecker.Run(symbolTable, ast);
         using MemoryStream stream = new();
         using StreamWriter writer = new(stream);
-        Compiler.Visitors.CodeGen.Run(writer, symbolTable, ast);
+        Compiler.Visitors.CodeGen.CodeGen.Run(writer, symbolTable, ast);
         
         writer.Flush(); // Required
         string code = Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int) stream.Length);

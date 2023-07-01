@@ -1,10 +1,9 @@
 using System.Text.RegularExpressions;
-using System;
-using System.IO;
+using Compiler.Visitors.TypeChecker.Utils;
 using Moduino.analysis;
 using Moduino.node;
 
-namespace Compiler.Visitors;
+namespace Compiler.Visitors.CodeGen;
 
 public class CodeGen : DepthFirstAdapter
 {

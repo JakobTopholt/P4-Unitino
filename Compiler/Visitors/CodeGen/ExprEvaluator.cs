@@ -2,7 +2,7 @@
 using Moduino.analysis;
 using Moduino.node;
 
-namespace Compiler.Visitors;
+namespace Compiler.Visitors.CodeGen;
 
 internal class ExprEvaluator : DepthFirstAdapter
 {

@@ -1,6 +1,9 @@
 ﻿using System.Text;
 using Compiler.Visitors;
+using Compiler.Visitors.CodeGen;
+using Compiler.Visitors.PrettyPrint;
 using Compiler.Visitors.TypeChecker;
+using Compiler.Visitors.TypeChecker.Utils;
 using Moduino.lexer;
 using Moduino.node;
 using Moduino.parser;

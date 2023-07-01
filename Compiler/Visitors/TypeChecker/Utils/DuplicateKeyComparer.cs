@@ -1,4 +1,4 @@
-﻿namespace Compiler.Visitors;
+﻿namespace Compiler.Visitors.TypeChecker.Utils;
 
 public class DuplicateKeyComparer<TKey> : IComparer<TKey> where TKey : IComparable
 {

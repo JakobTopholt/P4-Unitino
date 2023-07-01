@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Compiler.Visitors;
 using Compiler.Visitors.TypeChecker;
+using Compiler.Visitors.TypeChecker.Utils;
 using Moduino.node;
 using NUnit.Framework;
 using static UnitTest.TestUtils;
@@ -20,7 +21,7 @@ public class PrettyPrintTester
         
         StringBuilder sb = new();
         TextWriter output = new StringWriter(sb);
-        Compiler.Visitors.PrettyPrint.Run(symbolTable, ast, output);
+        Compiler.Visitors.PrettyPrint.PrettyPrint.Run(symbolTable, ast, output);
         
         Assert.That(sb.ToString().Trim(), Is.EqualTo(expectedOutput));
     }

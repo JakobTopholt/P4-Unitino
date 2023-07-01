@@ -1,26 +1,38 @@
 using System.Collections;
+using Compiler.Visitors.TypeChecker.Utils;
 using Moduino.analysis;
 using Moduino.node;
 
-namespace Compiler.Visitors;
+namespace Compiler.Visitors.TypeChecker;
 
 // This is the second pass of the typechecker
 
 internal class P2FunctionVisitor : DepthFirstAdapter
 {
     private SymbolTable symbolTable;
-    private P33LogicChecker _p33LogicChecker;
-    private TextWriter output;
-    public P2FunctionVisitor(SymbolTable symbolTable, TextWriter output)
+    private P3LogicChecker _p3LogicCheckerGlobal;
+    private Logger _logger;
+    public P2FunctionVisitor(SymbolTable symbolTable, Logger output)
     {
         this.symbolTable = symbolTable;
-        _p33LogicChecker = new P33LogicChecker(symbolTable, output);
-        this.output = output;
+        _p3LogicCheckerGlobal = new P3LogicChecker(symbolTable, output);
+        _logger = output;
     }
-    
+
+    public override void DefaultIn(Node node)
+    {
+        _logger.EnterNode(node);
+    }
+
+    public override void DefaultOut(Node node)
+    {
+        _logger.ExitNode(node);
+    }
+
     public override void OutAGrammar(AGrammar node)
     {
         symbolTable = symbolTable.ResetScope();
+        _logger.PrintAllErrors();
     }
 
     public override void CaseAArg(AArg node)
@@ -28,15 +40,15 @@ internal class P2FunctionVisitor : DepthFirstAdapter
         InAArg(node);
         if(node.GetType() != null)
         {
-            _p33LogicChecker.symbolTable = symbolTable;
-            node.GetType().Apply(_p33LogicChecker);
-            symbolTable = _p33LogicChecker.symbolTable;
+            _p3LogicCheckerGlobal.symbolTable = symbolTable;
+            node.GetType().Apply(_p3LogicCheckerGlobal);
+            symbolTable = _p3LogicCheckerGlobal.symbolTable;
         }
         if(node.GetId() != null)
         {
-            _p33LogicChecker.symbolTable = symbolTable;
-            node.GetId().Apply(_p33LogicChecker);
-            symbolTable = _p33LogicChecker.symbolTable;
+            _p3LogicCheckerGlobal.symbolTable = symbolTable;
+            node.GetId().Apply(_p3LogicCheckerGlobal);
+            symbolTable = _p3LogicCheckerGlobal.symbolTable;
         }
         OutAArg(node);
     }
@@ -123,6 +135,7 @@ internal class P2FunctionVisitor : DepthFirstAdapter
             symbolTable = symbolTable.EnterScope();
             //symbolTable.AddArgsToScope(node, node.GetArg());
         }
+        DefaultIn(node);
     }
 
     public override void OutAUntypedGlobal(AUntypedGlobal node)
@@ -132,9 +145,9 @@ internal class P2FunctionVisitor : DepthFirstAdapter
         bool untypedIsOk = true;
         foreach (PStmt stmt in stmts)
         {
-            _p33LogicChecker.symbolTable = symbolTable;
-            stmt.Apply(_p33LogicChecker);
-            symbolTable = _p33LogicChecker.symbolTable;
+            _p3LogicCheckerGlobal.symbolTable = symbolTable;
+            stmt.Apply(_p3LogicCheckerGlobal);
+            symbolTable = _p3LogicCheckerGlobal.symbolTable;
             if (symbolTable.GetSymbol(stmt) == Symbol.NotOk)
             {
                 untypedIsOk = false;
@@ -178,9 +191,8 @@ internal class P2FunctionVisitor : DepthFirstAdapter
                 symbolTable.AddNodeToUnit(node, unit);
             }
         }
-        
+        DefaultOut(node);
     }
-    
 
     public override void CaseATypedGlobal(ATypedGlobal node)
     {
@@ -195,9 +207,9 @@ internal class P2FunctionVisitor : DepthFirstAdapter
         }
         if(node.GetType() != null)
         {
-            _p33LogicChecker.symbolTable = symbolTable;
-            node.GetType().Apply(_p33LogicChecker);
-            symbolTable = _p33LogicChecker.symbolTable;
+            _p3LogicCheckerGlobal.symbolTable = symbolTable;
+            node.GetType().Apply(_p3LogicCheckerGlobal);
+            symbolTable = _p3LogicCheckerGlobal.symbolTable;
         }
         OutATypedGlobal(node);
     }
@@ -221,6 +233,7 @@ internal class P2FunctionVisitor : DepthFirstAdapter
             symbolTable = symbolTable.EnterScope();
             //symbolTable.AddArgsToScope(node, node.GetArg());
         }
+        DefaultIn(node);
     }
 
     public override void OutATypedGlobal(ATypedGlobal node)
@@ -229,9 +242,9 @@ internal class P2FunctionVisitor : DepthFirstAdapter
         bool typedIsOk = true;
         foreach (PStmt stmt in stmts)
         {
-            _p33LogicChecker.symbolTable = symbolTable;
-            stmt.Apply(_p33LogicChecker);
-            symbolTable = _p33LogicChecker.symbolTable;
+            _p3LogicCheckerGlobal.symbolTable = symbolTable;
+            stmt.Apply(_p3LogicCheckerGlobal);
+            symbolTable = _p3LogicCheckerGlobal.symbolTable;
         }
         if (!typedIsOk)
         {
@@ -279,73 +292,86 @@ internal class P2FunctionVisitor : DepthFirstAdapter
                     break;
             }
         }
-        
+        DefaultOut(node);
     }
 
     public override void InAIfStmt(AIfStmt node)
     {
+        DefaultIn(node);
         symbolTable = symbolTable.EnterScope();
     }
 
     public override void OutAIfStmt(AIfStmt node)
     {
+        DefaultOut(node);
         symbolTable = symbolTable.ExitScope();
     }
 
     public override void InAElseifStmt(AElseifStmt node)
     {
+        DefaultIn(node);
         symbolTable = symbolTable.EnterScope();
     }
 
     public override void OutAElseifStmt(AElseifStmt node)
     {
+        DefaultOut(node);
         symbolTable = symbolTable.ExitScope();
     }
 
     public override void InAElseStmt(AElseStmt node)
     {
+        DefaultIn(node);
         symbolTable = symbolTable.EnterScope();
     }
 
     public override void OutAElseStmt(AElseStmt node)
     {
+        DefaultOut(node);
         symbolTable = symbolTable.ExitScope();
     }
     
     public override void InAForStmt(AForStmt node)
     {
+        DefaultIn(node);
         symbolTable = symbolTable.EnterScope();
     }
 
     public override void OutAForStmt(AForStmt node)
     {
+        DefaultOut(node);
         symbolTable = symbolTable.ExitScope();
     }
     
 
     public override void InAWhileStmt(AWhileStmt node)
     {
+        DefaultIn(node);
         symbolTable = symbolTable.EnterScope();
     }
 
     public override void OutAWhileStmt(AWhileStmt node)
     {
+        DefaultOut(node);
         symbolTable = symbolTable.ExitScope();
     }
     
 
     public override void InADowhileStmt(ADowhileStmt node)
     {
+        DefaultIn(node);
         symbolTable = symbolTable.EnterScope();
     }
 
     public override void OutADowhileStmt(ADowhileStmt node)
     {
+        DefaultOut(node);
         symbolTable = symbolTable.ExitScope();
     }
 
     public override void CaseALoopGlobal(ALoopGlobal node)
     {
+        DefaultIn(node);
         symbolTable = symbolTable.EnterScope();
         IList stmts = node.GetStmt();
             
@@ -356,11 +382,12 @@ internal class P2FunctionVisitor : DepthFirstAdapter
                 symbolTable = symbolTable.EnterScope().ExitScope();
             }
         }
-        
+        DefaultOut(node);
         symbolTable = symbolTable.ExitScope();
     }
     public override void CaseAProgGlobal(AProgGlobal node)
     {
+        DefaultIn(node);
         symbolTable = symbolTable.EnterScope();
         IList stmts = node.GetStmt();
             
@@ -371,6 +398,7 @@ internal class P2FunctionVisitor : DepthFirstAdapter
                 symbolTable = symbolTable.EnterScope().ExitScope();
             }
         }
+        DefaultOut(node);
         symbolTable = symbolTable.ExitScope();
     } 
 }

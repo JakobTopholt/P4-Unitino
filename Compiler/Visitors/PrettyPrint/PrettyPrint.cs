@@ -1,20 +1,18 @@
-using System.Text.RegularExpressions;
+using Compiler.Visitors.TypeChecker.Utils;
 using Moduino.analysis;
 using Moduino.node;
-using Moduino.parser;
 
-namespace Compiler.Visitors;
+namespace Compiler.Visitors.PrettyPrint;
 
 public class PrettyPrint : DepthFirstAdapter
 {
     private SymbolTable symbolTable;
     private TextWriter output;
-    private Start ast;
+
     private PrettyPrint(SymbolTable symbolTable, Start ast, TextWriter output)
     {
         this.output = output;
         this.symbolTable = symbolTable;
-        this.ast = ast;
     }
     public static void Run(SymbolTable symbolTable, Start ast, TextWriter output)
     {

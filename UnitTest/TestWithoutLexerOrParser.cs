@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Compiler.Visitors;
 using Compiler.Visitors.TypeChecker;
+using Compiler.Visitors.TypeChecker.Utils;
 using Moduino.node;
 using NUnit.Framework;
 
@@ -157,7 +158,7 @@ String Fb(int b) {
         SymbolTable symbolTable = new();
         TypeChecker.Run(symbolTable, ast, Console.Out);
         
-        Compiler.Visitors.PrettyPrint.Run(symbolTable, ast, output);
+        Compiler.Visitors.PrettyPrint.PrettyPrint.Run(symbolTable, ast, output);
         
         // Assert
         Assert.That(sb.ToString().ReplaceLineEndings(), Is.EqualTo(_prettyPrint));
@@ -190,7 +191,7 @@ String Fb(int b) {
         // Act
         SymbolTable symbolTable = new();
         TypeChecker.Run(symbolTable, ast);
-        Compiler.Visitors.CodeGen.Run(writer, symbolTable, ast);
+        Compiler.Visitors.CodeGen.CodeGen.Run(writer, symbolTable, ast);
         
         writer.Flush(); // Required
         

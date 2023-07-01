@@ -1,65 +1,46 @@
+using Compiler.Visitors.TypeChecker.Utils;
 using Moduino.analysis;
 using Moduino.node;
 
-namespace Compiler.Visitors;
+namespace Compiler.Visitors.TypeChecker;
 
 // First pass of the typechecker
 
 internal class P0UnitVisitor : DepthFirstAdapter
 {
     private SymbolTable symbolTable;
-    private P33LogicChecker _p33LogicChecker;
-    private TextWriter output;
-    public P0UnitVisitor(SymbolTable symbolTable, TextWriter output)
+    private P3LogicChecker _p3LogicCheckerGlobal;
+    private Logger _logger;
+    public P0UnitVisitor(SymbolTable symbolTable, Logger output)
     {
         this.symbolTable = symbolTable;
-        _p33LogicChecker = new P33LogicChecker(symbolTable, output);
-        this.output = output;
+        _p3LogicCheckerGlobal = new P3LogicChecker(symbolTable, output);
+        _logger = output;
     }
-    public static bool StateUnit;
-    public string tempLocation = "";
-    public string tempResult = "";
-    public List<string?> errorResults = new List<string>();
-    public int indent = 0;
 
+    public override void DefaultIn(Node node)
+    {
+        _logger.EnterNode(node);
+    }
+
+    public override void DefaultOut(Node node)
+    {
+        _logger.ExitNode(node);
+    }
     public override void OutAGrammar(AGrammar node)
     {
-        foreach (string error in errorResults)
-        {
-            Console.WriteLine(error);
-        }
+        _logger.PrintAllErrors();
         symbolTable = symbolTable.ResetScope();
     }
-    
-    protected string IndentedString(string s)
-    {
-        return new string(' ', indent * 3) + s;
-    }
 
-    protected void PrintError()
-    {
-        if (tempResult != "")
-        {
-            errorResults.Add(tempLocation  + tempResult);
-            tempLocation = "";
-        }
-        else
-        {
-            tempLocation = "";
-        }
-    }
-    
     public override void InAUnitdeclGlobal(AUnitdeclGlobal node)
     {
         if (symbolTable.IsInExtendedScope(node.GetId().ToString()))
         {
             symbolTable.AddNode(node, Symbol.NotOk);
-            tempResult += IndentedString($"UnitId: {node.GetId()} has allready been declared before");
-            PrintError();
+            _logger.ThrowError($"UnitId: {node.GetId()} has already been declared before");
         }
-        tempLocation += IndentedString($"In unitDeclaration {node.GetId()}:\n");
-        indent++;
-        StateUnit = true;
+        DefaultIn(node);
     }
     public override void OutAUnitdeclGlobal(AUnitdeclGlobal node)
     {
@@ -76,25 +57,21 @@ internal class P0UnitVisitor : DepthFirstAdapter
         symbolTable.AddNode(node, subunitsIsOk ? Symbol.Ok : Symbol.NotOk);
         symbolTable.AddIdToUnitdecl(node.GetId().ToString(), node);
 
-        StateUnit = false;
-        PrintError();
-        indent--;
+        DefaultOut(node);
     }
 
     public override void CaseASubunit(ASubunit node)
     {
-        tempLocation += IndentedString($"In subunitDeclaration {node.GetId()}:");
-        indent++;
-        StateUnit = false;
+        DefaultIn(node);
         if (!symbolTable.IsInExtendedScope(node.GetId().ToString()))
         {
             PExp expression = node.GetExp();
-            expression.Apply(_p33LogicChecker);
+            expression.Apply(_p3LogicCheckerGlobal);
             
             if (symbolTable.GetSymbol(expression) != Symbol.Decimal)
             {
                 symbolTable.AddNode(node, Symbol.NotOk);
-                tempResult += IndentedString($"expression did not evaluate to a float or num value");
+                _logger.ThrowError($"expression did not evaluate to a float or num value");
                 return;
             }
             symbolTable.AddNode(node, Symbol.Decimal);
@@ -105,9 +82,8 @@ internal class P0UnitVisitor : DepthFirstAdapter
         {
             // Subunit's Id already declared
             symbolTable.AddNode(node, Symbol.NotOk);
-            tempResult += IndentedString($"{node.GetId()} has allready been declared");
+            _logger.ThrowError($"{node.GetId()} has allready been declared");
         }
-        PrintError();
-        indent--;
+        DefaultOut(node);
     }
 }

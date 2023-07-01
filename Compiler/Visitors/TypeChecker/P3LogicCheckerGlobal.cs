@@ -1,20 +1,21 @@
 using System.Collections;
+using Compiler.Visitors.TypeChecker.Utils;
 using Moduino.analysis;
 using Moduino.node;
 
-namespace Compiler.Visitors;
+namespace Compiler.Visitors.TypeChecker;
 
 // Dette er tredje og sidste pass af typecheckeren
 // Den bruger symbolTablen vi har populated til at tjekke
 
-internal partial class P33LogicChecker : DepthFirstAdapter
+internal partial class P3LogicChecker : DepthFirstAdapter
 {
     public SymbolTable symbolTable;
-    private TextWriter output;
-    public P33LogicChecker(SymbolTable symbolTable, TextWriter output)
+    private Logger _logger;
+    public P3LogicChecker(SymbolTable symbolTable, Logger output)
     {
         this.symbolTable = symbolTable;
-        this.output = output;
+        _logger = output;
     }
     SortedList<string, AUnitdeclGlobal> unitUseNums = new(new DuplicateKeyComparer<string>());
     SortedList<string, AUnitdeclGlobal> unitUseDens = new(new DuplicateKeyComparer<string>());
@@ -46,10 +47,7 @@ internal partial class P33LogicChecker : DepthFirstAdapter
             if (symbolTable.GetSymbol(global) == Symbol.NotOk)
                 grammarIsOk = false;
         }
-        foreach (string error in errorResults)
-        {
-            output.WriteLine(error);
-        }
+        _logger.PrintAllErrors();
 
         symbolTable = symbolTable.ResetScope();
         symbolTable.AddNode(node, grammarIsOk ? Symbol.Ok : Symbol.NotOk);
@@ -64,8 +62,7 @@ internal partial class P33LogicChecker : DepthFirstAdapter
 
     public override void InANumUnituse(ANumUnituse node)
     {
-        locations.Push(IndentedString($"in A NumUnit: {node.GetId()}\n"));
-        indent++;
+        DefaultIn(node);
     }
 
     public override void OutANumUnituse(ANumUnituse node)
@@ -74,16 +71,15 @@ internal partial class P33LogicChecker : DepthFirstAdapter
         AUnitdeclGlobal? unitDecl = symbolTable.GetUnitdeclFromId(id);
         
         symbolTable.AddNode(node, unitDecl != null ? Symbol.Ok : Symbol.NotOk);
-        tempResult += unitDecl != null ? "" : IndentedString($"{id} is not a valid unitType\n");
+        if (unitDecl == null)
+            _logger.ThrowError($"{id} is not a valid unitType");
         unitUseNums.Add(id, unitDecl);
-        PrintError();
-        indent--;
+        DefaultOut(node);
     }
 
     public override void InADenUnituse(ADenUnituse node)
     {
-        locations.Push(IndentedString($"in A DenUnit: {node.GetId()}\n"));
-        indent++;
+        DefaultIn(node);
     }
 
     public override void OutADenUnituse(ADenUnituse node)
@@ -92,16 +88,15 @@ internal partial class P33LogicChecker : DepthFirstAdapter
         AUnitdeclGlobal? unitDecl = symbolTable.GetUnitdeclFromId(id);
         
         symbolTable.AddNode(node, unitDecl != null ? Symbol.Ok : Symbol.NotOk);
-        tempResult += unitDecl != null ? "" : IndentedString($"{id} is not a valid unitType\n");
+        if (unitDecl == null)
+            _logger.ThrowError($"{id} is not a valid unitType");
         unitUseDens.Add(id, unitDecl);
-        PrintError();
-        indent--;
+        DefaultOut(node);
     }
 
     public override void InAUnitType(AUnitType node)
     {
-        locations.Push( IndentedString($"in a Unittype: {node.GetUnituse()}\n"));
-        indent++;
+        DefaultIn(node);
         unitUseNums = new SortedList<string, AUnitdeclGlobal>(new DuplicateKeyComparer<string>());
         unitUseDens = new SortedList<string, AUnitdeclGlobal>(new DuplicateKeyComparer<string>());
         
@@ -117,8 +112,7 @@ internal partial class P33LogicChecker : DepthFirstAdapter
         unitUseNums = new SortedList<string, AUnitdeclGlobal>(new DuplicateKeyComparer<string>());
         unitUseDens = new SortedList<string, AUnitdeclGlobal>(new DuplicateKeyComparer<string>());
         // symbolTable = symbolTable.EnterScope();
-        PrintError();
-        indent--;
+        DefaultOut(node);
     }
     public override void OutAIntType(AIntType node)
     {
@@ -152,8 +146,7 @@ internal partial class P33LogicChecker : DepthFirstAdapter
 
     public override void InAArg(AArg node)
     {
-        locations.Push(IndentedString($"in argument: {node.GetType() + " " + node.GetId()}\n"));
-        indent++;
+        DefaultIn(node);
     }
 
     public override void OutAArg(AArg node)
@@ -196,11 +189,10 @@ internal partial class P33LogicChecker : DepthFirstAdapter
                 default:
                     symbolTable.AddNode(node, Symbol.NotOk);
                     symbolTable.AddIdToNode(id, node);
-                    tempResult += IndentedString("Is not a valid type\n");
+                    _logger.ThrowError("Is not a valid type");
                     break;
             }
-            PrintError();
-        indent--;
+        DefaultOut(node);
     }
 
     public override void CaseAUntypedGlobal(AUntypedGlobal node)
@@ -248,8 +240,7 @@ internal partial class P33LogicChecker : DepthFirstAdapter
 
     public override void InAUntypedGlobal(AUntypedGlobal node)
     {
-        locations.Push($"In function {node.GetId()}\n");
-        indent++;
+        DefaultIn(node);
         symbolTable = symbolTable.EnterScope();
         //symbolTable.AddArgsToScope(node, node.GetArg());
     }
@@ -266,9 +257,7 @@ internal partial class P33LogicChecker : DepthFirstAdapter
         {
             symbolTable = symbolTable.ExitScope();
         }
-        locations.Clear();
-        reported = false;
-        indent--;
+        DefaultOut(node);
     }
 
     public override void CaseATypedGlobal(ATypedGlobal node)
@@ -311,8 +300,7 @@ internal partial class P33LogicChecker : DepthFirstAdapter
 
     public override void InATypedGlobal(ATypedGlobal node)
     {
-        locations.Push($"In function {node.GetId()}\n");
-        indent++;
+        DefaultIn(node);
         symbolTable = symbolTable.EnterScope();
         //symbolTable.AddArgsToScope(node, node.GetArg());
     }
@@ -359,14 +347,11 @@ internal partial class P33LogicChecker : DepthFirstAdapter
                     symbolTable.AddNode(node, Symbol.Ok);
                     break;
         }
-        locations.Clear();
-        reported = false;
-        indent--;
+        DefaultOut(node);
     }
     public override void InALoopGlobal(ALoopGlobal node)
     {
-        locations.Push("In Loop \n");
-        indent++;
+        DefaultIn(node);
         symbolTable.Loop++;
         if (symbolTable.Loop != 1)
         {
@@ -389,15 +374,12 @@ internal partial class P33LogicChecker : DepthFirstAdapter
         }
         symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, loopIsOk ? Symbol.Ok : Symbol.NotOk);
-        locations.Clear();
-        reported = false;
-        indent--;
+        DefaultOut(node);
     }
 
     public override void InAProgGlobal(AProgGlobal node)
     {
-        locations.Push("In Prog \n");
-        indent++;
+        DefaultIn(node);
         symbolTable.Prog++;
         if (symbolTable.Prog != 1)
         {
@@ -419,9 +401,7 @@ internal partial class P33LogicChecker : DepthFirstAdapter
         }
         symbolTable = symbolTable.ExitScope();
         symbolTable.AddNode(node, progIsOk ? Symbol.Ok : Symbol.NotOk);
-        locations.Clear();
-        reported = false;
-        indent--;
+        DefaultOut(node);
     }
 
 }

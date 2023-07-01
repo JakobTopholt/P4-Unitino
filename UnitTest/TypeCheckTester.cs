@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Compiler.Visitors;
 using Compiler.Visitors.TypeChecker;
+using Compiler.Visitors.TypeChecker.Utils;
 using Moduino.node;
 using NUnit.Framework;
 using static UnitTest.TestUtils;
